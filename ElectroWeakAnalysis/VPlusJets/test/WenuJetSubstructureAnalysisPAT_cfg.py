@@ -126,13 +126,13 @@ process.primaryVertex.src = cms.InputTag("goodOfflinePrimaryVertices");
 process.primaryVertex.cut = cms.string(" ");
 process.WToMunu.decay = cms.string("selectedPatMuonsPFlow patMETsPFlow");
 #process.WToEnu.decay = cms.string("selectedPatElectronsPFlow patMETsPFlow");
-process.WToEnu = cms.EDProducer("CandViewShallowCloneCombiner",
-    decay = cms.string("selectedPatElectronsPFlow patMETs"),
+    #process.WToEnu = cms.EDProducer("CandViewShallowCloneCombiner",
+    #decay = cms.string("selectedPatElectronsPFlow patMETs"),
 ## Note: the 'mt()' method doesn't compute the transverse mass correctly, so we have to do it by hand.
  #  cut = cms.string('daughter(0).pt >20 && daughter(1).pt >20  && sqrt(2*daughter(0).pt*daughter(1).pt*(1-cos(daughter(0).phi-daughter(1).phi)))>40'),
- cut = cms.string('1'),
-      checkCharge = cms.bool(False),
-)
+    # cut = cms.string('1'),
+#  checkCharge = cms.bool(False),
+#)
 
 
 process.bestWToEnu =cms.EDFilter("LargestPtCandViewSelector",
@@ -148,6 +148,8 @@ process.muonFilter.src= cms.InputTag("selectedPatMuonsLoosePFlow");
 process.myPartons.src= cms.InputTag("prunedGenParticles");
 process.genParticlesForJets.src= cms.InputTag("prunedGenParticles");
 process.ak5flavourByRef.jets= cms.InputTag("goodPatJetsPFlow");
+
+##process.tightElectrons("selectedPatElectronsPFlow");
 ##-------- Save V+jets trees --------
 process.VplusJetSubstructure = cms.EDAnalyzer("VplusJetSubstructureAnalysis",   
                                               HistOutFile = cms.string( OutputFileName ),
@@ -183,6 +185,7 @@ process.myseq = cms.Sequence(
 #    getattr(process,"patPF2PATSequence") *
 #    process.HLTEle *
 #    process.WPath *
+#    tightElectrons *
     process.WToEnu *
     process.bestWToEnu*
 #    VetoSequence*                  
@@ -194,7 +197,7 @@ process.myseq = cms.Sequence(
 #    process.CorPFJetPath
     )
 
-process.myseq.remove ( process.tightElectrons)
+##process.myseq.remove ( process.tightElectrons)
 process.myseq.remove ( process.looseElectrons)
 process.myseq.remove ( process.tightMuons)
 process.myseq.remove ( process.looseMuons)

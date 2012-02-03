@@ -1,31 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
-#WP80 electrons, only track iso, remove H/E cut
-tightElectrons = cms.EDFilter("GsfElectronRefSelector",
-    src = cms.InputTag( "gsfElectrons" ),
-    cut = cms.string(
-    "(ecalDrivenSeed==1) && (abs(superCluster.eta)<2.5)"
-    " && !(1.4442<abs(superCluster.eta)<1.566)"
-    " && (et>20.0)"
-    " && (gsfTrack.trackerExpectedHitsInner.numberOfHits==0 && !(-0.02<convDist<0.02 && -0.02<convDcot<0.02))"
-    " && (dr03TkSumPt/p4.Pt <0.1)"    
-    " && ((isEB"
-    " && (sigmaIetaIeta<0.01)"
-    " && ( -0.06<deltaPhiSuperClusterTrackAtVtx<0.06 )"
-    " && ( -0.004<deltaEtaSuperClusterTrackAtVtx<0.004 )"
-    ")"
-    " || (isEE"
-    " && (sigmaIetaIeta<0.03)"
-    " && ( -0.03<deltaPhiSuperClusterTrackAtVtx<0.03 )"
-    " && ( -0.007<deltaEtaSuperClusterTrackAtVtx<0.007 )"
-    "))"
-    )
-)
-
-
 
 WToEnu = cms.EDProducer("CandViewShallowCloneCombiner",
-    decay = cms.string("tightElectrons pfMet"),
+    decay = cms.string("selectedPatElectronsPFlow patMETs"),
 ## Note: the 'mt()' method doesn't compute the transverse mass correctly, so we have to do it by hand.
     cut = cms.string('daughter(0).pt >20 && daughter(1).pt >20  && sqrt(2*daughter(0).pt*daughter(1).pt*(1-cos(daughter(0).phi-daughter(1).phi)))>40'),
     checkCharge = cms.bool(False),
@@ -85,15 +62,15 @@ looseMuonFilter = cms.EDFilter("PATCandViewCountFilter",
 )
 
 
-WSequence = cms.Sequence(tightElectrons *
-                         WToEnu *
-                         bestWToEnu
-                         )
+    #WSequence = cms.Sequence(tightElectrons *
+    #                     WToEnu *
+    #                     bestWToEnu
+#                     )
 VetoSequence = cms.Sequence( looseElectrons *
                              looseElectronFilter *
                              looseMuons *
                              looseMuonFilter
                              )
 
-WPath = cms.Sequence(WSequence*VetoSequence)
+#WPath = cms.Sequence(WSequence*VetoSequence)
 
