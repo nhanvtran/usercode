@@ -95,7 +95,8 @@ ewk::VplusJetSubstructureAnalysis::VplusJetSubstructureAnalysis(const edm::Param
     //PATJetTreeFiller* tmp;
     for (int i = 0; i < nJetCollections_; i++){
         std::cout << "collection " << i << ": " << JetCollections_[i] << std::endl;
-        PATJetTreeFiller* tmp = new PATJetTreeFiller(JetCollections_[i].c_str(), myTree, JetCollections_[i].c_str(), i, iConfig);
+        //PATJetTreeFiller* tmp = new PATJetTreeFiller(JetCollections_[i].c_str(), myTree, JetCollections_[i].c_str(), i, iConfig);
+        PATJetTreeFiller* tmp = new PATJetTreeFiller(JetCollections_[i].c_str(), myTree, "PF", i, iConfig);
         jetcol.push_back( tmp );
     
     }

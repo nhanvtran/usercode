@@ -49,8 +49,8 @@
 //#include "ElectroWeakAnalysis/VPlusJets/interface/ColorCorrel.h"
 #include "ElectroWeakAnalysis/VPlusJets/interface/QGLikelihoodCalculator.h"
 
-ewk::PATJetTreeFiller::PATJetTreeFiller(const char *name, TTree* tree, 
-                                        const std::string jetType, int index, 
+ewk::PATJetTreeFiller::PATJetTreeFiller(const std::string jetType, TTree* tree, 
+                                        const std::string jetClass, int index, 
                                         const edm::ParameterSet iConfig)
 {
     
@@ -88,6 +88,7 @@ ewk::PATJetTreeFiller::PATJetTreeFiller(const char *name, TTree* tree,
     
     tree_     = tree;
     jetType_ = jetType;
+    jetClass_ = jetClass;
     
     Vtype_    = iConfig.getParameter<std::string>("VBosonType"); 
     LeptonType_ = iConfig.getParameter<std::string>("LeptonType");
@@ -157,8 +158,8 @@ void ewk::PATJetTreeFiller::SetBranches()
     SetBranch( Response2, "Jet" + jetType_ + "_Response2");
     
     
-    if( jetType_ == "Calo" || jetType_ == "Cor" || 
-       jetType_ == "JPT" || jetType_ == "JPTCor") {
+    if( jetClass_ == "Calo" || jetClass_ == "Cor" || 
+       jetClass_ == "JPT" || jetClass_ == "JPTCor") {
         /** Returns the jet hadronic energy fraction*/
         SetBranch( EnergyFractionHadronic, "Jet" + jetType_ + "_EnergyFractionHadronic");
         /** Returns the jet electromagnetic energy fraction*/
@@ -171,7 +172,7 @@ void ewk::PATJetTreeFiller::SetBranches()
     
     /////////////////////////////////////////////////////////////////////////
     
-    if( jetType_ == "Gen") {
+    if( jetClass_ == "Gen") {
         /** Returns energy of electromagnetic particles*/
         SetBranch( GenEmEnergy, "Jet" + jetType_ + "_EmEnergy");
         /** Returns energy of hadronic particles*/
@@ -184,7 +185,7 @@ void ewk::PATJetTreeFiller::SetBranches()
     
     /////////////////////////////////////////////////////////////////////////
     
-    if( jetType_ == "PF" || jetType_ == "PFCor" || jetType_ == "PFCorVBFTag") {
+    if( jetClass_ == "PF" || jetClass_ == "PFCor" || jetClass_ == "PFCorVBFTag") {
         /// chargedHadronEnergy 
         SetBranch( PFChargedHadronEnergy, "Jet" + jetType_ + "_ChargedHadronEnergy");
         ///  chargedHadronEnergyFraction
@@ -664,378 +665,6 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
     std::cout << "(b) NumJets == " << NumJets << std::endl;
     FillBranches();
     
-    /*
-     if(jets->size() < 1) return;
-     
-     
-     
-     
-     edm::Handle<reco::SecondaryVertexTagInfoCollection> svTagInfos;
-     if(runoverAOD){
-     iEvent.getByLabel("secondaryVertexTagInfos", svTagInfos);
-     }
-     // ---- Quark Gluon Likelihood
-     QGLikelihoodCalculator *qglikeli = new QGLikelihoodCalculator();  
-     
-     size_t iJet = 0;
-     double dist = 100000.0;
-     NumJets = 0;
-     numBTags = 0;
-     
-     
-     /////// Pileup density "rho" in the event from fastJet pileup calculation /////
-     float fastjet_rho = -999999.9;
-     edm::Handle<double> rho;
-     const edm::InputTag eventrho("kt6PFJets", "rho");
-     iEvent.getByLabel(eventrho,rho);
-     if( *rho == *rho) fastjet_rho = *rho;
-     
-     // get PFCandidates
-     edm::Handle<reco::PFCandidateCollection>  PFCandidates;
-     if(runoverAOD){
-     
-     iEvent.getByLabel("particleFlow", PFCandidates);
-     
-     }
-     
-     / ****************    MC Jet Flavor    *************** /
-     edm::Handle<reco::JetFlavourMatchingCollection> theTagByValue; 
-     if(doJetFlavorIdentification) 
-     if(runoverAOD){
-     iEvent.getByLabel (sourceByValue, theTagByValue ); }
-     
-     const reco::Jet *ij1=0;
-     const reco::Jet *ij2=0;
-     
-     // Loop over reco jets 
-     edm::View<reco::Jet>::const_iterator jet, endpjets = jets->end(); 
-     for (jet = jets->begin();  jet != endpjets;  ++jet, ++iJet) {
-     
-     
-     if(doJetFlavorIdentification) {
-     int flavor = -1;
-     if(runoverAOD){
-     for ( reco::JetFlavourMatchingCollection::const_iterator jfm  = 
-     theTagByValue->begin();
-     jfm != theTagByValue->end(); jfm ++ ) {
-     edm::RefToBase<reco::Jet> aJet  = (*jfm).first;   
-     const reco::JetFlavour aFlav = (*jfm).second;
-     dist = radius(aJet->eta(), aJet->phi(), 
-     (*jet).eta(), (*jet).phi());
-     if( dist < 0.0001 ) flavor = abs(aFlav.getFlavour()); 
-     }
-     Flavor[iJet] = flavor;
-     }
-     else
-     {
-     edm::Ptr<reco::Jet> ptrJet = jets->ptrAt( jet - jets->begin() );
-     ///*			 std::cout << "PtrJet nonnull? " << ptrJet.isNonnull() << std::endl;
-     //			 std::cout << "PtrJet available? " << ptrJet.isAvailable() << std::endl;
-     //			 std::cout << "Pt from Ptr = " << ptrJet->pt() << std::endl;
-     
-     if ( ptrJet.isNonnull() && ptrJet.isAvailable() ) {
-     const pat::Jet* pjet = dynamic_cast<const pat::Jet *>(ptrJet.get()) ;
-     if(pjet !=0)
-     {
-     bDiscriminator[iJet] = (*pjet).bDiscriminator("simpleSecondaryVertexHighEffBJetTags");
-     if(bDiscriminator[iJet]>1.74) numBTags ++;
-     std::cout << " ++++++++++++++++++++  get parton flavor" <<std::endl;
-     Flavor[iJet] = pjet->partonFlavour();
-     
-     }
-     }
-     
-     
-     }
-     }
-     
-     
-     
-     }
-     }
-     std::cout << "jet type "  << std::endl;
-     // CaloJet specific quantities
-     const std::type_info & type = typeid(*jet);
-     if ( type == typeid(reco::CaloJet) || type == typeid(pat::Jet)) std::cout << " typeid " << std::endl;
-     
-     if ( type == typeid(reco::CaloJet) ) {
-     const reco::CaloJet calojet = static_cast<const reco::CaloJet &>(*jet);
-     
-     MaxEInEmTowers[iJet] = calojet.maxEInEmTowers();
-     MaxEInHadTowers[iJet] = calojet.maxEInHadTowers();
-     EnergyFractionHadronic[iJet] 
-     = calojet.energyFractionHadronic();
-     EmEnergyFraction[iJet] 
-     = calojet.emEnergyFraction();
-     HadEnergyInHB[iJet] = calojet.hadEnergyInHB();
-     HadEnergyInHO[iJet] = calojet.hadEnergyInHO();
-     HadEnergyInHE[iJet] = calojet.hadEnergyInHE();
-     HadEnergyInHF[iJet] = calojet.hadEnergyInHF();
-     EmEnergyInEB[iJet] = calojet.emEnergyInEB();
-     EmEnergyInEE[iJet] = calojet.emEnergyInEE();
-     EmEnergyInHF[iJet] = calojet.emEnergyInHF();
-     TowersArea[iJet] = calojet.towersArea();
-     N90[iJet] = calojet.n90();
-     N60[iJet] = calojet.n60(); 
-     }
-     if ( type == typeid(reco::GenJet) ) {
-     // GenJet specific quantities
-     reco::GenJet genjet = static_cast<const reco::GenJet &>(*jet);
-     GenEmEnergy[iJet] = genjet.emEnergy();
-     GenHadEnergy[iJet] = genjet.hadEnergy();
-     GenInvisibleEnergy[iJet] = genjet.invisibleEnergy();
-     GenAuxiliaryEnergy[iJet] = genjet.auxiliaryEnergy();	  
-     }
-     if ( type == typeid(reco::PFJet) ) {
-     std::cout << "type pfjet "  << std::endl;
-     // PFJet specific quantities
-     reco::PFJet pfjet = static_cast<const reco::PFJet &>(*jet);
-     PFChargedHadronEnergy[iJet] = jet->chargedHadronEnergy();
-     PFChargedHadronEnergyFraction[iJet] = 
-     jet->chargedHadronEnergyFraction ();
-     PFNeutralHadronEnergy[iJet] = jet->neutralHadronEnergy();
-     PFNeutralHadronEnergyFraction[iJet] = 
-     jet->neutralHadronEnergyFraction ();
-     PFChargedEmEnergy[iJet] = jet->chargedEmEnergy ();
-     PFChargedEmEnergyFraction[iJet] = 
-     jet->chargedEmEnergyFraction ();
-     PFChargedMuEnergy[iJet] = jet->chargedMuEnergy ();
-     PFChargedMuEnergyFraction[iJet] = 
-     jet->chargedMuEnergyFraction ();
-     PFNeutralEmEnergy[iJet] = jet->neutralEmEnergy ();
-     PFNeutralEmEnergyFraction[iJet] = 
-     jet->neutralEmEnergyFraction ();
-     PFChargedMultiplicity[iJet] = jet->chargedMultiplicity();
-     PFNeutralMultiplicity[iJet] = jet->neutralMultiplicity();
-     PFMuonMultiplicity[iJet] = jet->muonMultiplicity();
-     PFPhotonEnergy[iJet] = jet->photonEnergy();
-     PFPhotonEnergyFraction[iJet] = jet->photonEnergyFraction();
-     PFElectronEnergy[iJet] = jet->electronEnergy();
-     PFElectronEnergyFraction[iJet] = jet->electronEnergyFraction();
-     PFMuonEnergy[iJet] = jet->muonEnergy();
-     PFMuonEnergyFraction[iJet] = jet->muonEnergyFraction();
-     PFHFHadronEnergy[iJet] = jet->HFHadronEnergy();
-     PFHFHadronEnergyFraction[iJet] = jet->HFHadronEnergyFraction();
-     PFHFEMEnergy[iJet] = jet->HFEMEnergy();
-     PFHFEMEnergyFraction[iJet] = jet->HFEMEnergyFraction();	 
-     PFChargedHadronMultiplicity[iJet] = jet->chargedHadronMultiplicity();
-     PFNeutralHadronMultiplicity[iJet] = jet->neutralHadronMultiplicity();
-     PFPhotonMultiplicity[iJet] = jet->photonMultiplicity();
-     PFElectronMultiplicity[iJet] = jet->electronMultiplicity();
-     PFHFHadronMultiplicity[iJet] = jet->HFHadronMultiplicity();
-     PFHFEMMultiplicity[iJet] = jet->HFEMMultiplicity();
-     
-     // ------- Compute pt_D and Quark Gluon Likelihood
-     
-     
-     
-     
-     float sumPt_cands=0.;
-     float sumPt2_cands=0.;
-     float rms_cands=0.;
-     
-     
-     std::cout << "pf cand "  << std::endl;
-     
-     if(runoverAOD){
-     std::vector<reco::PFCandidatePtr> pfCandidates = jet->getPFConstituents();
-     std::cout << "pf cand "  << std::endl;
-     
-     for (std::vector<reco::PFCandidatePtr>::const_iterator jt = pfCandidates.begin();
-     jt != pfCandidates.end(); ++jt) {
-     std::cout << "pf cand 2"  << std::endl;
-     
-     // reco::PFCandidate::ParticleType id = (*jt)->particleId();
-     // Convert particle momentum to normal TLorentzVector, wrong type :(
-     math::XYZTLorentzVectorD const& p4t = (*jt)->p4();
-     TLorentzVector p4(p4t.px(), p4t.py(), p4t.pz(), p4t.energy());
-     TLorentzVector jetp4;
-     jetp4.SetPtEtaPhiE(jet->pt(), jet->eta(), jet->phi(), jet->energy());
-     if(p4.Pt()!=0){
-     sumPt_cands += p4.Pt();
-     sumPt2_cands += (p4.Pt()*p4.Pt());
-     float deltaR = jetp4.DeltaR(p4);
-     rms_cands += (p4.Pt()*p4.Pt()*deltaR*deltaR);
-     }
-     }
-     
-     PFsumPtCands[iJet]  = sumPt_cands;
-     PFsumPt2Cands[iJet] = sumPt2_cands;
-     if(sumPt_cands != 0)  PFptD[iJet] = sqrt( sumPt2_cands )/sumPt_cands;
-     if(rms_cands  != 0)   PFrmsCands[iJet] = rms_cands/sumPt2_cands;
-     
-     PFqgLikelihood[iJet]= qglikeli->computeQGLikelihoodPU( Pt[iJet], fastjet_rho, 
-     PFChargedMultiplicity[iJet], 
-     PFNeutralMultiplicity[iJet], 
-     PFptD[iJet]);	 
-     if ( ij1==0 ) ij1=&(*jet); 
-     if ( ij1>0 && ij2==0 ) ij2=&(*jet);
-     }
-     }// close PF jets loop
-     }// close jets iteration loop
-     
-     NumJets = (int) iJet;
-     
-     
-     
-     
-     
-     // get the two daughters of vector boson
-     const reco::Candidate* m0 = Vboson->daughter(0);
-     const reco::Candidate* m1 = Vboson->daughter(1);
-     
-     TLorentzVector p4lepton1;
-     TLorentzVector p4lepton2;
-     TLorentzVector p4MET;
-     TLorentzVector p4lepton;
-     METzCalculator* metz = new METzCalculator();
-     if (LeptonType_=="electron") metz->SetLeptonType("electron");
-     double nupz;
-     
-     
-     // Compute pz if one of the lepton is neutrino
-     if( m0->isElectron() || m0->isMuon() ) 
-     p4lepton1.SetPxPyPzE(m0->px(), m0->py(), m0->pz(), m0->energy());
-     else {
-     p4MET.SetPxPyPzE((*pfmet)[0].px(), (*pfmet)[0].py(), (*pfmet)[0].pz(), (*pfmet)[0].energy());
-     p4lepton.SetPxPyPzE(m1->px(), m1->py(), m1->pz(), m1->energy());
-     metz->SetMET(p4MET);
-     metz->SetLepton(p4lepton);
-     nupz = metz->Calculate();
-     p4lepton1.SetPxPyPzE( m0->px(), m0->py(), nupz, sqrt(m0->px()*m0->px()+m0->py()*m0->py()+nupz*nupz) );
-     }
-     
-     if( m1->isElectron() || m1->isMuon() ) 
-     p4lepton2.SetPxPyPzE(m1->px(), m1->py(), m1->pz(), m1->energy());
-     else {
-     p4MET.SetPxPyPzE((*pfmet)[0].px(), (*pfmet)[0].py(), (*pfmet)[0].pz(), (*pfmet)[0].energy());
-     p4lepton.SetPxPyPzE(m0->px(), m0->py(), m0->pz(), m0->energy());
-     metz->SetMET(p4MET);
-     metz->SetLepton(p4lepton);
-     nupz = metz->Calculate();
-     p4lepton2.SetPxPyPzE( m1->px(), m1->py(), nupz, sqrt(m1->px()*m1->px()+m1->py()*m1->py()+nupz*nupz) );
-     }
-     
-     delete metz;
-     delete qglikeli;
-     
-     
-     
-     // Now compute all the invariant masses
-     TLorentzVector Vj;
-     TLorentzVector V2j;
-     TLorentzVector V3j;
-     TLorentzVector V4j;
-     TLorentzVector V5j;
-     TLorentzVector V6j;
-     
-     TLorentzVector c2j;
-     TLorentzVector c3j;
-     TLorentzVector c4j;
-     TLorentzVector c5j;
-     TLorentzVector c6j;
-     
-     
-     // 4-vectors for the first four jets
-     TLorentzVector p4j1;
-     TLorentzVector p4j2;
-     TLorentzVector p4j3;
-     TLorentzVector p4j4;
-     TLorentzVector p4j5;
-     TLorentzVector p4j6;
-     TLorentzVector p4V = p4lepton1 + p4lepton2;
-     
-     
-     if( NumJets>1 ) { 
-     p4j1.SetPxPyPzE( Px[0], Py[0], Pz[0], E[0] );
-     p4j2.SetPxPyPzE( Px[1], Py[1], Pz[1], E[1] );
-     c2j =  p4j1 + p4j2;
-     c2jMass =  c2j.M();
-     V2j =  p4V + c2j;
-     V2jMass =  V2j.M();
-     //V2jCosJacksonAngle = JacksonAngle( p4V, V2j);
-     //c2jCosJacksonAngle = JacksonAngle( p4j1, p4j2);
-     }
-     
-     if( NumJets>2 ) {
-     p4j3.SetPxPyPzE( Px[2], Py[2], Pz[2], E[2] );
-     c3j =  p4j1 + p4j2 + p4j3;
-     c3jMass =  c3j.M();
-     V3j =  p4V + c3j;
-     V3jMass =  V3j.M();
-     //V3jCosJacksonAngle = JacksonAngle( p4V, V3j);
-     //c3jCosJacksonAngle12 = JacksonAngle( p4j1,  p4j2 );
-     //c3jCosJacksonAngle23 = JacksonAngle( p4j2,  p4j3 );
-     //c3jCosJacksonAngle31 = JacksonAngle( p4j3,  p4j1 );
-     }
-     
-     if( NumJets>3 ) { 
-     p4j4.SetPxPyPzE( Px[3], Py[3], Pz[3], E[3] );
-     c4j =  p4j1 + p4j2 + p4j3 + p4j4;
-     c4jMass =  c4j.M();
-     V4j =  p4V + c4j;
-     V4jMass =  V4j.M();
-     
-     }
-     
-     if( NumJets>4 ) { 
-     p4j5.SetPxPyPzE( Px[4], Py[4], Pz[4], E[4] );
-     c5j =  p4j1 + p4j2 + p4j3 + p4j4 + p4j5;
-     c5jMass =  c5j.M();
-     V5j =  p4V + c5j;
-     V5jMass =  V5j.M();
-     
-     }
-     
-     if( NumJets>5 ) { 
-     p4j6.SetPxPyPzE( Px[5], Py[5], Pz[5], E[5] );
-     
-     c6j =  p4j1 + p4j2 + p4j3 + p4j4 + p4j5 + p4j6;
-     c6jMass =  c6j.M();
-     V6j =  p4V + c6j;
-     V6jMass =  V6j.M();
-     
-     }
-     
-     
-     
-     
-     // Angle between the decay planes of two W
-     cosphiDecayPlane = 10.0; 
-     cosThetaLnu = 10.0; 
-     cosThetaJJ = 10.0;
-     
-     
-     //    if( NumJets>1 ) dg_kin_Wuv_Wjj( p4lepton1, p4lepton2, 
-     //				   p4j1, p4j2, cosphiDecayPlane, 
-     //				   cosThetaLnu, cosThetaJJ);
-     
-     
-     // Color correlation between two W jets ( jets pull ) 
-     if ( ij1>0 && ij2>0 ) {
-     reco::PFJet pfj1 = static_cast<const reco::PFJet &> (*ij1) ;
-     reco::PFJet pfj2 = static_cast<const reco::PFJet &> (*ij2) ;
-     //leadingDeltaTheta = TMath::Abs( getDeltaTheta( &pfj1 , &pfj2) );
-     }   
-     
-     // Cos(theta*) or Helicity Angles in Higgs rest frame
-     if( NumJets>1 ){
-     TLorentzVector p4boson1;
-     p4boson1.SetPxPyPzE(Vboson->px(), Vboson->py(), Vboson->pz(), Vboson->energy());
-     TLorentzVector p4boson2 = p4j1 + p4j2;
-     TLorentzVector p4higgs  = p4boson1 + p4boson2;
-     TVector3 higgsBoost = p4higgs.BoostVector();
-     
-     //    j1Hel_HiggsCM = getHelicity( p4j1 , higgsBoost );
-     //     j2Hel_HiggsCM = getHelicity( p4j2 , higgsBoost );
-     //     l1Hel_HiggsCM = getHelicity( p4lepton1 , higgsBoost );
-     //     l2Hel_HiggsCM = getHelicity( p4lepton2 , higgsBoost );
-     //     b1Hel_HiggsCM = getHelicity( p4boson1 , higgsBoost );
-     //     b2Hel_HiggsCM = getHelicity( p4boson2 , higgsBoost );
-     
-     }
-     //FillBranches();
-     //*/
 }
 
 

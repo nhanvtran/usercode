@@ -48,8 +48,8 @@ namespace ewk {
   class PATJetTreeFiller {
   public:
     /// specify the name of the TTree, and the configuration for it
-    PATJetTreeFiller(const char *name, TTree* tree, 
-		  const std::string jetType, int index,
+    PATJetTreeFiller(const std::string jetType, TTree* tree, 
+		  const std::string jetClass, int index,
 		  const edm::ParameterSet iConfig );
 
 
@@ -84,7 +84,8 @@ namespace ewk {
 
       
     TTree* tree_;
-    std::string jetType_;
+      std::string jetClass_;
+      std::string jetType_;
     std::string Vtype_;
     std::string LeptonType_;
       std::string mInputJets;
