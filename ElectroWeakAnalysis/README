@@ -1,0 +1,28 @@
+
+--------- RECIPE for CMSSW_4_2_8_patch7 --------
+Instructions from https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideEWKVPlusJets
+
+
+source /uscmst1/prod/sw/cms/setup/cshrc prod       (at Fermilab LPC only)
+setenv SCRAM_ARCH slc5_amd64_gcc434
+scram project CMSSW CMSSW_4_2_8
+cd CMSSW_4_2_8_patch7/src/
+cmsenv
+cmscvsroot CMSSW
+
+###### use this dir
+cvs co -A -d ElectroWeakAnalysis UserCode/ntran/ElectroWeakAnalysis
+
+cvs co -r HEAD PhysicsTools/KinFitter
+cvs co -r V03-02-07 JetMETCorrections/Configuration     (needed for jet energy correction)
+cvs co -r V02-04-17 RecoJets/Configuration     (needed for deterministic FastJet subtraction)
+cvs co -r V04-01-00 RecoJets/JetAlgorithms     (needed for deterministic FastJet subtraction)
+cvs co -r V00-06-07 RecoJets/JetAnalyzers     (needed for JetId selectors, jet selectors, etc.)
+cvs co -r V05-05-03-00 RecoJets/JetProducers     (needed for deterministic FastJet subtraction)
+cvs co -r V05-05-03 RecoJets/JetProducers     (in 42x)
+cvs co -r V08-06-25 PhysicsTools/PatAlgos     (in 42x)
+cvs co -r V01-04-05 RecoVertex/PrimaryVertexProducer     (needed for DA Vertices in 415)
+cvs co -r V06-04-07-01 TrackingTools/TrajectoryState     (needed for DA Vertices in 415)
+scram b -j4
+cd ElectroWeakAnalysis/VPlusJets/test
+gunzip QG_QCD_Pt_15to3000_TuneZ2_Flat_7TeV_pythia6_Spring11-PU_S1_START311_V1G1-v1.root.gz
