@@ -254,6 +254,7 @@ void ewk::VplusJetSubstructureAnalysis::analyze(const edm::Event& iEvent, const 
         if(mNVB==2) recoBosonFillerE->fill(iEvent, 1);
     }
     else if (LeptonType_ == "muon"){
+        std::cout << "fill Muons!" << std::endl;
         recoBosonFillerMu->fill(iEvent);
     }
     else {

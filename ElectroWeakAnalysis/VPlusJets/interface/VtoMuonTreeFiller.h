@@ -21,6 +21,8 @@
 #ifndef ElectroWeakAnalysis_VPlusJets_VtoMuonTreeFiller_h
 #define ElectroWeakAnalysis_VPlusJets_VtoMuonTreeFiller_h
 
+#include "DataFormats/MuonReco/interface/Muon.h"  
+#include "DataFormats/PatCandidates/interface/Muon.h"
 #include <memory>
 #include <string>
 #include <iostream>
