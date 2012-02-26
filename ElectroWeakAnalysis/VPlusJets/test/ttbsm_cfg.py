@@ -787,7 +787,8 @@ else :
 		process.patseq
 	)
 
-process.out.SelectEvents.SelectEvents = cms.vstring('p0')
+process.outpath.remove(process.out)
+###process.out.SelectEvents.SelectEvents = cms.vstring('p0')
 
 # rename output file
 if options.useData :
