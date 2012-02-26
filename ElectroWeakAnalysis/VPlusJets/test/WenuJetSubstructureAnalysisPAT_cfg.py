@@ -49,7 +49,7 @@ numEventsToRun = 1000
 
 ##---------  W-->enu Collection ------------
 process.load("ElectroWeakAnalysis.VPlusJets.WenuCollections_cfi")
-process.load("ElectroWeakAnalysis.VPlusJets.WmunuCollections_cfi")
+#process.load("ElectroWeakAnalysis.VPlusJets.WmunuCollections_cfi")
 
 ##---------  Jet Collection ----------------
 #process.load("ElectroWeakAnalysis.VPlusJets.JetCollections_cfi")
