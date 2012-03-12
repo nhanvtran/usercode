@@ -38,7 +38,7 @@ namespace ewk {
   class VtoMuonTreeFiller {
   public:
     /// specify the name of the TTree, and the configuration for it
-    VtoMuonTreeFiller(const char *name, TTree* tree, 
+    VtoMuonTreeFiller(std::string vType, std::string leptonType, TTree* tree, 
 			  const edm::ParameterSet iConfig );
 
     /// default constructor
@@ -64,7 +64,7 @@ namespace ewk {
     void SetBranch( bool* x, std::string name );
 
     TTree* tree_;
-    const char *  name_;
+      std::string name_;
     std::string Vtype_;
     std::string LeptonType_;
     edm::InputTag mInputBoson;

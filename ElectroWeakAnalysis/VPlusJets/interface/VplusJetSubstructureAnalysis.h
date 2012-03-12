@@ -66,7 +66,6 @@ namespace ewk
         
         // flags
         bool runningOverMC_;
-        bool runoverAOD_;
         
         /// output ROOT file for the tree and histograms
         std::string fOutputFileName_ ;
@@ -77,10 +76,6 @@ namespace ewk
         std::string VBosonType_;
         std::string LeptonType_;
         edm::InputTag mInputBoson_;
-        // Jet information
-        std::vector< std::string > JetCollections_;
-        int nJetCollections_;
-        std::vector< PATJetTreeFiller* > jetcol;
         // MET information
         edm::InputTag mInputMet_;
         // Rho for pileup
@@ -88,32 +83,24 @@ namespace ewk
         std::string JetsFor_rho_lepIso_;
         // Primary Vertex        
         edm::InputTag mPrimaryVertex_;
-        
+        // Jet information
+        std::vector< std::string > PatJetCollections_;
+        std::vector< std::string > LiteJetCollections_;
+        std::vector< std::string > GenJetCollections_;
+        // all the jet collections (Pat, Lite, Gen, and otherwise)
+        std::vector< PATJetTreeFiller* > jetcol;
+
+        // more stuff
         edm::InputTag mInputBeamSpot;
         edm::InputTag mInputgenMet;
         
-        /// The objects that actually computes variables and fill the tree 
-        std::auto_ptr<ewk::PATJetTreeFiller> PatJetFiller_1;
-        std::auto_ptr<ewk::PATJetTreeFiller> PatJetFiller_2;
-        std::auto_ptr<ewk::PATJetTreeFiller> PatJetFiller_3;
-        //PATJetTreeFiller* PatJetFiller_1;
-        //PATJetTreeFiller* PatJetFiller_2;
-        //PATJetTreeFiller* PatJetFiller_3;
-        /*
-        std::auto_ptr<ewk::JetTreeFiller> CaloJetFiller;
-        std::auto_ptr<ewk::JetTreeFiller> CorrectedCaloJetFiller;
-        std::auto_ptr<ewk::JetTreeFiller> CorrectedPFJetFiller;
-        std::auto_ptr<ewk::JetTreeFiller> CorrectedPFJetFillerVBFTag; //For VBF Tag Jets
-        std::auto_ptr<ewk::JetTreeFiller> CorrectedJPTJetFiller;
-        std::auto_ptr<ewk::JetTreeFiller> GenJetFiller;
-        std::auto_ptr<ewk::JetTreeFiller> PFJetFiller; 
-        std::auto_ptr<ewk::JetTreeFiller> JPTJetFiller;
-         */
         //std::auto_ptr<ewk::VtoElectronTreeFiller> recoBosonFillerE;
-        ewk::VtoElectronTreeFiller* recoBosonFillerE;
+        ewk::VtoElectronTreeFiller* recoWBosonFillerE;
+        ewk::VtoElectronTreeFiller* recoZBosonFillerE;
         //std::auto_ptr<ewk::VtoMuonTreeFiller> recoBosonFillerMu;
-        ewk::VtoMuonTreeFiller* recoBosonFillerMu;
-
+        ewk::VtoMuonTreeFiller* recoWBosonFillerMu;
+        ewk::VtoMuonTreeFiller* recoZBosonFillerMu;
+        
         std::auto_ptr<ewk::MCTreeFiller> genBosonFiller;
         
         // private data members
@@ -123,6 +110,7 @@ namespace ewk
         int bunch; 
         int nPV; 
         int mNVB;
+        int eventClass;
         float mPVx[30];
         float mPVy[30];
         float mPVz[30];

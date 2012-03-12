@@ -36,7 +36,7 @@ namespace ewk {
   class VtoElectronTreeFiller {
   public:
     /// specify the name of the TTree, and the configuration for it
-    VtoElectronTreeFiller(const char *name, TTree* tree, 
+    VtoElectronTreeFiller(std::string vType, std::string leptonType, TTree* tree, 
 			  const edm::ParameterSet iConfig );
     
     /// default constructor
@@ -64,7 +64,7 @@ namespace ewk {
     bool isLooseElectron(const edm::Event& iEvent, const reco::GsfElectron& ele);
 
     TTree* tree_;
-    const char *  name_;
+    std::string name_;
     std::string Vtype_;
     std::string LeptonType_;
     edm::InputTag mInputBoson;
