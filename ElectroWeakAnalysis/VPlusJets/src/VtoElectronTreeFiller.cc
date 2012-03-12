@@ -33,15 +33,11 @@
 
 
 
-ewk::VtoElectronTreeFiller::VtoElectronTreeFiller(const char *name, TTree* tree, 
+ewk::VtoElectronTreeFiller::VtoElectronTreeFiller(std::string vType, std::string leptonType, TTree* tree, 
                                                   const edm::ParameterSet iConfig)
 {
     
     // ********** Vector boson ********** //
-    if(  iConfig.existsAs<edm::InputTag>("srcVectorBoson") )
-        mInputBoson = iConfig.getParameter<edm::InputTag>("srcVectorBoson"); 
-    else std::cout << "***Error:" << name << 
-        " Collection not specified !" << std::endl;
     if(  iConfig.existsAs<edm::InputTag>("srcMet") )
 		mInputMet = iConfig.getParameter<edm::InputTag>("srcMet");
     if(  iConfig.existsAs<edm::InputTag>("srcElectrons") )
@@ -50,305 +46,21 @@ ewk::VtoElectronTreeFiller::VtoElectronTreeFiller(const char *name, TTree* tree,
 		mInputBeamSpot  = iConfig.getParameter<edm::InputTag>("srcBeamSpot");
 	if( iConfig.existsAs<bool>("runningOverAOD"))
 		runoverAOD = iConfig.getParameter<bool>("runningOverAOD");
+
+    
+    if (vType == "W") mInputBoson = iConfig.getParameter<edm::InputTag>("srcVectorBosonWe");
+    if (vType == "Z") mInputBoson = iConfig.getParameter<edm::InputTag>("srcVectorBosonZe");
+    
     tree_     = tree;
-    name_     = name;
-    Vtype_    = iConfig.getParameter<std::string>("VBosonType"); 
-    LeptonType_ = iConfig.getParameter<std::string>("LeptonType");
+    name_     = vType;
+    if (leptonType == "muon") name_ += "mu";
+    if (leptonType == "electron") name_ += "el";
+    Vtype_    = vType; 
+    LeptonType_ = leptonType;
     
     if( !(tree==0) && LeptonType_=="electron") SetBranches();
 }
 
-
-
-
-
-void ewk::VtoElectronTreeFiller::SetBranches()
-{
-    // Declare jet branches
-    std::string lept1 = "eplus";
-    std::string lept2 = "eminus";
-    if( !(Vtype_=="Z") ) lept1 = "electron";
-    
-    SetBranch( &V_mass,      "mass");
-    SetBranch( &V_mt,        "mt");
-    SetBranch( &V_px,        "px");
-    SetBranch( &V_py,        "py");
-    SetBranch( &V_pz,        "pz");
-    SetBranch( &V_E,         "e");
-    SetBranch( &V_Pt,        "pt");
-    SetBranch( &V_Et,        "et");
-    SetBranch( &V_Eta,       "eta");    
-    SetBranch( &V_Phi,       "phi");
-    SetBranch( &V_Vx,        "vx");
-    SetBranch( &V_Vy,        "vy");
-    SetBranch( &V_Vz,        "vz");
-    SetBranch( &V_Y,         "y");
-    SetBranch( &nTightElectron, "numTightElectrons");
-    SetBranch( &nLooseElectron, "numLooseElectrons");
-    if(Vtype_=="W") {
-        SetBranch( &V_pzNu1,     "pzNu1");
-        SetBranch( &V_pzNu2,     "pzNu2");
-    }
-    ///////////////////////////////////////////////
-    SetBranch( &e1px,             lept1+"_px" );
-    SetBranch( &e1py,             lept1+"_py" );
-    SetBranch( &e1pz,             lept1+"_pz" );
-    SetBranch( &e1E,              lept1+"_e" );
-    SetBranch( &e1Pt,             lept1+"_pt" );
-    SetBranch( &e1Et,             lept1+"_et" );
-    SetBranch( &e1Eta,            lept1+"_eta" ); 
-    SetBranch( &e1Theta,          lept1+"_theta" ); 
-    SetBranch( &e1Phi,            lept1+"_phi" );
-    SetBranch( &e1Charge,         lept1+"_charge" );
-    SetBranch( &e1Vx,             lept1+"_vx" );
-    SetBranch( &e1Vy,             lept1+"_vy" );
-    SetBranch( &e1Vz,             lept1+"_vz" );
-    SetBranch( &e1Y,              lept1+"_y" );
-    SetBranch( &e1_trackiso,      lept1+"_trackiso" );
-    SetBranch( &e1_hcaliso,       lept1+"_hcaliso" );
-    SetBranch( &e1_ecaliso,       lept1+"_ecaliso" );
-    SetBranch( &e1Classification, lept1+"_classification" );
-    SetBranch( &e1_sc_x,          lept1+"_sc_x" );
-    SetBranch( &e1_sc_y,          lept1+"_sc_y" );
-    SetBranch( &e1_sc_z,          lept1+"_sc_z" );
-    SetBranch( &e1_sc_Theta,      lept1+"_sc_Theta" );
-    SetBranch( &e1_sc_Eta,        lept1+"_sc_Eta" );
-    SetBranch( &e1_sc_Phi,        lept1+"_sc_Phi" );
-    SetBranch( &e1_sc_E,          lept1+"_sc_E" );
-    SetBranch( &e1_sc_px,         lept1+"_sc_px" );
-    SetBranch( &e1_sc_py,         lept1+"_sc_py" );
-    SetBranch( &e1_sc_pz,         lept1+"_sc_pz" );
-    SetBranch( &e1_sc_Pt,         lept1+"_sc_Pt" );
-    SetBranch( &e1_sc_Et,         lept1+"_sc_Et" );	  
-    SetBranch( &e1_EoverPout,     lept1+"_eoverp_out" );
-    SetBranch( &e1_EoverPin,      lept1+"_eoverp_in" );
-    SetBranch( &e1_numberOfBrems, lept1+"_numbrem" );
-    SetBranch( &e1_BremFraction,  lept1+"_fbrem" );
-    SetBranch( &e1_DeltaEtaIn,    lept1+"_deltaeta_in" );
-    SetBranch( &e1_DeltaPhiIn,    lept1+"_deltaphi_in" );
-    SetBranch( &e1_DeltaPhiOut,   lept1+"_deltaphi_out" );
-    SetBranch( &e1_DeltaEtaOut,   lept1+"_deltaeta_out" );
-    SetBranch( &e1_Trackmom_calo, lept1+"_trackmom_calo" );
-    SetBranch( &e1_Trackmom_vtx,  lept1+"_trackmom_vtx" );	  
-    SetBranch( &e1_HoverE,        lept1+"_hovere" );	    
-    SetBranch( &e1_E9overE25,     lept1+"_e9e25" );
-    SetBranch( &e1_SigmaEtaEta,   lept1+"_sigmaetaeta" );
-    SetBranch( &e1_SigmaIetaIeta, lept1+"_sigmaietaieta" );
-    SetBranch( &e1_missingHits,   lept1+"_missingHits" );	  
-    SetBranch( &e1_dist,          lept1+"_dist" );
-    SetBranch( &e1_dcot,          lept1+"_dcot" );
-    SetBranch( &e1_convradius,    lept1+"_convradius" );
-    SetBranch( &ise1WP95,         lept1+"_isWP95" );
-    SetBranch( &ise1WP80,         lept1+"_isWP80" );
-    SetBranch( &ise1WP70,         lept1+"_isWP70" );
-    SetBranch( &e1_d0bsp,         lept1+"_d0bsp" );
-    SetBranch( &e1_dz000,         lept1+"_dz000" );
-    
-    SetBranch( &e1_pfiso_chargedHadronIso,         lept1+"_pfiso_chargedHadronIso" );
-    SetBranch( &e1_pfiso_photonIso,                lept1+"_pfiso_photonIso" );
-    SetBranch( &e1_pfiso_neutralHadronIso,         lept1+"_pfiso_neutralHadronIso" );
-    
-    
-    ////////////////////////////////////////////////////////
-    if(Vtype_=="Z") {	  
-        SetBranch( &e2px,             lept2+"_px" );
-        SetBranch( &e2py,             lept2+"_py" );
-        SetBranch( &e2pz,             lept2+"_pz" );
-        SetBranch( &e2E,              lept2+"_e" );
-        SetBranch( &e2Pt,             lept2+"_pt" );
-        SetBranch( &e2Et,             lept2+"_et" );
-        SetBranch( &e2Eta,            lept2+"_eta" ); 
-        SetBranch( &e2Theta,          lept2+"_theta" );    
-        SetBranch( &e2Phi,            lept2+"_phi" );
-        SetBranch( &e2Charge,         lept2+"_charge" );
-        SetBranch( &e2Vx,             lept2+"_vx" );
-        SetBranch( &e2Vy,             lept2+"_vy" );
-        SetBranch( &e2Vz,             lept2+"_vz" );
-        SetBranch( &e2Y,              lept2+"_y" );
-        SetBranch( &e2_trackiso,      lept2+"_trackiso" );
-        SetBranch( &e2_hcaliso,       lept2+"_hcaliso" );
-        SetBranch( &e2_ecaliso,       lept2+"_ecaliso");
-        SetBranch( &e2Classification, lept2+"_classification" );
-        SetBranch( &e2_sc_x,          lept2+"_sc_x" );
-        SetBranch( &e2_sc_y,          lept2+"_sc_y" );
-        SetBranch( &e2_sc_z,          lept2+"_sc_z" );
-        SetBranch( &e2_sc_Theta,      lept2+"_sc_Theta" );
-        SetBranch( &e2_sc_Eta,        lept2+"_sc_Eta" );
-        SetBranch( &e2_sc_Phi,        lept2+"_sc_Phi" );
-        SetBranch( &e2_sc_E,          lept2+"_sc_E" );
-        SetBranch( &e2_sc_px,         lept2+"_sc_px" );
-        SetBranch( &e2_sc_py,         lept2+"_sc_py" );
-        SetBranch( &e2_sc_pz,         lept2+"_sc_pz" );
-        SetBranch( &e2_sc_Pt,         lept2+"_sc_Pt" );
-        SetBranch( &e2_sc_Et,         lept2+"_sc_Et" );	  
-        SetBranch( &e2_EoverPout,     lept2+"_eoverp_out" );
-        SetBranch( &e2_EoverPin,      lept2+"_eoverp_in" );
-        SetBranch( &e2_numberOfBrems, lept2+"_numbrem" );
-        SetBranch( &e2_BremFraction,  lept2+"_fbrem" );
-        SetBranch( &e2_DeltaEtaIn,    lept2+"_deltaeta_in" );
-        SetBranch( &e2_DeltaPhiIn,    lept2+"_deltaphi_in" );
-        SetBranch( &e2_DeltaPhiOut,   lept2+"_deltaphi_out" );
-        SetBranch( &e2_DeltaEtaOut,   lept2+"_deltaeta_out" );
-        SetBranch( &e2_Trackmom_calo, lept2+"_trackmom_calo" );
-        SetBranch( &e2_Trackmom_vtx,  lept2+"_trackmom_vtx" );	  
-        SetBranch( &e2_HoverE,        lept2+"_hovere" );	   	  
-        SetBranch( &e2_E9overE25,     lept2+"_e9e25" );
-        SetBranch( &e2_SigmaEtaEta,   lept2+"_sigmaetaeta" );
-        SetBranch( &e2_SigmaIetaIeta, lept2+"_sigmaietaieta" );
-        SetBranch( &e2_missingHits,   lept2+"_missingHits" );
-        SetBranch( &e2_dist,          lept2+"_dist" );
-        SetBranch( &e2_dcot,          lept2+"_dcot" );
-        SetBranch( &e2_convradius,    lept2+"_convradius" );
-        SetBranch( &ise2WP95,         lept2+"_isWP95" );
-        SetBranch( &ise2WP80,         lept2+"_isWP80" );
-        SetBranch( &ise2WP70,         lept2+"_isWP70" );
-    }	  
-}
-/////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-void ewk::VtoElectronTreeFiller::init()   
-{
-    // initialize private data members
-    nLooseElectron = 0;
-    nTightElectron = 0;
-    V_mass                = -1.;
-    V_mt                  = -1.;
-    V_px                  = -99999.;
-    V_py                  = -99999.;
-    V_pz                  = -99999.;
-    V_E                   = -1.;
-    V_Pt                  = -1.;
-    V_Et                  = -1.;
-    V_Eta                 = -10.;
-    V_Phi                 = -10.;
-    V_Vx                  = -10.;
-    V_Vy                  = -10.;
-    V_Vz                  = -10.;
-    V_Y                   = -10.;
-    V_pzNu1               = -10000.0;
-    V_pzNu2               = -10000.0;
-    
-    ise1WP95          = false;
-    ise1WP80          = false;
-    ise1WP70          = false;
-    ise2WP95          = false;
-    ise2WP80          = false;
-    ise2WP70          = false;
-    
-    e1Classification   = -1; 
-    e1Charge           = -10;
-    e2Classification  = -1;
-    e2Charge          = -10;
-    
-    e1px               = -99999.;
-    e1py               = -99999.;
-    e1pz               = -99999.;
-    e1E                = -1.;
-    e1Et               = -1.;
-    e1Pt               = -1.;
-    e1Eta              = -10.;
-    e1Theta            = -99999.;
-    e1Phi              = -10.;
-    e1Vx               = -10.;
-    e1Vy               = -10.;
-    e1Vz               = -10.;
-    e1Y                = -10.;
-    e1_sc_x            = -10.;
-    e1_sc_y            = -10.;
-    e1_sc_z            = -10.;
-    e1_sc_Theta        = -99999.;
-    e1_sc_Eta          = -10.;    
-    e1_sc_Phi          = -10.;
-    e1_sc_E            = -1.;
-    e1_sc_px           = -99999.;
-    e1_sc_py           = -99999.;
-    e1_sc_pz           = -99999.;
-    e1_sc_Pt           = -1.;
-    e1_sc_Et           = -1.;	  
-    e1_EoverPout       = -1.;
-    e1_EoverPin        = -1.;
-    e1_numberOfBrems   = -10.;
-    e1_BremFraction    = -1.;
-    e1_DeltaEtaIn      = -10.;
-    e1_DeltaPhiIn      = -10.;
-    e1_DeltaPhiOut     = -10.;
-    e1_DeltaEtaOut     = -10.;
-    e1_Trackmom_calo   = -1.;
-    e1_Trackmom_vtx    = -1.;	  
-    e1_HoverE          = -1.;	   	  
-    e1_E9overE25       = -10.;
-    e1_SigmaEtaEta     = -1.;
-    e1_SigmaIetaIeta   = -1.;	  
-    e1_missingHits     = 100;
-    e1_dist            = -10.;
-    e1_dcot            = -10.;
-    e1_convradius      = -10.;
-    e1_d0bsp           = -99999.;
-    e1_dz000           = -99999.;
-    
-    e1_pfiso_chargedHadronIso       = -99999.;
-    e1_pfiso_photonIso              = -99999.;
-    e1_pfiso_neutralHadronIso       = -99999.;
-    
-    e2px              = -99999.;
-    e2py              = -99999.;
-    e2pz              = -99999.;
-    e2E               = -1.;
-    e2Pt              = -1.;
-    e2Et              = -1.;
-    e2Eta             = -10.;
-    e2Theta           = -99999.;
-    e2Phi             = -10.;
-    e2Vx              = -10.;
-    e2Vy              = -10.;
-    e2Vz              = -10.;
-    e2Y               = -10.;
-    e2_sc_x           = -10.;
-    e2_sc_y           = -10.;
-    e2_sc_z           = -10.;
-    e2_sc_Theta       = -99999.;
-    e2_sc_Eta         = -10.;    
-    e2_sc_Phi         = -10.;
-    e2_sc_E           = -1.;
-    e2_sc_px          = -99999.;
-    e2_sc_py          = -99999.;
-    e2_sc_pz          = -99999.;
-    e2_sc_Pt          = -1.;
-    e2_sc_Et          = -1.;	  
-    e2_EoverPout       = -1.;
-    e2_EoverPin        = -1.;
-    e2_numberOfBrems   = -10.;
-    e2_BremFraction    = -1.;
-    e2_DeltaEtaIn      = -10.;
-    e2_DeltaPhiIn      = -10.;
-    e2_DeltaPhiOut     = -10.;
-    e2_DeltaEtaOut     = -10.;
-    e2_Trackmom_calo   = -1.;
-    e2_Trackmom_vtx    = -1.;	  
-    e2_HoverE          = -1.;	    
-    e2_E9overE25       = -10.;
-    e2_SigmaEtaEta     = -1.;
-    e2_SigmaIetaIeta     = -1.;	  
-    e2_missingHits     = 100;
-    e2_dist            = -10.;
-    e2_dcot            = -10.;
-    e2_convradius      = -10.;
-    
-    //////////////
-    e1_trackiso     = 5000.0;
-    e1_hcaliso      = 5000.0;
-    e1_ecaliso      = 5000.0;
-    e2_trackiso     = 5000.0;
-    e2_hcaliso      = 5000.0;
-    e2_ecaliso      = 5000.0;
-    
-    // initialization done
-}
 
 void ewk::VtoElectronTreeFiller::fill(const edm::Event& iEvent, int vecBosonIndex)
 {
@@ -494,9 +206,12 @@ void ewk::VtoElectronTreeFiller::fill(const edm::Event& iEvent, int vecBosonInde
         e1Et               = ele1->et();
         
         /// isolation 
-        e1_trackiso       = ele1->dr03TkSumPt();
-        e1_ecaliso        = ele1->dr03EcalRecHitSumEt();
-        e1_hcaliso        = ele1->dr03HcalTowerSumEt();
+        e1_trackiso       = e1->dr03TkSumPt();
+        e1_ecaliso        = e1->dr03EcalRecHitSumEt();
+        e1_hcaliso        = e1->dr03HcalTowerSumEt();
+
+        // leave empty for now, add as necessary
+        ///*
         e1Classification  = ele1->classification();
         e1_numberOfBrems  = ele1->numberOfBrems();      
         e1_BremFraction   = ele1->fbrem();
@@ -742,6 +457,293 @@ bool ewk::VtoElectronTreeFiller::isLooseElectron(const edm::Event& iEvent, const
     return true;
 }
 
+void ewk::VtoElectronTreeFiller::SetBranches()
+{
+    // Declare jet branches
+    std::string lept1 = "eplus";
+    std::string lept2 = "eminus";
+    if( !(Vtype_=="Z") ) lept1 = "electron";
+    
+    SetBranch( &V_mass,      "mass");
+    SetBranch( &V_mt,        "mt");
+    SetBranch( &V_px,        "px");
+    SetBranch( &V_py,        "py");
+    SetBranch( &V_pz,        "pz");
+    SetBranch( &V_E,         "e");
+    SetBranch( &V_Pt,        "pt");
+    SetBranch( &V_Et,        "et");
+    SetBranch( &V_Eta,       "eta");    
+    SetBranch( &V_Phi,       "phi");
+    SetBranch( &V_Vx,        "vx");
+    SetBranch( &V_Vy,        "vy");
+    SetBranch( &V_Vz,        "vz");
+    SetBranch( &V_Y,         "y");
+    SetBranch( &nTightElectron, "numTightElectrons");
+    SetBranch( &nLooseElectron, "numLooseElectrons");
+    if(Vtype_=="W") {
+        SetBranch( &V_pzNu1,     "pzNu1");
+        SetBranch( &V_pzNu2,     "pzNu2");
+    }
+    ///////////////////////////////////////////////
+    SetBranch( &e1px,             lept1+"_px" );
+    SetBranch( &e1py,             lept1+"_py" );
+    SetBranch( &e1pz,             lept1+"_pz" );
+    SetBranch( &e1E,              lept1+"_e" );
+    SetBranch( &e1Pt,             lept1+"_pt" );
+    SetBranch( &e1Et,             lept1+"_et" );
+    SetBranch( &e1Eta,            lept1+"_eta" ); 
+    SetBranch( &e1Theta,          lept1+"_theta" ); 
+    SetBranch( &e1Phi,            lept1+"_phi" );
+    SetBranch( &e1Charge,         lept1+"_charge" );
+    SetBranch( &e1Vx,             lept1+"_vx" );
+    SetBranch( &e1Vy,             lept1+"_vy" );
+    SetBranch( &e1Vz,             lept1+"_vz" );
+    SetBranch( &e1Y,              lept1+"_y" );
+    SetBranch( &e1_trackiso,      lept1+"_trackiso" );
+    SetBranch( &e1_hcaliso,       lept1+"_hcaliso" );
+    SetBranch( &e1_ecaliso,       lept1+"_ecaliso" );
+    SetBranch( &e1Classification, lept1+"_classification" );
+    // drop for now, add as necessary
+    /*
+    SetBranch( &e1_sc_x,          lept1+"_sc_x" );
+    SetBranch( &e1_sc_y,          lept1+"_sc_y" );
+    SetBranch( &e1_sc_z,          lept1+"_sc_z" );
+    SetBranch( &e1_sc_Theta,      lept1+"_sc_Theta" );
+    SetBranch( &e1_sc_Eta,        lept1+"_sc_Eta" );
+    SetBranch( &e1_sc_Phi,        lept1+"_sc_Phi" );
+    SetBranch( &e1_sc_E,          lept1+"_sc_E" );
+    SetBranch( &e1_sc_px,         lept1+"_sc_px" );
+    SetBranch( &e1_sc_py,         lept1+"_sc_py" );
+    SetBranch( &e1_sc_pz,         lept1+"_sc_pz" );
+    SetBranch( &e1_sc_Pt,         lept1+"_sc_Pt" );
+    SetBranch( &e1_sc_Et,         lept1+"_sc_Et" );	  
+    SetBranch( &e1_EoverPout,     lept1+"_eoverp_out" );
+    SetBranch( &e1_EoverPin,      lept1+"_eoverp_in" );
+    SetBranch( &e1_numberOfBrems, lept1+"_numbrem" );
+    SetBranch( &e1_BremFraction,  lept1+"_fbrem" );
+    SetBranch( &e1_DeltaEtaIn,    lept1+"_deltaeta_in" );
+    SetBranch( &e1_DeltaPhiIn,    lept1+"_deltaphi_in" );
+    SetBranch( &e1_DeltaPhiOut,   lept1+"_deltaphi_out" );
+    SetBranch( &e1_DeltaEtaOut,   lept1+"_deltaeta_out" );
+    SetBranch( &e1_Trackmom_calo, lept1+"_trackmom_calo" );
+    SetBranch( &e1_Trackmom_vtx,  lept1+"_trackmom_vtx" );	  
+    SetBranch( &e1_HoverE,        lept1+"_hovere" );	    
+    SetBranch( &e1_E9overE25,     lept1+"_e9e25" );
+    SetBranch( &e1_SigmaEtaEta,   lept1+"_sigmaetaeta" );
+    SetBranch( &e1_SigmaIetaIeta, lept1+"_sigmaietaieta" );
+    SetBranch( &e1_missingHits,   lept1+"_missingHits" );	  
+    SetBranch( &e1_dist,          lept1+"_dist" );
+    SetBranch( &e1_dcot,          lept1+"_dcot" );
+    SetBranch( &e1_convradius,    lept1+"_convradius" );
+     SetBranch( &e1_d0bsp,         lept1+"_d0bsp" );
+     SetBranch( &e1_dz000,         lept1+"_dz000" );
+     
+     SetBranch( &e1_pfiso_chargedHadronIso,         lept1+"_pfiso_chargedHadronIso" );
+     SetBranch( &e1_pfiso_photonIso,                lept1+"_pfiso_photonIso" );
+     SetBranch( &e1_pfiso_neutralHadronIso,         lept1+"_pfiso_neutralHadronIso" );
+     //*/     
+    SetBranch( &ise1WP95,         lept1+"_isWP95" );
+    SetBranch( &ise1WP80,         lept1+"_isWP80" );
+    SetBranch( &ise1WP70,         lept1+"_isWP70" );
+    
+    
+    ////////////////////////////////////////////////////////
+    if(Vtype_=="Z") {	  
+        SetBranch( &e2px,             lept2+"_px" );
+        SetBranch( &e2py,             lept2+"_py" );
+        SetBranch( &e2pz,             lept2+"_pz" );
+        SetBranch( &e2E,              lept2+"_e" );
+        SetBranch( &e2Pt,             lept2+"_pt" );
+        SetBranch( &e2Et,             lept2+"_et" );
+        SetBranch( &e2Eta,            lept2+"_eta" ); 
+        SetBranch( &e2Theta,          lept2+"_theta" );    
+        SetBranch( &e2Phi,            lept2+"_phi" );
+        SetBranch( &e2Charge,         lept2+"_charge" );
+        SetBranch( &e2Vx,             lept2+"_vx" );
+        SetBranch( &e2Vy,             lept2+"_vy" );
+        SetBranch( &e2Vz,             lept2+"_vz" );
+        SetBranch( &e2Y,              lept2+"_y" );
+        SetBranch( &e2_trackiso,      lept2+"_trackiso" );
+        SetBranch( &e2_hcaliso,       lept2+"_hcaliso" );
+        SetBranch( &e2_ecaliso,       lept2+"_ecaliso");
+        /*
+        SetBranch( &e2Classification, lept2+"_classification" );
+        SetBranch( &e2_sc_x,          lept2+"_sc_x" );
+        SetBranch( &e2_sc_y,          lept2+"_sc_y" );
+        SetBranch( &e2_sc_z,          lept2+"_sc_z" );
+        SetBranch( &e2_sc_Theta,      lept2+"_sc_Theta" );
+        SetBranch( &e2_sc_Eta,        lept2+"_sc_Eta" );
+        SetBranch( &e2_sc_Phi,        lept2+"_sc_Phi" );
+        SetBranch( &e2_sc_E,          lept2+"_sc_E" );
+        SetBranch( &e2_sc_px,         lept2+"_sc_px" );
+        SetBranch( &e2_sc_py,         lept2+"_sc_py" );
+        SetBranch( &e2_sc_pz,         lept2+"_sc_pz" );
+        SetBranch( &e2_sc_Pt,         lept2+"_sc_Pt" );
+        SetBranch( &e2_sc_Et,         lept2+"_sc_Et" );	  
+        SetBranch( &e2_EoverPout,     lept2+"_eoverp_out" );
+        SetBranch( &e2_EoverPin,      lept2+"_eoverp_in" );
+        SetBranch( &e2_numberOfBrems, lept2+"_numbrem" );
+        SetBranch( &e2_BremFraction,  lept2+"_fbrem" );
+        SetBranch( &e2_DeltaEtaIn,    lept2+"_deltaeta_in" );
+        SetBranch( &e2_DeltaPhiIn,    lept2+"_deltaphi_in" );
+        SetBranch( &e2_DeltaPhiOut,   lept2+"_deltaphi_out" );
+        SetBranch( &e2_DeltaEtaOut,   lept2+"_deltaeta_out" );
+        SetBranch( &e2_Trackmom_calo, lept2+"_trackmom_calo" );
+        SetBranch( &e2_Trackmom_vtx,  lept2+"_trackmom_vtx" );	  
+        SetBranch( &e2_HoverE,        lept2+"_hovere" );	   	  
+        SetBranch( &e2_E9overE25,     lept2+"_e9e25" );
+        SetBranch( &e2_SigmaEtaEta,   lept2+"_sigmaetaeta" );
+        SetBranch( &e2_SigmaIetaIeta, lept2+"_sigmaietaieta" );
+        SetBranch( &e2_missingHits,   lept2+"_missingHits" );
+        SetBranch( &e2_dist,          lept2+"_dist" );
+        SetBranch( &e2_dcot,          lept2+"_dcot" );
+        SetBranch( &e2_convradius,    lept2+"_convradius" );
+         //*/
+        SetBranch( &ise2WP95,         lept2+"_isWP95" );
+        SetBranch( &ise2WP80,         lept2+"_isWP80" );
+        SetBranch( &ise2WP70,         lept2+"_isWP70" );
+    }	  
+}
+/////////////////////////////////////////////////////////////////////////
+
+void ewk::VtoElectronTreeFiller::init()   
+{
+    // initialize private data members
+    nLooseElectron = 0;
+    nTightElectron = 0;
+    V_mass                = -1.;
+    V_mt                  = -1.;
+    V_px                  = -99999.;
+    V_py                  = -99999.;
+    V_pz                  = -99999.;
+    V_E                   = -1.;
+    V_Pt                  = -1.;
+    V_Et                  = -1.;
+    V_Eta                 = -10.;
+    V_Phi                 = -10.;
+    V_Vx                  = -10.;
+    V_Vy                  = -10.;
+    V_Vz                  = -10.;
+    V_Y                   = -10.;
+    V_pzNu1               = -10000.0;
+    V_pzNu2               = -10000.0;
+    
+    ise1WP95          = false;
+    ise1WP80          = false;
+    ise1WP70          = false;
+    ise2WP95          = false;
+    ise2WP80          = false;
+    ise2WP70          = false;
+    
+    e1Classification   = -1; 
+    e1Charge           = -10;
+    e2Classification  = -1;
+    e2Charge          = -10;
+    
+    e1px               = -99999.;
+    e1py               = -99999.;
+    e1pz               = -99999.;
+    e1E                = -1.;
+    e1Et               = -1.;
+    e1Pt               = -1.;
+    e1Eta              = -10.;
+    e1Theta            = -99999.;
+    e1Phi              = -10.;
+    e1Vx               = -10.;
+    e1Vy               = -10.;
+    e1Vz               = -10.;
+    e1Y                = -10.;
+    e1_sc_x            = -10.;
+    e1_sc_y            = -10.;
+    e1_sc_z            = -10.;
+    e1_sc_Theta        = -99999.;
+    e1_sc_Eta          = -10.;    
+    e1_sc_Phi          = -10.;
+    e1_sc_E            = -1.;
+    e1_sc_px           = -99999.;
+    e1_sc_py           = -99999.;
+    e1_sc_pz           = -99999.;
+    e1_sc_Pt           = -1.;
+    e1_sc_Et           = -1.;	  
+    e1_EoverPout       = -1.;
+    e1_EoverPin        = -1.;
+    e1_numberOfBrems   = -10.;
+    e1_BremFraction    = -1.;
+    e1_DeltaEtaIn      = -10.;
+    e1_DeltaPhiIn      = -10.;
+    e1_DeltaPhiOut     = -10.;
+    e1_DeltaEtaOut     = -10.;
+    e1_Trackmom_calo   = -1.;
+    e1_Trackmom_vtx    = -1.;	  
+    e1_HoverE          = -1.;	   	  
+    e1_E9overE25       = -10.;
+    e1_SigmaEtaEta     = -1.;
+    e1_SigmaIetaIeta   = -1.;	  
+    e1_missingHits     = 100;
+    e1_dist            = -10.;
+    e1_dcot            = -10.;
+    e1_convradius      = -10.;
+    e1_d0bsp           = -99999.;
+    e1_dz000           = -99999.;
+    
+    e1_pfiso_chargedHadronIso       = -99999.;
+    e1_pfiso_photonIso              = -99999.;
+    e1_pfiso_neutralHadronIso       = -99999.;
+    
+    e2px              = -99999.;
+    e2py              = -99999.;
+    e2pz              = -99999.;
+    e2E               = -1.;
+    e2Pt              = -1.;
+    e2Et              = -1.;
+    e2Eta             = -10.;
+    e2Theta           = -99999.;
+    e2Phi             = -10.;
+    e2Vx              = -10.;
+    e2Vy              = -10.;
+    e2Vz              = -10.;
+    e2Y               = -10.;
+    e2_sc_x           = -10.;
+    e2_sc_y           = -10.;
+    e2_sc_z           = -10.;
+    e2_sc_Theta       = -99999.;
+    e2_sc_Eta         = -10.;    
+    e2_sc_Phi         = -10.;
+    e2_sc_E           = -1.;
+    e2_sc_px          = -99999.;
+    e2_sc_py          = -99999.;
+    e2_sc_pz          = -99999.;
+    e2_sc_Pt          = -1.;
+    e2_sc_Et          = -1.;	  
+    e2_EoverPout       = -1.;
+    e2_EoverPin        = -1.;
+    e2_numberOfBrems   = -10.;
+    e2_BremFraction    = -1.;
+    e2_DeltaEtaIn      = -10.;
+    e2_DeltaPhiIn      = -10.;
+    e2_DeltaPhiOut     = -10.;
+    e2_DeltaEtaOut     = -10.;
+    e2_Trackmom_calo   = -1.;
+    e2_Trackmom_vtx    = -1.;	  
+    e2_HoverE          = -1.;	    
+    e2_E9overE25       = -10.;
+    e2_SigmaEtaEta     = -1.;
+    e2_SigmaIetaIeta     = -1.;	  
+    e2_missingHits     = 100;
+    e2_dist            = -10.;
+    e2_dcot            = -10.;
+    e2_convradius      = -10.;
+    
+    //////////////
+    e1_trackiso     = 5000.0;
+    e1_hcaliso      = 5000.0;
+    e1_ecaliso      = 5000.0;
+    e2_trackiso     = 5000.0;
+    e2_hcaliso      = 5000.0;
+    e2_ecaliso      = 5000.0;
+    
+    // initialization done
+}
 
 
 

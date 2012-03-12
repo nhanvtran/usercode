@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Project: CMS detector at the CERN
  *
- * Package: ElectroWeakAnalysis/VplusJetSubstructure
+ * Package: ElectroWeakAnalysis/DiJetSubstructure
  *
  *
  * Authors:
@@ -20,7 +20,7 @@
 
 
 // user include files
-#include "ElectroWeakAnalysis/VPlusJets/interface/VplusJetSubstructureAnalysis.h" 
+#include "ElectroWeakAnalysis/VPlusJets/interface/DiJetSubstructureAnalysis.h" 
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/BeamSpot/interface/BeamSpot.h"
@@ -37,17 +37,12 @@
 
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
-ewk::VplusJetSubstructureAnalysis::VplusJetSubstructureAnalysis(const edm::ParameterSet& iConfig)
+ewk::DiJetSubstructureAnalysis::DiJetSubstructureAnalysis(const edm::ParameterSet& iConfig)
 {
     std::cout << "constructor!" << std::endl;
     
     // output file
     fOutputFileName_ = iConfig.getParameter<std::string>("HistOutFile");
-    
-    // lepton information
-    LeptonType_ = iConfig.getParameter<std::string>("LeptonType");
-    VBosonType_ = iConfig.getParameter<std::string>("VBosonType");
-    //mInputBoson_ = iConfig.getParameter<edm::InputTag>("srcVectorBoson"); 
     
     // jet collections
     PatJetCollections_ = iConfig.getParameter< std::vector<std::string> >("PatJetCollections");
@@ -70,27 +65,7 @@ ewk::VplusJetSubstructureAnalysis::VplusJetSubstructureAnalysis(const edm::Param
     
     // declare ntuple
     hOutputFile = new TFile( fOutputFileName_.c_str(), "RECREATE" );
-    myTree = new TTree( "VJetSubstructure","V+jets Tree" );
-    
-    /*
-    // boson filler 
-    if (LeptonType_ == "electron"){
-        recoBosonFillerE = new VtoElectronTreeFiller( VBosonType_.c_str(), myTree, iConfig);
-    }
-    else if (LeptonType_ == "muon"){
-        recoBosonFillerMu = new VtoMuonTreeFiller( VBosonType_.c_str(), myTree, iConfig);
-    }
-    else {
-        std::cout << "Error: invalid lepton type" << std::endl;
-    }
-    //*/
-    
-    recoWBosonFillerE = new VtoElectronTreeFiller( "W", "electron", myTree, iConfig);
-    recoZBosonFillerE = new VtoElectronTreeFiller( "Z", "electron", myTree, iConfig);
-    recoWBosonFillerMu = new VtoMuonTreeFiller( "W", "muon", myTree, iConfig);
-    recoZBosonFillerMu = new VtoMuonTreeFiller( "Z", "muon", myTree, iConfig);
-
-    
+    myTree = new TTree( "DiJetSubstructure","dijets Tree" );    
     
     ////////////////////////////////////
     for (unsigned int i = 0; i < PatJetCollections_.size(); i++){
@@ -115,10 +90,10 @@ ewk::VplusJetSubstructureAnalysis::VplusJetSubstructureAnalysis(const edm::Param
 
 
 
-ewk::VplusJetSubstructureAnalysis::~VplusJetSubstructureAnalysis() {}
+ewk::DiJetSubstructureAnalysis::~DiJetSubstructureAnalysis() {}
 
 
-void ewk::VplusJetSubstructureAnalysis::beginJob() {
+void ewk::DiJetSubstructureAnalysis::beginJob() {
     // Declare all the branches of the tree
     std::cout << "start begin job" << std::endl;
     declareTreeBranches();
@@ -129,7 +104,7 @@ void ewk::VplusJetSubstructureAnalysis::beginJob() {
 
 
 // ------------ method called to produce the data  ------------
-void ewk::VplusJetSubstructureAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void ewk::DiJetSubstructureAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     
     
     // write event information
@@ -250,129 +225,21 @@ void ewk::VplusJetSubstructureAnalysis::analyze(const edm::Event& iEvent, const 
         ctid++;
     }
     
-    // ---------------------------------------------------------
-    // V e c t o r   b o s o n   c l a s s i f i c a t i o n   a n d   i d e n t i f i c i a t i o n
-    // count total number of candidates and then select good ones based on lepton identification
-    ///*
-    edm::Handle<edm::View< reco::Candidate> > We_boson;
-    iEvent.getByLabel( "WToEnu", We_boson);
-    edm::Handle<edm::View< reco::Candidate> > Wm_boson;
-    iEvent.getByLabel( "WToMunu", Wm_boson);
-    edm::Handle<edm::View< reco::Candidate> > Ze_boson;
-    iEvent.getByLabel( "ZToEE", Ze_boson);
-    edm::Handle<edm::View< reco::Candidate> > Zm_boson;
-    iEvent.getByLabel( "ZToMM", Zm_boson);
-
-    edm::Handle<edm::View<pat::Muon> > muonHandle;
-    iEvent.getByLabel("selectedPatMuonsPFlow",muonHandle);
-    edm::View<pat::Muon> muons = *muonHandle;
-    
-    edm::Handle<edm::View<pat::Electron> > electronHandle;
-    iEvent.getByLabel("selectedPatElectronsPFlow",electronHandle);
-    edm::View<pat::Electron> electrons = *electronHandle;
-        
-    int n_We = We_boson->size(), n_Wm = Wm_boson->size();
-    int n_Ze = Ze_boson->size(), n_Zm = Zm_boson->size();
-    int n_e = electrons.size(), n_m = muons.size();
-    int nTotCands = n_We + n_Wm + n_Ze + n_Zm; 
-    
-    
-    // can refine selections later...
-    if ( nTotCands == 0 ) return;
-    else {
-        
-        std::cout << "n electrons: " << electrons.size() << std::endl;
-        std::cout << "n muons: " << muons.size() << std::endl;
-        
-        // numbers of V candidates
-        std::cout << "We_boson size: " << We_boson->size() << std::endl;
-        std::cout << "Wm_boson size: " << Wm_boson->size() << std::endl;
-        std::cout << "Ze_boson size: " << Ze_boson->size() << std::endl;
-        std::cout << "Zm_boson size: " << Zm_boson->size() << std::endl;
-                
-        if ( nTotCands == 1 ) {
-            std::cout << "hooray!" << std::endl;
-            if (n_We == 1) eventClass = 1;   
-            if (n_Wm == 1) eventClass = 2;   
-            if (n_Ze == 1) eventClass = 3;   
-            if (n_Zm == 1) eventClass = 4;   
-        }
-        else {
-            
-            if (n_We == 1 && n_e == 1 && n_Wm == 0 && n_m == 0 && n_Ze == 0 && n_Zm == 0){
-                std::cout << "this is a W->enu event" << std::endl;
-                eventClass = 1;
-            }
-            else if (n_We == 0 && n_e == 0 && n_Wm == 1 && n_m == 1 && n_Ze == 0 && n_Zm == 0){
-                std::cout << "this is a W->munu event" << std::endl;
-                eventClass = 2;
-            }
-            else if (n_We >= 0 && n_e == 2 && n_Wm == 0 && n_m == 0 && n_Ze == 1 && n_Zm == 0){
-                std::cout << "this is a Z->ee event" << std::endl;
-                eventClass = 3;
-            }
-            else if (n_We == 0 && n_e == 0 && n_Wm >= 0 && n_m == 2 && n_Ze == 0 && n_Zm == 1){
-                std::cout << "this is a Z->mumu event" << std::endl;
-                eventClass = 4;
-            }
-            else{
-                std::cout << "throw out this event" << std::endl;
-                eventClass = -1;
-                return;
-            }
-        }
-        
-        recoWBosonFillerE->fill(iEvent, 0);
-        recoWBosonFillerMu->fill(iEvent);
-        recoZBosonFillerE->fill(iEvent, 0);
-        recoZBosonFillerMu->fill(iEvent);
-
-    }
-    
-    //*/
-    
-    /*
-    // First check if this event has at least 1 V boson
-    edm::Handle<edm::View< reco::Candidate> > boson;
-    iEvent.getByLabel( mInputBoson_, boson);
-    mNVB = boson->size();
-    if( mNVB<1 ) return; // Nothing to fill
-    
-    //  Store reconstructed vector boson information
-    if (LeptonType_ == "electron"){
-        recoBosonFillerE->fill(iEvent, 0);
-        if(mNVB==2) recoBosonFillerE->fill(iEvent, 1);
-    }
-    else if (LeptonType_ == "muon"){
-        std::cout << "fill Muons!" << std::endl;
-        recoBosonFillerMu->fill(iEvent);
-    }
-    else {
-        std::cout << "Error: invalid lepton type" << std::endl;
-    }
-    */
-    
-    ///*
-    //edm::Handle<edm::View<pat::Jet> > jets_CA8PF;
-    //iEvent.getByLabel( "goodPatJetsCA8PFlow", jets_CA8PF );
-    
     unsigned int nAllCollections = PatJetCollections_.size() + LiteJetCollections_.size() + GenJetCollections_.size();
     for (unsigned int i = 0; i < nAllCollections; i++){
-        std::cout << "------- i coll: " << i << std::endl; 
+        //std::cout << "------- i coll: " << i << std::endl; 
         jetcol[i]->fill(iEvent);
     }
-    std::cout << "after..." << std::endl;
+    //std::cout << "after..." << std::endl;
     //myTree->Print("V");
-    std::cout << ">>>>>overall fill! event: " << event  << std::endl;
+    //std::cout << ">>>>>overall fill! event: " << event  << std::endl;
     myTree->Fill();
-    std::cout << "crash?" << event  << std::endl;
-
     
 } // analyze method
 
 
 //  **** Utility: declare TTree branches for ntuple variables ***
-void ewk::VplusJetSubstructureAnalysis::declareTreeBranches() {
+void ewk::DiJetSubstructureAnalysis::declareTreeBranches() {
     
     myTree->Branch("event_runNo",  &run,   "event_runNo/I");
     myTree->Branch("event_evtNo",  &event, "event_evtNo/I");
@@ -382,7 +249,7 @@ void ewk::VplusJetSubstructureAnalysis::declareTreeBranches() {
     myTree->Branch("event_PVx",    mPVx,   "event_PVx[30]/F"); 
     myTree->Branch("event_PVy",    mPVy,   "event_PVy[30]/F"); 
     myTree->Branch("event_PVz",    mPVz,   "event_PVz[30]/F");
-    myTree->Branch("eventClass",   &eventClass, "event_Class/I");
+
     /*
      if(runoverAOD_){
      myTree->Branch("event_met_calomet",    &mMET,  "event_met_calomet/F"); 
@@ -407,8 +274,6 @@ void ewk::VplusJetSubstructureAnalysis::declareTreeBranches() {
     myTree->Branch("event_BeamSpot_z"       ,&mBSz              ,"event_BeamSpot_z/F");
     
     
-    myTree->Branch(("num"+VBosonType_).c_str(),&mNVB ,("num"+VBosonType_+"/I").c_str());
-    
     if ( runningOverMC_ ){
         
         myTree->Branch("event_met_genmet",    &genMET,  "event_met_genmet/F"); 
@@ -427,7 +292,7 @@ void ewk::VplusJetSubstructureAnalysis::declareTreeBranches() {
 
 
 
-void ewk::VplusJetSubstructureAnalysis::endJob()
+void ewk::DiJetSubstructureAnalysis::endJob()
 {
     hOutputFile->SetCompressionLevel(2);
     hOutputFile->cd();
@@ -443,5 +308,5 @@ void ewk::VplusJetSubstructureAnalysis::endJob()
 // declare this class as a plugin
 #include "FWCore/PluginManager/interface/ModuleDef.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-using ewk::VplusJetSubstructureAnalysis;
-DEFINE_FWK_MODULE(VplusJetSubstructureAnalysis);
+using ewk::DiJetSubstructureAnalysis;
+DEFINE_FWK_MODULE(DiJetSubstructureAnalysis);
