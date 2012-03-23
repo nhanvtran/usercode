@@ -11,7 +11,7 @@
 #include "RooPlot.h"
 using namespace RooFit ;
 
-void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "PS"){
+void plotPdf_5D_HWW(float mH = 125, TString mode="MCFM", TString dataType = "SM"){
     
     gROOT->ProcessLine(".L ~/tdrstyle.C");
     setTDRStyle();
@@ -36,8 +36,7 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "PS")
     RooRealVar* gamW = new RooRealVar("gamW","gamW",2.1);
     // More parameters, these are the couplings "a1","a2","a3" which are _complex_ (which is why there are phases "phi*Val")
     RooRealVar* a1Val = new RooRealVar("a1Val","a1Val",1);
-    RooRealVar* phi1Val = new RooRealVar("phi1Val","phi1Val",TMath::Pi());
-    //RooRealVar* phi1Val = new RooRealVar("phi1Val","phi1Val", 0);
+    RooRealVar* phi1Val = new RooRealVar("phi1Val","phi1Val", 0);
     RooRealVar* a2Val = new RooRealVar("a2Val","a2Val",0);
     RooRealVar* phi2Val = new RooRealVar("phi2Val","phi2Val", 0);
     RooRealVar* a3Val = new Roo RealVar("a3Val","a3Val",0);

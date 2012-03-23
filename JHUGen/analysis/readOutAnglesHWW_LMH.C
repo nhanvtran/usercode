@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include "TLorentzVector.h"
 
+
 using namespace std;
 
 void calculateAngles(TLorentzVector p4H, TLorentzVector p4Z1, TLorentzVector p4M11, TLorentzVector p4M12, TLorentzVector p4Z2, TLorentzVector p4M21, TLorentzVector p4M22, double& costheta1, double& costheta2, double& phi, double& costhetastar, double& phistar1, double& phistar2, double& phistar12, double& phi1, double& phi2, bool verbose);
@@ -51,6 +52,18 @@ void readOutAnglesHWW_LMH(std::string filename){
 	tree->Branch("lm_pT", &m_lminus_pT, "lm_pT/D");
 	tree->Branch("nubar_pT", &m_nubar_pT, "nubar_pT/D");
 	
+	//
+	// WW analysis specific variables
+	// 
+	Double_t m_dphill, m_mll, m_leadleppt, m_trailleppt, m_met, m_dilpt, m_mt;
+	tree->Branch("dphill", &m_dphill, "dphill/D");
+	tree->Branch("mll", &m_mll, "mll/D");
+	tree->Branch("leadleppt", &m_leadleppt, "leadleppt/D");
+	tree->Branch("trailleppt", &m_trailleppt, "trailleppt/D");
+	tree->Branch("met", &m_met, "met/D");	
+	tree->Branch("mt", &m_mt, "mt/D");
+	tree->Branch("dilpt", &m_dilpt, "dilpt/D");
+
 	int ctr = 0;
 	int iFile = 0;
 	while (!fin.eof() && fin.good()){
@@ -110,6 +123,7 @@ void readOutAnglesHWW_LMH(std::string filename){
 					nubar = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);		
 				}				
 			}
+
 			/*
 			std::cout << Form("nu (px, py, pz, E): (%.3f, %.3f, %.3f, %.3f) \n", nu.Px(), nu.Py(), nu.Pz(), nu.E());
 			std::cout << Form("lplus (px, py, pz, E): (%.3f, %.3f, %.3f, %.3f) \n", lplus.Px(), lplus.Py(), lplus.Pz(), lplus.E());
@@ -123,7 +137,7 @@ void readOutAnglesHWW_LMH(std::string filename){
 			TLorentzVector X = Wplus + Wminus;
 			
 			double angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2;
-			calculateAngles( X, Wplus, lplus, nu, Wminus, lminus, nubar, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2, false);
+			calculateAngles( X, Wplus, nu, lplus,  Wminus, lminus, nubar, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2, false);
 						
 			m_costheta1 = angle_costheta1;
 			m_costheta2 = angle_costheta2;
@@ -144,6 +158,24 @@ void readOutAnglesHWW_LMH(std::string filename){
 			m_lminus_pT = lminus.Pt();
 			m_nubar_pT = nubar.Pt();
 			
+			
+			// 
+			// get the WW analysis variables
+			// 
+			double dphillvalue = lplus.Phi() - lminus.Phi();
+			while (dphillvalue > TMath::Pi()) dphillvalue -= 2*TMath::Pi();
+			while (dphillvalue <= -TMath::Pi()) dphillvalue += 2*TMath::Pi();
+			m_dphill  = TMath::Abs(dphillvalue);
+			m_mll = (lplus + lminus).M();
+			
+			m_leadleppt = lplus.Pt() > lminus.Pt() ? lplus.Pt() : lminus.Pt();
+			m_trailleppt = lplus.Pt() < lminus.Pt() ? lplus.Pt() : lminus.Pt();
+			m_met = sqrt(pow(nu.Px()+nubar.Px(), 2) + pow(nu.Py()+nubar.Py(), 2));
+			m_dilpt = (lplus+lminus).Pt();
+			double dphidilmet = (lplus+lminus).Phi() - (nu+nubar).Phi();
+			while (dphidilmet > TMath::Pi()) dphidilmet -= 2*TMath::Pi();
+			while (dphidilmet <= -TMath::Pi()) dphidilmet += 2*TMath::Pi();
+			m_mt  = 2*sqrt(m_dilpt * m_met ) * fabs(sin(dphidilmet / 2.));
 			tree->Fill();
 		}
 		
