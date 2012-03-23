@@ -567,6 +567,116 @@ END FUNCTION
 
 
 
+SUBROUTINE VVBranchings(MY_IDUP,ICOLUP)
+use ModParameters
+implicit none
+integer :: MY_IDUP(4:9),ICOLUP(1:2,6:9),DKFlavor
+real(8) :: DKRnd
+
+!    particle associations:
+!    
+!    IDUP(6)  -->  MomDK(:,2)  -->     v-spinor
+!    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
+!    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
+!    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
+!
+
+   if( DecayMode1.eq.0 ) then! Z1->2l
+        call random_number(DKRnd)
+        MY_IDUP(4) = Z0_
+        DKFlavor = ZLepBranching( DKRnd )!= ElM or MuM
+        MY_IDUP(6) =-DKFlavor
+        MY_IDUP(7) =+DKFlavor
+   elseif( DecayMode1.eq.1 ) then! Z1->2q
+        call random_number(DKRnd)
+        MY_IDUP(4) = Z0_
+        DKFlavor = ZQuaBranching( DKRnd )!= Up,Dn,Chm,Str,Bot
+        MY_IDUP(6) =-DKFlavor
+        MY_IDUP(7) =+DKFlavor
+        ICOLUP(1:2,6) = (/0,503/)
+        ICOLUP(1:2,7) = (/503,0/)
+   elseif( DecayMode1.eq.2 ) then! Z1->2tau
+        MY_IDUP(4) = Z0_
+        MY_IDUP(6) = TaP_
+        MY_IDUP(7) = TaM_
+   elseif( DecayMode1.eq.3 ) then! Z1->2nu
+        call random_number(DKRnd)
+        MY_IDUP(4) = Z0_
+        DKFlavor = ZNuBranching( DKRnd )!= NuE,NuM,NuT
+        MY_IDUP(6) =-DKFlavor
+        MY_IDUP(7) =+DKFlavor
+   elseif( DecayMode1.eq.4 ) then! W1(+)->lnu
+        call random_number(DKRnd)
+        MY_IDUP(4) = Wp_
+        DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
+        MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
+        MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
+   elseif( DecayMode1.eq.5 ) then! W1(+)->2q
+        call random_number(DKRnd)
+        MY_IDUP(4) = Wp_
+        DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
+        MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor
+        MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
+        ICOLUP(1:2,6) = (/0,503/)
+        ICOLUP(1:2,7) = (/503,0/)
+   elseif( DecayMode1.eq.6 ) then! W1(+)->taunu
+        MY_IDUP(4) = Wp_
+        MY_IDUP(6) = TaP_
+        MY_IDUP(7) = NuT_
+   endif
+
+
+   if( DecayMode2.eq.0 ) then! Z2->2l (sample over el,mu)
+        call random_number(DKRnd)
+        MY_IDUP(5) = Z0_
+        DKFlavor = ZLepBranching( DKRnd )!= ElM or MuM
+        MY_IDUP(8) =-DKFlavor
+        MY_IDUP(9) =+DKFlavor
+   elseif( DecayMode2.eq.1 ) then! Z2->2q
+        call random_number(DKRnd)
+        MY_IDUP(5) = Z0_
+        DKFlavor = ZQuaBranching( DKRnd )!= Up,Dn,Chm,Str,Bot
+        MY_IDUP(8) =-DKFlavor
+        MY_IDUP(9) =+DKFlavor
+        ICOLUP(1:2,8) = (/0,504/)
+        ICOLUP(1:2,9) = (/504,0/)
+   elseif( DecayMode2.eq.2 ) then! Z2->2tau
+        MY_IDUP(5) = Z0_
+        MY_IDUP(8) = TaP_
+        MY_IDUP(9) = TaM_
+   elseif( DecayMode2.eq.3 ) then! Z2->2nu
+        call random_number(DKRnd)
+        MY_IDUP(5) = Z0_
+        DKFlavor = ZNuBranching( DKRnd )!= NuE,NuM,NuT
+        MY_IDUP(8) =-DKFlavor
+        MY_IDUP(9) =+DKFlavor
+   elseif( DecayMode2.eq.4 ) then! W2(-)->lnu
+        call random_number(DKRnd)
+        MY_IDUP(5) = Wm_
+        DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
+        MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
+        MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
+   elseif( DecayMode2.eq.5 ) then! W2(-)->2q (sample over u,d,s,c)
+        call random_number(DKRnd)
+        MY_IDUP(5) = Wm_
+        DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
+        MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
+        MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
+        ICOLUP(1:2,8) = (/0,504/)
+        ICOLUP(1:2,9) = (/504,0/)
+   elseif( DecayMode2.eq.6 ) then! W2(-)->taunu
+        MY_IDUP(5) = Wm_
+        MY_IDUP(8) = ANuT_
+        MY_IDUP(9) = TaM_
+   endif
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
 
 
 

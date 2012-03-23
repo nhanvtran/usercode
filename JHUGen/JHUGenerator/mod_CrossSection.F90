@@ -18,8 +18,8 @@ contains
  real(8) :: EvalWeighted,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt
  real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
  real(8) :: pdf(-6:6,1:2)
- integer :: NBin(1:11),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),DKFlavor
- real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,DKRnd
+ integer :: NBin(1:11),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9)
+ real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
  real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4)
  real(8) :: EZ,  EZ1, EZ2, pz, xmax, xx1, xx2
  real(8) :: pz12, MomExt_f(1:4,1:4), MomDK_f(1:4,1:4)
@@ -36,100 +36,23 @@ contains
       call PDFMapping(12,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
     endif
     EvalCounter = EvalCounter+1
-   if( DecayMode1.eq.0 ) then! Z1->2l (sample over el,mu)
-        call random_number(DKRnd)
-        MY_IDUP(4) = Z0_
-        DKFlavor = ZLepBranching( DKRnd )
-        MY_IDUP(6) =+DKFlavor
-        MY_IDUP(7) =-DKFlavor
-   elseif( DecayMode1.eq.1 ) then! Z1->2q (sample over u,d,s,c,b)
-        call random_number(DKRnd)
-        MY_IDUP(4) = Z0_
-        DKFlavor = ZQuaBranching( DKRnd )
-        MY_IDUP(6) =+DKFlavor
-        MY_IDUP(7) =-DKFlavor
-        ICOLUP(1:2,6) = (/503,0/)
-        ICOLUP(1:2,7) = (/0,503/)
-   elseif( DecayMode1.eq.2 ) then! Z1->2tau
-        MY_IDUP(4) = Z0_
-        MY_IDUP(6) = TaP_
-        MY_IDUP(7) = TaM_
-   elseif( DecayMode1.eq.3 ) then! Z1->2nu (sample over nu_el,nu_mu,nu_tau)
-        call random_number(DKRnd)
-        MY_IDUP(4) = Z0_
-        DKFlavor = ZNuBranching( DKRnd )
-        MY_IDUP(6) =+DKFlavor
-        MY_IDUP(7) =-DKFlavor
-   elseif( DecayMode1.eq.4 ) then! W1(+)->lnu (sample over el,nu)
-        call random_number(DKRnd)
-        MY_IDUP(4) = Wp_
-        DKFlavor = WLepBranching( DKRnd )
-        MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
-        MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
-   elseif( DecayMode1.eq.5 ) then! W1(+)->2q (sample over u,d,s,c)
-        call random_number(DKRnd)
-        MY_IDUP(4) = Wp_
-        DKFlavor = WQuaUpBranching( DKRnd )
-        MY_IDUP(6) = +abs(DKFlavor)    ! up flavor
-        MY_IDUP(7) = -abs(DKFlavor)-1  ! anti-dn flavor
-        ICOLUP(1:2,6) = (/503,0/)
-        ICOLUP(1:2,7) = (/0,503/)
-   elseif( DecayMode1.eq.6 ) then! W1(+)->taunu
-        MY_IDUP(4) = Wp_
-        MY_IDUP(6) = TaP_
-        MY_IDUP(7) = NuT_
-   endif
 
 
-   if( DecayMode2.eq.0 ) then! Z2->2l (sample over el,mu)
-        call random_number(DKRnd)
-        MY_IDUP(5) = Z0_
-        DKFlavor = ZLepBranching( DKRnd )
-        MY_IDUP(8) =+DKFlavor
-        MY_IDUP(9) =-DKFlavor
-   elseif( DecayMode2.eq.1 ) then! Z2->2q (sample over u,d,s,c,b)
-        call random_number(DKRnd)
-        MY_IDUP(5) = Z0_
-        DKFlavor = ZQuaBranching( DKRnd )
-        MY_IDUP(8) =+DKFlavor
-        MY_IDUP(9) =-DKFlavor
-        ICOLUP(1:2,8) = (/504,0/)
-        ICOLUP(1:2,9) = (/0,504/)
-   elseif( DecayMode2.eq.2 ) then! Z2->2tau
-        MY_IDUP(5) = Z0_
-        MY_IDUP(8) = TaP_
-        MY_IDUP(9) = TaM_
-   elseif( DecayMode2.eq.3 ) then! Z2->2nu (sample over nu_el,nu_mu,nu_tau)
-        call random_number(DKRnd)
-        MY_IDUP(5) = Z0_
-        DKFlavor = ZNuBranching( DKRnd )
-        MY_IDUP(8) =+DKFlavor
-        MY_IDUP(9) =-DKFlavor
-   elseif( DecayMode2.eq.4 ) then! W2(-)->lnu (sample over el,nu)
-        call random_number(DKRnd)
-        MY_IDUP(5) = Wm_
-        DKFlavor = WLepBranching( DKRnd )
-        MY_IDUP(8) = -abs(DKFlavor)     ! lepton(-)
-        MY_IDUP(9) = -abs(DKFlavor)-7   ! anti-neutrino
-   elseif( DecayMode2.eq.5 ) then! W2(-)->2q (sample over u,d,s,c)
-        call random_number(DKRnd)
-        MY_IDUP(5) = Wm_
-        DKFlavor = WQuaUpBranching( DKRnd )
-        MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
-        MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
-        ICOLUP(1:2,8) = (/0,504/)
-        ICOLUP(1:2,9) = (/504,0/)
-   elseif( DecayMode2.eq.6 ) then! W2(-)->taunu
-        MY_IDUP(5) = Wm_
-        MY_IDUP(8) = TaM_
-        MY_IDUP(9) = ANuT_
-   endif
+
+
+!    particle associations:
+!    
+!    IDUP(6)  -->  MomDK(:,2)  -->     v-spinor
+!    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
+!    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
+!    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
+!
+    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
+
 
   yz1 = yRnd(10)
   yz2 = yRnd(11)
-  offzchannel = yRnd(12) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell
-
-
+  offzchannel = yRnd(12) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell 
   if ((OffShellV1.eqv..true.).and.(OffShellV2.eqv..true.)) then
         if(M_Reso.gt.2d0*M_V) then
             EZ_max = EHat
@@ -285,7 +208,7 @@ real(8) :: RES(-5:5,-5:5)
 real(8) :: EvalUnWeighted,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt
 real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
 real(8) :: pdf(-6:6,1:2)
-integer :: NBin(1:11),NHisto,i,DKFlavor
+integer :: NBin(1:11),NHisto,i
 real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
 real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomExt_f(1:4,1:4),MomDK_f(1:4,1:4)
 logical :: applyPSCut,genEvt
@@ -293,7 +216,7 @@ real(8) :: CS_max, channel_ratio
 real(8) :: oneovervolume, bound(1:11), sumtot,yz1,yz2,EZ_max,dr,MZ1,MZ2
 integer :: parton(-5:5,-5:5), i1, ifound, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9)
 real(8)::ntRnd,ZMass(1:2)
-real(8) :: offzchannel,DKRnd
+real(8) :: offzchannel
 include 'vegas_common.f'
 include 'csmaxvalue.f'
 
@@ -312,99 +235,12 @@ include 'csmaxvalue.f'
    EvalCounter = EvalCounter+1
 
    MY_IDUP(3)= 0
-   if( DecayMode1.eq.0 ) then! Z1->2l (sample over el,mu)
-        call random_number(DKRnd)
-        MY_IDUP(4) = Z0_
-        DKFlavor = ZLepBranching( DKRnd )
-        MY_IDUP(6) =+DKFlavor
-        MY_IDUP(7) =-DKFlavor
-   elseif( DecayMode1.eq.1 ) then! Z1->2q (sample over u,d,s,c,b)
-        call random_number(DKRnd)
-        MY_IDUP(4) = Z0_
-        DKFlavor = ZQuaBranching( DKRnd )
-        MY_IDUP(6) =+DKFlavor
-        MY_IDUP(7) =-DKFlavor
-        ICOLUP(1:2,6) = (/503,0/)
-        ICOLUP(1:2,7) = (/0,503/)
-   elseif( DecayMode1.eq.2 ) then! Z1->2tau
-        MY_IDUP(4) = Z0_
-        MY_IDUP(6) = TaP_
-        MY_IDUP(7) = TaM_
-   elseif( DecayMode1.eq.3 ) then! Z1->2nu (sample over nu_el,nu_mu,nu_tau)
-        call random_number(DKRnd)
-        MY_IDUP(4) = Z0_
-        DKFlavor = ZNuBranching( DKRnd )
-        MY_IDUP(6) =+DKFlavor
-        MY_IDUP(7) =-DKFlavor
-   elseif( DecayMode1.eq.4 ) then! W1(+)->lnu (sample over el,nu)
-        call random_number(DKRnd)
-        MY_IDUP(4) = Wp_
-        DKFlavor = WLepBranching( DKRnd )
-        MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
-        MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
-   elseif( DecayMode1.eq.5 ) then! W1(+)->2q (sample over u,d,s,c)
-        call random_number(DKRnd)
-        MY_IDUP(4) = Wp_
-        DKFlavor = WQuaUpBranching( DKRnd )
-        MY_IDUP(6) = +abs(DKFlavor)    ! up flavor
-        MY_IDUP(7) = -abs(DKFlavor)-1  ! anti-dn flavor
-        ICOLUP(1:2,6) = (/503,0/)
-        ICOLUP(1:2,7) = (/0,503/)
-   elseif( DecayMode1.eq.6 ) then! W1(+)->taunu
-        MY_IDUP(4) = Wp_
-        MY_IDUP(6) = TaP_
-        MY_IDUP(7) = NuT_
-   endif
+   call VVBranchings(MY_IDUP(6:9),ICOLUP(1:2,6:9))
 
-
-   if( DecayMode2.eq.0 ) then! Z2->2l (sample over el,mu)
-        call random_number(DKRnd)
-        MY_IDUP(5) = Z0_
-        DKFlavor = ZLepBranching( DKRnd )
-        MY_IDUP(8) =+DKFlavor
-        MY_IDUP(9) =-DKFlavor
-   elseif( DecayMode2.eq.1 ) then! Z2->2q (sample over u,d,s,c,b)
-        call random_number(DKRnd)
-        MY_IDUP(5) = Z0_
-        DKFlavor = ZQuaBranching( DKRnd )
-        MY_IDUP(8) =+DKFlavor
-        MY_IDUP(9) =-DKFlavor
-        ICOLUP(1:2,8) = (/504,0/)
-        ICOLUP(1:2,9) = (/0,504/)
-   elseif( DecayMode2.eq.2 ) then! Z2->2tau
-        MY_IDUP(5) = Z0_
-        MY_IDUP(8) = TaP_
-        MY_IDUP(9) = TaM_
-   elseif( DecayMode2.eq.3 ) then! Z2->2nu (sample over nu_el,nu_mu,nu_tau)
-        call random_number(DKRnd)
-        MY_IDUP(5) = Z0_
-        DKFlavor = ZNuBranching( DKRnd )
-        MY_IDUP(8) =+DKFlavor
-        MY_IDUP(9) =-DKFlavor
-   elseif( DecayMode2.eq.4 ) then! W2(-)->lnu (sample over el,nu)
-        call random_number(DKRnd)
-        MY_IDUP(5) = Wm_
-        DKFlavor = WLepBranching( DKRnd )
-        MY_IDUP(8) = -abs(DKFlavor)     ! lepton(-)
-        MY_IDUP(9) = -abs(DKFlavor)-7   ! anti-neutrino
-   elseif( DecayMode2.eq.5 ) then! W2(-)->2q (sample over u,d,s,c)
-        call random_number(DKRnd)
-        MY_IDUP(5) = Wm_
-        DKFlavor = WQuaUpBranching( DKRnd )
-        MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
-        MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
-        ICOLUP(1:2,8) = (/0,504/)
-        ICOLUP(1:2,9) = (/504,0/)
-   elseif( DecayMode2.eq.6 ) then! W2(-)->taunu
-        MY_IDUP(5) = Wm_
-        MY_IDUP(8) = TaM_
-        MY_IDUP(9) = ANuT_
-   endif
 
   yz1 = yRnd(10)
   yz2 = yRnd(11)
   offzchannel = yRnd(15) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell
-
   if ((OffShellV1.eqv..true.).and.(OffShellV2.eqv..true.)) then
         if(M_Reso.gt.2d0*M_V) then
             EZ_max = EHat
