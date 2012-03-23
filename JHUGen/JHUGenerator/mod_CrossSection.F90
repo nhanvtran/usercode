@@ -235,7 +235,7 @@ include 'csmaxvalue.f'
    EvalCounter = EvalCounter+1
 
    MY_IDUP(3)= 0
-   call VVBranchings(MY_IDUP(6:9),ICOLUP(1:2,6:9))
+   call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
 
 
   yz1 = yRnd(10)
