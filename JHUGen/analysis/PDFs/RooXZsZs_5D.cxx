@@ -97,8 +97,11 @@ Double_t RooXZsZs_5D::evaluate() const
     if (nanval != nanval) return 1e-9;
     
     Double_t f00Val = (a1Val*a1Val*chi*chi+pow(a2Val,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1Val*a2Val*chi*(chi*chi-1)*eta*cos(phi1Val-phi2Val));
-    Double_t fppVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1)+2.*a1Val*a3Val*chi*sqrt(chi*chi-1)*eta*cos(phi1Val-phi3Val));
-    Double_t fmmVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1)+2.*a1Val*a3Val*chi*sqrt(chi*chi-1)*eta*cos(phi1Val-phi3Val));
+    //Double_t fppVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1)+2.*a1Val*a3Val*chi*sqrt(chi*chi-1)*eta*cos(phi1Val-phi3Val));
+    //Double_t fmmVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1)+2.*a1Val*a3Val*chi*sqrt(chi*chi-1)*eta*cos(phi1Val-phi3Val));
+    Double_t fppVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1));
+    Double_t fmmVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1));
+    
     Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val));
     Double_t phippVal = atan2(a1Val*sin(phi1Val)+a3Val*eta*sqrt(chi*chi-1)*sin(phi3Val),a1Val*cos(phi3Val)-a3Val*eta*sqrt(chi*chi-1)*cos(phi3Val));
     Double_t phimmVal = atan2(a1Val*sin(phi1Val)-a3Val*eta*sqrt(chi*chi-1)*sin(phi3Val),a1Val*cos(phi3Val)+a3Val*eta*sqrt(chi*chi-1)*cos(phi3Val));
