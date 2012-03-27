@@ -55,11 +55,13 @@ void readOutAnglesHWW_LMH(std::string filename){
 	//
 	// WW analysis specific variables
 	// 
-	Double_t m_dphill, m_mll, m_leadleppt, m_trailleppt, m_met, m_dilpt, m_mt;
+	Double_t m_dphill, m_mll, m_leadleppt, m_trailleppt, m_met, m_dilpt, m_mt, m_leadlepeta, m_traillepeta;
 	tree->Branch("dphill", &m_dphill, "dphill/D");
 	tree->Branch("mll", &m_mll, "mll/D");
 	tree->Branch("leadleppt", &m_leadleppt, "leadleppt/D");
 	tree->Branch("trailleppt", &m_trailleppt, "trailleppt/D");
+	tree->Branch("leadlepeta", &m_leadlepeta, "leadlepeta/D");
+	tree->Branch("traillepeta", &m_traillepeta, "traillepeta/D");
 	tree->Branch("met", &m_met, "met/D");	
 	tree->Branch("mt", &m_mt, "mt/D");
 	tree->Branch("dilpt", &m_dilpt, "dilpt/D");
@@ -170,6 +172,8 @@ void readOutAnglesHWW_LMH(std::string filename){
 			
 			m_leadleppt = lplus.Pt() > lminus.Pt() ? lplus.Pt() : lminus.Pt();
 			m_trailleppt = lplus.Pt() < lminus.Pt() ? lplus.Pt() : lminus.Pt();
+			m_leadlepeta = lplus.Pt() > lminus.Pt() ? lplus.Eta() : lminus.Eta();
+			m_traillepeta = lplus.Pt() < lminus.Pt() ? lplus.Eta() : lminus.Eta();
 			m_met = sqrt(pow(nu.Px()+nubar.Px(), 2) + pow(nu.Py()+nubar.Py(), 2));
 			m_dilpt = (lplus+lminus).Pt();
 			double dphidilmet = (lplus+lminus).Phi() - (nu+nubar).Phi();
