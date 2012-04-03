@@ -11,7 +11,7 @@
 #include "RooPlot.h"
 using namespace RooFit ;
 
-void plotPdf_5D_HWW(float mH = 125, TString mode="MCFM", TString dataType = "SM"){
+void plotPdf_5D_HWW(float mH = 170, TString mode="JHU", TString dataType = "T"){
     
     gROOT->ProcessLine(".L ~/tdrstyle.C");
     setTDRStyle();
