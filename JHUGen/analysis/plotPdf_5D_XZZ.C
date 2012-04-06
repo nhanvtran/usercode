@@ -37,8 +37,8 @@ void plotPdf_5D_XZZ() {
     RooRealVar* fp0Val = new RooRealVar("fp0Val", "fp0Val", 0.075);
     RooRealVar* f0mVal = new RooRealVar("f0mVal", "f0mVal", 0.075);
     
-    RooRealVar* phippVal = new RooRealVar("phippVal", "phippVal", 0);
-    RooRealVar* phimmVal = new RooRealVar("phimmVal", "phimmVal", 0);
+    RooRealVar* phippVal = new RooRealVar("phippVal", "phippVal", TMath::Pi());
+    RooRealVar* phimmVal = new RooRealVar("phimmVal", "phimmVal", TMath::Pi());
     RooRealVar* phipmVal = new RooRealVar("phipmVal", "phipmVal", 0);
     RooRealVar* phip0Val = new RooRealVar("phip0Val", "phip0Val", 0);
     RooRealVar* phi0mVal = new RooRealVar("phi0mVal", "phi0mVal", 0);
@@ -65,19 +65,25 @@ void plotPdf_5D_XZZ() {
     
     // PDF definition SM Higgs (JP = 2+)
     RooSpinTwo_5D *myPDF = new RooSpinTwo_5D("myPDF","myPDF", *h1, *h2, *hs, *Phi, *Phi1, *fppVal, *fmmVal, *fpmVal, *fp0Val, *f0mVal, *phippVal, *phimmVal, *phipmVal, *phip0Val, *phi0mVal, *fz1Val, *fz2Val, *R1Val, *R2Val, *para2, *para4, *para6, *para8, *acca0, *acca1, *acca2, *acca4);
-
- // setting for 2-
+    
+    // setting for 2-
     RooRealVar* fppValp = new RooRealVar("fppValp", "fppValp", 0.125);
     RooRealVar* fmmValp = new RooRealVar("fmmValp", "fmmValp", 0.125);
-    RooRealVar* fpmValp = new RooRealVar("fpmValp", "fpmValp", 0.0);
-    RooRealVar* fp0Valp = new RooRealVar("fp0Valp", "fp0Valp", 0.0);
-    RooRealVar* f0mValp = new RooRealVar("f0mValp", "f0mValp", 0.0);
+    RooRealVar* fpmValp = new RooRealVar("fpmValp", "fpmValp", 0.);
+    RooRealVar* fp0Valp = new RooRealVar("fp0Valp", "fp0Valp", 0.1875);
+    RooRealVar* f0mValp = new RooRealVar("f0mValp", "f0mValp", 0.1875);
 
-    RooSpinTwo_5D *myPDFA = new RooSpinTwo_5D("myPDF","myPDF", *h1, *h2, *hs, *Phi, *Phi1, *fppValp, *fmmValp, *fpmValp, *fp0Valp, *f0mValp, *phippVal, *phimmVal, *phipmVal, *phip0Val, *phi0mVal, *fz1Val, *fz2Val, *R1Val, *R2Val, *para2, *para4, *para6, *para8, *acca0, *acca1, *acca2, *acca4);
+    RooRealVar* phippValp = new RooRealVar("phippValp", "phippValp", TMath::Pi());
+    RooRealVar* phimmValp = new RooRealVar("phimmValp", "phimmValp", 0);
+    RooRealVar* phipmValp = new RooRealVar("phipmValp", "phipmValp", 0);
+    RooRealVar* phip0Valp = new RooRealVar("phip0Valp", "phip0Valp", TMath::Pi());
+    RooRealVar* phi0mValp = new RooRealVar("phi0mValp", "phi0mValp", 0);
+
+    RooSpinTwo_5D *myPDFA = new RooSpinTwo_5D("myPDF","myPDF", *h1, *h2, *hs, *Phi, *Phi1, *fppValp, *fmmValp, *fpmValp, *fp0Valp, *f0mValp, *phippValp, *phimmValp, *phipmValp, *phip0Valp, *phi0mValp, *fz1Val, *fz2Val, *R1Val, *R2Val, *para2, *para4, *para6, *para8, *acca0, *acca1, *acca2, *acca4);
 
     // Grab input file to convert to RooDataSet
-    //TFile* fin = new TFile("THiggsZZ_250_JHU.root");
-    TFile* fin = new TFile("PTHiggsZZ_250_JHU.root");
+    TFile* fin = new TFile("THiggsZZ_250_JHU.root");
+    //TFile* fin = new TFile("PTHiggsZZ_250_JHU.root");
     TTree* tin = (TTree*) fin->Get("angles");
     RooDataSet data("data","data",tin,RooArgSet(*h1,*h2, *hs, *Phi, *Phi1));
     /*
@@ -98,7 +104,7 @@ void plotPdf_5D_XZZ() {
     box3->SetBorderSize(0);
     box3->AddEntry(dum1,"5D Model: JP = 2+","l");
     box3->AddEntry(dum2,"5D Model: JP = 2-","l");
-    box3->AddEntry(dum0,"JHU generator simulation: JP = 2-","p");
+    box3->AddEntry(dum0,"JHU generator simulation: JP = 2+","p");
     
     RooPlot* h1frame =  h1->frame(55);
     data.plotOn(h1frame);
@@ -140,10 +146,10 @@ void plotPdf_5D_XZZ() {
     czz->cd(6);
     Phiframe->Draw();
     
-    czz->SaveAs("angles_PTHiggsZZ_250_JHU.eps");
-    czz->SaveAs("angles_PTHiggsZZ_250_JHU.png");
+    // czz->SaveAs("angles_PTHiggsZZ_250_JHU.eps");
+    // czz->SaveAs("angles_PTHiggsZZ_250_JHU.png");
     
-    //  czz->SaveAs("angles_THiggsZZ_250_JHU.eps");
-    //czz->SaveAs("angles_THiggsZZ_250_JHU.png");
+    czz->SaveAs("angles_THiggsZZ_250_JHU.eps");
+    czz->SaveAs("angles_THiggsZZ_250_JHU.png");
 
 }
