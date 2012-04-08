@@ -125,15 +125,58 @@ void vJetSubstructureAnalysis::Loop(Long64_t maxevents)
                 j_ak5tr_mass = JetAK5TRIMMEDPF_Mass[0];
                 j_ak5pr_mass = JetAK5PRUNEDPF_Mass[0];
                 j_ak5ft_mass = JetAK5FILTEREDPF_Mass[0];
-
-                //j_ak7_mass = JetAK7PF_Mass[0];
+                j_ak7_mass = JetAK7PF_Mass[0];
                 j_ak7tr_mass = JetAK7TRIMMEDPF_Mass[0];
                 j_ak7pr_mass = JetAK7PRUNEDPF_Mass[0];
                 j_ak7ft_mass = JetAK7FILTEREDPF_Mass[0];
-
+                j_ak8_mass = JetAK8PF_Mass[0];
+                j_ak8tr_mass = JetAK8TRIMMEDPF_Mass[0];
+                j_ak8pr_mass = JetAK8PRUNEDPF_Mass[0];
+                j_ak8ft_mass = JetAK8FILTEREDPF_Mass[0];
                 j_ca8_mass = JetCA8PF_Mass[0];
                 j_ca8pr_mass = JetCA8PRUNEDPF_Mass[0];
-
+                
+                j_ak5tr_pt = JetAK5TRIMMEDPF_Pt[0];
+                j_ak5pr_pt = JetAK5PRUNEDPF_Pt[0];
+                j_ak5ft_pt = JetAK5FILTEREDPF_Pt[0];
+                j_ak7_pt = JetAK7PF_Pt[0];
+                j_ak7tr_pt = JetAK7TRIMMEDPF_Pt[0];
+                j_ak7pr_pt = JetAK7PRUNEDPF_Pt[0];
+                j_ak7ft_pt = JetAK7FILTEREDPF_Pt[0];
+                j_ak8_pt = JetAK8PF_Pt[0];
+                j_ak8tr_pt = JetAK8TRIMMEDPF_Pt[0];
+                j_ak8pr_pt = JetAK8PRUNEDPF_Pt[0];
+                j_ak8ft_pt = JetAK8FILTEREDPF_Pt[0];
+                j_ca8_pt = JetCA8PF_Pt[0];
+                j_ca8pr_pt = JetCA8PRUNEDPF_Pt[0];
+                
+                j_ak5tr_nJ = (double) JetAK5TRIMMEDPF_nJets;
+                j_ak5pr_nJ = (double) JetAK5PRUNEDPF_nJets;
+                j_ak5ft_nJ = (double) JetAK5FILTEREDPF_nJets;
+                j_ak7_nJ = (double) JetAK7PF_nJets;
+                j_ak7tr_nJ = (double) JetAK7TRIMMEDPF_nJets;
+                j_ak7pr_nJ = (double) JetAK7PRUNEDPF_nJets;
+                j_ak7ft_nJ = (double) JetAK7FILTEREDPF_nJets;
+                j_ak8_nJ = (double) JetAK8PF_nJets;
+                j_ak8tr_nJ = (double) JetAK8TRIMMEDPF_nJets;
+                j_ak8pr_nJ = (double) JetAK8PRUNEDPF_nJets;
+                j_ak8ft_nJ = (double) JetAK8FILTEREDPF_nJets;
+                j_ca8_nJ = (double) JetCA8PF_nJets;
+                j_ca8pr_nJ = (double) JetCA8PRUNEDPF_nJets;
+                
+                j_ak5tr_area = (double) JetAK5TRIMMEDPF_Area[0];
+                j_ak5pr_area = (double) JetAK5PRUNEDPF_Area[0];
+                j_ak5ft_area = (double) JetAK5FILTEREDPF_Area[0];
+                j_ak7_area = (double) JetAK7PF_Area[0];
+                j_ak7tr_area = (double) JetAK7TRIMMEDPF_Area[0];
+                j_ak7pr_area = (double) JetAK7PRUNEDPF_Area[0];
+                j_ak7ft_area = (double) JetAK7FILTEREDPF_Area[0];
+                j_ak8_area = (double) JetAK8PF_Area[0];
+                j_ak8tr_area = (double) JetAK8TRIMMEDPF_Area[0];
+                j_ak8pr_area = (double) JetAK8PRUNEDPF_Area[0];
+                j_ak8ft_area = (double) JetAK8FILTEREDPF_Area[0];
+                j_ca8_area = (double) JetCA8PF_Area[0];
+                j_ca8pr_area = (double) JetCA8PRUNEDPF_Area[0];
 
                 otree->Fill();
             }

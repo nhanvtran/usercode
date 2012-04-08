@@ -30,10 +30,10 @@ void runVJetSubstructureAnalysis(){
     bool runElectrons = false;
 
     double scf = 1/5.000; // one over integrated lumi of the sample
-    vJetSubstructureAnalysis test_ttbar("/eos/uscms/store/user/ntran/smpjs/v10_v2/ttbar_vjet/demo*.root","ntuples/test.root");
-    //vJetSubstructureAnalysis test_ttbar("root://xrootd.unl.edu//store//ntran/smpjs/v10_v2/ttbar_vjet/demo_10_1_K4Z.root","ntuples/test.root");
-    //vJetSubstructureAnalysis test_ttbar("tmp/demo*.root","ntuples/test.root");
-    test_ttbar.Loop(20000);
+    vJetSubstructureAnalysis test_ww("/eos/uscms/store/user/smpjs/ntran/tlbsm_v10/nt_ww_vj/demo*.root","ntuples/test_ww.root");
+    test_ww.Loop(-1);
     
+    vJetSubstructureAnalysis test_wj("/eos/uscms/store/user/smpjs/ntran/tlbsm_v10/nt_wj_vj/demo*.root","ntuples/test_wj.root");
+    test_wj.Loop(-1);
     
 }

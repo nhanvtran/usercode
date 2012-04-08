@@ -44,7 +44,7 @@ else:
     process.GlobalTag.globaltag = 'START42_V13::All'
 
 OutputFileName = "demo.root"
-numEventsToRun = 1000
+numEventsToRun = 10000
 ############################################
 
 ##---------  W-->enu Collection ------------
@@ -80,7 +80,7 @@ process.source = cms.Source("PoolSource",
 ##### test data samples                                                                            
 #    '/store/user/lpctlbsm/samvel/SingleElectron/tlbsm_v9_Summer11-PU_S4_START42_V11-v1_2011_10_12_21_06_34/f8e845a0332c56398831da6c30999af1/ttbsm_42x_data_428_1_upi.root'
 ## #v10
-'/store/user/ntran/ntran/WW_TuneZ2_7TeV_pythia6_tauola/ttbsm_v10_v2_WW_TuneZ2_7TeV_pythia6_tauola/9b28f3f8b392373f53b6169b6cb537b0/ttbsm_42x_mc_63_1_kCh.root',
+'/store/user/smpjs/ntran/WW_TuneZ2_7TeV_pythia6_tauola/ttbsm_v10_WW_TuneZ2_7TeV_pythia6_tauola/a326ba49a16ab761c492392538b61378/ttbsm_42x_mc_100_1_WMC.root',
                                                               #'/store/user/ntran/ntran/WW_TuneZ2_7TeV_pythia6_tauola/ttbsm_v10_v2_WW_TuneZ2_7TeV_pythia6_tauola/9b28f3f8b392373f53b6169b6cb537b0/ttbsm_42x_mc_10_1_ZKo.root'
                                                               #'file:ttbsm_42x_mc.root'
                                                               ) 
@@ -111,8 +111,8 @@ process.VplusJetSubstructure = cms.EDAnalyzer("VplusJetSubstructureAnalysis",
                                               LeptonType     = cms.string('electron'),    
 
                                               PatJetCollections = cms.vstring('goodPatJetsPFlow','goodPatJetsCA8PrunedPF','goodPatJetsCA8PF'),    
-                                              LiteJetCollections = cms.vstring('ak5TrimmedLite','ak5FilteredLite','ak5PrunedLite','ak7TrimmedLite','ak7FilteredLite','ak7PrunedLite'),    
-                                              GenJetCollections = cms.vstring('ak5GenJetsNoNu','ak7GenJetsNoNu','ca8GenJetsNoNu'),    
+                                              LiteJetCollections = cms.vstring('ak5TrimmedLite','ak5FilteredLite','ak5PrunedLite','ak7Lite','ak7TrimmedLite','ak7FilteredLite','ak7PrunedLite','ak8Lite','ak8TrimmedLite','ak8FilteredLite','ak8PrunedLite'),    
+                                              GenJetCollections = cms.vstring('ak5GenJetsNoNu','ak7GenJetsNoNu','ak8GenJetsNoNu','ca8GenJetsNoNu'),    
                                               
                                               srcElectrons  = cms.InputTag("selectedPatElectronsPFlow"), # matches VBoson src
                                               srcMet = cms.InputTag("patMETsPFlow"),

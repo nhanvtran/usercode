@@ -34,6 +34,10 @@ double j_ak7_mass;
 double j_ak7tr_mass;
 double j_ak7pr_mass;
 double j_ak7ft_mass;
+double j_ak8_mass;
+double j_ak8tr_mass;
+double j_ak8pr_mass;
+double j_ak8ft_mass;
 double j_ca8_mass;    
 double j_ca8pr_mass;
 
@@ -50,7 +54,10 @@ double g_l_pt = 35.;
 double g_j_mu = 1.0;
 
 void InitTree( TTree* tree );
-TH1D* ExtractHisto( TTree* tree, std::string varname, char* cut, int nbins=100, double hlo=0., double hhi=1. );
+TH1D* ExtractHisto( char* name, TTree* tree, std::string varname, char* cut, int nbins=100, double hlo=0., double hhi=1. );
+TH1D* ExtractProfileVPt( char* name, TTree* tree, std::string varname, char* cut, int nbins=100, double hlo=0., double hhi=100. );
+TH1D* ExtractProfileVNvert( char* name, TTree* tree, std::string varname, char* cut, int nbins, double hlo, double hhi );
+void convertProfileToTH1D( TProfile* p, TH1D* h );
 
 void plotVars(std::string dir="figs", double ilumi = 1.){
     
@@ -64,11 +71,12 @@ void plotVars(std::string dir="figs", double ilumi = 1.){
     double LUMI = ilumi;
     
     // list the jet typs that you are interested in
-    const int nJetTypes = 10;
-    std::string jetNames [nJetTypes] = {"ak5","ak5tr","ak5pr","ak5ft","ak7tr","ak7pr","ak7ft","ca8","ca8pr"};
- 
+    const int nJetTypes = 14;
+    std::string jetNames [nJetTypes] = {"ak5","ak5tr","ak5pr","ak5ft","ak7","ak7tr","ak7pr","ak7ft","ak8","ak8tr","ak8pr","ak8ft","ca8","ca8pr"};
+    
     // ------------------------------------------
-    // cuts
+    // [ 1 ]   c u t s 
+    // ------------------------------------------
     // non-jet cuts
     g_e_met = 25.;
     g_w_mt = 50.;
@@ -78,53 +86,349 @@ void plotVars(std::string dir="figs", double ilumi = 1.){
     string s_effWeighting = ""; if (b_effWeighting) s_effWeighting = "e_effwt*";
     string s_puWeighting = ""; if (b_puWeighting) s_puWeighting = "e_puwt*";
     char nonjetCuts[192];
-    
-    //sprintf(nonjetCuts,"e_effwt*((e_met > %f)&&(l_pt > %f)&&(w_mt > %f))",g_e_met,g_l_pt,g_w_mt);
-    std::string dummyjettype = "ak5";
-    sprintf(nonjetCuts,"%s%s((e_met > %f)&&(l_pt > %f)&&(w_mt > %f)&&(j_%s_pt > %f)&&(j_%s_mass < %f)&& (j_%s_mass>%f)&&(j_%s_nJ<=%f))",
-            s_effWeighting.c_str(), s_puWeighting.c_str(),
-            g_e_met,g_l_pt,g_w_mt,
-            dummyjettype.c_str(), g_j_pt,
-            dummyjettype.c_str(), g_j_mass_hi,
-            dummyjettype.c_str(), g_j_mass_lo,
-            dummyjettype.c_str(), g_nJ);
-    
     // jet cuts
     g_j_mu = 1.0;
     g_j_pt = 50.; 
     g_j_mass_lo = 0.;
     g_j_mass_hi = 1000.;
     g_nJ = 6.;
-            
-    // tree names
-    TFile f_ttbar("ntuples/test.root");
-    TTree* t_ttbar = (TTree*) f_ttbar.Get("otree");
-    //InitTree(t_ttbar);
-   
-    // extract histos!
-    TH1D* test = ExtractHisto( t_ttbar, "j_ak5_pt", nonjetCuts, 100, 0., 200.);
+    
+    
+    // ------------------------------------------
+    // [ 2 ]   t r e e   n a m e s
+    // ------------------------------------------
+    TFile f_wjets("ntuples/test_wj.root");
+    TTree* t_wjets = (TTree*) f_wjets.Get("otree");
+    t_wjets->SetName("otree_wj");
+    TFile f_ww("ntuples/test_ww.root");
+    TTree* t_ww = (TTree*) f_ww.Get("otree");
+    t_ww->SetName("otree_ww");
+    
+    // ----------------------------------
+    // start defining histograms
+    // ----------------------------------
+    TH1D* hwj_mass[nJetTypes];
+    TH1D* hwj_area[nJetTypes];
+    TH1D* hwj_pt[nJetTypes];
+    TH1D* hwj_mVpt[nJetTypes];
+    TH1D* hwj_mVv[nJetTypes];
+    TH1D* hww_mass[nJetTypes];
+    TH1D* hww_area[nJetTypes];
+    TH1D* hww_pt[nJetTypes];
+    TH1D* hww_mVpt[nJetTypes];
+    TH1D* hww_mVv[nJetTypes];
 
-    TCanvas* c = new TCanvas("c","c",700,700);
-    c->cd();
-    std::cout << "mean: " << test->GetMean() << std::endl;
-    test->Draw();
-    c->SaveAs("test.eps");
+    TH1D* hwj_mVpt_ovAK5[nJetTypes];
+    TH1D* hwj_mVpt_ovAK7[nJetTypes];
+    TH1D* hwj_mVpt_ovAK8[nJetTypes];
+    TH1D* hww_mVpt_ovAK5[nJetTypes];
+    TH1D* hww_mVpt_ovAK7[nJetTypes];
+    TH1D* hww_mVpt_ovAK8[nJetTypes];
+    TH1D* hwj_ptVpt_ovAK5[nJetTypes];
+    TH1D* hwj_ptVpt_ovAK7[nJetTypes];
+    TH1D* hwj_ptVpt_ovAK8[nJetTypes];
+    TH1D* hww_ptVpt_ovAK5[nJetTypes];
+    TH1D* hww_ptVpt_ovAK7[nJetTypes];
+    TH1D* hww_ptVpt_ovAK8[nJetTypes];
+    // ----------------------------------
+    // [ 3 ]   s t a r t   m a k i n g   h i s t o g r a m s
+    // ----------------------------------
+    char hn[192];
+    for (int i = 0; i < nJetTypes; i++){
+        
+        std::cout << "jet type: " << jetNames[i] << std::endl;
+        
+        sprintf(nonjetCuts,"%s%s((e_met > %f)&&(l_pt > %f)&&(w_mt > %f)&&(j_%s_pt > %f)&&(j_%s_mass < %f)&& (j_%s_mass>%f)&&(j_%s_nJ<=%f))",
+                s_effWeighting.c_str(), s_puWeighting.c_str(),
+                g_e_met,g_l_pt,g_w_mt,
+                jetNames[i].c_str(), g_j_pt,
+                jetNames[i].c_str(), g_j_mass_hi,
+                jetNames[i].c_str(), g_j_mass_lo,
+                jetNames[i].c_str(), g_nJ);
+        
+        // ttbar histos
+        std::string varname = "j_" + jetNames[i] + "_mass"; sprintf( hn, "j_mass_%i_%s", i);
+        hwj_mass[i] = ExtractHisto( hn, t_wjets, varname.c_str(), nonjetCuts, 100, 0., 150.);
+        hww_mass[i] = ExtractHisto( hn, t_ww, varname.c_str(), nonjetCuts, 100, 0., 150.);
+        
+        varname = "j_" + jetNames[i] + "_pt"; sprintf( hn, "j_pt_%i", i);
+        hwj_pt[i] = ExtractHisto( hn, t_wjets, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        hww_pt[i] = ExtractHisto( hn, t_ww, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        
+        varname = "j_" + jetNames[i] + "_area"; sprintf( hn, "j_area_%i", i);
+        hwj_area[i] = ExtractHisto( hn, t_wjets, varname.c_str(), nonjetCuts, 100, 0., 5.);
+        hww_area[i] = ExtractHisto( hn, t_ww, varname.c_str(), nonjetCuts, 100, 0., 5.);
+        
+        varname = "j_" + jetNames[i] + "_mass:j_" + jetNames[i] + "_pt"; sprintf( hn, "j_vpt_%i", i);
+        hwj_mVpt[i] = ExtractProfileVPt( hn, t_wjets, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        hww_mVpt[i] = ExtractProfileVPt( hn, t_ww, varname.c_str(), nonjetCuts, 100, 0., 500.);
+                
+        varname = "j_" + jetNames[i] + "_mass:e_nvert"; sprintf( hn, "j_vnv_%i", i);
+        hwj_mVv[i] = ExtractProfileVNvert( hn, t_wjets, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        hww_mVv[i] = ExtractProfileVNvert( hn, t_ww, varname.c_str(), nonjetCuts, 100, 0., 500.);
+
+        // over ak5
+        std::cout << "===========================" << std::endl;
+        varname = "(j_" + jetNames[i] + "_mass/j_ak5_mass):j_ak5_pt"; sprintf( hn, "j_mvptak5_%i", i);
+        hwj_mVpt_ovAK5[i] = ExtractProfileVPt( hn, t_wjets, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        hww_mVpt_ovAK5[i] = ExtractProfileVPt( hn, t_ww, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        varname = "(j_" + jetNames[i] + "_pt/j_ak5_pt):j_ak5_pt"; sprintf( hn, "j_ptvptak5_%i", i);
+        hwj_ptVpt_ovAK5[i] = ExtractProfileVPt( hn, t_wjets, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        hww_ptVpt_ovAK5[i] = ExtractProfileVPt( hn, t_ww, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        // over ak7
+        varname = "(j_" + jetNames[i] + "_mass/j_ak7_mass):j_ak7_pt"; sprintf( hn, "j_mvptak7_%i", i);
+        hwj_mVpt_ovAK7[i] = ExtractProfileVPt( hn, t_wjets, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        hww_mVpt_ovAK7[i] = ExtractProfileVPt( hn, t_ww, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        varname = "(j_" + jetNames[i] + "_pt/j_ak7_pt):j_ak7_pt"; sprintf( hn, "j_ptvptak7_%i", i);
+        hwj_ptVpt_ovAK7[i] = ExtractProfileVPt( hn, t_wjets, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        hww_ptVpt_ovAK7[i] = ExtractProfileVPt( hn, t_ww, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        // over ak8
+        varname = "(j_" + jetNames[i] + "_mass/j_ak8_mass):j_ak8_pt"; sprintf( hn, "j_mvptak8_%i", i);
+        hwj_mVpt_ovAK8[i] = ExtractProfileVPt( hn, t_wjets, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        hww_mVpt_ovAK8[i] = ExtractProfileVPt( hn, t_ww, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        varname = "(j_" + jetNames[i] + "_pt/j_ak8_pt):j_ak8_pt"; sprintf( hn, "j_ptvptak8_%i", i);
+        hwj_ptVpt_ovAK8[i] = ExtractProfileVPt( hn, t_wjets, varname.c_str(), nonjetCuts, 100, 0., 500.);
+        hww_ptVpt_ovAK8[i] = ExtractProfileVPt( hn, t_ww, varname.c_str(), nonjetCuts, 100, 0., 500.);
+
+        
+        // properties
+        int curColor = i+1;
+        if (curColor == 5) curColor = 42;
+        if (curColor == 7) curColor = 46;
+        int markerStyle = 20;
+        if (i >= 4) markerStyle = 24;
+        hwj_mass[i]->SetLineColor(curColor);
+        hwj_pt[i]->SetLineColor(curColor);
+        hwj_area[i]->SetLineColor(curColor);
+        hwj_mVpt[i]->SetLineColor(curColor); hwj_mVpt[i]->SetMarkerColor(curColor); hwj_mVpt[i]->SetMarkerStyle(markerStyle);
+        hwj_mVpt[i]->SetLineColor(curColor); hwj_mVv[i]->SetMarkerColor(curColor); hwj_mVv[i]->SetMarkerStyle(markerStyle);            
+        
+        hww_mass[i]->SetLineColor(curColor);
+        hww_pt[i]->SetLineColor(curColor);
+        hww_area[i]->SetLineColor(curColor);
+        hww_mVpt[i]->SetLineColor(curColor); hww_mVpt[i]->SetMarkerColor(curColor); hww_mVpt[i]->SetMarkerStyle(markerStyle);
+        hww_mVpt[i]->SetLineColor(curColor); hww_mVv[i]->SetMarkerColor(curColor); hww_mVv[i]->SetMarkerStyle(markerStyle);    
+
+    }
+
+    
+    // ----------------------------------
+    // [ 4 ]   s t a r t   m a k i n g   p l o t s
+    // ----------------------------------
+    
+    /////////////////
+    // legends
+    TLegend * box1 = new TLegend(0.5,0.50,0.93,0.92);
+    box1->SetFillColor(0);
+    box1->SetBorderSize(0);
+    box1->AddEntry(hwj_mass[0],"AK5","l");
+    box1->AddEntry(hwj_mass[1],"AK5Trimmed","l");
+    box1->AddEntry(hwj_mass[2],"AK5Pruned","l");
+    box1->AddEntry(hwj_mass[3],"AK5Filtered","l");
+    box1->AddEntry(hwj_mass[4],"AK7","l");
+    box1->AddEntry(hwj_mass[5],"AK7Trimmed","l");
+    box1->AddEntry(hwj_mass[6],"AK7Pruned","l");
+    box1->AddEntry(hwj_mass[7],"AK7Filtered","l");
+    
+    TLegend * box2 = new TLegend(0.5,0.50,0.93,0.92);
+    box2->SetFillColor(0);
+    box2->SetBorderSize(0);
+    box2->AddEntry(hwj_mass[8],"AK8","l");
+    box2->AddEntry(hwj_mass[9],"AK8Trimmed","l");
+    box2->AddEntry(hwj_mass[10],"AK8Pruned","l");
+    box2->AddEntry(hwj_mass[11],"AK8Filtered","l");
+    box2->AddEntry(hwj_mass[12],"CA8","l");
+    box2->AddEntry(hwj_mass[13],"CA8Pruned","l");
+    
+    TLegend * box3 = new TLegend(0.5,0.70,0.93,0.92);
+    box3->SetFillColor(0);
+    box3->SetBorderSize(0);
+    box3->AddEntry(hwj_mVpt[0],"AK5","pe");
+    box3->AddEntry(hwj_mVpt[1],"AK5Trimmed","pe");
+    box3->AddEntry(hwj_mVpt[2],"AK5Pruned","pe");
+    box3->AddEntry(hwj_mVpt[3],"AK5Filtered","pe");
+    box3->AddEntry(hwj_mVpt[4],"AK7Trimmed","pe");
+    box3->AddEntry(hwj_mVpt[5],"AK7Pruned","pe");
+    box3->AddEntry(hwj_mVpt[6],"AK7Filtered","pe");
+    //box3->AddEntry(hwj_mass[7],"CA8","l");
+    //box3->AddEntry(hwj_mass[8],"CA8Pruned","l");
+
+    TCanvas* c = new TCanvas("c","c",1400,1400);
+    c->Divide(2,2);
+    c->cd(1);
+    //hwj_mass[0]->GetXaxis()->SetRangeUser(0.,75);
+    hwj_mass[0]->Draw();
+    hwj_mass[1]->Draw("sames");
+    hwj_mass[2]->Draw("sames");
+    hwj_mass[3]->Draw("sames");
+    hwj_mass[4]->Draw("sames");
+    hwj_mass[5]->Draw("sames");
+    hwj_mass[6]->Draw("sames");
+    hwj_mass[7]->Draw("sames");
+    box1->Draw();
+    c->cd(2);
+    hwj_mass[8]->Draw();
+    hwj_mass[9]->Draw("sames");
+    hwj_mass[10]->Draw("sames");
+    hwj_mass[11]->Draw("sames");
+    hwj_mass[12]->Draw("sames");
+    hwj_mass[13]->Draw("sames");
+    box2->Draw();
+    c->cd(3);
+    hwj_mass[0]->Draw();
+    hwj_mass[1]->Draw("sames");
+    hwj_mass[2]->Draw("sames");
+    hwj_mass[3]->Draw("sames");
+    hwj_mass[4]->Draw("sames");
+    hwj_mass[5]->Draw("sames");
+    hwj_mass[6]->Draw("sames");
+    hwj_mass[7]->Draw("sames");
+    gPad->SetLogy();
+    c->cd(4);
+    hwj_mass[8]->Draw();
+    hwj_mass[9]->Draw("sames");
+    hwj_mass[10]->Draw("sames");
+    hwj_mass[11]->Draw("sames");
+    hwj_mass[12]->Draw("sames");
+    hwj_mass[13]->Draw("sames");
+    gPad->SetLogy();
+    c->Update();
+    c->SaveAs("figs/test_mass.eps");
+    
+    TCanvas* c_area = new TCanvas("c_area","c_area",1400,700);
+    c_area->Divide(2,1);
+    c_area->cd(1);
+    hwj_area[0]->Draw();
+    hwj_area[1]->Draw("sames");
+    hwj_area[2]->Draw("sames");
+    hwj_area[3]->Draw("sames");
+    hwj_area[4]->Draw("sames");
+    hwj_area[5]->Draw("sames");
+    hwj_area[6]->Draw("sames");
+    hwj_area[7]->Draw("sames");
+    box1->Draw();
+    c_area->cd(2);
+    hwj_area[8]->Draw();
+    hwj_area[9]->Draw("sames");
+    hwj_area[10]->Draw("sames");
+    hwj_area[11]->Draw("sames");
+    hwj_area[12]->Draw("sames");
+    hwj_area[13]->Draw("sames");
+    box2->Draw();
+    c_area->Update();
+    c_area->SaveAs("figs/test_area.eps");
+    
+    TCanvas* c_pt = new TCanvas("c_pt","c_pt",1000,600);
+    c_pt->Divide(2,1);
+    c_pt->cd(1);
+    hwj_mVpt_ovAK5[0]->GetYaxis()->SetRangeUser(0.,1.1); hwj_mVpt_ovAK5[0]->SetMarkerColor(kBlack);
+    hwj_mVpt_ovAK5[0]->Draw();
+    hwj_mVpt_ovAK5[1]->SetMarkerColor(kRed);
+    hwj_mVpt_ovAK5[1]->Draw("sames");
+    hwj_mVpt_ovAK5[2]->SetMarkerColor(kBlue);
+    hwj_mVpt_ovAK5[2]->Draw("sames");
+    hwj_mVpt_ovAK5[3]->SetMarkerColor(kMagenta);
+    hwj_mVpt_ovAK5[3]->Draw("sames");
+    c_pt->cd(2);
+    hwj_ptVpt_ovAK5[0]->GetYaxis()->SetRangeUser(0.,1.1); hwj_ptVpt_ovAK5[0]->SetMarkerColor(kBlack);
+    hwj_ptVpt_ovAK5[0]->Draw();
+    hwj_ptVpt_ovAK5[1]->SetMarkerColor(kRed);
+    hwj_ptVpt_ovAK5[1]->Draw("sames");
+    hwj_ptVpt_ovAK5[2]->SetMarkerColor(kBlue);
+    hwj_ptVpt_ovAK5[2]->Draw("sames");
+    hwj_ptVpt_ovAK5[3]->SetMarkerColor(kMagenta);
+    hwj_ptVpt_ovAK5[3]->Draw("sames");
+    c_pt->Update();
+    c_pt->SaveAs("figs/test_pt.eps");
+
+    TCanvas* c2 = new TCanvas("c2","c2",1400,700);
+    c2->Divide(2,1);
+    c2->cd(1);
+    hwj_mVpt[0]->GetYaxis()->SetRangeUser(0.,100.); hwj_mVpt[0]->Draw();
+    hwj_mVpt[1]->Draw("sames");
+    hwj_mVpt[2]->Draw("sames");
+    hwj_mVpt[3]->Draw("sames");
+    hwj_mVpt[4]->Draw("sames");
+    hwj_mVpt[5]->Draw("sames");
+    hwj_mVpt[6]->Draw("sames");
+    c2->cd(2);
+    hwj_mVv[0]->GetYaxis()->SetRangeUser(0.,100.); hwj_mVv[0]->Draw();    
+    hwj_mVv[1]->Draw("sames");
+    hwj_mVv[2]->Draw("sames");
+    hwj_mVv[3]->Draw("sames");
+    hwj_mVv[4]->Draw("sames");
+    hwj_mVv[5]->Draw("sames");
+    hwj_mVv[6]->Draw("sames");
+    box3->Draw();
+    c2->Update();
+    c2->SaveAs("figs/test_profile.eps");
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-TH1D* ExtractHisto( TTree* tree, std::string varname, char* cut, int nbins, double hlo, double hhi ){
+TH1D* ExtractHisto( char* name, TTree* tree, std::string varname, char* cut, int nbins, double hlo, double hhi ){
+    //std::cout << "varname: " << varname << std::endl;
     
-    TH1D* h = new TH1D("h","h",nbins,hlo,hhi); 
-    
-    tree->Project("h",varname.c_str(), cut );
-    
-    //for (int i = 0; i < tree->GetEntries(); i++){
-    //    tree->GetEntry(i);
-    //}
+    char hname[192];
+    sprintf(hname,"h_%s_%s",name,tree->GetName());
+    TH1D* h = new TH1D(hname,varname.c_str(),nbins,hlo,hhi); 
+    tree->Project(hname,varname.c_str(), cut );
     
     return h;
+    
+}
+
+TH1D* ExtractProfileVPt( char* name, TTree* tree, std::string varname, char* cut, int nbins, double hlo, double hhi ){
+    
+    char pname[192];
+    sprintf(pname,"p_%s_%s",name,tree->GetName());
+    char hname[192];
+    sprintf(hname,"h_%s_%s",name,tree->GetName());
+    
+    double xbinsProfile[29] = {50,55,60,65,70,75,80,85,90,95,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,350,400,450,500};
+    //TProfile* p_vPt = new TProfile(pname,"p_vPt",28,xbinsProfile, hlo, hhi);     
+    TProfile* p_vPt = new TProfile(pname,"p_vPt",28,xbinsProfile, hlo, hhi);     
+    TH1D* h_vPt = new TH1D(hname,"; jet pT; <m_{j}>",28,xbinsProfile);
+    
+    //std::cout << "varname: " << varname << std::endl;
+    
+    tree->Project(pname,varname.c_str(), cut );
+    //p_vPt->Draw();
+    
+    
+    convertProfileToTH1D( p_vPt, h_vPt );
+    
+    return h_vPt;
+    
+}
+
+TH1D* ExtractProfileVNvert( char* name, TTree* tree, std::string varname, char* cut, int nbins, double hlo, double hhi ){
+    
+    char pname[192];
+    sprintf(pname,"p_%s_%s",name,tree->GetName());
+    char hname[192];
+    sprintf(hname,"h_%s_%s",name,tree->GetName());
+    
+    TProfile* p_vV = new TProfile(pname,"p_vV",30,0.,30.,hlo, hhi); 
+    TH1D* h_vV = new TH1D(hname,"; # of vertices; <m_{j}>",30,0.,30.);
+    
+    tree->Project(pname,varname.c_str(), cut );
+    convertProfileToTH1D( p_vV, h_vV );
+    
+    return h_vV;
+    
+}
+
+void convertProfileToTH1D( TProfile* p, TH1D* h ){
+    
+    for (int i = 1; i <= p->GetNbinsX(); i++){
+        
+        h->SetBinContent( i, p->GetBinContent( i ) );
+        h->SetBinError( i, p->GetBinError( i ) );
+        
+        //cout << " p->GetBinContent( i ): " << p->GetBinContent( i ) << std::endl;
+    }
     
 }
 
@@ -160,7 +464,12 @@ void InitTree( TTree* tree ){
     tree->SetBranchAddress("j_ak7tr_mass", &j_ak7tr_mass);
     tree->SetBranchAddress("j_ak7pr_mass", &j_ak7pr_mass);
     tree->SetBranchAddress("j_ak7ft_mass", &j_ak7ft_mass);
-    
+
+    tree->SetBranchAddress("j_ak8_mass", &j_ak8_mass);
+    tree->SetBranchAddress("j_ak8tr_mass", &j_ak8tr_mass);
+    tree->SetBranchAddress("j_ak8pr_mass", &j_ak8pr_mass);
+    tree->SetBranchAddress("j_ak8ft_mass", &j_ak8ft_mass);
+
     tree->SetBranchAddress("j_ca8_mass", &j_ca8_mass);
     tree->SetBranchAddress("j_ca8pr_mass", &j_ca8pr_mass);
     
