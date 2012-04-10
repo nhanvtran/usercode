@@ -51,11 +51,12 @@ void runVJetSubstructureAnalysis(){
     
     if (b_buildHistos){
 
-        double sclfactor = LUMI*31300000./80978873;
+        double sclfactor = LUMI*43000./4223922.;
         buildHistos ht_ww("ntuples/test_ww.root","ntuples/histos_ww.root");
         ht_ww.Loop( sclfactor );
         
-        sclfactor = LUMI*43000./4223922;
+        //sclfactor = LUMI*43000./4223922;
+        sclfactor = LUMI*31300000./80978873;
         buildHistos ht_wj("ntuples/test_wj.root","ntuples/histos_wj.root");
         ht_wj.Loop( sclfactor );
 
