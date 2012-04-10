@@ -12,7 +12,7 @@
 #include "TROOT.h"
 using namespace RooFit ;
 
-void plotPdf_5D_XWW(){
+void plotPdf_5D_XWW() {
     
     gROOT->ProcessLine(".L ~/tdrstyle.C");
     setTDRStyle();
@@ -30,21 +30,12 @@ void plotPdf_5D_XWW(){
     
     // angular variables
     // These values correspond to the 2m+
-    /*
     RooRealVar* fppVal = new RooRealVar("fppVal", "fppVal", 0.0089);
     RooRealVar* fmmVal = new RooRealVar("fmmVal", "fmmVal", 0.0089);
     RooRealVar* fpmVal = new RooRealVar("fpmVal", "fpmVal", 0.3108);
     RooRealVar* fp0Val = new RooRealVar("fp0Val", "fp0Val", 0.0643);
     RooRealVar* f0mVal = new RooRealVar("f0mVal", "f0mVal", 0.0643);
-    */
-
-    RooRealVar* fppVal = new RooRealVar("fppVal", "fppVal", 0.0287);
-    RooRealVar* fmmVal = new RooRealVar("fmmVal", "fmmVal", 0.0287);
-    RooRealVar* fpmVal = new RooRealVar("fpmVal", "fpmVal", 0.2148);
-    RooRealVar* fp0Val = new RooRealVar("fp0Val", "fp0Val", 0.0961);
-    RooRealVar* f0mVal = new RooRealVar("f0mVal", "f0mVal", 0.0961);
-
-
+    
     RooRealVar* phippVal = new RooRealVar("phippVal", "phippVal", 0);
     RooRealVar* phimmVal = new RooRealVar("phimmVal", "phimmVal", 0);
     RooRealVar* phipmVal = new RooRealVar("phipmVal", "phipmVal", 0);
@@ -52,8 +43,12 @@ void plotPdf_5D_XWW(){
     RooRealVar* phi0mVal = new RooRealVar("phi0mVal", "phi0mVal", 0);
 
     // related to the gg/qq productions 
-    RooRealVar* fz1Val = new RooRealVar("fz1Val", "fz1Val", 0.25);
-    RooRealVar* fz2Val = new RooRealVar("fz2Val", "fz2Val", 0.75);
+    RooRealVar* fz1Val = new RooRealVar("fz1Val", "fz1Val", 0);
+    RooRealVar* fz2Val = new RooRealVar("fz2Val", "fz2Val", 1.0);
+
+    // Even more parameters, do not have to touch, based on W couplings
+    RooRealVar* R1Val = new RooRealVar("R1Val","R1Val",1);
+    RooRealVar* R2Val = new RooRealVar("R2Val","R2Val",-1);
 
     // these are the acceptance terms associated with the production angles
     // the default setting is for setting no-acceptance
@@ -66,18 +61,30 @@ void plotPdf_5D_XWW(){
     RooRealVar* acca1 = new RooRealVar("acca1", "acca1", 0);
     RooRealVar* acca2 = new RooRealVar("acca2", "acca2", 0);
     RooRealVar* acca4 = new RooRealVar("acca4", "acca4", 0);
-
-    // Even more parameters, do not have to touch, based on W couplings
-    RooRealVar* R1Val = new RooRealVar("R1Val","R1Val",-1);
-    RooRealVar* R2Val = new RooRealVar("R2Val","R2Val",1);
     
     // PDF definition SM Higgs (JP = 2+)
     RooSpinTwo_5D *myPDF = new RooSpinTwo_5D("myPDF","myPDF", *h1, *h2, *hs, *Phi, *Phi1, *fppVal, *fmmVal, *fpmVal, *fp0Val, *f0mVal, *phippVal, *phimmVal, *phipmVal, *phip0Val, *phi0mVal, *fz1Val, *fz2Val, *R1Val, *R2Val, *para2, *para4, *para6, *para8, *acca0, *acca1, *acca2, *acca4);
+    
+    // setting for 2-
+    RooRealVar* fppValp = new RooRealVar("fppValp", "fppValp", 0.102);
+    RooRealVar* fmmValp = new RooRealVar("fmmValp", "fmmValp", 0.102);
+    RooRealVar* fpmValp = new RooRealVar("fpmValp", "fpmValp", 0.);
+    RooRealVar* fp0Valp = new RooRealVar("fp0Valp", "fp0Valp", 0.199);
+    RooRealVar* f0mValp = new RooRealVar("f0mValp", "f0mValp", 0.199);
+
+    RooRealVar* phippValp = new RooRealVar("phippValp", "phippValp", TMath::Pi());
+    RooRealVar* phimmValp = new RooRealVar("phimmValp", "phimmValp", 0);
+    RooRealVar* phipmValp = new RooRealVar("phipmValp", "phipmValp", 0);
+    RooRealVar* phip0Valp = new RooRealVar("phip0Valp", "phip0Valp", TMath::Pi());
+    RooRealVar* phi0mValp = new RooRealVar("phi0mValp", "phi0mValp", 0);
+
+    RooSpinTwo_5D *myPDFA = new RooSpinTwo_5D("myPDF","myPDF", *h1, *h2, *hs, *Phi, *Phi1, *fppValp, *fmmValp, *fpmValp, *fp0Valp, *f0mValp, *phippValp, *phimmValp, *phipmValp, *phip0Valp, *phi0mValp, *fz1Val, *fz2Val, *R1Val, *R2Val, *para2, *para4, *para6, *para8, *acca0, *acca1, *acca2, *acca4);
 
     // Grab input file to convert to RooDataSet
-    TFile* fin = new TFile("THiggsWW_170_JHU.root");
+    TFile* fin = new TFile("THiggsWW_250_JHU.root");
     TTree* tin = (TTree*) fin->Get("angles");
     RooDataSet data("data","data",tin,RooArgSet(*h1,*h2, *hs, *Phi, *Phi1));
+    
     /*
     for (int i=1;i<10;i++) {
       RooArgSet* row = data.get(i);
@@ -85,38 +92,51 @@ void plotPdf_5D_XWW(){
       std::cout << "weight: " << data.weight() << std::endl;
     }
     */
-
-    // P L O T   . . . 
+    
+    // read another input file
+    TFile* fin2 = new TFile("PTHiggsWW_250_JHU.root");
+    TTree* tin2 = (TTree*) fin2->Get("angles");
+    RooDataSet data2("data2","data2",tin2,RooArgSet(*h1,*h2, *hs, *Phi, *Phi1));
+    
+    // P L O T   . . .  
     // (All parameters fixed, no fitting, just looking at the shape of the PDFs w.r.t. the data)
-    TH1F* dum0 = new TH1F("dum0","dum0",1,0,1); dum0->SetLineColor(kBlue); dum0->SetLineWidth(3);
-    TH1F* dum1 = new TH1F("dum1","dum1",1,0,1); dum1->SetLineColor(kBlue); dum1->SetLineWidth(3);
-    TH1F* dum2 = new TH1F("dum2","dum2",1,0,1); dum2->SetLineColor(kRed);  dum2->SetLineWidth(3);
+    TH1F* dum0 = new TH1F("dum0","dum0",1,0,1); dum0->SetLineColor(kRed); dum0->SetMarkerColor(kBlack); dum0->SetLineWidth(3);
+    TH1F* dum1 = new TH1F("dum1","dum1",1,0,1); dum1->SetLineColor(kBlue); dum1->SetMarkerColor(kBlack); dum1->SetMarkerStyle(24), dum1->SetLineWidth(3);
     TLegend * box3 = new TLegend(0.1,0.1,0.9,0.92);
     box3->SetFillColor(0);
     box3->SetBorderSize(0);
-    box3->AddEntry(dum1,"5D Model: JP = 2+","l");
-    // box3->AddEntry(dum2,"5D Model: JP = 0-","l");
-    box3->AddEntry(dum0,"JHU generator simulation: JP = 2+","p");
+    box3->AddEntry(dum0,"X#rightarrow WW JP = 2m+","lp");
+    box3->AddEntry(dum1,"X#rightarrow WW JP = 2-","lp");
     
     RooPlot* h1frame =  h1->frame(55);
-    data.plotOn(h1frame);
-    myPDF->plotOn(h1frame);
+    data.plotOn(h1frame, LineColor(kBlack));
+    myPDF->plotOn(h1frame, LineColor(kRed));
+    data2.plotOn(h1frame, LineColor(kBlack), MarkerStyle(24));
+    myPDFA->plotOn(h1frame, LineColor(kBlue));
     
     RooPlot* h2frame =  h2->frame(55);
-    data.plotOn(h2frame);
-    myPDF->plotOn(h2frame);
+    data.plotOn(h2frame, LineColor(kBlack));
+    myPDF->plotOn(h2frame, LineColor(kRed));
+    data2.plotOn(h2frame, LineColor(kBlack), MarkerStyle(24));
+    myPDFA->plotOn(h2frame, LineColor(kBlue));
     
     RooPlot* hsframe =  hs->frame(55);
-    data.plotOn(hsframe);
-    myPDF->plotOn(hsframe);
+    data.plotOn(hsframe, LineColor(kBlack));
+    myPDF->plotOn(hsframe, LineColor(kRed));
+    data2.plotOn(hsframe, LineColor(kBlack), MarkerStyle(24));
+    myPDFA->plotOn(hsframe, LineColor(kBlue));
     
     RooPlot* Phiframe =  Phi->frame(55);
-    data.plotOn(Phiframe);
-    myPDF->plotOn(Phiframe);
+    data.plotOn(Phiframe, LineColor(kBlack));
+    myPDF->plotOn(Phiframe, LineColor(kRed));
+    data2.plotOn(Phiframe, LineColor(kBlack), MarkerStyle(24));
+    myPDFA->plotOn(Phiframe, LineColor(kBlue));
     
     RooPlot* Phi1frame =  Phi1->frame(55);
-    data.plotOn(Phi1frame);
-    myPDF->plotOn(Phi1frame);
+    data.plotOn(Phi1frame, LineColor(kBlack));
+    myPDF->plotOn(Phi1frame, LineColor(kRed));
+    data2.plotOn(Phi1frame, LineColor(kBlack), MarkerStyle(24));
+    myPDFA->plotOn(Phi1frame, LineColor(kBlue));
     
     TCanvas* czz = new TCanvas( "czz", "czz", 1000, 600 );
     czz->Divide(3,2);
@@ -133,7 +153,7 @@ void plotPdf_5D_XWW(){
     czz->cd(6);
     Phiframe->Draw();
     
-    czz->SaveAs("angles_THiggsWW_170_JHU.eps");
-    czz->SaveAs("angles_THiggsWW_170_JHU.png");
+    czz->SaveAs("epsfiles/angles_TWW250_JHU.eps");
+    czz->SaveAs("pngfiles/angles_TWW250_JHU.png");
 
 }
