@@ -66,7 +66,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 process.MessageLogger.destinations = ['cout', 'cerr']
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
 
 #process.options = cms.untracked.PSet( SkipEvent = cms.untracked.vstring('ProductNotFound')
@@ -80,7 +80,7 @@ process.source = cms.Source("PoolSource",
 ##### test data samples                                                                            
 #    '/store/user/lpctlbsm/samvel/SingleElectron/tlbsm_v9_Summer11-PU_S4_START42_V11-v1_2011_10_12_21_06_34/f8e845a0332c56398831da6c30999af1/ttbsm_42x_data_428_1_upi.root'
 ## #v10
-'/store/user/smpjs/ntran/WW_TuneZ2_7TeV_pythia6_tauola/ttbsm_v10_WW_TuneZ2_7TeV_pythia6_tauola/a326ba49a16ab761c492392538b61378/ttbsm_42x_mc_100_1_WMC.root',
+'/store/user/smpjs/ntran/SingleElectron/ttbsm_v10_SingleElectron_Run2011A-PromptReco-v4/2900f36c5423fd804f580f1efac6dc75/ttbsm_42x_data_157_1_enm.root',
                                                               #'/store/user/ntran/ntran/WW_TuneZ2_7TeV_pythia6_tauola/ttbsm_v10_v2_WW_TuneZ2_7TeV_pythia6_tauola/9b28f3f8b392373f53b6169b6cb537b0/ttbsm_42x_mc_10_1_ZKo.root'
                                                               #'file:ttbsm_42x_mc.root'
                                                               ) 

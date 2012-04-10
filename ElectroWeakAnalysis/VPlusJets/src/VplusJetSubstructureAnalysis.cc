@@ -214,40 +214,43 @@ void ewk::VplusJetSubstructureAnalysis::analyze(const edm::Event& iEvent, const 
     else  lepIsoRho =  -999999.9;
     */
     
-    /////////// GenMET information & MC Pileup Summary Info  //////////
-    mcPUtotnvtx = 0;
-    mcPUbx[0]   = -999; mcPUbx[1]   = -999; mcPUbx[2]   = -999;
-    mcPUnvtx[0] = -999; mcPUnvtx[1] = -999; mcPUnvtx[2] = -999;
-    if ( runningOverMC_ ){
-        edm::Handle<reco::GenMETCollection> genMETs;
-        /*
-         if(runoverAOD_){
-         iEvent.getByLabel(mInputgenMet,genMETs);
-         if ( genMETs->size() == 0) {
-         genMET   = -1.0;
-         genSumET = -1.0;
-         genMETSign  = -1.0;
-         genMETPhi   = -10.0;
-         } else {
-         genMET = (*genMETs)[0].et();
-         genSumET = (*genMETs)[0].sumEt();  
-         genMETSign = (*genMETs)[0].significance();  
-         genMETPhi = (*genMETs)[0].phi();
-         }
-         */
-    }
-    // MC Pileup Summary Info
-    const edm::InputTag PileupSrc("addPileupInfo");
-    edm::Handle<std::vector< PileupSummaryInfo > >  PupInfo;
-    iEvent.getByLabel(PileupSrc, PupInfo);
-    std::vector<PileupSummaryInfo>::const_iterator PVI;
-    int ctid = 0;
-    for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
-        if (ctid>2) break;
-        mcPUbx[ctid]   =  PVI->getBunchCrossing();
-        mcPUnvtx[ctid] =  PVI->getPU_NumInteractions();
-        mcPUtotnvtx   +=  PVI->getPU_NumInteractions();
-        ctid++;
+    //std::cout << "runningOverMC_: " << runningOverMC_ << std::endl;
+    if (runningOverMC_){
+        /////////// GenMET information & MC Pileup Summary Info  //////////
+        mcPUtotnvtx = 0;
+        mcPUbx[0]   = -999; mcPUbx[1]   = -999; mcPUbx[2]   = -999;
+        mcPUnvtx[0] = -999; mcPUnvtx[1] = -999; mcPUnvtx[2] = -999;
+        if ( runningOverMC_ ){
+            edm::Handle<reco::GenMETCollection> genMETs;
+            /*
+             if(runoverAOD_){
+             iEvent.getByLabel(mInputgenMet,genMETs);
+             if ( genMETs->size() == 0) {
+             genMET   = -1.0;
+             genSumET = -1.0;
+             genMETSign  = -1.0;
+             genMETPhi   = -10.0;
+             } else {
+             genMET = (*genMETs)[0].et();
+             genSumET = (*genMETs)[0].sumEt();  
+             genMETSign = (*genMETs)[0].significance();  
+             genMETPhi = (*genMETs)[0].phi();
+             }
+             */
+        }
+        // MC Pileup Summary Info
+        const edm::InputTag PileupSrc("addPileupInfo");
+        edm::Handle<std::vector< PileupSummaryInfo > >  PupInfo;
+        iEvent.getByLabel(PileupSrc, PupInfo);
+        std::vector<PileupSummaryInfo>::const_iterator PVI;
+        int ctid = 0;
+        for(PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI) {
+            if (ctid>2) break;
+            mcPUbx[ctid]   =  PVI->getBunchCrossing();
+            mcPUnvtx[ctid] =  PVI->getPU_NumInteractions();
+            mcPUtotnvtx   +=  PVI->getPU_NumInteractions();
+            ctid++;
+        }
     }
     
     // ---------------------------------------------------------
@@ -281,17 +284,17 @@ void ewk::VplusJetSubstructureAnalysis::analyze(const edm::Event& iEvent, const 
     if ( nTotCands == 0 ) return;
     else {
         
-        std::cout << "n electrons: " << electrons.size() << std::endl;
-        std::cout << "n muons: " << muons.size() << std::endl;
+        //std::cout << "n electrons: " << electrons.size() << std::endl;
+        //std::cout << "n muons: " << muons.size() << std::endl;
         
         // numbers of V candidates
-        std::cout << "We_boson size: " << We_boson->size() << std::endl;
-        std::cout << "Wm_boson size: " << Wm_boson->size() << std::endl;
-        std::cout << "Ze_boson size: " << Ze_boson->size() << std::endl;
-        std::cout << "Zm_boson size: " << Zm_boson->size() << std::endl;
+        //std::cout << "We_boson size: " << We_boson->size() << std::endl;
+        //std::cout << "Wm_boson size: " << Wm_boson->size() << std::endl;
+        //std::cout << "Ze_boson size: " << Ze_boson->size() << std::endl;
+        //std::cout << "Zm_boson size: " << Zm_boson->size() << std::endl;
                 
         if ( nTotCands == 1 ) {
-            std::cout << "hooray!" << std::endl;
+            //std::cout << "hooray!" << std::endl;
             if (n_We == 1) eventClass = 1;   
             if (n_Wm == 1) eventClass = 2;   
             if (n_Ze == 1) eventClass = 3;   
@@ -358,14 +361,11 @@ void ewk::VplusJetSubstructureAnalysis::analyze(const edm::Event& iEvent, const 
     
     unsigned int nAllCollections = PatJetCollections_.size() + LiteJetCollections_.size() + GenJetCollections_.size();
     for (unsigned int i = 0; i < nAllCollections; i++){
-        std::cout << "------- i coll: " << i << std::endl; 
+        //std::cout << "------- i coll: " << i << std::endl; 
         jetcol[i]->fill(iEvent);
     }
-    std::cout << "after..." << std::endl;
     //myTree->Print("V");
-    std::cout << ">>>>>overall fill! event: " << event  << std::endl;
     myTree->Fill();
-    std::cout << "crash?" << event  << std::endl;
 
     
 } // analyze method

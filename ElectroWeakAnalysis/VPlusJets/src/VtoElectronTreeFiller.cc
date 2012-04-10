@@ -123,11 +123,11 @@ void ewk::VtoElectronTreeFiller::fill(const edm::Event& iEvent, int vecBosonInde
         return;  // if no electron found, then return
     } 
    
-    std::cout << "number of daugters " << Vboson->numberOfDaughters() <<std::endl;
+    //std::cout << "number of daugters " << Vboson->numberOfDaughters() <<std::endl;
     // get the two daughters
     reco::CandidateBaseRef m0 = Vboson->daughter(0)->masterClone();
     reco::CandidateBaseRef m1 = Vboson->daughter(1)->masterClone();
-    std::cout << "ptr m1 is nonnull " << m1.isNonnull() <<std::endl ;
+    //std::cout << "ptr m1 is nonnull " << m1.isNonnull() <<std::endl ;
     
     const reco::GsfElectron* e1=NULL;
     const reco::GsfElectron* e2=NULL;
@@ -136,22 +136,22 @@ void ewk::VtoElectronTreeFiller::fill(const edm::Event& iEvent, int vecBosonInde
     
 
     if( type0 == typeid(pat::Electron) ){
-        std::cout << " boson daughter - pat el " << std::endl;
+        //std::cout << " boson daughter - pat el " << std::endl;
         
-        std::cout << "ptr is nonnull " << m0.isNonnull() <<std::endl ;
-        std::cout << "charge from Ptr = " << m0->charge() << std::endl;
+        //std::cout << "ptr is nonnull " << m0.isNonnull() <<std::endl ;
+        //std::cout << "charge from Ptr = " << m0->charge() << std::endl;
         e1 = dynamic_cast<const pat::Electron *>(&*m0) ;
-        std::cout << "charge from el 1 = " << e1->charge() << std::endl;
-        std::cout << "pt from el 1 = " << e1->pt() << std::endl;
+        //std::cout << "charge from el 1 = " << e1->charge() << std::endl;
+        //std::cout << "pt from el 1 = " << e1->pt() << std::endl;
     }
     
     if( type1 == typeid(pat::Electron) ){
-        std::cout << " boson daughter - pat el 2" << std::endl;
+        //std::cout << " boson daughter - pat el 2" << std::endl;
         
-        std::cout << "ptr is nonnull " << m1.isNonnull() <<std::endl ;
-        std::cout << "charge from Ptr = " << m1->charge() << std::endl;
+        //std::cout << "ptr is nonnull " << m1.isNonnull() <<std::endl ;
+        //std::cout << "charge from Ptr = " << m1->charge() << std::endl;
         e2 = dynamic_cast<const pat::Electron *>(&*m1) ;
-        std::cout << "charge from el 2 = " << e2->charge() << std::endl;
+        //std::cout << "charge from el 2 = " << e2->charge() << std::endl;
     }
 
     

@@ -117,7 +117,7 @@ void ewk::VtoMuonTreeFiller::fill(const edm::Event& iEvent)
     const std::type_info & type0 = typeid(*m0);
     const std::type_info & type1 = typeid(*m1);
     
-    std::cout << "Dynamic casting!!" << std::endl;
+    //std::cout << "Dynamic casting!!" << std::endl;
     if( type0 == typeid(pat::Muon) ) 
         mu1 = dynamic_cast<const pat::Muon *>( &*m0 ); 
     if( type1 == typeid(pat::Muon) )
