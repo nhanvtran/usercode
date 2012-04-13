@@ -66,6 +66,19 @@ void plotPdf_5D_XZZ() {
     // PDF definition SM Higgs (JP = 2+)
     RooSpinTwo_5D *myPDF = new RooSpinTwo_5D("myPDF","myPDF", *h1, *h2, *hs, *Phi, *Phi1, *fppVal, *fmmVal, *fpmVal, *fp0Val, *f0mVal, *phippVal, *phimmVal, *phipmVal, *phip0Val, *phi0mVal, *fz1Val, *fz2Val, *R1Val, *R2Val, *para2, *para4, *para6, *para8, *acca0, *acca1, *acca2, *acca4);
     
+    // dataset for (JP = 2+)
+    TFile* fin = new TFile("THiggsZZ_250_JHU.root");
+    TTree* tin = (TTree*) fin->Get("angles");
+    RooDataSet data("data","data",tin,RooArgSet(*h1,*h2, *hs, *Phi, *Phi1));
+    
+    /*
+    for (int i=1;i<10;i++) {
+      RooArgSet* row = data.get(i);
+      row->Print("v");
+      std::cout << "weight: " << data.weight() << std::endl;
+    }
+    */
+
     // setting for 2-
     RooRealVar* fppValp = new RooRealVar("fppValp", "fppValp", 0.1251);
     RooRealVar* fmmValp = new RooRealVar("fmmValp", "fmmValp", 0.1251);
@@ -81,64 +94,90 @@ void plotPdf_5D_XZZ() {
 
     RooSpinTwo_5D *myPDFA = new RooSpinTwo_5D("myPDF","myPDF", *h1, *h2, *hs, *Phi, *Phi1, *fppValp, *fmmValp, *fpmValp, *fp0Valp, *f0mValp, *phippValp, *phimmValp, *phipmValp, *phip0Valp, *phi0mValp, *fz1Val, *fz2Val, *R1Val, *R2Val, *para2, *para4, *para6, *para8, *acca0, *acca1, *acca2, *acca4);
 
-    // Grab input file to convert to RooDataSet
-    TFile* fin = new TFile("THiggsZZ_250_JHU.root");
-    TTree* tin = (TTree*) fin->Get("angles");
-    RooDataSet data("data","data",tin,RooArgSet(*h1,*h2, *hs, *Phi, *Phi1));
-    
-    /*
-    for (int i=1;i<10;i++) {
-      RooArgSet* row = data.get(i);
-      row->Print("v");
-      std::cout << "weight: " << data.weight() << std::endl;
-    }
-    */
-    
-    // read another input file
+    // dataset for (JP = 2-)
     TFile* fin2 = new TFile("PTHiggsZZ_250_JHU.root");
     TTree* tin2 = (TTree*) fin2->Get("angles");
     RooDataSet data2("data2","data2",tin2,RooArgSet(*h1,*h2, *hs, *Phi, *Phi1));
     
+
+
+    // setting for 2L-
+    RooRealVar* fppVal2L = new RooRealVar("fppVal2L", "fppVal2L", 0.104);
+    RooRealVar* fmmVal2L = new RooRealVar("fmmVal2L", "fmmVal2L", 0.104);
+    RooRealVar* fpmVal2L = new RooRealVar("fpmVal2L", "fpmVal2L", 0.);
+    RooRealVar* fp0Val2L = new RooRealVar("fp0Val2L", "fp0Val2L", 0.);
+    RooRealVar* f0mVal2L = new RooRealVar("f0mVal2L", "f0mVal2L", 0.);
+
+    RooRealVar* phippVal2L = new RooRealVar("phippVal2L", "phippVal2L", TMath::Pi());
+    RooRealVar* phimmVal2L = new RooRealVar("phimmVal2L", "phimmVal2L", TMath::Pi());
+    RooRealVar* phipmVal2L = new RooRealVar("phipmVal2L", "phipmVal2L", 0);
+    RooRealVar* phip0Val2L = new RooRealVar("phip0Val2L", "phip0Val2L", 0);
+    RooRealVar* phi0mVal2L = new RooRealVar("phi0mVal2L", "phi0mVal2L", 0);
+
+    RooRealVar* fz1Val2L = new RooRealVar("fz1Val2L", "fz1Val2L", 0);
+    RooRealVar* fz2Val2L = new RooRealVar("fz2Val2L", "fz2Val2L", 0.4);
+
+    RooSpinTwo_5D *myPDF2L = new RooSpinTwo_5D("myPDF","myPDF", *h1, *h2, *hs, *Phi, *Phi1, *fppVal2L, *fmmVal2L, *fpmVal2L, *fp0Val2L, *f0mVal2L, *phippVal2L, *phimmVal2L, *phipmVal2L, *phip0Val2L, *phi0mVal2L, *fz1Val2L, *fz2Val2L, *R1Val, *R2Val, *para2, *para4, *para6, *para8, *acca0, *acca1, *acca2, *acca4);
+
+    // dataset for (JP = 2-)
+    TFile* fin3 = new TFile("2LZZ_250_JHU.root");
+    TTree* tin3 = (TTree*) fin3->Get("angles");
+    RooDataSet data3("data3","data3",tin3,RooArgSet(*h1,*h2, *hs, *Phi, *Phi1));
+    
+
     // P L O T   . . .  
     // (All parameters fixed, no fitting, just looking at the shape of the PDFs w.r.t. the data)
-    TH1F* dum0 = new TH1F("dum0","dum0",1,0,1); dum0->SetLineColor(kRed); dum0->SetMarkerColor(kBlack); dum0->SetLineWidth(3);
-    TH1F* dum1 = new TH1F("dum1","dum1",1,0,1); dum1->SetLineColor(kBlue); dum1->SetMarkerColor(kBlack); dum1->SetMarkerStyle(24), dum1->SetLineWidth(3);
+    TH1F* dum0 = new TH1F("dum0","dum0",1,0,1); dum0->SetLineColor(kRed); dum0->SetMarkerColor(kBlack); dum0->SetLineWidth(3); // 2m+
+    TH1F* dum1 = new TH1F("dum1","dum1",1,0,1); dum1->SetLineColor(kBlue); dum1->SetMarkerColor(kBlack); dum1->SetMarkerStyle(24), dum1->SetLineWidth(3); // 2-
+    TH1F* dum2 = new TH1F("dum2","dum2",1,0,1); dum2->SetLineColor(kGreen); dum2->SetMarkerColor(kBlack); dum2->SetMarkerStyle(21), dum2->SetLineWidth(3); // 2L+
+
     TLegend * box3 = new TLegend(0.1,0.1,0.9,0.92);
     box3->SetFillColor(0);
     box3->SetBorderSize(0);
     box3->AddEntry(dum0,"X#rightarrow ZZ JP = 2m+","lp");
     box3->AddEntry(dum1,"X#rightarrow ZZ JP = 2-","lp");
+    box3->AddEntry(dum2,"X#rightarrow ZZ JP = 2L-","lp");
     
     RooPlot* h1frame =  h1->frame(55);
     data.plotOn(h1frame, LineColor(kBlack));
     myPDF->plotOn(h1frame, LineColor(kRed));
     data2.plotOn(h1frame, LineColor(kBlack), MarkerStyle(24));
     myPDFA->plotOn(h1frame, LineColor(kBlue));
-    
+    data3.plotOn(h1frame, LineColor(kBlack), MarkerStyle(21));
+    myPDF2L->plotOn(h1frame, LineColor(kGreen));    
+
     RooPlot* h2frame =  h2->frame(55);
     data.plotOn(h2frame, LineColor(kBlack));
     myPDF->plotOn(h2frame, LineColor(kRed));
     data2.plotOn(h2frame, LineColor(kBlack), MarkerStyle(24));
     myPDFA->plotOn(h2frame, LineColor(kBlue));
+    data3.plotOn(h2frame, LineColor(kBlack), MarkerStyle(21));
+    myPDF2L->plotOn(h2frame, LineColor(kGreen));
     
     RooPlot* hsframe =  hs->frame(55);
     data.plotOn(hsframe, LineColor(kBlack));
     myPDF->plotOn(hsframe, LineColor(kRed));
     data2.plotOn(hsframe, LineColor(kBlack), MarkerStyle(24));
     myPDFA->plotOn(hsframe, LineColor(kBlue));
-    
+    data3.plotOn(hsframe, LineColor(kBlack), MarkerStyle(21));
+    myPDF2L->plotOn(hsframe, LineColor(kGreen));
+
     RooPlot* Phiframe =  Phi->frame(55);
     data.plotOn(Phiframe, LineColor(kBlack));
     myPDF->plotOn(Phiframe, LineColor(kRed));
     data2.plotOn(Phiframe, LineColor(kBlack), MarkerStyle(24));
     myPDFA->plotOn(Phiframe, LineColor(kBlue));
+    data3.plotOn(Phiframe, LineColor(kBlack), MarkerStyle(21));
+    myPDF2L->plotOn(Phiframe, LineColor(kGreen));
     
     RooPlot* Phi1frame =  Phi1->frame(55);
     data.plotOn(Phi1frame, LineColor(kBlack));
     myPDF->plotOn(Phi1frame, LineColor(kRed));
     data2.plotOn(Phi1frame, LineColor(kBlack), MarkerStyle(24));
     myPDFA->plotOn(Phi1frame, LineColor(kBlue));
-    
+    data3.plotOn(Phi1frame, LineColor(kBlack), MarkerStyle(21));
+    myPDF2L->plotOn(Phi1frame, LineColor(kGreen));
+
     TCanvas* czz = new TCanvas( "czz", "czz", 1000, 600 );
     czz->Divide(3,2);
     czz->cd(1);

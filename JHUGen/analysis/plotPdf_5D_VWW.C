@@ -36,7 +36,7 @@ void plotPdf_5D_VWW() {
 
     // Even more parameters, do not have to touch, based on W couplings
     RooRealVar* R1Val = new RooRealVar("R1Val","R1Val",1);
-    RooRealVar* R2Val = new RooRealVar("R2Val","R2Val",-1);
+    RooRealVar* R2Val = new RooRealVar("R2Val","R2Val",1);
 
 
     // these are the acceptance terms associated with the production angles
