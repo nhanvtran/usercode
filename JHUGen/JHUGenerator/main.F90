@@ -47,7 +47,16 @@ integer :: NumArgs,NArg,OffShell_XVV
    DecayMode2=0
    Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
    Unweighted =.true.
-   OffShell_XVV=000! 000: H,Z1,Z2 on-shell; 010: H,Z2 on-shell, Z1 off-shell; and so on
+   OffShell_XVV=000! 000: X,V1,V2 on-shell; 010: X,V2 on-shell, V1 off-shell; and so on
+
+! !       DecayMode=0: Z --> l+ l- (l=e,mu)
+! !       DecayMode=1: Z --> q qbar (q=u,d,c,s,b)
+! !       DecayMode=2: Z --> tau+ tau-
+! !       DecayMode=3: Z --> nu nubar (nu=nu_e,nu_mu,nu_tau)
+! !       DecayMode=4: W --> l nu_l (l=e,mu)
+! !       DecayMode=5: W --> q qbar' (q=u,c, qbar'=d,s)
+! !       DecayMode=6: W --> tau nu_tau
+! !       DecayMode=7: photon
 
    DataFile="./data/output"
 
@@ -101,16 +110,19 @@ integer :: NumArgs,NArg,OffShell_XVV
         OffShellV2=.false.
     endif
 
-    if( (OffShellV1.or.OffShellV2.or.OffShellReson) .and. Process.ne.0) then
-        print *, "off shell Z/W's only allowed for spin 0 resonance"
-        stop
-    endif
+!     if( ((OffShellV1).or.(OffShellV2).or.(OffShellReson)) ) then
+!         print *, "off shell Z/W's only allowed for spin 0,2 resonance"
+! !         stop
+!     endif
     if( DecayMode1.le.3 ) then
        M_V = M_Z
        Ga_V= Ga_Z
-    elseif( DecayMode1.ge.4 ) then
+    elseif( (DecayMode1.ge.4) .and. (DecayMode1.le.6) ) then
        M_V = M_W
        Ga_V= Ga_W    
+    elseif( DecayMode1.eq.7 ) then
+       M_V = 0d0
+       Ga_V= 0d0    
     endif
 
     if( (DecayMode1.le.3) .and. (DecayMode2.ge.4) ) then
@@ -123,8 +135,18 @@ integer :: NumArgs,NArg,OffShell_XVV
        stop
     endif
 
-    if( (DecayMode1.ge.7) .or. (DecayMode2.ge.7) .or. (DecayMode1.lt..0) .or. (DecayMode2.lt.0) ) then
+    if( (DecayMode1.eq.7) .and. (DecayMode2.ne.7) ) then
        print *, "3 DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
+       stop
+    endif
+
+    if( (DecayMode1.eq.7) .and. (OffShellV1 .or. OffShellV2) ) then
+       print *, "4 Photons have to be on-shell."
+       stop
+    endif
+
+    if( (DecayMode1.ge.8) .or. (DecayMode2.ge.8) .or. (DecayMode1.lt..0) .or. (DecayMode2.lt.0) ) then
+       print *, "5 DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
        stop
     endif
 
