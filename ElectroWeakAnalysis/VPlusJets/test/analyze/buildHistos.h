@@ -18,6 +18,8 @@
 class buildHistos {
     public :
     
+    bool _isData;
+    
     std::vector < std::string > jetTypes;
     int nJetTypes;
     TFile* fout;
@@ -36,6 +38,8 @@ class buildHistos {
     TH1D *h_j_p[25];
     TH1D *h_j_mass[25];
     TH1D *h_j_area[25];
+
+    TH1D *h_j_ca8pr_mu;
     
     TH1D *h_j_mass_pt50to100[25];    
     TH1D *h_j_mass_pt100to150[25];
@@ -52,7 +56,34 @@ class buildHistos {
     TProfile *p_j_ptOverAK5[25];
     TProfile *p_j_ptOverAK7[25];
     TProfile *p_j_ptOverAK8[25];
+    TProfile *p_j_massOverAK5vNV[25];
+    TProfile *p_j_massOverAK7vNV[25];
+    TProfile *p_j_massOverAK8vNV[25];
+    TProfile *p_j_ptOverAK5vNV[25];
+    TProfile *p_j_ptOverAK7vNV[25];
+    TProfile *p_j_ptOverAK8vNV[25];
     //*/
+    
+    // gen jet histograms
+    TH1D *h_j_massOverAK5g[25];    
+    TH1D *h_j_massOverAK7g[25];    
+    TH1D *h_j_massOverAK8g[25];    
+    TH1D *h_j_massOverCA8g[25];    
+    TH1D *h_j_ptOverAK5g[25];    
+    TH1D *h_j_ptOverAK7g[25];    
+    TH1D *h_j_ptOverAK8g[25];    
+    TH1D *h_j_ptOverCA8g[25];    
+
+    TProfile *p_j_massOverAK5g[25];    
+    TProfile *p_j_massOverAK7g[25];    
+    TProfile *p_j_massOverAK8g[25];    
+    TProfile *p_j_massOverCA8g[25];    
+    TProfile *p_j_ptOverAK5g[25];    
+    TProfile *p_j_ptOverAK7g[25];    
+    TProfile *p_j_ptOverAK8g[25];    
+    TProfile *p_j_ptOverCA8g[25];    
+
+    
     
     TTree          *fChain;   //!pointer to the analyzed TTree or TChain
     Int_t           fCurrent; //!current Tree number in a TChain
@@ -70,6 +101,15 @@ class buildHistos {
     Double_t        l_pt;
     Double_t        l_reliso;
     
+    Int_t j_ak5_match;
+    Int_t j_ak7_match;
+    Int_t j_ak8_match;
+    Int_t j_ca8_match;
+    
+    Double_t j_ak5_nBtags;
+    Double_t j_ca8pr_m1;
+    Double_t j_ca8pr_m2;
+    
     Double_t j_nJ[25];
     Double_t j_bdis[25]; 
     Double_t j_eta[25]; 
@@ -79,23 +119,29 @@ class buildHistos {
     Double_t j_mass[25]; 
     Double_t j_area[25];     
 
-    buildHistos(std::string inputname, std::string oname);
+    buildHistos( std::string oname, bool isData);
     virtual ~buildHistos();
     virtual int    findIndexForJetType( std::string name );
     virtual Int_t    Cut(Long64_t entry);
     virtual Int_t    GetEntry(Long64_t entry);
     virtual Long64_t LoadTree(Long64_t entry);
-    virtual void     Init(TTree *tree);
-    virtual void     Loop(double sampleSclFactor);
+    virtual void     Init( );
+    virtual void     Loop(std::string inputname, double sampleSclFactor);
     virtual Bool_t   Notify();
     virtual void     Show(Long64_t entry = -1);
+    virtual void     ReadTree( TTree* tree );
+    virtual void     WriteOut();
+    
 };
 
 #endif
 
 #ifdef buildHistos_cxx
-buildHistos::buildHistos(std::string inputname, std::string oname)
+buildHistos::buildHistos( std::string oname, bool isData)
 {
+    
+    _isData = isData;
+    
     /*
     // if parameter tree is not specified (or zero), connect the file
     // used to generate this class and read the Tree.
@@ -109,15 +155,10 @@ buildHistos::buildHistos(std::string inputname, std::string oname)
     }
     Init(tree);
      */
-    char fname[192];
-    sprintf(fname,"%s",inputname.c_str());
-    
-    TChain* tree = new TChain("otree","otree");
-    tree->Add(fname);
     
     fout = new TFile(oname.c_str(),"RECREATE");
     
-    Init( tree );
+    Init( );
 }
 
 buildHistos::~buildHistos()
@@ -159,104 +200,87 @@ Long64_t buildHistos::LoadTree(Long64_t entry)
     return centry;
 }
 
-void buildHistos::Init(TTree *tree)
+void buildHistos::Init( )
 {
     
-    const int nJetTypes_C = 14;
-    std::string jetNames[nJetTypes_C] = {"ak5","ak5tr","ak5pr","ak5ft","ak7","ak7tr","ak7pr","ak7ft","ak8","ak8tr","ak8pr","ak8ft","ca8","ca8pr"};
+    const int nJetTypes_C = 18;
+    std::string jetNames[nJetTypes_C] = {"ak5","ak5tr","ak5pr","ak5ft","ak7","ak7tr","ak7pr","ak7ft","ak8","ak8tr","ak8pr","ak8ft","ca8","ca8pr","ak5g","ak7g","ak8g","ca8g"};
     for (int i = 0; i < nJetTypes_C; i++){
         jetTypes.push_back( jetNames[i] );
     }
     nJetTypes = jetTypes.size();
-    std::cout << "nJetTypes: " << nJetTypes << std::endl;
-
-    // The Init() function is called when the selector needs to initialize
-    // a new tree or chain. Typically here the branch addresses and branch
-    // pointers of the tree will be set.
-    // It is normally not necessary to make changes to the generated
-    // code, but the routine can be extended by the user if needed.
-    // Init() will be called many times when running on PROOF
-    // (once per file to be processed).
     
-    // Set branch addresses and branch pointers
-    if (!tree) return;
-    fChain = tree;
-    fCurrent = -1;
-    fChain->SetMakeClass(1);
+    // --------------------------------------------
+    // don't run over gen jet collections if data!!
+    if (_isData) nJetTypes -= 4;
+    // --------------------------------------------
     
-    fChain->SetBranchAddress("e_puwt", &e_puwt);
-    fChain->SetBranchAddress("e_puwt_up", &e_puwt_up);
-    fChain->SetBranchAddress("e_puwt_dn", &e_puwt_dn);
-    fChain->SetBranchAddress("e_effwt", &e_effwt);
-    fChain->SetBranchAddress("e_met", &e_met);
-    fChain->SetBranchAddress("e_nvert", &e_nvert);
-    fChain->SetBranchAddress("e_weight", &e_weight);
-    fChain->SetBranchAddress("w_mt", &w_mt);
-    fChain->SetBranchAddress("w_pt", &w_pt);
-    fChain->SetBranchAddress("l_pt", &l_pt);
-    fChain->SetBranchAddress("l_reliso", &l_reliso);
-
+    //std::cout << "nJetTypes: " << nJetTypes << std::endl;
+    
     h_w_mt = new TH1D("h_w_mt", "h_w_mt", 100, 0., 200);
-    h_w_pt = new TH1D("h_w_pt", "h_w_pt", 100, 0., 600);
-    h_e_met = new TH1D("h_e_met", "h_e_met", 100, 0., 500);
-    h_l_pt = new TH1D("h_l_pt", "h_l_pt", 100, 0., 500);
-    
-    for (int i = 0; i < nJetTypes; i++){
-        
-        std::cout << "string: " << ("j_" + jetTypes[i] + "_nJ") << std::endl;
-        j_nJ[i] = 0.;
-        j_mass[i] = 0.;
-        j_bdis[i] = 0.;
-        j_eta[i] = 0.;
-        j_phi[i] = 0.;
-        j_pt[i] = 0.;
-        j_p[i] = 0.;
-        
-        fChain->SetBranchAddress( ("j_" + jetTypes[i] + "_nJ").c_str(), &j_nJ[i]);// , &b_j_ak5_nJ);
-        fChain->SetBranchAddress( ("j_" + jetTypes[i] + "_mass").c_str(), &j_mass[i]);// , &b_j_ak5_nJ);
-        fChain->SetBranchAddress( ("j_" + jetTypes[i] + "_area").c_str(), &j_area[i]);
-        fChain->SetBranchAddress( ("j_" + jetTypes[i] + "_pt").c_str(), &j_pt[i]);// , &b_j_ak5_nJ);
-        
-        if ( jetTypes[i] == "ak5" ){
-            fChain->SetBranchAddress( ("j_" + jetTypes[i] + "_bdis").c_str(), &j_bdis[i]);// , &b_j_ak5_nJ);
-            fChain->SetBranchAddress( ("j_" + jetTypes[i] + "_eta").c_str(), &j_eta[i]);// , &b_j_ak5_nJ);
-            fChain->SetBranchAddress( ("j_" + jetTypes[i] + "_phi").c_str(), &j_phi[i]);// , &b_j_ak5_nJ);
-            fChain->SetBranchAddress( ("j_" + jetTypes[i] + "_p").c_str(), &j_p[i]);// , &b_j_ak5_nJ);        
-        }
+    h_w_pt = new TH1D("h_w_pt", "h_w_pt", 100, 0., 500);
+    h_e_met = new TH1D("h_e_met", "h_e_met", 100, 0., 300);
+    h_l_pt = new TH1D("h_l_pt", "h_l_pt", 100, 0., 300);
 
-    }
+    h_j_ca8pr_mu = new TH1D("h_j_ca8pr_mu", "h_j_ca8pr_mu", 100, 0., 1.);
+
     
+    int nBins = 20;
     
     // DECLARATION OF HISTOGRAMS
     double xbinsProfile[29] = {50,55,60,65,70,75,80,85,90,95,100,110,120,130,140,150,160,170,180,190,200,225,250,275,300,350,400,450,500};
     for (int i = 0; i < nJetTypes; i++){
-        h_j_nJ[i] = new TH1D( ("h_j_" + jetTypes[i] + "_nJ").c_str(), ("h_j_" + jetTypes[i] + "_nJ").c_str(), 10,0., 10. ); 
-        h_j_mass[i] = new TH1D( ("h_j_" + jetTypes[i] + "_mass").c_str(), ("h_j_" + jetTypes[i] + "_mass").c_str(), 100,0.,200. );
-        h_j_area[i] = new TH1D( ("h_j_" + jetTypes[i] + "_area").c_str(), ("h_j_" + jetTypes[i] + "_area").c_str(), 100,0.,10. );
-        h_j_bdis[i] = new TH1D( ("h_j_" + jetTypes[i] + "_bdis").c_str(), ("h_j_" + jetTypes[i] + "_bdis").c_str(), 100,0.,10. );
-        h_j_eta[i] = new TH1D( ("h_j_" + jetTypes[i] + "_eta").c_str(), ("h_j_" + jetTypes[i] + "_eta").c_str(), 100,-5.,5. );
-        h_j_phi[i] = new TH1D( ("h_j_" + jetTypes[i] + "_phi").c_str(), ("h_j_" + jetTypes[i] + "_phi").c_str(), 100,-10.,10. );
-        h_j_pt[i] = new TH1D( ("h_j_" + jetTypes[i] + "_pt").c_str(), ("h_j_" + jetTypes[i] + "_pt").c_str(), 100,0.,500 );
-        h_j_p[i] = new TH1D( ("h_j_" + jetTypes[i] + "_p").c_str(), ("h_j_" + jetTypes[i] + "_p").c_str(), 100,0.,500 );
+        h_j_nJ[i] = new TH1D( ("h_j_" + jetTypes[i] + "_nJ").c_str(), ("; n Jets (" + jetTypes[i] + ");count").c_str(), 10,0., 10. ); 
+        h_j_mass[i] = new TH1D( ("h_j_" + jetTypes[i] + "_mass").c_str(), ("; jet mass (" + jetTypes[i] + ");count").c_str(), nBins,0.,200. );
+        h_j_area[i] = new TH1D( ("h_j_" + jetTypes[i] + "_area").c_str(), ("; jet area (" + jetTypes[i] + ");count").c_str(), nBins,0.,4. );
+        h_j_bdis[i] = new TH1D( ("h_j_" + jetTypes[i] + "_bdis").c_str(), ("; ejt b disc (" + jetTypes[i] + ");count").c_str(), nBins,0.,10. );
+        h_j_eta[i] = new TH1D( ("h_j_" + jetTypes[i] + "_eta").c_str(), ("; jet eta (" + jetTypes[i] + ");count").c_str(), nBins,-5.,5. );
+        h_j_phi[i] = new TH1D( ("h_j_" + jetTypes[i] + "_phi").c_str(), ("; jet phi (" + jetTypes[i] + ");count").c_str(), nBins,-10.,10. );
+        h_j_pt[i] = new TH1D( ("h_j_" + jetTypes[i] + "_pt").c_str(), ("; jet pT (" + jetTypes[i] + ");count").c_str(), nBins,0.,500 );
+        h_j_p[i] = new TH1D( ("h_j_" + jetTypes[i] + "_p").c_str(), ("; jet pT (" + jetTypes[i] + ");count").c_str(), nBins,0.,500 );
         
         // in bins of pT
-        h_j_mass_pt50to100[i] = new TH1D( ("h_j_" + jetTypes[i] + "_mass_pt50to100").c_str(), ("h_j_" + jetTypes[i] + "_mass_pt50to100").c_str(), 100,0., 200. ); 
-        h_j_mass_pt100to150[i] = new TH1D( ("h_j_" + jetTypes[i] + "_mass_pt100to150").c_str(), ("h_j_" + jetTypes[i] + "_mass_pt100to150").c_str(), 100,0., 200. ); 
-        h_j_mass_pt150to200[i] = new TH1D( ("h_j_" + jetTypes[i] + "_mass_pt150to200").c_str(), ("h_j_" + jetTypes[i] + "_mass_pt150to200").c_str(), 100,0., 200. ); 
-        h_j_mass_pt200to300[i] = new TH1D( ("h_j_" + jetTypes[i] + "_mass_pt200to300").c_str(), ("h_j_" + jetTypes[i] + "_mass_pt200to300").c_str(), 100,0., 200. ); 
-        h_j_mass_pt300andup[i] = new TH1D( ("h_j_" + jetTypes[i] + "_mass_pt300andup").c_str(), ("h_j_" + jetTypes[i] + "_mass_pt300andup").c_str(), 100,0., 200. ); 
+        h_j_mass_pt50to100[i] = new TH1D( ("h_j_" + jetTypes[i] + "_mass_pt50to100").c_str(), ("; jet mass (" + jetTypes[i] + ");count").c_str(), nBins,0., 200. ); 
+        h_j_mass_pt100to150[i] = new TH1D( ("h_j_" + jetTypes[i] + "_mass_pt100to150").c_str(), ("; jet mass (" + jetTypes[i] + ");count").c_str(), nBins,0., 200. ); 
+        h_j_mass_pt150to200[i] = new TH1D( ("h_j_" + jetTypes[i] + "_mass_pt150to200").c_str(), ("; jet mass (" + jetTypes[i] + ");count").c_str(), nBins,0., 200. ); 
+        h_j_mass_pt200to300[i] = new TH1D( ("h_j_" + jetTypes[i] + "_mass_pt200to300").c_str(), ("; jet mass (" + jetTypes[i] + ");count").c_str(), nBins,0., 200. ); 
+        h_j_mass_pt300andup[i] = new TH1D( ("h_j_" + jetTypes[i] + "_mass_pt300andup").c_str(), ("; jet mass (" + jetTypes[i] + ");count").c_str(), nBins,0., 200. ); 
         
         // profile
-        p_j_massvpt[i] = new TProfile(("p_j_" + jetTypes[i] + "_massvpt").c_str(),("p_j_" + jetTypes[i] + "_massvpt").c_str(),28,xbinsProfile, 0., 1000.);   
-        p_j_massvNV[i] = new TProfile(("p_j_" + jetTypes[i] + "_massvNV").c_str(),("p_j_" + jetTypes[i] + "_massvNV").c_str(),30,0, 30., 0, 1000.);   
+        p_j_massvpt[i] = new TProfile(("p_j_" + jetTypes[i] + "_massvpt").c_str(),("; jet pT; jet mass (" + jetTypes[i] + ")").c_str(),28,xbinsProfile, 0., 1000.);   
+        p_j_massvNV[i] = new TProfile(("p_j_" + jetTypes[i] + "_massvNV").c_str(),("; n vertices; jet mass (" + jetTypes[i] + ")").c_str(),30,0, 30., 0, 1000.);   
         
         // profile, ratio plots
-        p_j_massOverAK5[i] = new TProfile(("p_j_" + jetTypes[i] + "_massOverAK5").c_str(),("p_j_" + jetTypes[i] + "_massOverAK5").c_str(),28,xbinsProfile, 0., 5.);   
-        p_j_massOverAK7[i] = new TProfile(("p_j_" + jetTypes[i] + "_massOverAK7").c_str(),("p_j_" + jetTypes[i] + "_massOverAK7").c_str(),28,xbinsProfile, 0., 5.);   
-        p_j_massOverAK8[i] = new TProfile(("p_j_" + jetTypes[i] + "_massOverAK8").c_str(),("p_j_" + jetTypes[i] + "_massOverAK8").c_str(),28,xbinsProfile, 0., 5.);   
-        p_j_ptOverAK5[i] = new TProfile(("p_j_" + jetTypes[i] + "_ptOverAK5").c_str(),("p_j_" + jetTypes[i] + "_ptOverAK5").c_str(),28,xbinsProfile, 0., 5.);   
-        p_j_ptOverAK7[i] = new TProfile(("p_j_" + jetTypes[i] + "_ptOverAK7").c_str(),("p_j_" + jetTypes[i] + "_ptOverAK7").c_str(),28,xbinsProfile, 0., 5.);   
-        p_j_ptOverAK8[i] = new TProfile(("p_j_" + jetTypes[i] + "_ptOverAK8").c_str(),("p_j_" + jetTypes[i] + "_ptOverAK8").c_str(),28,xbinsProfile, 0., 5.);   
+        p_j_massOverAK5[i] = new TProfile(("p_j_" + jetTypes[i] + "_massOverAK5").c_str(),("; jet pT; jet mass ratio (" + jetTypes[i] + "/ak5)").c_str(),28,xbinsProfile, 0., 5.);   
+        p_j_massOverAK7[i] = new TProfile(("p_j_" + jetTypes[i] + "_massOverAK7").c_str(),("; jet pT; jet mass ratio (" + jetTypes[i] + "/ak7)").c_str(),28,xbinsProfile, 0., 5.);   
+        p_j_massOverAK8[i] = new TProfile(("p_j_" + jetTypes[i] + "_massOverAK8").c_str(),("; jet pT; jet mass ratio (" + jetTypes[i] + "/ak8)").c_str(),28,xbinsProfile, 0., 5.);   
+        p_j_ptOverAK5[i] = new TProfile(("p_j_" + jetTypes[i] + "_ptOverAK5").c_str(),("; jet pT; jet pT ratio (" + jetTypes[i] + "/ak5)").c_str(),28,xbinsProfile, 0., 5.);   
+        p_j_ptOverAK7[i] = new TProfile(("p_j_" + jetTypes[i] + "_ptOverAK7").c_str(),("; jet pT; jet pT ratio (" + jetTypes[i] + "/ak7)").c_str(),28,xbinsProfile, 0., 5.);   
+        p_j_ptOverAK8[i] = new TProfile(("p_j_" + jetTypes[i] + "_ptOverAK8").c_str(),("; jet pT; jet pT ratio (" + jetTypes[i] + "/ak8)").c_str(),28,xbinsProfile, 0., 5.);   
+
+        p_j_massOverAK5vNV[i] = new TProfile(("p_j_" + jetTypes[i] + "_massOverAK5vNV").c_str(),("; n vertices; jet mass ratio (" + jetTypes[i] + "/ak5)").c_str(),30,0, 30., 0, 1000.);   
+        p_j_massOverAK7vNV[i] = new TProfile(("p_j_" + jetTypes[i] + "_massOverAK7vNV").c_str(),("; n vertices; jet mass ratio (" + jetTypes[i] + "/ak7)").c_str(),30,0, 30., 0, 1000.);   
+        p_j_massOverAK8vNV[i] = new TProfile(("p_j_" + jetTypes[i] + "_massOverAK8vNV").c_str(),("; n vertices; jet mass ratio (" + jetTypes[i] + "/ak8)").c_str(),30,0, 30., 0, 1000.);   
+        p_j_ptOverAK5vNV[i] = new TProfile(("p_j_" + jetTypes[i] + "_ptOverAK5vNV").c_str(),("; n vertices; jet pT ratio (" + jetTypes[i] + "/ak5)").c_str(),30,0, 30., 0, 1000.);   
+        p_j_ptOverAK7vNV[i] = new TProfile(("p_j_" + jetTypes[i] + "_ptOverAK7vNV").c_str(),("; n vertices; jet pT ratio (" + jetTypes[i] + "/ak7)").c_str(),30,0, 30., 0, 1000.);   
+        p_j_ptOverAK8vNV[i] = new TProfile(("p_j_" + jetTypes[i] + "_ptOverAK8vNV").c_str(),("; n vertices; jet pT ratio (" + jetTypes[i] + "/ak8)").c_str(),30,0, 30., 0, 1000.);   
+
+        
+        // gen jets
+        h_j_massOverAK5g[i] = new TProfile(("h_j_" + jetTypes[i] + "_massOverAK5g").c_str(),("; jet mass ratio (" + jetTypes[i] + "/ak5g);").c_str(),nBins, 0., 2.);   
+        h_j_massOverAK7g[i] = new TProfile(("h_j_" + jetTypes[i] + "_massOverAK7g").c_str(),("; jet mass ratio (" + jetTypes[i] + "/ak7g);").c_str(),nBins, 0., 2.);   
+        h_j_massOverAK8g[i] = new TProfile(("h_j_" + jetTypes[i] + "_massOverAK8g").c_str(),("; jet mass ratio (" + jetTypes[i] + "/ak8g);").c_str(),nBins, 0., 2.);   
+        h_j_ptOverAK5g[i] = new TProfile(("h_j_" + jetTypes[i] + "_ptOverAK5g").c_str(),("; jet pT ratio (" + jetTypes[i] + "/ak5g);").c_str(),nBins, 0., 2.);   
+        h_j_ptOverAK7g[i] = new TProfile(("h_j_" + jetTypes[i] + "_ptOverAK7g").c_str(),("; jet pT ratio (" + jetTypes[i] + "/ak7g);").c_str(),nBins, 0., 2.);   
+        h_j_ptOverAK8g[i] = new TProfile(("h_j_" + jetTypes[i] + "_ptOverAK8g").c_str(),("; jet pT ratio (" + jetTypes[i] + "/ak8g);").c_str(),nBins, 0., 2.);   
+        
+        p_j_massOverAK5g[i] = new TProfile(("p_j_" + jetTypes[i] + "_massOverAK5g").c_str(),("; jet pT; jet mass ratio (" + jetTypes[i] + "/ak5g)").c_str(),28,xbinsProfile, 0., 5.);   
+        p_j_massOverAK7g[i] = new TProfile(("p_j_" + jetTypes[i] + "_massOverAK7g").c_str(),("; jet pT; jet mass ratio (" + jetTypes[i] + "/ak7g)").c_str(),28,xbinsProfile, 0., 5.);   
+        p_j_massOverAK8g[i] = new TProfile(("p_j_" + jetTypes[i] + "_massOverAK8g").c_str(),("; jet pT; jet mass ratio (" + jetTypes[i] + "/ak8g)").c_str(),28,xbinsProfile, 0., 5.);   
+        p_j_ptOverAK5g[i] = new TProfile(("p_j_" + jetTypes[i] + "_ptOverAK5g").c_str(),("; jet pT; jet pT ratio (" + jetTypes[i] + "/ak5g)").c_str(),28,xbinsProfile, 0., 5.);   
+        p_j_ptOverAK7g[i] = new TProfile(("p_j_" + jetTypes[i] + "_ptOverAK7g").c_str(),("; jet pT; jet pT ratio (" + jetTypes[i] + "/ak7g)").c_str(),28,xbinsProfile, 0., 5.);   
+        p_j_ptOverAK8g[i] = new TProfile(("p_j_" + jetTypes[i] + "_ptOverAK8g").c_str(),("; jet pT; jet pT ratio (" + jetTypes[i] + "/ak8g)").c_str(),28,xbinsProfile, 0., 5.);   
+    
     }
     
     

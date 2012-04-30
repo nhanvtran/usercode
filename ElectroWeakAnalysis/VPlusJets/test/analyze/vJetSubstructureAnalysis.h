@@ -21,7 +21,7 @@ class vJetSubstructureAnalysis {
     TTree          *fChain;   //!pointer to the analyzed TTree or TChain
     Int_t           fCurrent; //!current Tree number in a TChain
     
-    double j_ak5_bdis, j_ak5_eta, j_ak5_phi, j_ak5_pt, j_ak5_mass, j_ak5_area, j_ak5_nJ, j_ak5_mu, j_ak5_p;
+    double j_ak5_bdis, j_ak5_eta, j_ak5_phi, j_ak5_pt, j_ak5_mass, j_ak5_area, j_ak5_nJ, j_ak5_nBtags, j_ak5_mu, j_ak5_p;
     double j_ak5tr_mass, j_ak5tr_pt, j_ak5tr_nJ, j_ak5tr_area;
     double j_ak5pr_mass, j_ak5pr_pt, j_ak5pr_nJ, j_ak5pr_area;
     double j_ak5ft_mass, j_ak5ft_pt, j_ak5ft_nJ, j_ak5ft_area;
@@ -34,10 +34,18 @@ class vJetSubstructureAnalysis {
     double j_ak8pr_mass, j_ak8pr_pt, j_ak8pr_nJ, j_ak8pr_area;
     double j_ak8ft_mass, j_ak8ft_pt, j_ak8ft_nJ, j_ak8ft_area;
     double j_ca8_mass, j_ca8_pt, j_ca8_nJ, j_ca8_area;    
-    double j_ca8pr_mass, j_ca8pr_pt, j_ca8pr_nJ, j_ca8pr_area;
+    double j_ca8pr_mass, j_ca8pr_pt, j_ca8pr_nJ, j_ca8pr_area, j_ca8pr_m1, j_ca8pr_m2;
     
     double e_nvert, l_pt, l_reliso, e_met, e_weight, w_mt, w_pt;
     double e_puwt, e_puwt_up, e_puwt_dn, e_effwt;
+
+    // gen jet data
+    double j_ak5g_mass, j_ak5g_pt, j_ak5g_nJ, j_ak5g_area;    
+    double j_ak7g_mass, j_ak7g_pt, j_ak7g_nJ, j_ak7g_area;    
+    double j_ak8g_mass, j_ak8g_pt, j_ak8g_nJ, j_ak8g_area;    
+    double j_ca8g_mass, j_ca8g_pt, j_ca8g_nJ, j_ca8g_area; 
+    
+    int j_ak5_match, j_ak7_match, j_ak8_match, j_ca8_match;
     
     // Declaration of leaf types
     Float_t         Wel_mass;
@@ -1601,6 +1609,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     otree->Branch("l_pt", &l_pt, "l_pt/D");
     otree->Branch("l_reliso", &l_reliso, "l_reliso/D");
     otree->Branch("j_ak5_nJ", &j_ak5_nJ, "j_ak5_nJ/D");
+    otree->Branch("j_ak5_nBtags", &j_ak5_nBtags, "j_ak5_nBtags/D");
     otree->Branch("j_ak5_mu", &j_ak5_mu, "j_ak5_mu/D");
     otree->Branch("j_ak5_bdis", &j_ak5_bdis, "j_ak5_bdis/D");
     otree->Branch("j_ak5_eta", &j_ak5_eta, "j_ak5_eta/D");
@@ -1609,6 +1618,12 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     otree->Branch("j_ak5_p", &j_ak5_p, "j_ak5_p/D");
     otree->Branch("j_ak5_mass", &j_ak5_mass, "j_ak5_mass/D");
     otree->Branch("j_ak5_area", &j_ak5_area, "j_ak5_area/D");
+    
+    // matching flag
+    otree->Branch("j_ak5_match", &j_ak5_match, "j_ak5_match/I");
+    otree->Branch("j_ak7_match", &j_ak7_match, "j_ak7_match/I");
+    otree->Branch("j_ak8_match", &j_ak8_match, "j_ak8_match/I");
+    otree->Branch("j_ca8_match", &j_ca8_match, "j_ca8_match/I");
     
     otree->Branch("j_ak5tr_mass", &j_ak5tr_mass, "j_ak5tr_mass/D");
     otree->Branch("j_ak5pr_mass", &j_ak5pr_mass, "j_ak5pr_mass/D");
@@ -1623,6 +1638,10 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     otree->Branch("j_ak8ft_mass", &j_ak8ft_mass, "j_ak8ft_mass/D");
     otree->Branch("j_ca8_mass", &j_ca8_mass, "j_ca8_mass/D");
     otree->Branch("j_ca8pr_mass", &j_ca8pr_mass, "j_ca8pr_mass/D");
+    otree->Branch("j_ak5g_mass", &j_ak5g_mass, "j_ak5g_mass/D");
+    otree->Branch("j_ak7g_mass", &j_ak7g_mass, "j_ak7g_mass/D");
+    otree->Branch("j_ak8g_mass", &j_ak8g_mass, "j_ak8g_mass/D");
+    otree->Branch("j_ca8g_mass", &j_ca8g_mass, "j_ca8g_mass/D");
     
     otree->Branch("j_ak5tr_pt", &j_ak5tr_pt, "j_ak5tr_pt/D");
     otree->Branch("j_ak5pr_pt", &j_ak5pr_pt, "j_ak5pr_pt/D");
@@ -1637,6 +1656,10 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     otree->Branch("j_ak8ft_pt", &j_ak8ft_pt, "j_ak8ft_pt/D");
     otree->Branch("j_ca8_pt", &j_ca8_pt, "j_ca8_pt/D");
     otree->Branch("j_ca8pr_pt", &j_ca8pr_pt, "j_ca8pr_pt/D");
+    otree->Branch("j_ak5g_pt", &j_ak5g_pt, "j_ak5g_pt/D");
+    otree->Branch("j_ak7g_pt", &j_ak7g_pt, "j_ak7g_pt/D");
+    otree->Branch("j_ak8g_pt", &j_ak8g_pt, "j_ak8g_pt/D");
+    otree->Branch("j_ca8g_pt", &j_ca8g_pt, "j_ca8g_pt/D");
     
     otree->Branch("j_ak5tr_nJ", &j_ak5tr_nJ, "j_ak5tr_nJ/D");
     otree->Branch("j_ak5pr_nJ", &j_ak5pr_nJ, "j_ak5pr_nJ/D");
@@ -1651,7 +1674,11 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     otree->Branch("j_ak8ft_nJ", &j_ak8ft_nJ, "j_ak8ft_nJ/D");
     otree->Branch("j_ca8_nJ", &j_ca8_nJ, "j_ca8_nJ/D");
     otree->Branch("j_ca8pr_nJ", &j_ca8pr_nJ, "j_ca8pr_nJ/D");
-    
+    otree->Branch("j_ak5g_nJ", &j_ak5g_nJ, "j_ak5g_nJ/D");
+    otree->Branch("j_ak7g_nJ", &j_ak7g_nJ, "j_ak7g_nJ/D");
+    otree->Branch("j_ak8g_nJ", &j_ak8g_nJ, "j_ak8g_nJ/D");
+    otree->Branch("j_ca8g_nJ", &j_ca8g_nJ, "j_ca8g_nJ/D");
+
     otree->Branch("j_ak5tr_area", &j_ak5tr_area, "j_ak5tr_area/D");
     otree->Branch("j_ak5pr_area", &j_ak5pr_area, "j_ak5pr_area/D");
     otree->Branch("j_ak5ft_area", &j_ak5ft_area, "j_ak5ft_area/D");
@@ -1665,6 +1692,13 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     otree->Branch("j_ak8ft_area", &j_ak8ft_area, "j_ak8ft_area/D");
     otree->Branch("j_ca8_area", &j_ca8_area, "j_ca8_area/D");
     otree->Branch("j_ca8pr_area", &j_ca8pr_area, "j_ca8pr_area/D");
+    otree->Branch("j_ak5g_area", &j_ak5g_area, "j_ak5g_area/D");
+    otree->Branch("j_ak7g_area", &j_ak7g_area, "j_ak7g_area/D");
+    otree->Branch("j_ak8g_area", &j_ak8g_area, "j_ak8g_area/D");
+    otree->Branch("j_ca8g_area", &j_ca8g_area, "j_ca8g_area/D");
+    
+    otree->Branch("j_ca8pr_m1", &j_ca8pr_m1, "j_ca8pr_m1/D");
+    otree->Branch("j_ca8pr_m2", &j_ca8pr_m2, "j_ca8pr_m2/D"); 
 
 }
 

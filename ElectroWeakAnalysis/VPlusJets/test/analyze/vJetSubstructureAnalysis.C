@@ -61,6 +61,26 @@ void vJetSubstructureAnalysis::Loop(Long64_t maxevents)
     
     Long64_t nbytes = 0, nb = 0;
     Long64_t ctr = 0.;
+    
+    // counters
+    Long64_t ctr_class1_matched_ak5 = 0.;
+    Long64_t ctr_class1_unmatched_ak5 = 0.;
+    Long64_t ctr_class1_matched_ak7 = 0.;
+    Long64_t ctr_class1_unmatched_ak7 = 0.;
+    Long64_t ctr_class1_matched_ak8 = 0.;
+    Long64_t ctr_class1_unmatched_ak8 = 0.;
+    Long64_t ctr_class1_matched_ca8 = 0.;
+    Long64_t ctr_class1_unmatched_ca8 = 0.;
+    
+    Long64_t ctr50_class1_matched_ak5 = 0.;
+    Long64_t ctr50_class1_unmatched_ak5 = 0.;
+    Long64_t ctr50_class1_matched_ak7 = 0.;
+    Long64_t ctr50_class1_unmatched_ak7 = 0.;
+    Long64_t ctr50_class1_matched_ak8 = 0.;
+    Long64_t ctr50_class1_unmatched_ak8 = 0.;
+    Long64_t ctr50_class1_matched_ca8 = 0.;
+    Long64_t ctr50_class1_unmatched_ca8 = 0.;
+    
     for (Long64_t jentry=0; jentry<nentries;jentry++) {
         Long64_t ientry = LoadTree(jentry);
         if (ientry < 0) break;
@@ -109,9 +129,18 @@ void vJetSubstructureAnalysis::Loop(Long64_t maxevents)
             eleMHTEff.GetEfficiency(event_met_pfmet, 0) *
             eleWMtEff.GetEfficiency(Wel_mt, Wel_electron_eta);
             /////////////////////////////////////////
-
             
-            if (b_eleWP80 && b_phasespace && b_trigger){
+            bool b_jets = false;
+            if ((JetAK5PF_nJets + JetAK7PF_nJets + JetAK8PF_nJets + JetCA8PF_nJets) > 0) b_jets = true;
+            //std::cout << "nJ: " << (JetAK5PF_nJets + JetAK7PF_nJets + JetAK8PF_nJets + JetCA8PF_nJets) << std::endl;
+            
+            
+            if (b_eleWP80 && b_phasespace && b_trigger && b_jets){
+                
+                ///*
+                ////////////////
+                // backwards logic, match gen jet to highest pT reco jet
+                ////////////////
                 
                 //std::cout << "good event with e_pt = " << l_pt << std::endl;
                 j_ak5_bdis = JetAK5PF_bDiscSSVHE[0];
@@ -121,7 +150,8 @@ void vJetSubstructureAnalysis::Loop(Long64_t maxevents)
                 j_ak5_mass = JetAK5PF_Mass[0];
                 j_ak5_area = JetAK5PF_Area[0];
                 j_ak5_nJ = JetAK5PF_nJets;
-
+                j_ak5_nBtags = JetAK5PF_nJetBTags;
+                
                 j_ak5tr_mass = JetAK5TRIMMEDPF_Mass[0];
                 j_ak5pr_mass = JetAK5PRUNEDPF_Mass[0];
                 j_ak5ft_mass = JetAK5FILTEREDPF_Mass[0];
@@ -135,7 +165,7 @@ void vJetSubstructureAnalysis::Loop(Long64_t maxevents)
                 j_ak8ft_mass = JetAK8FILTEREDPF_Mass[0];
                 j_ca8_mass = JetCA8PF_Mass[0];
                 j_ca8pr_mass = JetCA8PRUNEDPF_Mass[0];
-                
+
                 j_ak5tr_pt = JetAK5TRIMMEDPF_Pt[0];
                 j_ak5pr_pt = JetAK5PRUNEDPF_Pt[0];
                 j_ak5ft_pt = JetAK5FILTEREDPF_Pt[0];
@@ -178,6 +208,145 @@ void vJetSubstructureAnalysis::Loop(Long64_t maxevents)
                 j_ca8_area = (double) JetCA8PF_Area[0];
                 j_ca8pr_area = (double) JetCA8PRUNEDPF_Area[0];
 
+                j_ca8pr_m1 = (double) JetCA8PRUNEDPF_subJet1Mass[0];
+                j_ca8pr_m2 = (double) JetCA8PRUNEDPF_subJet2Mass[0];
+                
+                // gen jet information
+                // do a delta R matching of 0.3                                
+                int matchIndex_ak5 = -1;
+                double toler = 100.;
+                int maxLoop = JetAK5GENJETSNONU_nJets;
+                if (maxLoop > 6) maxLoop = 6;
+                for (int k = 0; k < maxLoop; k++){
+                    Double_t deta = JetAK5PF_Eta[0]-JetAK5GENJETSNONU_Eta[k];
+                    Double_t dphi = TVector2::Phi_mpi_pi(JetAK5PF_Phi[0]-JetAK5GENJETSNONU_Phi[k]);
+                    double deltaR = TMath::Sqrt( deta*deta+dphi*dphi );
+                    //std::cout << "deltaR (ak5): " << deltaR << std::endl;
+                    if (deltaR < 0.3 && deltaR < toler){ matchIndex_ak5 = k; toler = deltaR; }
+                }
+                int matchIndex_ak7 = -1;
+                toler = 100.;
+                maxLoop = JetAK7GENJETSNONU_nJets;
+                if (maxLoop > 6) maxLoop = 6;
+                for (int k = 0; k < maxLoop; k++){
+                    Double_t deta = JetAK7PF_Eta[0]-JetAK7GENJETSNONU_Eta[k];
+                    Double_t dphi = TVector2::Phi_mpi_pi(JetAK7PF_Phi[0]-JetAK7GENJETSNONU_Phi[k]);
+                    double deltaR = TMath::Sqrt( deta*deta+dphi*dphi );
+                    //std::cout << "deltaR (ak7): " << deltaR << std::endl;
+                    if (deltaR < 0.3 && deltaR < toler){ matchIndex_ak7 = k; toler = deltaR; }
+                }
+                int matchIndex_ak8 = -1;
+                toler = 100.;
+                maxLoop = JetAK8GENJETSNONU_nJets;
+                if (maxLoop > 6) maxLoop = 6;
+                for (int k = 0; k < maxLoop; k++){
+                    Double_t deta = JetAK8PF_Eta[0]-JetAK8GENJETSNONU_Eta[k];
+                    Double_t dphi = TVector2::Phi_mpi_pi(JetAK8PF_Phi[0]-JetAK8GENJETSNONU_Phi[k]);
+                    double deltaR = TMath::Sqrt( deta*deta+dphi*dphi );
+                    //std::cout << "deltaR (ak8): " << deltaR << std::endl;
+                    if (deltaR < 0.3 && deltaR < toler){ matchIndex_ak8 = k; toler = deltaR; }
+                }
+                int matchIndex_ca8 = -1;
+                toler = 100.;
+                maxLoop = JetCA8GENJETSNONU_nJets;
+                if (maxLoop > 6) maxLoop = 6;
+                for (int k = 0; k < maxLoop; k++){
+                    Double_t deta = JetCA8PF_Eta[0]-JetCA8GENJETSNONU_Eta[k];
+                    Double_t dphi = TVector2::Phi_mpi_pi(JetCA8PF_Phi[0]-JetCA8GENJETSNONU_Phi[k]);
+                    double deltaR = TMath::Sqrt( deta*deta+dphi*dphi );
+                    //std::cout << "deltaR (ca8): " << deltaR << std::endl;
+                    if (deltaR < 0.3 && deltaR < toler){ matchIndex_ca8 = k; toler = deltaR; }
+                }
+
+                
+                ////////////////////////
+                // M a t c h   c o u n t i n g
+                if (matchIndex_ak5 < 0){
+                    //std::cout << "WARNING -- No Gen Jet Match for ak5! " << std::endl;
+                    ctr_class1_unmatched_ak5++;
+                    j_ak5_match = 0;
+                    if (JetAK5PF_Pt[0] > 50){
+                        ctr50_class1_unmatched_ak5++;
+                    }
+                }
+                else{
+                    ctr_class1_matched_ak5++;
+                    j_ak5_match = 1;
+                    if (JetAK5PF_Pt[0] > 50){
+                        ctr50_class1_matched_ak5++;
+                    }
+                }
+                ////////////////////////
+                if (matchIndex_ak7 < 0){
+                    //std::cout << "WARNING -- No Gen Jet Match for ak7! " << std::endl;
+                    ctr_class1_unmatched_ak7++;
+                    j_ak7_match = 0;
+                    if (JetAK7PF_Pt[0] > 50){
+                        ctr50_class1_unmatched_ak7++;
+                    }
+                }
+                else{
+                    ctr_class1_matched_ak7++;
+                    j_ak7_match = 1;
+                    if (JetAK7PF_Pt[0] > 50){
+                        ctr50_class1_matched_ak7++;
+                    }                }
+                ////////////////////////
+                if (matchIndex_ak8 < 0){
+                    //std::cout << "WARNING -- No Gen Jet Match for ak8! " << std::endl;
+                    ctr_class1_unmatched_ak8++;
+                    j_ak8_match = 0;
+                    if (JetAK8PF_Pt[0] > 50){
+                        ctr50_class1_unmatched_ak8++;
+                    }
+                }
+                else{
+                    ctr_class1_matched_ak8++;
+                    j_ak8_match = 1;
+                    if (JetAK8PF_Pt[0] > 50){
+                        ctr50_class1_matched_ak8++;
+                    }                }
+                ////////////////////////
+                if (matchIndex_ca8 < 0){
+                    //std::cout << "WARNING -- No Gen Jet Match for ca8! " << std::endl;
+                    ctr_class1_unmatched_ca8++;
+                    j_ca8_match = 0;
+                    if (JetCA8PF_Pt[0] > 50){
+                        ctr50_class1_unmatched_ca8++;
+                    }
+                }
+                else{
+                    ctr_class1_matched_ca8++;
+                    j_ca8_match = 1;
+                    if (JetCA8PF_Pt[0] > 50){
+                        ctr50_class1_matched_ca8++;
+                    }
+                }
+                ////////////////////////
+                
+                //std::cout << "-----------" << std::endl;
+                j_ak5g_mass = JetAK5GENJETSNONU_Mass[matchIndex_ak5];
+                j_ak5g_pt = JetAK5GENJETSNONU_Pt[matchIndex_ak5];
+                j_ak5g_nJ = JetAK5GENJETSNONU_nJets;
+                j_ak5g_area = JetAK5GENJETSNONU_Area[matchIndex_ak5];
+                
+                j_ak7g_mass = JetAK7GENJETSNONU_Mass[matchIndex_ak7];
+                j_ak7g_pt = JetAK7GENJETSNONU_Pt[matchIndex_ak7];
+                j_ak7g_nJ = JetAK7GENJETSNONU_nJets;
+                j_ak7g_area = JetAK7GENJETSNONU_Area[matchIndex_ak7];
+                
+                j_ak8g_mass = JetAK8GENJETSNONU_Mass[matchIndex_ak8];
+                j_ak8g_pt = JetAK8GENJETSNONU_Pt[matchIndex_ak8];
+                j_ak8g_nJ = JetAK8GENJETSNONU_nJets;
+                j_ak8g_area = JetAK8GENJETSNONU_Area[matchIndex_ak8];
+                
+                j_ca8g_mass = JetCA8GENJETSNONU_Mass[matchIndex_ca8];
+                j_ca8g_pt = JetCA8GENJETSNONU_Pt[matchIndex_ca8];
+                j_ca8g_nJ = JetCA8GENJETSNONU_nJets;
+                j_ca8g_area = JetCA8GENJETSNONU_Area[matchIndex_ca8];
+                                
+                //
+                
                 otree->Fill();
             }
         }
@@ -189,4 +358,21 @@ void vJetSubstructureAnalysis::Loop(Long64_t maxevents)
         if ((ctr > MAXEVENTS)&&(MAXEVENTS > 0)) break;
     }
     std::cout << "ctr: " << ctr << std::endl;
+    std::cout << "ctr_class1_matched_ak5: " << ctr_class1_matched_ak5 << std::endl;
+    std::cout << "ctr_class1_unmatched_ak5: " << ctr_class1_unmatched_ak5 << std::endl;
+    std::cout << "ctr_class1_matched_ak7: " << ctr_class1_matched_ak7 << std::endl;
+    std::cout << "ctr_class1_unmatched_ak7: " << ctr_class1_unmatched_ak7 << std::endl;
+    std::cout << "ctr_class1_matched_ak8: " << ctr_class1_matched_ak8 << std::endl;
+    std::cout << "ctr_class1_unmatched_ak8: " << ctr_class1_unmatched_ak8 << std::endl;
+    std::cout << "ctr_class1_matched_ca8: " << ctr_class1_matched_ca8 << std::endl;
+    std::cout << "ctr_class1_unmatched_ca8: " << ctr_class1_unmatched_ca8 << std::endl;
+
+    std::cout << "ctr50_class1_matched_ak5: " << ctr50_class1_matched_ak5 << std::endl;
+    std::cout << "ctr50_class1_unmatched_ak5: " << ctr50_class1_unmatched_ak5 << std::endl;
+    std::cout << "ctr50_class1_matched_ak7: " << ctr50_class1_matched_ak7 << std::endl;
+    std::cout << "ctr50_class1_unmatched_ak7: " << ctr50_class1_unmatched_ak7 << std::endl;
+    std::cout << "ctr50_class1_matched_ak8: " << ctr50_class1_matched_ak8 << std::endl;
+    std::cout << "ctr50_class1_unmatched_ak8: " << ctr50_class1_unmatched_ak8 << std::endl;
+    std::cout << "ctr50_class1_matched_ca8: " << ctr50_class1_matched_ca8 << std::endl;
+    std::cout << "ctr50_class1_unmatched_ca8: " << ctr50_class1_unmatched_ca8 << std::endl;
 }

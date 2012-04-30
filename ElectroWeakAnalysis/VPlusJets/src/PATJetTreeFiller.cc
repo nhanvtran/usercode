@@ -216,6 +216,7 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
             Y[iJet]  = jet->rapidity();
             Mass[iJet] = jet->mass(); 
             Area[iJet] = jet->jetArea();
+            JecFactor[iJet] = jet->jecFactor(0);
             nJetDaughters[iJet] = jet->numberOfDaughters();
             
             bDiscriminatorSSVHE[iJet] = jet->bDiscriminator("simpleSecondaryVertexHighEffBJetTags");
@@ -237,22 +238,28 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
     }
     else if (jetCollType_ == "LiteJet"){
         
-
+        
         std::string px_s = jetCollName_ + "_px";        
         std::string py_s = jetCollName_ + "_py";
         std::string pz_s = jetCollName_ + "_pz";
         std::string e_s = jetCollName_ + "_energy";
         std::string area_s = jetCollName_ + "_jetArea";
+        std::string jecFactor_s = jetCollName_ + "_jecFactor";
+         
+        
         edm::Handle< std::vector< float > > j_px;
         edm::Handle< std::vector< float > > j_py;
         edm::Handle< std::vector< float > > j_pz;
         edm::Handle< std::vector< float > > j_e;
         edm::Handle< std::vector< float > > j_area;
+        edm::Handle< std::vector< float > > j_jecFactor;
+
         iEvent.getByLabel( jetCollName_.c_str(), "px", j_px ); 
         iEvent.getByLabel( jetCollName_.c_str(), "py", j_py ); 
         iEvent.getByLabel( jetCollName_.c_str(), "pz", j_pz ); 
         iEvent.getByLabel( jetCollName_.c_str(), "energy", j_e ); 
         iEvent.getByLabel( jetCollName_.c_str(), "jetArea", j_area ); 
+        iEvent.getByLabel( jetCollName_.c_str(), "jecFactor", j_jecFactor ); 
 
         NumJets = j_px->size(); 
 
@@ -262,7 +269,9 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
         std::vector< float >::const_iterator jit_pz = j_pz->begin();
         std::vector< float >::const_iterator jit_e = j_e->begin();
         std::vector< float >::const_iterator jit_area = j_area->begin();
-        for (jit_px = j_px->begin();  jit_px != endpjets;  ++jit_px, ++jit_py, ++jit_pz, ++jit_e, ++jit_area, ++iJet) {
+        std::vector< float >::const_iterator jit_jecFactor = j_jecFactor->begin();
+
+        for (jit_px = j_px->begin();  jit_px != endpjets;  ++jit_px, ++jit_py, ++jit_pz, ++jit_e, ++jit_area, ++jit_jecFactor, ++iJet) {
             
             if( !(iJet< (unsigned int) NUM_JET_MAX) ) break;
             
@@ -280,6 +289,7 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
             Y[iJet]  = curJet->Rapidity();
             Mass[iJet] = curJet->M(); 
             Area[iJet] = *jit_area;
+            JecFactor[iJet] = *jit_jecFactor;
             
             //std::cout << "p4: " << curJet->Px() << ", " << curJet->Py() << ", " << curJet->Pz() << ", " << curJet->E() << std::endl;
             
@@ -342,6 +352,8 @@ void ewk::PATJetTreeFiller::SetBranches()
     SetBranch( Y, "Jet" + jetCollTag_ + "_Y");
     SetBranch( Mass, "Jet" + jetCollTag_ + "_Mass");
     SetBranch( Area, "Jet" + jetCollTag_ + "_Area");
+    SetBranch( JecFactor, "Jet" + jetCollTag_ + "_JecFactor");
+
     
     if (jetCollType_ == "PatJet"){
         SetBranchSingle( &numBTags, "Jet" + jetCollTag_ + "_nJetBTags");
@@ -381,6 +393,7 @@ void ewk::PATJetTreeFiller::init()
         Y[j] = -10.0;
         Mass[j] = -1.0;
         Area[j] = -1.0;
+        JecFactor[j] = -1.0;
         nJetDaughters[j] = -1;
         
         bDiscriminatorSSVHE[j] = -1.0;

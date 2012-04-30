@@ -62,7 +62,7 @@ namespace ewk {
         /// To be called once per event to fill the values for jets
         void fill(const edm::Event &iEvent);
         
-        static const int NUM_JET_MAX = 6;
+        static const int NUM_JET_MAX = 8;
         
     protected:
         
@@ -120,6 +120,7 @@ namespace ewk {
         float maxDistance[NUM_JET_MAX];
         int   nConstituents[NUM_JET_MAX];
         float Area[NUM_JET_MAX];
+        float JecFactor[NUM_JET_MAX];
         
         float Px[NUM_JET_MAX];
         float Py[NUM_JET_MAX];

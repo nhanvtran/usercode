@@ -25,8 +25,9 @@ void runVJetSubstructureAnalysis(){
     gROOT->ProcessLine(".L vJetSubstructureAnalysis.C+g");
     gROOT->ProcessLine(".L buildHistos.C+g");
 
-    bool b_runAnalysis = false;
-    bool b_buildHistos = true;
+    bool b_runAnalysis = true;
+    bool b_buildHistos = false;
+    bool isData = false;
     
     //bool b_runMuons = true;
     //bool b_runElectrons = false;
@@ -38,32 +39,52 @@ void runVJetSubstructureAnalysis(){
     
     if (b_runAnalysis){
         
-        vJetSubstructureAnalysis test_ww("/eos/uscms/store/user/smpjs/ntran/tlbsm_v10/nt_ww_vj/demo*.root","ntuples/test_ww.root");
-        test_ww.Loop(-1);
+        ///*
+        //vJetSubstructureAnalysis test_ww("/eos/uscms/store/user/smpjs/ntran/tlbsm_v10/nt_ww_vj/demo*.root","ntuples_v4/test_ww.root");
+        //test_ww.Loop(-1);
         
-        vJetSubstructureAnalysis test_wj("/eos/uscms/store/user/smpjs/ntran/tlbsm_v10/nt_wj_vj/demo*.root","ntuples/test_wj.root");
-        test_wj.Loop(-1);
+        vJetSubstructureAnalysis test_wj("/eos/uscms/store/user/smpjs/ntran/tlbsm_v10/nt_wj_vj/demo*.root","ntuples_v4/test_wj_dummy.root");
+        test_wj.Loop(100000);
 
-        vJetSubstructureAnalysis test_tt("/eos/uscms/store/user/smpjs/kalanand/ttbar-Summer11/demo*.root","ntuples/test_tt.root");
+        //vJetSubstructureAnalysis test_tt("/eos/uscms/store/user/smpjs/kalanand/ttbar-Summer11/demo*.root","ntuples_v4/test_tt.root");
+        //test_tt.Loop(-1);
+        // */
+        ///*
+        std::cout << "hi tt" << std::endl;
+        //vJetSubstructureAnalysis test_dat("/eos/uscms/store/user/smpjs/ntran/tlbsm_v10/ntdata_SingleElectron_Prompt-v4/demo*.root","ntuples_v4/test_data_SingleElectron_Prompt-v4.root");
+        //test_dat.Loop(-1);
+        std::cout << "bi tt" << std::endl;
+        //*/
+        
+        /*
+        //vJetSubstructureAnalysis test_tt("/eos/uscms/store/user/smpjs/ntran/tlbsm_v10/nt_tt_vj/demo*.root","ntuples_v2/dummy.root");
+        vJetSubstructureAnalysis test_tt("/eos/uscms/store/user/smpjs/kalanand/ttbar-Summer11/demo*.root","ntuples_v2/test_tt.root");
         test_tt.Loop(-1);
-
+         //*/
     }
     
     if (b_buildHistos){
-
+        ///*
         double sclfactor = LUMI*43000./4223922.;
-        buildHistos ht_ww("ntuples/test_ww.root","ntuples/histos_ww.root");
+        buildHistos ht_ww("ntuples_v2/test_ww.root","histos_v2_50/histos_ww.root", isData);
         ht_ww.Loop( sclfactor );
         
+        ///*
         //sclfactor = LUMI*43000./4223922;
         sclfactor = LUMI*31300000./80978873;
-        buildHistos ht_wj("ntuples/test_wj.root","ntuples/histos_wj.root");
+        buildHistos ht_wj("ntuples_v2/test_wj.root","histos_v2_50/histos_wj.root", isData);
         ht_wj.Loop( sclfactor );
+        //*/
 
         sclfactor = LUMI*163110./3683595;
-        buildHistos ht_tt("ntuples/test_tt.root","ntuples/histos_tt.root");
+        buildHistos ht_tt("ntuples_v2/test_tt.root","histos_v2_50/histos_tt.root", isData);
         ht_tt.Loop( sclfactor );
-
+        //*/
+        
+        isData = true;
+        sclfactor = 1;
+        buildHistos ht_dat("ntuples_v2/test_data_SingleElectron_Prompt-v4.root","histos_v2_50/histos_data_SingleElectron_Prompt-v4.root", isData);
+        ht_dat.Loop( sclfactor );
     }
     
 }
