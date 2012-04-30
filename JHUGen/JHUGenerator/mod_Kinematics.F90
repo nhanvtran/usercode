@@ -158,46 +158,51 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1
     write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,Lifetime,Spin
 
 
-! decay product 1 (V1)
+! decay product 1 (V1): l-, nu or q
     i=7
     write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L12Mass,Lifetime,Spin
 
-! decay product 2 (V1)
+! decay product 2 (V1): l+, nubar or qbar
     i=6
     write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L11Mass,Lifetime,Spin
 
-! decay product 1 (V2)
+! decay product 1 (V2): l-, nu or q
     i=9
     write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L22Mass,Lifetime,Spin
 
-! decay product 2 (V2)
+! decay product 2 (V2): l+, nubar or qbar
     i=8
     write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
 
     write(14,"(A)") "</event>"
 
+!print * ,"check ", LHE_IDUP(6),MomDummy(1:4,4)
+!print * ,"check ", LHE_IDUP(7),MomDummy(1:4,3)
+!print * ,"check ", LHE_IDUP(8),MomDummy(1:4,6)
+!print * ,"check ", LHE_IDUP(9),MomDummy(1:4,5)
+!pause
 
 END SUBROUTINE
 
 
 
-SUBROUTINE EvalPhasespace_ZWDecay(ZMom,MZ,xRndPS,MomDK,PSWgt)
+SUBROUTINE EvalPhasespace_VDecay(VMom,MV,xRndPS,MomDK,PSWgt)
 use ModMisc
 use ModParameters
 implicit none
 real(8) :: PSWgt,PSWgt2,PSWgt3
-real(8) :: ZMom(1:4),MomChk(1:4,1:3)
+real(8) :: VMom(1:4),MomChk(1:4,1:3)
 real(8) :: MomDK(1:4,1:2)
-real(8) :: xRndPS(1:2),MZ
+real(8) :: xRndPS(1:2),MV
 integer,parameter :: N2=2
 real(8),parameter :: PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
 
 
-!     MomDK(1:4,i): i= 1:l+, 2:l-
-      call genps(2,MZ,xRndPS(1:2),(/0d0,0d0/),MomDK(1:4,1:2),PSWgt2)
-!     boost all guys to the ZW frame:
-      call boost(MomDK(1:4,1),ZMom(1:4),MZ)
-      call boost(MomDK(1:4,2),ZMom(1:4),MZ)
+      call genps(2,MV,xRndPS(1:2),(/0d0,0d0/),MomDK(1:4,1:2),PSWgt2)
+
+!     boost all guys to the V boson frame:
+      call boost(MomDK(1:4,1),VMom(1:4),MV)
+      call boost(MomDK(1:4,2),VMom(1:4),MV)
       PSWgt = PSWgt2*PiWgt2
 
 RETURN
@@ -207,7 +212,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE EvalPhasespace_2to2ZW(EHat,Masses,xRndPS,Mom,PSWgt)
+SUBROUTINE EvalPhasespace_2to2(EHat,Masses,xRndPS,Mom,PSWgt)
 use ModMisc
 use ModParameters
 implicit none
@@ -377,6 +382,10 @@ integer :: NumPart,NBin(:)
 real(8) :: pT_lepM,pT_lepP
 real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ
 
+!   MomDK(:,i): i=1 fermion
+!   MomDK(:,i): i=2 anti-fermion
+!   MomDK(:,i): i=3 fermion'
+!   MomDK(:,i): i=4 anti-fermion'
 
       applyPSCut = .false.
 
@@ -426,12 +435,17 @@ real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ
       call boost(MomLept(1:4,3),MomBoost(1:4),mG)
       call boost(MomLept(1:4,4),MomBoost(1:4),mG)
 
-      MomLepP(2:4) = MomLept(2:4,1).cross.MomLept(2:4,2)
-      MomLepP(2:4) = MomLepP(2:4)/dsqrt( MomLepP(2)**2+MomLepP(3)**2+MomLepP(4)**2 )
-      MomLepM(2:4) = MomLept(2:4,3).cross.MomLept(2:4,4)
-      MomLepM(2:4) = MomLepM(2:4)/dsqrt( MomLepM(2)**2+MomLepM(3)**2+MomLepM(4)**2 )
+
+!     orthogonal vectors defined as p(fermion) x p(antifermion)
+      MomLepP(2:4) = (MomLept(2:4,1)).cross.(MomLept(2:4,2))! orthogonal vector to lepton plane
+      MomLepP(2:4) = MomLepP(2:4)/dsqrt( MomLepP(2)**2+MomLepP(3)**2+MomLepP(4)**2 )! normalize
+      
+      MomLepM(2:4) = (MomLept(2:4,3)).cross.(MomLept(2:4,4))! orthogonal vector to lepton plane
+      MomLepM(2:4) = MomLepM(2:4)/dsqrt( MomLepM(2)**2+MomLepM(3)**2+MomLepM(4)**2 )! normalize
 
       CosPhi_LepPlanes = acos(MomLepP(2)*MomLepM(2)+MomLepP(3)*MomLepM(3)+MomLepP(4)*MomLepM(4))
+
+
 
 !     scattering angle of Z in graviton rest frame
       MomG(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
@@ -441,7 +455,7 @@ real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ
       call boost(MomZ(1:4),MomBoost(1:4),mG)
       CosThetaZ = MomZ(4)/dsqrt(MomZ(2)**2+MomZ(3)**2+MomZ(4)**2)
 
-!     lepton invariant mass distribuion - should be Breit-Wignher
+!     lepton invariant mass distribuion - should be Breit-Wigner
 
 !     binning
       NBin(1) = WhichBin(1,pT_lepP)
@@ -581,6 +595,7 @@ real(8) :: DKRnd
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
 !
 
+
    if( DecayMode1.eq.0 ) then! Z1->2l
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
@@ -623,6 +638,10 @@ real(8) :: DKRnd
         MY_IDUP(4) = Wp_
         MY_IDUP(6) = TaP_
         MY_IDUP(7) = NuT_
+   elseif( DecayMode1.eq.7 ) then! photon
+        MY_IDUP(4) = Pho_
+        MY_IDUP(6) = -9999
+        MY_IDUP(7) = -9999
    endif
 
 
@@ -668,6 +687,10 @@ real(8) :: DKRnd
         MY_IDUP(5) = Wm_
         MY_IDUP(8) = ANuT_
         MY_IDUP(9) = TaM_
+   elseif( DecayMode2.eq.7 ) then! photon
+        MY_IDUP(5) = Pho_
+        MY_IDUP(8) = -9999
+        MY_IDUP(9) = -9999
    endif
 
 

@@ -46,7 +46,7 @@ contains
 !    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
-!
+
     call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
 
 
@@ -117,19 +117,27 @@ contains
   endif
 
 
-    if( MZ1+MZ2.gt.EHat ) then
+    if( EHat.lt.MZ1+MZ2 ) then
       EvalWeighted = 0d0
       return
     endif
 
 
-    call EvalPhaseSpace_2to2ZW(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
+    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
     call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
-    call EvalPhasespace_ZWDecay(MomExt(1:4,3),MZ1,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
-    call EvalPhasespace_ZWDecay(MomExt(1:4,4),MZ2,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
-    PSWgt = PSWgt * PSWgt2*PSWgt3
+    if( DecayMode1.ne.7 ) then ! don't decay the photon
+        call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
+        call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
+        PSWgt = PSWgt * PSWgt2*PSWgt3
+    else
+        MomDK(1:4,1) = MomExt(1:4,3)
+        MomDK(1:4,2) = 0d0
+        MomDK(1:4,3) = MomExt(1:4,4)
+        MomDK(1:4,4) = 0d0
+    endif
 
-    if( OffShellV1.or.OffShellV2 ) then
+
+    if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
     else
         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
@@ -150,12 +158,15 @@ contains
       elseif(Process.eq.2) then
             call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
       endif
+
       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       EvalWeighted = LO_Res_Unpol * PreFac
     endif
+
+
 
    if (PChannel.eq.1.or.PChannel.eq.2) then
       PDFFac = pdf(Up_,1) *pdf(AUp_,2)  + pdf(Dn_,1) *pdf(ADn_,2)   &
@@ -170,13 +181,14 @@ contains
       elseif(Process.eq.2) then
          call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
       endif
-
       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * QuarkColAvg**2
+
       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       EvalWeighted = LO_Res_Unpol * PreFac
    endif
+
 
       do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),EvalWeighted*VgsWgt)
@@ -235,6 +247,13 @@ include 'csmaxvalue.f'
    EvalCounter = EvalCounter+1
 
    MY_IDUP(3)= 0
+
+!    particle associations:
+!    
+!    IDUP(6)  -->  MomDK(:,2)  -->     v-spinor
+!    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
+!    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
+!    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
 
 
@@ -312,13 +331,21 @@ include 'csmaxvalue.f'
     endif
 
 
-   call EvalPhaseSpace_2to2ZW(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
+   call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
-   call EvalPhasespace_ZWDecay(MomExt(1:4,3),MZ1,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
-   call EvalPhasespace_ZWDecay(MomExt(1:4,4),MZ2,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
-   PSWgt = PSWgt * PSWgt2*PSWgt3
+   if( DecayMode1.ne.7 ) then ! don't decay the photon
+      call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
+      call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
+      PSWgt = PSWgt * PSWgt2*PSWgt3
+    else
+        MomDK(1:4,1) = MomExt(1:4,3)
+        MomDK(1:4,2) = 0d0
+        MomDK(1:4,3) = MomExt(1:4,4)
+        MomDK(1:4,4) = 0d0
+   endif
 
-    if( OffShellV1.or.OffShellV2 ) then
+
+    if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
     else
         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
@@ -465,7 +492,7 @@ IF( GENEVT ) THEN
          enddo
          AccepCounter = AccepCounter + 1
          AccepCounter_part = AccepCounter_part  + parton
-         if( OffShellV1.or.OffShellV2 ) then
+         if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
               call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
           else
               call WriteOutEvent((/MomExt_f(1:4,1),MomExt_f(1:4,2),MomDK_f(1:4,1),MomDK_f(1:4,2),MomDK_f(1:4,3),MomDK_f(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
@@ -716,10 +743,10 @@ END FUNCTION
 !
 !
 !
-!    call EvalPhaseSpace_2to2ZW(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
+!    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
 !    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
-!    call EvalPhasespace_ZWDecay(MomExt(1:4,3),MZ1,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
-!    call EvalPhasespace_ZWDecay(MomExt(1:4,4),MZ2,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
+!    call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
+!    call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
 !    PSWgt = PSWgt * PSWgt2*PSWgt3
 !
 !     if( OffShellV1.or.OffShellV2 ) then!NEW

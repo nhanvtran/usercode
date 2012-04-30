@@ -1,5 +1,0 @@
-There is a script "converter.sh" which
-takes as input an LHE file and turns it into a ROOT file with the angles calculated and some other information.
->>> bash converter.sh <filename>.lhe
-
-There is an example script plotPdfs_5D.C which plots the angles and PDF projections of those angles.  It assumes a PDF (not in CVS yet) for your signal that the user must provide.  
