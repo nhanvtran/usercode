@@ -30,10 +30,13 @@
 
 
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
+
 !---- the 1/Lambda coupling
       Lambda_inv = 1.0d0/Lambda
+
 !---- full prefactor; 8 is  the color factor
-      prefactor = 8d0*(Lambda_inv**2)**2*(one/two*M_V*Ga_V)**2*gZ_sq**2
+      prefactor = 8d0*(Lambda_inv**2)**2*gZ_sq**2
+
 
          if( DecayMode1.le.3 ) then!  Z decay
               if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
@@ -52,10 +55,25 @@
                     aL1=0d0
                     aR1=0d0
               endif
+              prefactor = prefactor *(one/two*M_V*Ga_V)**2
+              s = 2d0 * scr(p(:,3),p(:,4))
+              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+              s = 2d0 * scr(p(:,5),p(:,6))
+              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
          elseif( DecayMode1.ge.4 .and. DecayMode1.le.6 ) then !  W decay
               aL1 = bL
               aR1 = bR
-         elseif( DecayMode1.eq.7 ) then !  photon decay
+              prefactor = prefactor *(one/two*M_V*Ga_V)**2
+              s = 2d0 * scr(p(:,3),p(:,4))
+              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+              s = 2d0 * scr(p(:,5),p(:,6))
+              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+         elseif( DecayMode1.eq.7 ) then !  photon "decay"
+              aL1=1d0
+              aR1=1d0
+              propZ1 = 1d0
+              propZ2 = 1d0
+              prefactor = prefactor/gZ_sq**2! cancel the overall z coupling
          else
               aL1=0d0
               aR1=0d0            
@@ -81,7 +99,9 @@
          elseif( DecayMode2.ge.4 .and. DecayMode2.le.6 ) then !  W decay
               aL2 = bL
               aR2 = bR
-         elseif( DecayMode2.eq.7 ) then !  photon decay
+         elseif( DecayMode2.eq.7 ) then !  photon "decay"
+              aL2=1d0
+              aR2=1d0  
          else
               aL2=0d0
               aR2=0d0
@@ -90,30 +110,30 @@
       s  = 2d0 * scr(p(:,1),p(:,2))
       propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
 
-      s = 2d0 * scr(p(:,3),p(:,4))
-      propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
-      s = 2d0 * scr(p(:,5),p(:,6))
-      propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
 sum = zero
 
 do i1=1,2
 do i2 = 1,2
 do i3 = 1,2
 do i4 = 1,2
-
          pin(1,:) = p(:,1)
          pin(2,:) = p(:,2)
          sp(1,:) = pol_mless2(dcmplx(p(:,1)),-3+2*i1,'in')  ! gluon
          sp(2,:) = pol_mless2(dcmplx(p(:,2)),-3+2*i2,'in')  ! gluon
-         pin(3,:) = p(:,3) + p(:,4)
-         pin(4,:) = p(:,5)+p(:,6)
-!-------- -1 == left, 1 == right
-         sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
-         sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-,mu+ / Q,Qbar
 
-!          call ggGZZampl_old(pin,sp,A(1))
+!-------- -1 == left, 1 == right
+         if( DecayMode1.ne.7 ) then 
+            pin(3,:) = p(:,3)+p(:,4)
+            pin(4,:) = p(:,5)+p(:,6)
+            sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
+            sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-,mu+ / Q,Qbar
+         elseif( DecayMode1.eq.7 ) then 
+            pin(3,:) = p(:,3)
+            pin(4,:) = p(:,5)
+            sp(3,:) = pol_mless2(dcmplx(pin(3,:)),-3+2*i3,'out')  ! photon
+            sp(4,:) = pol_mless2(dcmplx(pin(4,:)),-3+2*i4,'out')  ! photon
+         endif
+
          call ggGZZampl(pin,sp,A(1))
 
          if (i3.eq.1) then
@@ -126,7 +146,8 @@ do i4 = 1,2
          elseif(i4.eq.2) then
             A(1) = aR2*A(1)
          endif
-          sum = sum + abs(propG*propZ1*propZ2*A(1))**2
+
+         sum = sum + abs(propG*propZ1*propZ2*A(1))**2
 enddo
 enddo
 enddo
@@ -158,10 +179,13 @@ enddo
 !       aL = -one + two*sitW**2
 !       aR = aL+one
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
+
 !---- the 1/Lambda coupling
       Lambda_inv = 1.0_dp/Lambda
+
 !---- full prefactor; 3 is  the color factor
-      prefactor = 3d0*(Lambda_inv**2)**2*(one/two*M_V*Ga_V)**2*gZ_sq**2
+      prefactor = 3d0*(Lambda_inv**2)**2*gZ_sq**2
+
 
          if( DecayMode1.le.3 ) then!  Z decay
               if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
@@ -180,10 +204,25 @@ enddo
                     aL1=0d0
                     aR1=0d0
               endif
+              prefactor = prefactor *(one/two*M_V*Ga_V)**2
+              s = 2d0 * scr(p(:,3),p(:,4))
+              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+              s = 2d0 * scr(p(:,5),p(:,6))
+              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
          elseif( DecayMode1.ge.4 .and. DecayMode1.le.6 ) then !  W decay
               aL1 = bL
               aR1 = bR
+              prefactor = prefactor *(one/two*M_V*Ga_V)**2
+              s = 2d0 * scr(p(:,3),p(:,4))
+              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+              s = 2d0 * scr(p(:,5),p(:,6))
+              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
          elseif( DecayMode1.eq.7 ) then !  photon decay
+              aL1=1d0
+              aR1=1d0
+              propZ1 = 1d0
+              propZ2 = 1d0
+              prefactor = prefactor/gZ_sq**2! cancel the overall z coupling
          else
               aL1=0d0
               aR1=0d0            
@@ -210,6 +249,8 @@ enddo
               aL2 = bL
               aR2 = bR
          elseif( DecayMode2.eq.7 ) then !  photon decay
+              aL2=1d0
+              aR2=1d0  
          else
               aL2=0d0
               aR2=0d0  
@@ -218,11 +259,6 @@ enddo
       s  = two*scr(p(:,1),p(:,2))
       propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
 
-      s = two*scr(p(:,3),p(:,4))
-      propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
-      s = two*scr(p(:,5),p(:,6))
-      propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
       sum = zero
 do i1=1,2
@@ -232,11 +268,19 @@ do i4 = 1,2
          pin(2,:) = p(:,2)
          sp(1,:) = pol_dk2mom(dcmplx(p(:,2)),dcmplx(p(:,1)),-3+2*i1)  !qbq
          sp(2,:) = sp(1,:)  !-- the same, isn't really needed but for uniform bookeeping
-         pin(3,:) = p(:,3) + p(:,4)
-         pin(4,:) = p(:,5) + p(:,6)
+
 !-------- -1 == left, 1 == right
-         sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
-         sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-.mu+ / Q,Qbar
+         if( DecayMode1.ne.7 ) then 
+            pin(3,:) = p(:,3)+p(:,4)
+            pin(4,:) = p(:,5)+p(:,6)
+            sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
+            sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-,mu+ / Q,Qbar
+         elseif( DecayMode1.eq.7 ) then 
+            pin(3,:) = p(:,3)
+            pin(4,:) = p(:,5)
+            sp(3,:) = pol_mless2(dcmplx(pin(3,:)),-3+2*i3,'out')  ! photon
+            sp(4,:) = pol_mless2(dcmplx(pin(4,:)),-3+2*i4,'out')  ! photon
+         endif
 
          call qqGZZampl(pin,sp,A(1))
 
@@ -341,6 +385,8 @@ enddo
 
       q34 = (MG**2-MZ3**2-MZ4**2)/2d0
 
+
+if( DecayMode1.le.3 .or. ((DecayMode1.ge.4) .and. (DecayMode1.le.6)) ) then! decay into Z's or W's
       if (generate_bis) then
           rr = q34/Lambda**2
           yyy1 = q34*(b1   + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)  + b5*M_V**2/q34)
@@ -359,9 +405,26 @@ enddo
           yyy6 = c6
           yyy7 = c7
       endif
-
-
-
+elseif( DecayMode1.eq.7 ) then! decay into photons
+      if (generate_bis) then
+          rr = q34/Lambda**2
+          yyy1 = q34*(b1   + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)  + b5*M_V**2/q34)
+          yyy2 = -b1/two + b3*rr*(1d0-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
+          yyy3 = (-b2/two - b3- two*b4)*rr/q34
+          yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
+          yyy5 = two*b8*rr*MG**2/q34
+          yyy6 = 0d0
+          yyy7 = b10*rr*MG**2/q34
+      else
+          yyy1 = q34*c1
+          yyy2 = c2
+          yyy3 = c3
+          yyy4 = c4
+          yyy5 = c5
+          yyy6 = c6
+          yyy7 = c7
+      endif
+endif
 
       res = czero
       res =                                                               &
@@ -476,13 +539,14 @@ enddo
           MG = M_Reso
       endif
 
-!---- data that defines couplings
+!---- define couplings
       q34 = (MG**2-MZ3**2-MZ4**2)/2d0!  = s = pV1.pV2    = (q_q-MZ3^2-MZ4^2)/2
       rr_gam = q_q/two/Lambda**2! kappa for IS
       xxx1 = (a1 + a2*rr_gam)
       xxx2 = -a1/two + (a3+two*a4)*rr_gam
       xxx3 = 4d0*a5*rr_gam
 
+if( DecayMode1.le.3 .or. ((DecayMode1.ge.4) .and. (DecayMode1.le.6)) ) then! decay into Z's or W's
       if (generate_bis) then
           rr = q34/Lambda**2! kappa for FS
           yyy1 = q34*(b1 + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)   + b5*M_V**2/q34)
@@ -501,6 +565,26 @@ enddo
           yyy6 = c6
           yyy7 = c7
       endif
+elseif( DecayMode1.eq.7 ) then! decay into photons
+      if (generate_bis) then
+          rr = q34/Lambda**2! kappa for FS
+          yyy1 = q34*(b1 + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)   + b5*M_V**2/q34)
+          yyy2 = -b1/two + b3*rr*(one-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
+          yyy3 = (-b2/two - b3- two*b4)*rr/q34
+          yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
+          yyy5 = two*b8*rr*MG**2/q34
+          yyy6 = 0d0
+          yyy7 = b10*rr*MG**2/q34
+      else
+          yyy1 = q34*c1
+          yyy2 = c2
+          yyy3 = c3
+          yyy4 = c4
+          yyy5 = c5
+          yyy6 = c6
+          yyy7 = c7
+      endif
+endif
 
 
 

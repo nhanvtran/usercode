@@ -136,7 +136,8 @@ contains
         MomDK(1:4,4) = 0d0
     endif
 
-    if( OffShellV1.or.OffShellV2 ) then
+
+    if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
     else
         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
@@ -344,7 +345,7 @@ include 'csmaxvalue.f'
    endif
 
 
-    if( OffShellV1.or.OffShellV2 ) then
+    if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
     else
         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
@@ -491,7 +492,7 @@ IF( GENEVT ) THEN
          enddo
          AccepCounter = AccepCounter + 1
          AccepCounter_part = AccepCounter_part  + parton
-         if( OffShellV1.or.OffShellV2 ) then
+         if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
               call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
           else
               call WriteOutEvent((/MomExt_f(1:4,1),MomExt_f(1:4,2),MomDK_f(1:4,1),MomDK_f(1:4,2),MomDK_f(1:4,3),MomDK_f(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
