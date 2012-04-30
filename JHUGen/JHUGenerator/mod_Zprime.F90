@@ -37,7 +37,7 @@
 !---- full prefactor; 3 is  the color factor
       prefactor = 3d0*(Lambda_inv**2)**2*(one/two*M_V*Ga_V)**2*gZ_sq**2
 
-         if( DecayMode1.le.3 ) then
+         if( DecayMode1.le.3 ) then!  Z decay
               if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
                     aL1=aL_lep
                     aR1=aR_lep
@@ -54,11 +54,16 @@
                     aL1=0d0
                     aR1=0d0
               endif
-         else
+         elseif( DecayMode1.ge.4 .and. DecayMode1.le.6 ) then !  W decay
               aL1 = bL
               aR1 = bR
+         elseif( DecayMode1.eq.7 ) then !  photon decay
+         else
+              aL1=0d0
+              aR1=0d0            
          endif
-         if( DecayMode2.le.3 ) then
+
+         if( DecayMode2.le.3 ) then!  Z decay
               if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
                     aL2=aL_lep
                     aR2=aR_lep
@@ -75,9 +80,13 @@
                     aL2=0d0
                     aR2=0d0
               endif
-         else
+         elseif( DecayMode2.ge.4 .and. DecayMode2.le.6 ) then !  W decay
               aL2 = bL
               aR2 = bR
+         elseif( DecayMode2.eq.7 ) then !  photon decay
+         else
+              aL2=0d0
+              aR2=0d0  
          endif
 
 
@@ -149,7 +158,6 @@ enddo
       complex(dp) :: q1(4),q2(4),q3(4),q4(4),q(4)
       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
       complex(dp) :: yyy1,yyy2,yyy3,yyy4,xxx1
-      real(dp) :: q34
 
       q1 = dcmplx(p(1,:),0d0)
       q2 = dcmplx(p(2,:),0d0)
@@ -196,8 +204,6 @@ enddo
       e4_q3 = sc(e4,q3)
 
 
-      q34 = 0.5_dp*(M_Reso**2 - two*M_V**2)
-
       res = czero
 
       xxx1 = (1d0,0d0)  !  different possibilities for fermion couplings
@@ -208,13 +214,9 @@ enddo
       yyy2 = zprime_zz_a
 
 
-
-
        res= -e1_e3*e4_q3*xxx1*yyy1  &
-      - e1_e4*e3_q4*xxx1*yyy1    &
-      - et1(e1,e3,e4,q3)*xxx1*yyy2 + et1(e1,e3,e4,q4)*xxx1*yyy2
-
-
+            - e1_e4*e3_q4*xxx1*yyy1    &
+            - et1(e1,e3,e4,q3)*xxx1*yyy2 + et1(e1,e3,e4,q4)*xxx1*yyy2
 
       end subroutine qqZprimeZZampl
 
@@ -346,6 +348,9 @@ enddo
 
     Ub(:)=ubar0(plepton,i)
     V(:)=v0(antilepton,-i)
+
+!print *, "ubar mom",plepton
+!print *, "v    mom",antilepton
 
     !---Now return in Kirill's notation  1=E,2=px,3=py,4=pz
     !   This is an expression for (-i)/qsq* (-i) Ub(+/-)) Gamma^\mu V(-/+)
