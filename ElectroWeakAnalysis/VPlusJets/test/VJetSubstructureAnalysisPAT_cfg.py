@@ -117,8 +117,8 @@ process.VplusJetSubstructure = cms.EDAnalyzer("VplusJetSubstructureAnalysis",
                                               srcElectrons  = cms.InputTag("selectedPatElectronsPFlow"), # matches VBoson src
                                               srcMet = cms.InputTag("patMETsPFlow"),
 
-                                              srcJetsforRho = cms.string("kt6PFJetsPFlow"),
-                                              srcJetsforRho_lepIso = cms.string("kt6PFJetsPFlow"),
+                                              srcJetsforRho = cms.string("kt6PFJets"),
+                                              srcJetsforRho_lepIso = cms.string("kt6PFJets"),
                                               srcPrimaryVertex = cms.InputTag("goodOfflinePrimaryVertices"),                               
                                               
                                               runningOverMC = cms.bool(isMC),			
