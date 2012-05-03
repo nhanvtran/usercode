@@ -92,7 +92,7 @@ process.source = cms.Source("PoolSource",
 ##-------- Electron events of interest --------
 process.HLTEle =cms.EDFilter("HLTHighLevel",
      TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-     HLTPaths = cms.vstring('HLT_Photon15_Cleaned_L1R', 'HLT_Ele15_*', 'HLT_Ele17_*', 'HLT_Ele22_*', 'HLT_Ele25_*','HLT_Ele27_*', 'HLT_Ele32_*','HLT_DoubleEle*'),
+     HLTPaths = cms.vstring('HLT_Photon15_Cleaned_L1R', 'HLT_Ele15_*', 'HLT_Ele17_*', 'HLT_Ele22_*', 'HLT_Ele25_*','HLT_Ele27_*', 'HLT_Ele32_*','HLT_Mu9','HLT_Mu11','HLT_Mu13','HLT_Mu15_v*','HLT_Mu17_v*','HLT_Mu24_v*','HLT_Mu30_v*','HLT_IsoMu17_v*','HLT_IsoMu24_v*','HLT_IsoMu30_v*','HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*','HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*'),
      eventSetupPathsKey = cms.string(''),
      andOr = cms.bool(True), #----- True = OR, False = AND between the HLTPaths
      throw = cms.bool(False) # throw exception on unknown path names
@@ -100,13 +100,9 @@ process.HLTEle =cms.EDFilter("HLTHighLevel",
 
 
 ##-------- Muon events of interest --------
-process.HLTMu =cms.EDFilter("HLTHighLevel",
-                            TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-                            HLTPaths = cms.vstring('HLT_Mu9','HLT_Mu11','HLT_Mu13','HLT_Mu15_v*','HLT_Mu17_v*','HLT_Mu24_v*','HLT_Mu30_v*','HLT_IsoMu17_v*','HLT_IsoMu24_v*','HLT_IsoMu30_v*','HLT_DoubleMu*'),
-                            eventSetupPathsKey = cms.string(''),
-                            andOr = cms.bool(True), #----- True = OR, False = AND between the HLTPaths
-                            throw = cms.bool(False) # throw exception on unknown path names
-                            )
+#process.HLTMu =cms.EDFilter("HLTHighLevel",
+#TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
+#HLTPaths = cms.vstring('HLT_Mu9','HLT_Mu11','HLT_Mu13','HLT_Mu15_v*','HLT_Mu17_v*','HLT_Mu24_v*','HLT_Mu30_v*','HLT_IsoMu17_v*','HLT_IsoMu24_v*','HLT_IsoMu30_v*','HLT_DoubleMu*'),
 
 
 ##process.tightElectrons("selectedPatElectronsPFlow");
@@ -128,8 +124,8 @@ process.VplusJetSubstructure = cms.EDAnalyzer("VplusJetSubstructureAnalysis",
                                               srcElectrons  = cms.InputTag("selectedPatElectronsPFlow"), # matches VBoson src
                                               srcMet = cms.InputTag("patMETsPFlow"),
 
-                                              srcJetsforRho = cms.string("kt6PFJetsPFlow"),
-                                              srcJetsforRho_lepIso = cms.string("kt6PFJetsPFlow"),
+                                              srcJetsforRho = cms.string("kt6PFJets"),
+                                              srcJetsforRho_lepIso = cms.string("kt6PFJets"),
                                               srcPrimaryVertex = cms.InputTag("goodOfflinePrimaryVertices"),                               
                                               
                                               runningOverMC = cms.bool(isMC),			
@@ -141,7 +137,6 @@ process.VplusJetSubstructure = cms.EDAnalyzer("VplusJetSubstructureAnalysis",
 process.myseq = cms.Sequence(
 #    process.TrackVtxPath *
     process.HLTEle *
-    process.HLTMu *
     process.WToMunu *
     process.ZToEE *
     process.ZToMM *
@@ -161,7 +156,6 @@ process.myseq = cms.Sequence(
 
 if isMC:
     process.myseq.remove ( process.HLTEle )
-    process.myseq.remove ( process.HLTMu )
 
 
 
