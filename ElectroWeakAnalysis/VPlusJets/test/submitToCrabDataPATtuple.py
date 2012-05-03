@@ -70,7 +70,7 @@ def setupFJ3(index):
 ###################
 for i in range(len(channels)):
     changeCrabTemplateFile(i)    
-    #submitcommand = "crab -create -cfg " + "crabjob_" + channels[i] + ".cfg"
-    #child   = os.system(submitcommand)
-    #setupFJ3(i)
-    #child2   = os.system("crab -submit -c "+channels[i])
+    submitcommand = "crab -create -cfg " + "crabjob_" + channels[i] + ".cfg"
+    child   = os.system(submitcommand)
+    setupFJ3(i)
+    child2   = os.system("crab -submit -c "+channels[i])
