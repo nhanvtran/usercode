@@ -2,85 +2,64 @@ import os,sys
 import string, re
 from time import gmtime, localtime, strftime
 
-dataset    = [
-##     "/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##    "/WW_TuneZ2_7TeV_pythia6_tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM ",
-##    "/ZZ_TuneZ2_7TeV_pythia6_tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/WZ_TuneZ2_7TeV_pythia6_tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/TTJets_TuneZ2_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v2/AODSIM",
-##     "/GluGluToHToWWToLNuQQ_M-170_7TeV-powheg-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/GluGluToHToWWToLNuQQ_M-180_7TeV-powheg-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/GluGluToHToWWToLNuQQ_M-190_7TeV-powheg-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/GluGluToHToWWToLNuQQ_M-200_7TeV-powheg-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/GluGluToHToWWToLNuQQ_M-250_7TeV-powheg-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/GluGluToHToWWToLNuQQ_M-300_7TeV-powheg-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/GluGluToHToWWToLNuQQ_M-350_7TeV-powheg-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/GluGluToHToWWToLNuQQ_M-400_7TeV-powheg-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/GluGluToHToWWToLNuQQ_M-450_7TeV-powheg-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/GluGluToHToWWToLNuQQ_M-500_7TeV-powheg-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/GluGluToHToWWToLNuQQ_M-550_7TeV-powheg-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/GluGluToHToWWToLNuQQ_M-600_7TeV-powheg-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/QCD_Pt-20_MuEnrichedPt-15_TuneZ2_7TeV-pythia6/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/WJetsToLNu_TuneD6T_7TeV-madgraph-tauola/Fall10-START38_V12-v1/AODSIM",
-##     "/WJets_TuneD6T_scaleup_7TeV-madgraph-tauola/Fall10-START38_V12-v1/AODSIM",
-##     "/WJets_TuneD6T_scaledown_7TeV-madgraph-tauola/Fall10-START38_V12-v1/GEN-SIM-RECO"
-##     "/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM",   
-##     "/Tbar_TuneZ2_s-channel_7TeV-powheg-tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/Tbar_TuneZ2_t-channel_7TeV-powheg-tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/Tbar_TuneZ2_tW-channel-DS_7TeV-powheg-tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-    #"/Tbar_TuneZ2_tW-channel-DR_7TeV-powheg-tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM",    
-    #"/T_TuneZ2_s-channel_7TeV-powheg-tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/T_TuneZ2_t-channel_7TeV-powheg-tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/T_TuneZ2_tW-channel-DS_7TeV-powheg-tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM",
-##     "/T_TuneZ2_tW-channel-DR_7TeV-powheg-tauola/Fall11-PU_S6_START42_V14B-v1/AODSIM"   
-"/WZ_TuneZ2_7TeV_pythia6_tauola/kalanand-ttbsm_v10beta_WZtoAnything_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
-"/ZZ_TuneZ2_7TeV_pythia6_tauola/kalanand-ttbsm_v10beta_ZZtoAnything_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
-"/WW_TuneZ2_7TeV_pythia6_tauola/kalanand-ttbsm_v10beta_WWtoAnything_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
-"/TTJets_TuneZ2_7TeV-madgraph-tauola/kalanand-ttbsm_v10beta_TTJets_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
-"/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola/ntran-ttbsm_v10_WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v1-a326ba49a16ab761c492392538b61378/USER"              
-]
+dataset    = [ 
+              # diboson
+              "/WW_TuneZ2_7TeV_pythia6_tauola/kalanand-ttbsm_v10beta_WWtoAnything_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+              "/WZ_TuneZ2_7TeV_pythia6_tauola/kalanand-ttbsm_v10beta_WZtoAnything_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+              "/ZZ_TuneZ2_7TeV_pythia6_tauola/kalanand-ttbsm_v10beta_ZZtoAnything_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+              # ttbar
+              "/TTJets_TuneZ2_7TeV-madgraph-tauola/kalanand-ttbsm_v10beta_TTJets_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+              # W+jets
+              "/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola/ntran-ttbsm_v10_WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v1-a326ba49a16ab761c492392538b61378/USER",
+              "/WJetsToLNu_PtW-100_TuneZ2_7TeV-madgraph/dlopesttbsm_v10beta_WJetsToLNu_PtW-100_TuneZ2_7TeV-madgraph-a326ba49a16ab761c492392538b61378/USER",
+              "/WJetsToLNu_Pt-100_7TeV-herwigpp/dlopes-ttbsm_v10beta_WJetsToLNu_Pt-100_7TeV-herwigpp-a326ba49a16ab761c492392538b61378/USER",
+              # Z+jets
+              "/DYJetsToLL_PtZ-100_TuneZ2_7TeV-madgraph-tauola/mulhearn-mulhearn-ttbsm_DYJetsToLL_PtZ-100_TuneZ2_7TeV-madgraph-tauola_Fall11-a326ba49a16ab761c492392538b61378/USER",
+              "/ZJetsToLL_Pt-100_7TeV-herwigpp/mulhearn-mulhearn-ttbsm_ZJetsToLL_Pt-100_7TeV-herwigpp_Fall11-a326ba49a16ab761c492392538b61378/USER",
+              # single top
+              "/Tbar_TuneZ2_s-channel_7TeV-powheg-tauola/kalanand-ttbsm_v10beta_Tbar_s-channel_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+              "/Tbar_TuneZ2_t-channel_7TeV-powheg-tauola/kalanand-ttbsm_v10beta_Tbar_t-channel_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+              "/Tbar_TuneZ2_tW-channel-DS_7TeV-powheg-tauola/kalanand-ttbsm_v10beta_Tbar_tW-channel-DS_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+              "/Tbar_TuneZ2_tW-channel-DR_7TeV-powheg-tauola/kalanand-ttbsm_v10beta_Tbar_tW-channel-DR_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+              "/T_TuneZ2_s-channel_7TeV-powheg-tauola/kalanand-ttbsm_v10beta_T_s-channel_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+              "/T_TuneZ2_t-channel_7TeV-powheg-tauola/kalanand-ttbsm_v10beta_T_t-channel_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+              "/T_TuneZ2_tW-channel-DS_7TeV-powheg-tauola/kalanand-ttbsm_v10beta_T_tW-channel-DS_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+              "/T_TuneZ2_tW-channel-DR_7TeV-powheg-tauola/kalanand-ttbsm_v10beta_T_tW-channel-DR_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER"
+              ]
 
 
 channels   = [
 ##     "WJets",
+    "ch_WWtoAnything",    
     "ch_WZtoAnything",    
     "ch_ZZtoAnything",
-    "ch_WWtoAnything",    
+    
     "ch_TTbar",
-    "ch_WJets"            
-##     "WZtoAnything",
-##     "TTJets",
-##     "HWWToLNuQQ_M-170",
-##     "HWWToLNuQQ_M-180",
-##     "HWWToLNuQQ_M-190",
-##     "HWWToLNuQQ_M-200",
-##     "HWWToLNuQQ_M-250",    
-##     "HWWToLNuQQ_M-300",
-##     "HWWToLNuQQ_M-350",
-##     "HWWToLNuQQ_M-400",
-##     "HWWToLNuQQ_M-450",
-##     "HWWToLNuQQ_M-500",
-##     "HWWToLNuQQ_M-550",
-##     "HWWToLNuQQ_M-600",     
-##     "QCD_Pt-20_MuEnrichedPt-15",
-##     "WJetsToLNu_TuneD6T_Fall10",
-##     "WJets_TuneD6T_scaleup",
-##     "WJets_TuneD6T_scaledown"
-##     "DYJetsToLL",
-##     "Tbar_s-channel",
-##     "Tbar_t-channel",
-##     "Tbar_tW-channel-DS",
-    #"Tbar_tW-channel-DR",    
-    #"T_s-channel",
-##     "T_t-channel",
-##     "T_tW-channel-DS",
-##     "T_tW-channel-DR"    
+    
+    "ch_WJets_inclusive",
+    "ch_WJets_boostedMadGraph",
+    "ch_WJets_boostedHerwig",
+
+    "ch_ZJets_boostedMadGraph",              
+    "ch_ZJets_boostedHerwig",     
+              
+    "ch_singleTbar_s",                   
+    "ch_singleTbar_t",                   
+    "ch_singleTbar_DS",                   
+    "ch_singleTbar_DR",                                 
+    "ch_singleT_s",                   
+    "ch_singleT_t",                   
+    "ch_singleT_DS",                   
+    "ch_singleT_DR",                                 
+              
 ]
-##condor   = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-##condor   = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-condor   = [1,1,1,1,1]
 
-
+condor   = [
+            1,1,1,1,1,
+            1,1,1,1,1,
+            1,1,1,1,1,
+            1,1
+            ]
 
 def changeCrabTemplateFile(index):
     fin  = open("crabTemplateVJetSubstructure_MC.cfg")
@@ -120,8 +99,8 @@ def setupFJ3(index):
             
 ###################
 for i in range(len(channels)):
-    #    changeCrabTemplateFile(i)    
-    #    submitcommand = "crab -create -cfg " + "crabjob_" + channels[i] + ".cfg"
-    #    child   = os.system(submitcommand)
-#    setupFJ3(i)
+    changeCrabTemplateFile(i)    
+    submitcommand = "crab -create -cfg " + "crabjob_" + channels[i] + ".cfg"
+    child   = os.system(submitcommand)
+    setupFJ3(i)
     child2   = os.system("crab -submit -c "+channels[i])
