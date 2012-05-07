@@ -134,7 +134,8 @@ def processNtuples(dirname,oname,isData):
     l_phi_ = array( 'f', [ 0. ] )    
     e_met_ = array( 'f', [ 0. ] )
     e_nvert_ = array( 'f', [ 0. ] )    
-    e_effwt_ = array( 'f', [ 0. ] )    
+    e_effwt_ = array( 'f', [ 0. ] )  
+    e_class_ = array( 'f', [ 0. ] )    
     e_puwt_ = array( 'f', [ 0. ] )    
     e_puwt_up_ = array( 'f', [ 0. ] )    
     e_puwt_dn_ = array( 'f', [ 0. ] )    
@@ -166,6 +167,7 @@ def processNtuples(dirname,oname,isData):
     to.Branch("j_ca8pr_m1", j_ca8pr_m1_ , "j_ca8pr_m1/F")
     to.Branch("j_ca8pr_m2", j_ca8pr_m2_ , "j_ca8pr_m2/F")
     to.Branch("e_effwt", e_effwt_ , "e_effwt/F")
+    to.Branch("e_class", e_class_ , "e_class/F")
     to.Branch("e_puwt", e_puwt_ , "e_puwt/F")    
     to.Branch("e_puwt_up", e_puwt_up_ , "e_puwt_up/F")
     to.Branch("e_puwt_dn", e_puwt_dn_ , "e_puwt_dn/F")
@@ -194,11 +196,33 @@ def processNtuples(dirname,oname,isData):
     for i in xrange(entries):
         if i%10000 == 0:   
             print "Entry: " + str(i)
-
         chain.GetEntry( i )
-        # Selection for the Wenu events
-        if chain.eventClass == 1 and chain.Wel_electron_isWP80 and chain.Wel_electron_pt > 35 and chain.Wel_pt > 120: 
 
+        # ------------------  
+        ## PU weights
+        if isData == 0:
+            e_puwt_[0] = puWeights.Get( chain.GetLeaf("event_mcPU_nvtx").GetValue(0), chain.GetLeaf("event_mcPU_nvtx").GetValue(1), chain.GetLeaf("event_mcPU_nvtx").GetValue(2) )
+            e_puwt_up_[0] = puWeights.GetUp( chain.GetLeaf("event_mcPU_nvtx").GetValue(0), chain.GetLeaf("event_mcPU_nvtx").GetValue(1), chain.GetLeaf("event_mcPU_nvtx").GetValue(2) )
+            e_puwt_dn_[0] = puWeights.GetDown( chain.GetLeaf("event_mcPU_nvtx").GetValue(0), chain.GetLeaf("event_mcPU_nvtx").GetValue(1), chain.GetLeaf("event_mcPU_nvtx").GetValue(2) )        
+        else:         
+            e_puwt_[0] = -1.
+            e_puwt_up_[0] = -1.  
+            e_puwt_dn_[0] = -1.
+        # ------------------  
+        
+        passesAsClass1 = False
+        passesAsClass2 = False
+        passesAsClass3 = False
+        passesAsClass4 = False
+        ###################################################################
+        ###################################################################
+        # S e l e c t i o n   f o r   t h e   W e n u   e v e n t s
+        electroniso = (chain.Wel_electron_trackiso+chain.Wel_electron_hcaliso+chain.Wel_electron_ecaliso-chain.event_fastJetRho*3.141592653589*0.09)/chain.Wel_electron_pt
+        if chain.eventClass == 1 and chain.Wel_electron_isWP80 and chain.Wel_electron_pt > 35 and electroniso < 0.05 and chain.Wel_mt > 50 and chain.Wel_pt > 120 and chain.event_met_pfmet > 25: 
+
+            passesAsClass1 = True
+            e_class_[0] = 1
+            
             v_mt_[0] = chain.Wel_mt
             v_pt_[0] = chain.Wel_pt
             l_pt_[0] = chain.Wel_electron_pt
@@ -206,14 +230,51 @@ def processNtuples(dirname,oname,isData):
             l_phi_[0] = chain.Wel_electron_phi    
             e_met_[0] = chain.event_met_pfmet
             e_nvert_[0] = float(chain.event_nPV)
+            
+            # ------------------   
+            ## Wenu efficiencies
+            eff_eleid = eleIdEff.GetEfficiency(l_pt_[0], l_eta_[0])
+            eff_elereco = eleRecoEff.GetEfficiency(l_pt_[0], l_eta_[0])
+            eff_elehlt = eleHLTEff.GetEfficiency(l_pt_[0], l_eta_[0])
+            eff_elemht = eleMHTEff.GetEfficiency(e_met_[0], 0)
+            eff_elewmt = eleWMtEff.GetEfficiency(v_mt_[0], l_eta_[0])
+            e_effwt_[0] = eff_eleid*eff_elereco*eff_elehlt*eff_elemht*eff_elewmt
+            
+
+        ###################################################################
+        ###################################################################
+        # S e l e c t i o n   f o r   t h e   W e n u   e v e n t s
+        muoniso = (chain.Wmu_muon_trackiso+chain.Wmu_muon_hcaliso+chain.Wmu_muon_ecaliso-chain.event_fastJetRho*3.1415939*0.09)/chain.Wmu_muon_pt;
+        if chain.eventClass == 2 and muoniso < 0.1 and chain.Wmu_muon_d0bsp < 0.02 and chain.Wmu_muon_pt > 25 and abs(chain.Wmu_muon_eta) < 2.1 and chain.Wmu_mt > 50 and chain.Wmu_pt > 120  and chain.event_met_pfmet > 25: 
+
+            passesAsClass2 = True
+            e_class_[0] = 2
+                
+            v_mt_[0] = chain.Wmu_mt
+            v_pt_[0] = chain.Wmu_pt
+            l_pt_[0] = chain.Wmu_muon_pt
+            l_eta_[0] = chain.Wmu_muon_eta    
+            l_phi_[0] = chain.Wmu_muon_phi    
+            e_met_[0] = chain.event_met_pfmet
+            e_nvert_[0] = float(chain.event_nPV)
+            
+            # ------------------   
+            ## Wmunu efficiencies
+            e_effwt_[0] =muIDEff.GetEfficiency(chain.Wmu_muon_pt, chain.Wmu_muon_eta) * muHLTEff.GetEfficiency(chain.Wmu_muon_pt, chain.Wmu_muon_eta)
+
+        ###################################################################
+        ###################################################################
+        # F i l l   j e t   i n f o r m a t i o n
+        if passesAsClass1 == True or passesAsClass2 == True or passesAsClass3 == True or passesAsClass4 == True:
+            
             j_ca8pr_m1_[0] = chain.GetLeaf("JetCA8PRUNEDPF_subJet1Mass").GetValue(0)
             j_ca8pr_m2_[0] = chain.GetLeaf("JetCA8PRUNEDPF_subJet2Mass").GetValue(0)
-                        
+                
             for jitr in range(len(jtypes)):
                 #print "----" + str(jitr) + "----"
                 # do not loop on the gen jets if it is data
                 if (jtypes[jitr].find("g") < 0):
-                    
+                        
                     if jtypes[jitr].find("7") > 0 or jtypes[jitr].find("8") > 0 or jtypes[jitr].find("12") > 0:
                         # put in the corrections for R >= 0.7 jets
                         jpx = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Px").GetValue(0)
@@ -240,10 +301,10 @@ def processNtuples(dirname,oname,isData):
                         j_phi_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Phi").GetValue(0)
                         j_pt_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Pt").GetValue(0)
                         j_jecfactor_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_JecFactor").GetValue(0)
-
+                        
                     j_area_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Area").GetValue(0)
                     j_nJ_[jitr][0] = float( chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_nJets").GetValue() )
-                
+                    
                 # gen jets, have to do matching
                 elif (jtypes[jitr].find("g") > 0) and (isData == 0): 
                     # get matching reco collection
@@ -274,29 +335,15 @@ def processNtuples(dirname,oname,isData):
                         j_phi_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Phi").GetValue(matchindex)
                         j_pt_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Pt").GetValue(matchindex)
                         j_jecfactor_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_JecFactor").GetValue(matchindex)    
-
-                else: continue
-            # ------------------   
-            ## Wenu efficiencies
-            eff_eleid = eleIdEff.GetEfficiency(l_pt_[0], l_eta_[0])
-            eff_elereco = eleRecoEff.GetEfficiency(l_pt_[0], l_eta_[0])
-            eff_elehlt = eleHLTEff.GetEfficiency(l_pt_[0], l_eta_[0])
-            eff_elemht = eleMHTEff.GetEfficiency(e_met_[0], 0)
-            eff_elewmt = eleWMtEff.GetEfficiency(v_mt_[0], l_eta_[0])
-            e_effwt_[0] = eff_eleid*eff_elereco*eff_elehlt*eff_elemht*eff_elewmt
-            # ------------------  
-            ## PU weights
-            if isData == 0:
-                e_puwt_[0] = puWeights.Get( chain.GetLeaf("event_mcPU_nvtx").GetValue(0), chain.GetLeaf("event_mcPU_nvtx").GetValue(1), chain.GetLeaf("event_mcPU_nvtx").GetValue(2) )
-                e_puwt_up_[0] = puWeights.GetUp( chain.GetLeaf("event_mcPU_nvtx").GetValue(0), chain.GetLeaf("event_mcPU_nvtx").GetValue(1), chain.GetLeaf("event_mcPU_nvtx").GetValue(2) )
-                e_puwt_dn_[0] = puWeights.GetDown( chain.GetLeaf("event_mcPU_nvtx").GetValue(0), chain.GetLeaf("event_mcPU_nvtx").GetValue(1), chain.GetLeaf("event_mcPU_nvtx").GetValue(2) )        
-            else:         
-                e_puwt_[0] = -1.
-                e_puwt_up_[0] = -1.  
-                e_puwt_dn_[0] = -1.
                     
+                else: continue
+                
             to.Fill()
-    
+        
+        ###################################################################
+        ###################################################################
+
+            
     print "Writing out the reduce analysis tuples into ", oname
     fo.cd()
     to.Write()        
