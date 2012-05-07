@@ -27,7 +27,7 @@ if [ "$buildHistos" == "True" ]; then
     c=$startval
     while ((c< ${totalNumberOfFiles}))
     do          
-        options="-b -r -n $c -c $channel"
+        options="-b -m -n $c -c $channel"
         location=`pwd`
         echo $options
         echo $location
