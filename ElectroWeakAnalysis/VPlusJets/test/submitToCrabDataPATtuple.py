@@ -26,7 +26,7 @@ channels   = [
               # Single Electrons done so far
               "dat_ch_SingleEl_2011A_May10",
               "dat_ch_EleHad_2011A_promptV4",
-              "dat_ch_EleHad_2011A_Aug05,
+              "dat_ch_EleHad_2011A_Aug05",
               "dat_ch_EleHad_2011A_promptV6",
               "dat_ch_EleHad_2011B_promptV1",              
               # Single Mu
