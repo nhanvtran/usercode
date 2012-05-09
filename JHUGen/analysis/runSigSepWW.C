@@ -1,4 +1,4 @@
-void runSigSepWW(int higgsMass=125, double intLumi=20.0, int nToys = 1, bool draw=false){
+void runSigSepWW(int higgsMass=125, double intLumi=20.0, int nToys = 1000, bool draw=false){
     
     using namespace RooFit;
     
@@ -60,20 +60,24 @@ void runSigSepWW(int higgsMass=125, double intLumi=20.0, int nToys = 1, bool dra
     if(draw){
     
       // plot 1
+      /*
       zeroPlusData2d->plotOn(plot1,MarkerColor(kRed));
       zeroPlusPdf->plotOn(plot1,LineColor(kRed), LineStyle(kDashed));
+      */
       zeroMinusData2d->plotOn(plot1,MarkerColor(kBlue));
       zeroMinusPdf->plotOn(plot1,LineColor(kBlue), LineStyle(kDashed));
+      /*
       bkgData2d->plotOn(plot1,MarkerColor(kBlack));
       bkgPdf->plotOn(plot1, LineColor(kBlack), LineStyle(kDashed));
-
       zeroPlusData2d->plotOn(plot2,MarkerColor(kRed));
       zeroPlusPdf->plotOn(plot2,LineColor(kRed), LineStyle(kDashed));
+      */
       zeroMinusData2d->plotOn(plot2,MarkerColor(kBlue));
       zeroMinusPdf->plotOn(plot2,LineColor(kBlue), LineStyle(kDashed));
+      /*
       bkgData2d->plotOn(plot2,MarkerColor(kBlack));
       bkgPdf->plotOn(plot2, LineColor(kBlack), LineStyle(kDashed));
-      
+      */
       TCanvas* fitCan = new TCanvas("fitCan","fitCan",400,400);
       plot1->Draw();
       fitCan->SaveAs(Form("plots/epsfiles/MELAproj2d_0plusVS0minus_125GeV_mll.eps"));
@@ -84,9 +88,12 @@ void runSigSepWW(int higgsMass=125, double intLumi=20.0, int nToys = 1, bool dra
     }
 
     char statResults2d[25];
-    sprintf(statResults2d,"stat_0plusVS0minus_%iGeV_embed_2d.root",higgsMass);
+    sprintf(statResults2d,"stat_0plusVS0minus_%iGeV_pure_2d.root",higgsMass);
     statsFactory *my2dHypothesisSeparation = new statsFactory(obs2d, zeroPlusPdf, zeroMinusPdf, statResults2d);
-    my2dHypothesisSeparation->hypothesisSeparationWithBackground(sigRate*intLumi,sigRate*intLumi,nToys, zeroPlusData2d, zeroMinusData2d, bkgPdf,bkgRate*intLumi, bkgData2d);
+    // running the embedded toys
+    // my2dHypothesisSeparation->hypothesisSeparationWithBackground(sigRate*intLumi,sigRate*intLumi,nToys, zeroPlusData2d, zeroMinusData2d, bkgPdf,bkgRate*intLumi, bkgData2d);
+    // running pure toys
+    my2dHypothesisSeparation->hypothesisSeparationWithBackground(sigRate*intLumi,sigRate*intLumi,nToys, bkgPdf,bkgRate*intLumi);
     delete my2dHypothesisSeparation;
     
 }

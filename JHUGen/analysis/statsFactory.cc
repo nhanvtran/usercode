@@ -70,8 +70,8 @@ statsFactory::statsFactory(RooArgSet* set, RooAbsPdf* pdf1, RooAbsPdf* pdf2, std
     H1pdf = pdf2;
     fout = new TFile( outputFileName.c_str(), "RECREATE");
     
-    nsig = new RooRealVar("nsig","number of signal events",0.,300) ;
-    nbkg = new RooRealVar("nbkg","number of background events",0.,300) ;
+    nsig = new RooRealVar("nsig","number of signal events",0.,1000) ;
+    nbkg = new RooRealVar("nbkg","number of background events",0.,20000) ;
     //Construct composite PDF
     totalPdf = new RooAddPdf("totalPdf","totalPdf",RooArgList(*H0pdf,*H1pdf),RooArgList(*nsig,*nbkg));
     
@@ -80,7 +80,7 @@ statsFactory::statsFactory(RooArgSet* set, RooAbsPdf* pdf1, RooAbsPdf* pdf2, std
     ulTuple = new TNtuple("ulTuple","ulTuple", "UL:nPoiss"); 
     ulTuple_em = new TNtuple("ulTuple_em","ulTuple_em", "UL:nPoiss"); 
     
-    hypTuple = new TNtuple("hypTuple","hypTuple", "S_H0:S_H1"); 
+    hypTuple = new TNtuple("hypTuple","hypTuple", "S_H0:S_H1:nSigFitH0:nBkgFitH0:nSigFitH1:nBkgFitH1"); 
     hypTuple_em_wBkg = new TNtuple("hypTuple_em_wBkg","hypTuple_em_wBkg", "S_H0:S_H1"); 
 
 }
@@ -224,8 +224,7 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys){
     std::cout << "Performing " << nToys << " toys..." << std::endl;
     for (int i = 0; i < nToys; i++){
         
-        //if(i%100==0) cout << "toy number " << i << endl;
-        cout << "toy number " << i << endl;
+        if(i%100==0) cout << "toy number " << i << endl;
         
         nPoiss = rng.Poisson(nsignal+nbackground);
         nsig->setVal(nsignal);
@@ -462,13 +461,13 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
     //nbkg->setVal(nbackground);
     
     // make the composite models
-    RooRealVar* nsig0 = new RooRealVar("nsig0","number of signal events", nH0, 0., 300) ;
-    RooRealVar* nbkg0 = new RooRealVar("nbkg0","number of background events", nBkg, 0., 300) ;
+    RooRealVar* nsig0 = new RooRealVar("nsig0","number of signal events", nH0, 0., nH0*2.0) ;
+    RooRealVar* nbkg0 = new RooRealVar("nbkg0","number of background events", nBkg, 0., nBkg*2.0);
     //Construct composite PDF
     RooAddPdf* totalPdf0 = new RooAddPdf("totalPdf0","totalPdf0",RooArgList(*H0pdf,*bkgpdf),RooArgList(*nsig0,*nbkg0));
     // make the composite models
-    RooRealVar* nsig1 = new RooRealVar("nsig1","number of signal events", nH1, 0., 300) ;
-    RooRealVar* nbkg1 = new RooRealVar("nbkg1","number of background events", nBkg, 0., 300) ;
+    RooRealVar* nsig1 = new RooRealVar("nsig1","number of signal events", nH1, 0., nH1*2.0) ;
+    RooRealVar* nbkg1 = new RooRealVar("nbkg1","number of background events", nBkg, 0., nBkg*2.0);
     //Construct composite PDF
     RooAddPdf* totalPdf1 = new RooAddPdf("totalPdf1","totalPdf1",RooArgList(*H1pdf,*bkgpdf),RooArgList(*nsig1,*nbkg1));
     
@@ -500,6 +499,8 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
         RooArgSet *temp0;
         std::cout << "generating..." << std::endl;
         for(int iSig=0; iSig<nPoiss1_sig; iSig++){
+	  if ( iSig%100 == 0 )  
+	    std::cout << "generating signal " << iSig << " th event.\n"; 
             
             if(sig0PlaceHolder>=sig0PoolData->sumEntries()){
               cout << "Sorry, your sig0 tree only has " << sig0PoolData->sumEntries() << "entries.  Bye!" << endl;
@@ -514,6 +515,9 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
         }
         
         for(int iBkg=0; iBkg<nPoiss1_bkg; iBkg++){
+
+	  if ( iBkg %1000 == 0 )  
+	    std::cout << "generating background " << iBkg << " th event.\n"; 
             
             if(bkgPlaceHolder>=bkgPoolData->sumEntries()){
               cout << "Sorry, your bkg tree only has " << bkgPoolData->sumEntries() << "entries.  Bye!" << endl;
@@ -604,7 +608,7 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
     
 }
 
-// HYPOTHESIS TESTING WITH BACKGROUND
+// HYPOTHESIS TESTING WITH BACKGROUND based on pure toy
 void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, int nToys, RooAbsPdf* bkgpdf, double nBkg){
     
     //Extended Likelihood Formalism
@@ -614,13 +618,13 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
     //nbkg->setVal(nbackground);
     
     // make the composite models
-    RooRealVar* nsig0 = new RooRealVar("nsig0","number of signal events", nH0, 0., 300) ;
-    RooRealVar* nbkg0 = new RooRealVar("nbkg0","number of background events", nBkg, 0., 300) ;
+    RooRealVar* nsig0 = new RooRealVar("nsig0","number of signal events", nH0, 0., nH0*2.0);
+    RooRealVar* nbkg0 = new RooRealVar("nbkg0","number of background events", nBkg, 0., nBkg*2.0) ;
     //Construct composite PDF
     RooAddPdf* totalPdf0 = new RooAddPdf("totalPdf0","totalPdf0",RooArgList(*H0pdf,*bkgpdf),RooArgList(*nsig0,*nbkg0));
     // make the composite models
-    RooRealVar* nsig1 = new RooRealVar("nsig1","number of signal events", nH1, 0., 300) ;
-    RooRealVar* nbkg1 = new RooRealVar("nbkg1","number of background events", nBkg, 0., 300) ;
+    RooRealVar* nsig1 = new RooRealVar("nsig1","number of signal events", nH1, 0., nH1*2.0) ;
+    RooRealVar* nbkg1 = new RooRealVar("nbkg1","number of background events", nBkg, 0., nBkg*2.0);
     //Construct composite PDF
     RooAddPdf* totalPdf1 = new RooAddPdf("totalPdf1","totalPdf1",RooArgList(*H1pdf,*bkgpdf),RooArgList(*nsig1,*nbkg1));
     
@@ -640,6 +644,9 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
         RooDataSet* data_H0 = totalPdf0->generate(*observables, (int) nPoiss1);
         // fit H0
         RooFitResult* r_H0 = totalPdf0->fitTo(*data_H0,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE),PrintLevel(-1));
+	double nSigFitH0 = nsig0->getVal();
+        double nBkgFitH0 = nbkg0->getVal();
+	
         // fit H1
         RooFitResult* r0_H0 = totalPdf1->fitTo(*data_H0,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE), PrintLevel(-1));
         //std::cout << "FCN r: " << r->minNll() << std::endl;
@@ -654,12 +661,16 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
         RooFitResult* r_H1 = totalPdf0->fitTo(*data_H1,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE),PrintLevel(-1));
         // fit H1
         RooFitResult* r0_H1 = totalPdf1->fitTo(*data_H1,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE), PrintLevel(-1));
+	double nSigFitH1 = nsig1->getVal();
+        double nBkgFitH1 = nbkg1->getVal();
         //std::cout << "FCN r: " << r->minNll() << std::endl;
         //std::cout << "FCN r0: " << r0->minNll() << std::endl;
         
         double s_estimator_H1 = 2.*(r_H1->minNll() - r0_H1->minNll());
         
-        hypTuple->Fill( s_estimator_H0, s_estimator_H1 );
+        std::cout << "s_H0: " << s_estimator_H0 << ", s_H1: " << s_estimator_H1 << std::endl;
+	
+        hypTuple->Fill( s_estimator_H0, s_estimator_H1, nSigFitH0, nBkgFitH0, nSigFitH1, nBkgFitH1 );
         
         
         delete data_H0;
