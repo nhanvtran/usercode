@@ -21,20 +21,22 @@ class vJetSubstructureAnalysis {
     TTree          *fChain;   //!pointer to the analyzed TTree or TChain
     Int_t           fCurrent; //!current Tree number in a TChain
     
-    double j_ak5_bdis, j_ak5_eta, j_ak5_phi, j_ak5_pt, j_ak5_mass, j_ak5_area, j_ak5_nJ, j_ak5_nBtags, j_ak5_mu, j_ak5_p;
-    double j_ak5tr_mass, j_ak5tr_pt, j_ak5tr_nJ, j_ak5tr_area;
-    double j_ak5pr_mass, j_ak5pr_pt, j_ak5pr_nJ, j_ak5pr_area;
-    double j_ak5ft_mass, j_ak5ft_pt, j_ak5ft_nJ, j_ak5ft_area;
-    double j_ak7_mass, j_ak7_pt, j_ak7_nJ, j_ak7_area;
-    double j_ak7tr_mass, j_ak7tr_pt, j_ak7tr_nJ, j_ak7tr_area;
-    double j_ak7pr_mass, j_ak7pr_pt, j_ak7pr_nJ, j_ak7pr_area;
-    double j_ak7ft_mass, j_ak7ft_pt, j_ak7ft_nJ, j_ak7ft_area;
-    double j_ak8_mass, j_ak8_pt, j_ak8_nJ, j_ak8_area;
-    double j_ak8tr_mass, j_ak8tr_pt, j_ak8tr_nJ, j_ak8tr_area;
-    double j_ak8pr_mass, j_ak8pr_pt, j_ak8pr_nJ, j_ak8pr_area;
-    double j_ak8ft_mass, j_ak8ft_pt, j_ak8ft_nJ, j_ak8ft_area;
-    double j_ca8_mass, j_ca8_pt, j_ca8_nJ, j_ca8_area;    
-    double j_ca8pr_mass, j_ca8pr_pt, j_ca8pr_nJ, j_ca8pr_area, j_ca8pr_m1, j_ca8pr_m2;
+    double j_ak5_bdis, j_ak5_eta, j_ak5_phi, j_ak5_pt, j_ak5_mass, j_ak5_area, j_ak5_nJ, j_ak5_nBtags, j_ak5_mu, j_ak5_p, j_ak5_jecfactor;
+    double j_ak5tr_mass, j_ak5tr_pt, j_ak5tr_nJ, j_ak5tr_area, j_ak5tr_jecfactor;
+    double j_ak5pr_mass, j_ak5pr_pt, j_ak5pr_nJ, j_ak5pr_area, j_ak5pr_jecfactor;
+    double j_ak5ft_mass, j_ak5ft_pt, j_ak5ft_nJ, j_ak5ft_area, j_ak5ft_jecfactor;
+    double j_ak7_mass, j_ak7_pt, j_ak7_nJ, j_ak7_area, j_ak7_jecfactor;
+    double j_ak7tr_mass, j_ak7tr_pt, j_ak7tr_nJ, j_ak7tr_area, j_ak7tr_jecfactor;
+    double j_ak7pr_mass, j_ak7pr_pt, j_ak7pr_nJ, j_ak7pr_area, j_ak7pr_jecfactor;
+    double j_ak7ft_mass, j_ak7ft_pt, j_ak7ft_nJ, j_ak7ft_area, j_ak7ft_jecfactor;
+    double j_ak8_mass, j_ak8_pt, j_ak8_nJ, j_ak8_area, j_ak8_jecfactor;
+    double j_ak8tr_mass, j_ak8tr_pt, j_ak8tr_nJ, j_ak8tr_area, j_ak8tr_jecfactor;
+    double j_ak8pr_mass, j_ak8pr_pt, j_ak8pr_nJ, j_ak8pr_area, j_ak8pr_jecfactor;
+    double j_ak8ft_mass, j_ak8ft_pt, j_ak8ft_nJ, j_ak8ft_area, j_ak8ft_jecfactor;
+    double j_ca8_mass, j_ca8_pt, j_ca8_nJ, j_ca8_area, j_ca8_jecfactor;    
+    double j_ca8pr_mass, j_ca8pr_pt, j_ca8pr_nJ, j_ca8pr_area, j_ca8pr_m1, j_ca8pr_m2, j_ca8pr_jecfactor;
+    double j_ca12ft_mass, j_ca12ft_pt, j_ca12ft_nJ, j_ca12ft_area, j_ca12ft_jecfactor;
+    double j_ca12mdft_mass, j_ca12mdft_pt, j_ca12mdft_nJ, j_ca12mdft_area, j_ca12mdft_jecfactor;
     
     double e_nvert, l_pt, l_reliso, e_met, e_weight, w_mt, w_pt;
     double e_puwt, e_puwt_up, e_puwt_dn, e_effwt;
@@ -46,6 +48,25 @@ class vJetSubstructureAnalysis {
     double j_ca8g_mass, j_ca8g_pt, j_ca8g_nJ, j_ca8g_area; 
     
     int j_ak5_match, j_ak7_match, j_ak8_match, j_ca8_match;
+    
+    // counters
+    Long64_t ctr_class1_matched_ak5;
+    Long64_t ctr_class1_unmatched_ak5;
+    Long64_t ctr_class1_matched_ak7;
+    Long64_t ctr_class1_unmatched_ak7;
+    Long64_t ctr_class1_matched_ak8;
+    Long64_t ctr_class1_unmatched_ak8;
+    Long64_t ctr_class1_matched_ca8;
+    Long64_t ctr_class1_unmatched_ca8;
+    
+    Long64_t ctr50_class1_matched_ak5;
+    Long64_t ctr50_class1_unmatched_ak5;
+    Long64_t ctr50_class1_matched_ak7;
+    Long64_t ctr50_class1_unmatched_ak7;
+    Long64_t ctr50_class1_matched_ak8;
+    Long64_t ctr50_class1_unmatched_ak8;
+    Long64_t ctr50_class1_matched_ca8;
+    Long64_t ctr50_class1_unmatched_ca8;
     
     // Declaration of leaf types
     Float_t         Wel_mass;
@@ -261,6 +282,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK5PF_Y[6];
     Float_t         JetAK5PF_Mass[6];
     Float_t         JetAK5PF_Area[6];
+    Float_t         JetAK5PF_JecFactor[6];
     Int_t           JetAK5PF_nJetBTags;
     Int_t           JetAK5PF_nDau[6];
     Float_t         JetAK5PF_bDiscSSVHE[6];
@@ -282,6 +304,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetCA8PRUNEDPF_Y[6];
     Float_t         JetCA8PRUNEDPF_Mass[6];
     Float_t         JetCA8PRUNEDPF_Area[6];
+    Float_t         JetCA8PRUNEDPF_JecFactor[6];
     Int_t           JetCA8PRUNEDPF_nJetBTags;
     Int_t           JetCA8PRUNEDPF_nDau[6];
     Float_t         JetCA8PRUNEDPF_bDiscSSVHE[6];
@@ -305,6 +328,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetCA8PF_Y[6];
     Float_t         JetCA8PF_Mass[6];
     Float_t         JetCA8PF_Area[6];
+    Float_t         JetCA8PF_JecFactor[6];
     Int_t           JetCA8PF_nJetBTags;
     Int_t           JetCA8PF_nDau[6];
     Float_t         JetCA8PF_bDiscSSVHE[6];
@@ -313,6 +337,50 @@ class vJetSubstructureAnalysis {
     Float_t         JetCA8PF_bDiscJP[6];
     Float_t         JetCA8PF_bDiscrSSVHP[6];
     Float_t         JetCA8PF_bDiscTCHP[6];
+    Int_t           JetCA12FILTEREDPF_nJets;
+    Float_t         JetCA12FILTEREDPF_Et[6];
+    Float_t         JetCA12FILTEREDPF_Pt[6];
+    Float_t         JetCA12FILTEREDPF_Eta[6];
+    Float_t         JetCA12FILTEREDPF_Phi[6];
+    Float_t         JetCA12FILTEREDPF_Theta[6];
+    Float_t         JetCA12FILTEREDPF_Px[6];
+    Float_t         JetCA12FILTEREDPF_Py[6];
+    Float_t         JetCA12FILTEREDPF_Pz[6];
+    Float_t         JetCA12FILTEREDPF_E[6];
+    Float_t         JetCA12FILTEREDPF_Y[6];
+    Float_t         JetCA12FILTEREDPF_Mass[6];
+    Float_t         JetCA12FILTEREDPF_Area[6];
+    Float_t         JetCA12FILTEREDPF_JecFactor[6];
+    Int_t           JetCA12FILTEREDPF_nJetBTags;
+    Int_t           JetCA12FILTEREDPF_nDau[6];
+    Float_t         JetCA12FILTEREDPF_bDiscSSVHE[6];
+    Float_t         JetCA12FILTEREDPF_bDiscTCHE[6];
+    Float_t         JetCA12FILTEREDPF_bDiscrCSV[6];
+    Float_t         JetCA12FILTEREDPF_bDiscJP[6];
+    Float_t         JetCA12FILTEREDPF_bDiscrSSVHP[6];
+    Float_t         JetCA12FILTEREDPF_bDiscTCHP[6];
+    Int_t           JetCA12MASSDROPFILTEREDPF_nJets;
+    Float_t         JetCA12MASSDROPFILTEREDPF_Et[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_Pt[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_Eta[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_Phi[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_Theta[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_Px[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_Py[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_Pz[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_E[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_Y[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_Mass[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_Area[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_JecFactor[6];
+    Int_t           JetCA12MASSDROPFILTEREDPF_nJetBTags;
+    Int_t           JetCA12MASSDROPFILTEREDPF_nDau[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_bDiscSSVHE[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_bDiscTCHE[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_bDiscrCSV[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_bDiscJP[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_bDiscrSSVHP[6];
+    Float_t         JetCA12MASSDROPFILTEREDPF_bDiscTCHP[6];
     Int_t           JetAK5TRIMMEDPF_nJets;
     Float_t         JetAK5TRIMMEDPF_Et[6];
     Float_t         JetAK5TRIMMEDPF_Pt[6];
@@ -326,6 +394,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK5TRIMMEDPF_Y[6];
     Float_t         JetAK5TRIMMEDPF_Mass[6];
     Float_t         JetAK5TRIMMEDPF_Area[6];
+    Float_t         JetAK5TRIMMEDPF_JecFactor[6];
     Int_t           JetAK5FILTEREDPF_nJets;
     Float_t         JetAK5FILTEREDPF_Et[6];
     Float_t         JetAK5FILTEREDPF_Pt[6];
@@ -339,6 +408,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK5FILTEREDPF_Y[6];
     Float_t         JetAK5FILTEREDPF_Mass[6];
     Float_t         JetAK5FILTEREDPF_Area[6];
+    Float_t         JetAK5FILTEREDPF_JecFactor[6];
     Int_t           JetAK5PRUNEDPF_nJets;
     Float_t         JetAK5PRUNEDPF_Et[6];
     Float_t         JetAK5PRUNEDPF_Pt[6];
@@ -352,6 +422,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK5PRUNEDPF_Y[6];
     Float_t         JetAK5PRUNEDPF_Mass[6];
     Float_t         JetAK5PRUNEDPF_Area[6];
+    Float_t         JetAK5PRUNEDPF_JecFactor[6];
     Int_t           JetAK7PF_nJets;
     Float_t         JetAK7PF_Et[6];
     Float_t         JetAK7PF_Pt[6];
@@ -365,6 +436,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK7PF_Y[6];
     Float_t         JetAK7PF_Mass[6];
     Float_t         JetAK7PF_Area[6];
+    Float_t         JetAK7PF_JecFactor[6];
     Int_t           JetAK7TRIMMEDPF_nJets;
     Float_t         JetAK7TRIMMEDPF_Et[6];
     Float_t         JetAK7TRIMMEDPF_Pt[6];
@@ -378,6 +450,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK7TRIMMEDPF_Y[6];
     Float_t         JetAK7TRIMMEDPF_Mass[6];
     Float_t         JetAK7TRIMMEDPF_Area[6];
+    Float_t         JetAK7TRIMMEDPF_JecFactor[6];
     Int_t           JetAK7FILTEREDPF_nJets;
     Float_t         JetAK7FILTEREDPF_Et[6];
     Float_t         JetAK7FILTEREDPF_Pt[6];
@@ -391,6 +464,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK7FILTEREDPF_Y[6];
     Float_t         JetAK7FILTEREDPF_Mass[6];
     Float_t         JetAK7FILTEREDPF_Area[6];
+    Float_t         JetAK7FILTEREDPF_JecFactor[6];
     Int_t           JetAK7PRUNEDPF_nJets;
     Float_t         JetAK7PRUNEDPF_Et[6];
     Float_t         JetAK7PRUNEDPF_Pt[6];
@@ -404,6 +478,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK7PRUNEDPF_Y[6];
     Float_t         JetAK7PRUNEDPF_Mass[6];
     Float_t         JetAK7PRUNEDPF_Area[6];
+    Float_t         JetAK7PRUNEDPF_JecFactor[6];
     Int_t           JetAK8PF_nJets;
     Float_t         JetAK8PF_Et[6];
     Float_t         JetAK8PF_Pt[6];
@@ -417,6 +492,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK8PF_Y[6];
     Float_t         JetAK8PF_Mass[6];
     Float_t         JetAK8PF_Area[6];
+    Float_t         JetAK8PF_JecFactor[6];
     Int_t           JetAK8TRIMMEDPF_nJets;
     Float_t         JetAK8TRIMMEDPF_Et[6];
     Float_t         JetAK8TRIMMEDPF_Pt[6];
@@ -430,6 +506,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK8TRIMMEDPF_Y[6];
     Float_t         JetAK8TRIMMEDPF_Mass[6];
     Float_t         JetAK8TRIMMEDPF_Area[6];
+    Float_t         JetAK8TRIMMEDPF_JecFactor[6];
     Int_t           JetAK8FILTEREDPF_nJets;
     Float_t         JetAK8FILTEREDPF_Et[6];
     Float_t         JetAK8FILTEREDPF_Pt[6];
@@ -443,6 +520,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK8FILTEREDPF_Y[6];
     Float_t         JetAK8FILTEREDPF_Mass[6];
     Float_t         JetAK8FILTEREDPF_Area[6];
+    Float_t         JetAK8FILTEREDPF_JecFactor[6];
     Int_t           JetAK8PRUNEDPF_nJets;
     Float_t         JetAK8PRUNEDPF_Et[6];
     Float_t         JetAK8PRUNEDPF_Pt[6];
@@ -456,6 +534,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK8PRUNEDPF_Y[6];
     Float_t         JetAK8PRUNEDPF_Mass[6];
     Float_t         JetAK8PRUNEDPF_Area[6];
+    Float_t         JetAK8PRUNEDPF_JecFactor[6];
     Int_t           JetAK5GENJETSNONU_nJets;
     Float_t         JetAK5GENJETSNONU_Et[6];
     Float_t         JetAK5GENJETSNONU_Pt[6];
@@ -469,6 +548,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK5GENJETSNONU_Y[6];
     Float_t         JetAK5GENJETSNONU_Mass[6];
     Float_t         JetAK5GENJETSNONU_Area[6];
+    Float_t         JetAK5GENJETSNONU_JecFactor[6];
     Int_t           JetAK7GENJETSNONU_nJets;
     Float_t         JetAK7GENJETSNONU_Et[6];
     Float_t         JetAK7GENJETSNONU_Pt[6];
@@ -482,6 +562,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK7GENJETSNONU_Y[6];
     Float_t         JetAK7GENJETSNONU_Mass[6];
     Float_t         JetAK7GENJETSNONU_Area[6];
+    Float_t         JetAK7GENJETSNONU_JecFactor[6];
     Int_t           JetAK8GENJETSNONU_nJets;
     Float_t         JetAK8GENJETSNONU_Et[6];
     Float_t         JetAK8GENJETSNONU_Pt[6];
@@ -495,6 +576,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetAK8GENJETSNONU_Y[6];
     Float_t         JetAK8GENJETSNONU_Mass[6];
     Float_t         JetAK8GENJETSNONU_Area[6];
+    Float_t         JetAK8GENJETSNONU_JecFactor[6];
     Int_t           JetCA8GENJETSNONU_nJets;
     Float_t         JetCA8GENJETSNONU_Et[6];
     Float_t         JetCA8GENJETSNONU_Pt[6];
@@ -508,6 +590,7 @@ class vJetSubstructureAnalysis {
     Float_t         JetCA8GENJETSNONU_Y[6];
     Float_t         JetCA8GENJETSNONU_Mass[6];
     Float_t         JetCA8GENJETSNONU_Area[6];
+    Float_t         JetCA8GENJETSNONU_JecFactor[6];
     Int_t           event_runNo;
     Int_t           event_evtNo;
     Int_t           event_lumi;
@@ -749,6 +832,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK5PF_Y;   //!
     TBranch        *b_JetAK5PF_Mass;   //!
     TBranch        *b_JetAK5PF_Area;   //!
+    TBranch        *b_JetAK5PF_JecFactor;   //!
     TBranch        *b_JetAK5PF_nJetBTags;   //!
     TBranch        *b_JetAK5PF_nDau;   //!
     TBranch        *b_JetAK5PF_bDiscSSVHE;   //!
@@ -770,6 +854,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetCA8PRUNEDPF_Y;   //!
     TBranch        *b_JetCA8PRUNEDPF_Mass;   //!
     TBranch        *b_JetCA8PRUNEDPF_Area;   //!
+    TBranch        *b_JetCA8PRUNEDPF_JecFactor;   //!
     TBranch        *b_JetCA8PRUNEDPF_nJetBTags;   //!
     TBranch        *b_JetCA8PRUNEDPF_nDau;   //!
     TBranch        *b_JetCA8PRUNEDPF_bDiscSSVHE;   //!
@@ -793,6 +878,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetCA8PF_Y;   //!
     TBranch        *b_JetCA8PF_Mass;   //!
     TBranch        *b_JetCA8PF_Area;   //!
+    TBranch        *b_JetCA8PF_JecFactor;   //!
     TBranch        *b_JetCA8PF_nJetBTags;   //!
     TBranch        *b_JetCA8PF_nDau;   //!
     TBranch        *b_JetCA8PF_bDiscSSVHE;   //!
@@ -801,6 +887,50 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetCA8PF_bDiscJP;   //!
     TBranch        *b_JetCA8PF_bDiscrSSVHP;   //!
     TBranch        *b_JetCA8PF_bDiscTCHP;   //!
+    TBranch        *b_JetCA12FILTEREDPF_nJets;   //!
+    TBranch        *b_JetCA12FILTEREDPF_Et;   //!
+    TBranch        *b_JetCA12FILTEREDPF_Pt;   //!
+    TBranch        *b_JetCA12FILTEREDPF_Eta;   //!
+    TBranch        *b_JetCA12FILTEREDPF_Phi;   //!
+    TBranch        *b_JetCA12FILTEREDPF_Theta;   //!
+    TBranch        *b_JetCA12FILTEREDPF_Px;   //!
+    TBranch        *b_JetCA12FILTEREDPF_Py;   //!
+    TBranch        *b_JetCA12FILTEREDPF_Pz;   //!
+    TBranch        *b_JetCA12FILTEREDPF_E;   //!
+    TBranch        *b_JetCA12FILTEREDPF_Y;   //!
+    TBranch        *b_JetCA12FILTEREDPF_Mass;   //!
+    TBranch        *b_JetCA12FILTEREDPF_Area;   //!
+    TBranch        *b_JetCA12FILTEREDPF_JecFactor;   //!
+    TBranch        *b_JetCA12FILTEREDPF_nJetBTags;   //!
+    TBranch        *b_JetCA12FILTEREDPF_nDau;   //!
+    TBranch        *b_JetCA12FILTEREDPF_bDiscSSVHE;   //!
+    TBranch        *b_JetCA12FILTEREDPF_bDiscTCHE;   //!
+    TBranch        *b_JetCA12FILTEREDPF_bDiscrCSV;   //!
+    TBranch        *b_JetCA12FILTEREDPF_bDiscJP;   //!
+    TBranch        *b_JetCA12FILTEREDPF_bDiscrSSVHP;   //!
+    TBranch        *b_JetCA12FILTEREDPF_bDiscTCHP;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_nJets;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_Et;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_Pt;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_Eta;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_Phi;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_Theta;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_Px;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_Py;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_Pz;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_E;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_Y;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_Mass;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_Area;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_JecFactor;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_nJetBTags;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_nDau;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_bDiscSSVHE;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_bDiscTCHE;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_bDiscrCSV;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_bDiscJP;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_bDiscrSSVHP;   //!
+    TBranch        *b_JetCA12MASSDROPFILTEREDPF_bDiscTCHP;   //!
     TBranch        *b_JetAK5TRIMMEDPF_nJets;   //!
     TBranch        *b_JetAK5TRIMMEDPF_Et;   //!
     TBranch        *b_JetAK5TRIMMEDPF_Pt;   //!
@@ -814,6 +944,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK5TRIMMEDPF_Y;   //!
     TBranch        *b_JetAK5TRIMMEDPF_Mass;   //!
     TBranch        *b_JetAK5TRIMMEDPF_Area;   //!
+    TBranch        *b_JetAK5TRIMMEDPF_JecFactor;   //!
     TBranch        *b_JetAK5FILTEREDPF_nJets;   //!
     TBranch        *b_JetAK5FILTEREDPF_Et;   //!
     TBranch        *b_JetAK5FILTEREDPF_Pt;   //!
@@ -827,6 +958,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK5FILTEREDPF_Y;   //!
     TBranch        *b_JetAK5FILTEREDPF_Mass;   //!
     TBranch        *b_JetAK5FILTEREDPF_Area;   //!
+    TBranch        *b_JetAK5FILTEREDPF_JecFactor;   //!
     TBranch        *b_JetAK5PRUNEDPF_nJets;   //!
     TBranch        *b_JetAK5PRUNEDPF_Et;   //!
     TBranch        *b_JetAK5PRUNEDPF_Pt;   //!
@@ -840,6 +972,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK5PRUNEDPF_Y;   //!
     TBranch        *b_JetAK5PRUNEDPF_Mass;   //!
     TBranch        *b_JetAK5PRUNEDPF_Area;   //!
+    TBranch        *b_JetAK5PRUNEDPF_JecFactor;   //!
     TBranch        *b_JetAK7PF_nJets;   //!
     TBranch        *b_JetAK7PF_Et;   //!
     TBranch        *b_JetAK7PF_Pt;   //!
@@ -853,6 +986,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK7PF_Y;   //!
     TBranch        *b_JetAK7PF_Mass;   //!
     TBranch        *b_JetAK7PF_Area;   //!
+    TBranch        *b_JetAK7PF_JecFactor;   //!
     TBranch        *b_JetAK7TRIMMEDPF_nJets;   //!
     TBranch        *b_JetAK7TRIMMEDPF_Et;   //!
     TBranch        *b_JetAK7TRIMMEDPF_Pt;   //!
@@ -866,6 +1000,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK7TRIMMEDPF_Y;   //!
     TBranch        *b_JetAK7TRIMMEDPF_Mass;   //!
     TBranch        *b_JetAK7TRIMMEDPF_Area;   //!
+    TBranch        *b_JetAK7TRIMMEDPF_JecFactor;   //!
     TBranch        *b_JetAK7FILTEREDPF_nJets;   //!
     TBranch        *b_JetAK7FILTEREDPF_Et;   //!
     TBranch        *b_JetAK7FILTEREDPF_Pt;   //!
@@ -879,6 +1014,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK7FILTEREDPF_Y;   //!
     TBranch        *b_JetAK7FILTEREDPF_Mass;   //!
     TBranch        *b_JetAK7FILTEREDPF_Area;   //!
+    TBranch        *b_JetAK7FILTEREDPF_JecFactor;   //!
     TBranch        *b_JetAK7PRUNEDPF_nJets;   //!
     TBranch        *b_JetAK7PRUNEDPF_Et;   //!
     TBranch        *b_JetAK7PRUNEDPF_Pt;   //!
@@ -892,6 +1028,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK7PRUNEDPF_Y;   //!
     TBranch        *b_JetAK7PRUNEDPF_Mass;   //!
     TBranch        *b_JetAK7PRUNEDPF_Area;   //!
+    TBranch        *b_JetAK7PRUNEDPF_JecFactor;   //!
     TBranch        *b_JetAK8PF_nJets;   //!
     TBranch        *b_JetAK8PF_Et;   //!
     TBranch        *b_JetAK8PF_Pt;   //!
@@ -905,6 +1042,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK8PF_Y;   //!
     TBranch        *b_JetAK8PF_Mass;   //!
     TBranch        *b_JetAK8PF_Area;   //!
+    TBranch        *b_JetAK8PF_JecFactor;   //!
     TBranch        *b_JetAK8TRIMMEDPF_nJets;   //!
     TBranch        *b_JetAK8TRIMMEDPF_Et;   //!
     TBranch        *b_JetAK8TRIMMEDPF_Pt;   //!
@@ -918,6 +1056,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK8TRIMMEDPF_Y;   //!
     TBranch        *b_JetAK8TRIMMEDPF_Mass;   //!
     TBranch        *b_JetAK8TRIMMEDPF_Area;   //!
+    TBranch        *b_JetAK8TRIMMEDPF_JecFactor;   //!
     TBranch        *b_JetAK8FILTEREDPF_nJets;   //!
     TBranch        *b_JetAK8FILTEREDPF_Et;   //!
     TBranch        *b_JetAK8FILTEREDPF_Pt;   //!
@@ -931,6 +1070,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK8FILTEREDPF_Y;   //!
     TBranch        *b_JetAK8FILTEREDPF_Mass;   //!
     TBranch        *b_JetAK8FILTEREDPF_Area;   //!
+    TBranch        *b_JetAK8FILTEREDPF_JecFactor;   //!
     TBranch        *b_JetAK8PRUNEDPF_nJets;   //!
     TBranch        *b_JetAK8PRUNEDPF_Et;   //!
     TBranch        *b_JetAK8PRUNEDPF_Pt;   //!
@@ -944,6 +1084,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK8PRUNEDPF_Y;   //!
     TBranch        *b_JetAK8PRUNEDPF_Mass;   //!
     TBranch        *b_JetAK8PRUNEDPF_Area;   //!
+    TBranch        *b_JetAK8PRUNEDPF_JecFactor;   //!
     TBranch        *b_JetAK5GENJETSNONU_nJets;   //!
     TBranch        *b_JetAK5GENJETSNONU_Et;   //!
     TBranch        *b_JetAK5GENJETSNONU_Pt;   //!
@@ -957,6 +1098,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK5GENJETSNONU_Y;   //!
     TBranch        *b_JetAK5GENJETSNONU_Mass;   //!
     TBranch        *b_JetAK5GENJETSNONU_Area;   //!
+    TBranch        *b_JetAK5GENJETSNONU_JecFactor;   //!
     TBranch        *b_JetAK7GENJETSNONU_nJets;   //!
     TBranch        *b_JetAK7GENJETSNONU_Et;   //!
     TBranch        *b_JetAK7GENJETSNONU_Pt;   //!
@@ -970,6 +1112,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK7GENJETSNONU_Y;   //!
     TBranch        *b_JetAK7GENJETSNONU_Mass;   //!
     TBranch        *b_JetAK7GENJETSNONU_Area;   //!
+    TBranch        *b_JetAK7GENJETSNONU_JecFactor;   //!
     TBranch        *b_JetAK8GENJETSNONU_nJets;   //!
     TBranch        *b_JetAK8GENJETSNONU_Et;   //!
     TBranch        *b_JetAK8GENJETSNONU_Pt;   //!
@@ -983,6 +1126,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetAK8GENJETSNONU_Y;   //!
     TBranch        *b_JetAK8GENJETSNONU_Mass;   //!
     TBranch        *b_JetAK8GENJETSNONU_Area;   //!
+    TBranch        *b_JetAK8GENJETSNONU_JecFactor;   //!
     TBranch        *b_JetCA8GENJETSNONU_nJets;   //!
     TBranch        *b_JetCA8GENJETSNONU_Et;   //!
     TBranch        *b_JetCA8GENJETSNONU_Pt;   //!
@@ -996,6 +1140,7 @@ class vJetSubstructureAnalysis {
     TBranch        *b_JetCA8GENJETSNONU_Y;   //!
     TBranch        *b_JetCA8GENJETSNONU_Mass;   //!
     TBranch        *b_JetCA8GENJETSNONU_Area;   //!
+    TBranch        *b_JetCA8GENJETSNONU_JecFactor;   //!
     TBranch        *b_event_runNo;   //!
     TBranch        *b_event_evtNo;   //!
     TBranch        *b_event_lumi;   //!
@@ -1032,6 +1177,7 @@ class vJetSubstructureAnalysis {
     virtual void     Loop(Long64_t maxevents=-1);
     virtual Bool_t   Notify();
     virtual void     Show(Long64_t entry = -1);
+    virtual void     FillTree();
 };
 
 #endif
@@ -1318,6 +1464,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK5PF_Y", JetAK5PF_Y, &b_JetAK5PF_Y);
     fChain->SetBranchAddress("JetAK5PF_Mass", JetAK5PF_Mass, &b_JetAK5PF_Mass);
     fChain->SetBranchAddress("JetAK5PF_Area", JetAK5PF_Area, &b_JetAK5PF_Area);
+    fChain->SetBranchAddress("JetAK5PF_JecFactor", JetAK5PF_JecFactor, &b_JetAK5PF_JecFactor);
     fChain->SetBranchAddress("JetAK5PF_nJetBTags", &JetAK5PF_nJetBTags, &b_JetAK5PF_nJetBTags);
     fChain->SetBranchAddress("JetAK5PF_nDau", JetAK5PF_nDau, &b_JetAK5PF_nDau);
     fChain->SetBranchAddress("JetAK5PF_bDiscSSVHE", JetAK5PF_bDiscSSVHE, &b_JetAK5PF_bDiscSSVHE);
@@ -1339,6 +1486,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetCA8PRUNEDPF_Y", JetCA8PRUNEDPF_Y, &b_JetCA8PRUNEDPF_Y);
     fChain->SetBranchAddress("JetCA8PRUNEDPF_Mass", JetCA8PRUNEDPF_Mass, &b_JetCA8PRUNEDPF_Mass);
     fChain->SetBranchAddress("JetCA8PRUNEDPF_Area", JetCA8PRUNEDPF_Area, &b_JetCA8PRUNEDPF_Area);
+    fChain->SetBranchAddress("JetCA8PRUNEDPF_JecFactor", JetCA8PRUNEDPF_JecFactor, &b_JetCA8PRUNEDPF_JecFactor);
     fChain->SetBranchAddress("JetCA8PRUNEDPF_nJetBTags", &JetCA8PRUNEDPF_nJetBTags, &b_JetCA8PRUNEDPF_nJetBTags);
     fChain->SetBranchAddress("JetCA8PRUNEDPF_nDau", JetCA8PRUNEDPF_nDau, &b_JetCA8PRUNEDPF_nDau);
     fChain->SetBranchAddress("JetCA8PRUNEDPF_bDiscSSVHE", JetCA8PRUNEDPF_bDiscSSVHE, &b_JetCA8PRUNEDPF_bDiscSSVHE);
@@ -1362,6 +1510,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetCA8PF_Y", JetCA8PF_Y, &b_JetCA8PF_Y);
     fChain->SetBranchAddress("JetCA8PF_Mass", JetCA8PF_Mass, &b_JetCA8PF_Mass);
     fChain->SetBranchAddress("JetCA8PF_Area", JetCA8PF_Area, &b_JetCA8PF_Area);
+    fChain->SetBranchAddress("JetCA8PF_JecFactor", JetCA8PF_JecFactor, &b_JetCA8PF_JecFactor);
     fChain->SetBranchAddress("JetCA8PF_nJetBTags", &JetCA8PF_nJetBTags, &b_JetCA8PF_nJetBTags);
     fChain->SetBranchAddress("JetCA8PF_nDau", JetCA8PF_nDau, &b_JetCA8PF_nDau);
     fChain->SetBranchAddress("JetCA8PF_bDiscSSVHE", JetCA8PF_bDiscSSVHE, &b_JetCA8PF_bDiscSSVHE);
@@ -1370,6 +1519,50 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetCA8PF_bDiscJP", JetCA8PF_bDiscJP, &b_JetCA8PF_bDiscJP);
     fChain->SetBranchAddress("JetCA8PF_bDiscrSSVHP", JetCA8PF_bDiscrSSVHP, &b_JetCA8PF_bDiscrSSVHP);
     fChain->SetBranchAddress("JetCA8PF_bDiscTCHP", JetCA8PF_bDiscTCHP, &b_JetCA8PF_bDiscTCHP);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_nJets", &JetCA12FILTEREDPF_nJets, &b_JetCA12FILTEREDPF_nJets);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_Et", JetCA12FILTEREDPF_Et, &b_JetCA12FILTEREDPF_Et);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_Pt", JetCA12FILTEREDPF_Pt, &b_JetCA12FILTEREDPF_Pt);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_Eta", JetCA12FILTEREDPF_Eta, &b_JetCA12FILTEREDPF_Eta);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_Phi", JetCA12FILTEREDPF_Phi, &b_JetCA12FILTEREDPF_Phi);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_Theta", JetCA12FILTEREDPF_Theta, &b_JetCA12FILTEREDPF_Theta);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_Px", JetCA12FILTEREDPF_Px, &b_JetCA12FILTEREDPF_Px);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_Py", JetCA12FILTEREDPF_Py, &b_JetCA12FILTEREDPF_Py);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_Pz", JetCA12FILTEREDPF_Pz, &b_JetCA12FILTEREDPF_Pz);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_E", JetCA12FILTEREDPF_E, &b_JetCA12FILTEREDPF_E);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_Y", JetCA12FILTEREDPF_Y, &b_JetCA12FILTEREDPF_Y);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_Mass", JetCA12FILTEREDPF_Mass, &b_JetCA12FILTEREDPF_Mass);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_Area", JetCA12FILTEREDPF_Area, &b_JetCA12FILTEREDPF_Area);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_JecFactor", JetCA12FILTEREDPF_JecFactor, &b_JetCA12FILTEREDPF_JecFactor);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_nJetBTags", &JetCA12FILTEREDPF_nJetBTags, &b_JetCA12FILTEREDPF_nJetBTags);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_nDau", JetCA12FILTEREDPF_nDau, &b_JetCA12FILTEREDPF_nDau);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_bDiscSSVHE", JetCA12FILTEREDPF_bDiscSSVHE, &b_JetCA12FILTEREDPF_bDiscSSVHE);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_bDiscTCHE", JetCA12FILTEREDPF_bDiscTCHE, &b_JetCA12FILTEREDPF_bDiscTCHE);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_bDiscrCSV", JetCA12FILTEREDPF_bDiscrCSV, &b_JetCA12FILTEREDPF_bDiscrCSV);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_bDiscJP", JetCA12FILTEREDPF_bDiscJP, &b_JetCA12FILTEREDPF_bDiscJP);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_bDiscrSSVHP", JetCA12FILTEREDPF_bDiscrSSVHP, &b_JetCA12FILTEREDPF_bDiscrSSVHP);
+    fChain->SetBranchAddress("JetCA12FILTEREDPF_bDiscTCHP", JetCA12FILTEREDPF_bDiscTCHP, &b_JetCA12FILTEREDPF_bDiscTCHP);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_nJets", &JetCA12MASSDROPFILTEREDPF_nJets, &b_JetCA12MASSDROPFILTEREDPF_nJets);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_Et", JetCA12MASSDROPFILTEREDPF_Et, &b_JetCA12MASSDROPFILTEREDPF_Et);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_Pt", JetCA12MASSDROPFILTEREDPF_Pt, &b_JetCA12MASSDROPFILTEREDPF_Pt);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_Eta", JetCA12MASSDROPFILTEREDPF_Eta, &b_JetCA12MASSDROPFILTEREDPF_Eta);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_Phi", JetCA12MASSDROPFILTEREDPF_Phi, &b_JetCA12MASSDROPFILTEREDPF_Phi);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_Theta", JetCA12MASSDROPFILTEREDPF_Theta, &b_JetCA12MASSDROPFILTEREDPF_Theta);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_Px", JetCA12MASSDROPFILTEREDPF_Px, &b_JetCA12MASSDROPFILTEREDPF_Px);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_Py", JetCA12MASSDROPFILTEREDPF_Py, &b_JetCA12MASSDROPFILTEREDPF_Py);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_Pz", JetCA12MASSDROPFILTEREDPF_Pz, &b_JetCA12MASSDROPFILTEREDPF_Pz);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_E", JetCA12MASSDROPFILTEREDPF_E, &b_JetCA12MASSDROPFILTEREDPF_E);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_Y", JetCA12MASSDROPFILTEREDPF_Y, &b_JetCA12MASSDROPFILTEREDPF_Y);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_Mass", JetCA12MASSDROPFILTEREDPF_Mass, &b_JetCA12MASSDROPFILTEREDPF_Mass);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_Area", JetCA12MASSDROPFILTEREDPF_Area, &b_JetCA12MASSDROPFILTEREDPF_Area);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_JecFactor", JetCA12MASSDROPFILTEREDPF_JecFactor, &b_JetCA12MASSDROPFILTEREDPF_JecFactor);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_nJetBTags", &JetCA12MASSDROPFILTEREDPF_nJetBTags, &b_JetCA12MASSDROPFILTEREDPF_nJetBTags);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_nDau", JetCA12MASSDROPFILTEREDPF_nDau, &b_JetCA12MASSDROPFILTEREDPF_nDau);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_bDiscSSVHE", JetCA12MASSDROPFILTEREDPF_bDiscSSVHE, &b_JetCA12MASSDROPFILTEREDPF_bDiscSSVHE);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_bDiscTCHE", JetCA12MASSDROPFILTEREDPF_bDiscTCHE, &b_JetCA12MASSDROPFILTEREDPF_bDiscTCHE);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_bDiscrCSV", JetCA12MASSDROPFILTEREDPF_bDiscrCSV, &b_JetCA12MASSDROPFILTEREDPF_bDiscrCSV);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_bDiscJP", JetCA12MASSDROPFILTEREDPF_bDiscJP, &b_JetCA12MASSDROPFILTEREDPF_bDiscJP);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_bDiscrSSVHP", JetCA12MASSDROPFILTEREDPF_bDiscrSSVHP, &b_JetCA12MASSDROPFILTEREDPF_bDiscrSSVHP);
+    fChain->SetBranchAddress("JetCA12MASSDROPFILTEREDPF_bDiscTCHP", JetCA12MASSDROPFILTEREDPF_bDiscTCHP, &b_JetCA12MASSDROPFILTEREDPF_bDiscTCHP);
     fChain->SetBranchAddress("JetAK5TRIMMEDPF_nJets", &JetAK5TRIMMEDPF_nJets, &b_JetAK5TRIMMEDPF_nJets);
     fChain->SetBranchAddress("JetAK5TRIMMEDPF_Et", JetAK5TRIMMEDPF_Et, &b_JetAK5TRIMMEDPF_Et);
     fChain->SetBranchAddress("JetAK5TRIMMEDPF_Pt", JetAK5TRIMMEDPF_Pt, &b_JetAK5TRIMMEDPF_Pt);
@@ -1383,6 +1576,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK5TRIMMEDPF_Y", JetAK5TRIMMEDPF_Y, &b_JetAK5TRIMMEDPF_Y);
     fChain->SetBranchAddress("JetAK5TRIMMEDPF_Mass", JetAK5TRIMMEDPF_Mass, &b_JetAK5TRIMMEDPF_Mass);
     fChain->SetBranchAddress("JetAK5TRIMMEDPF_Area", JetAK5TRIMMEDPF_Area, &b_JetAK5TRIMMEDPF_Area);
+    fChain->SetBranchAddress("JetAK5TRIMMEDPF_JecFactor", JetAK5TRIMMEDPF_JecFactor, &b_JetAK5TRIMMEDPF_JecFactor);
     fChain->SetBranchAddress("JetAK5FILTEREDPF_nJets", &JetAK5FILTEREDPF_nJets, &b_JetAK5FILTEREDPF_nJets);
     fChain->SetBranchAddress("JetAK5FILTEREDPF_Et", JetAK5FILTEREDPF_Et, &b_JetAK5FILTEREDPF_Et);
     fChain->SetBranchAddress("JetAK5FILTEREDPF_Pt", JetAK5FILTEREDPF_Pt, &b_JetAK5FILTEREDPF_Pt);
@@ -1396,6 +1590,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK5FILTEREDPF_Y", JetAK5FILTEREDPF_Y, &b_JetAK5FILTEREDPF_Y);
     fChain->SetBranchAddress("JetAK5FILTEREDPF_Mass", JetAK5FILTEREDPF_Mass, &b_JetAK5FILTEREDPF_Mass);
     fChain->SetBranchAddress("JetAK5FILTEREDPF_Area", JetAK5FILTEREDPF_Area, &b_JetAK5FILTEREDPF_Area);
+    fChain->SetBranchAddress("JetAK5FILTEREDPF_JecFactor", JetAK5FILTEREDPF_JecFactor, &b_JetAK5FILTEREDPF_JecFactor);
     fChain->SetBranchAddress("JetAK5PRUNEDPF_nJets", &JetAK5PRUNEDPF_nJets, &b_JetAK5PRUNEDPF_nJets);
     fChain->SetBranchAddress("JetAK5PRUNEDPF_Et", JetAK5PRUNEDPF_Et, &b_JetAK5PRUNEDPF_Et);
     fChain->SetBranchAddress("JetAK5PRUNEDPF_Pt", JetAK5PRUNEDPF_Pt, &b_JetAK5PRUNEDPF_Pt);
@@ -1409,6 +1604,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK5PRUNEDPF_Y", JetAK5PRUNEDPF_Y, &b_JetAK5PRUNEDPF_Y);
     fChain->SetBranchAddress("JetAK5PRUNEDPF_Mass", JetAK5PRUNEDPF_Mass, &b_JetAK5PRUNEDPF_Mass);
     fChain->SetBranchAddress("JetAK5PRUNEDPF_Area", JetAK5PRUNEDPF_Area, &b_JetAK5PRUNEDPF_Area);
+    fChain->SetBranchAddress("JetAK5PRUNEDPF_JecFactor", JetAK5PRUNEDPF_JecFactor, &b_JetAK5PRUNEDPF_JecFactor);
     fChain->SetBranchAddress("JetAK7PF_nJets", &JetAK7PF_nJets, &b_JetAK7PF_nJets);
     fChain->SetBranchAddress("JetAK7PF_Et", JetAK7PF_Et, &b_JetAK7PF_Et);
     fChain->SetBranchAddress("JetAK7PF_Pt", JetAK7PF_Pt, &b_JetAK7PF_Pt);
@@ -1422,6 +1618,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK7PF_Y", JetAK7PF_Y, &b_JetAK7PF_Y);
     fChain->SetBranchAddress("JetAK7PF_Mass", JetAK7PF_Mass, &b_JetAK7PF_Mass);
     fChain->SetBranchAddress("JetAK7PF_Area", JetAK7PF_Area, &b_JetAK7PF_Area);
+    fChain->SetBranchAddress("JetAK7PF_JecFactor", JetAK7PF_JecFactor, &b_JetAK7PF_JecFactor);
     fChain->SetBranchAddress("JetAK7TRIMMEDPF_nJets", &JetAK7TRIMMEDPF_nJets, &b_JetAK7TRIMMEDPF_nJets);
     fChain->SetBranchAddress("JetAK7TRIMMEDPF_Et", JetAK7TRIMMEDPF_Et, &b_JetAK7TRIMMEDPF_Et);
     fChain->SetBranchAddress("JetAK7TRIMMEDPF_Pt", JetAK7TRIMMEDPF_Pt, &b_JetAK7TRIMMEDPF_Pt);
@@ -1435,6 +1632,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK7TRIMMEDPF_Y", JetAK7TRIMMEDPF_Y, &b_JetAK7TRIMMEDPF_Y);
     fChain->SetBranchAddress("JetAK7TRIMMEDPF_Mass", JetAK7TRIMMEDPF_Mass, &b_JetAK7TRIMMEDPF_Mass);
     fChain->SetBranchAddress("JetAK7TRIMMEDPF_Area", JetAK7TRIMMEDPF_Area, &b_JetAK7TRIMMEDPF_Area);
+    fChain->SetBranchAddress("JetAK7TRIMMEDPF_JecFactor", JetAK7TRIMMEDPF_JecFactor, &b_JetAK7TRIMMEDPF_JecFactor);
     fChain->SetBranchAddress("JetAK7FILTEREDPF_nJets", &JetAK7FILTEREDPF_nJets, &b_JetAK7FILTEREDPF_nJets);
     fChain->SetBranchAddress("JetAK7FILTEREDPF_Et", JetAK7FILTEREDPF_Et, &b_JetAK7FILTEREDPF_Et);
     fChain->SetBranchAddress("JetAK7FILTEREDPF_Pt", JetAK7FILTEREDPF_Pt, &b_JetAK7FILTEREDPF_Pt);
@@ -1448,6 +1646,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK7FILTEREDPF_Y", JetAK7FILTEREDPF_Y, &b_JetAK7FILTEREDPF_Y);
     fChain->SetBranchAddress("JetAK7FILTEREDPF_Mass", JetAK7FILTEREDPF_Mass, &b_JetAK7FILTEREDPF_Mass);
     fChain->SetBranchAddress("JetAK7FILTEREDPF_Area", JetAK7FILTEREDPF_Area, &b_JetAK7FILTEREDPF_Area);
+    fChain->SetBranchAddress("JetAK7FILTEREDPF_JecFactor", JetAK7FILTEREDPF_JecFactor, &b_JetAK7FILTEREDPF_JecFactor);
     fChain->SetBranchAddress("JetAK7PRUNEDPF_nJets", &JetAK7PRUNEDPF_nJets, &b_JetAK7PRUNEDPF_nJets);
     fChain->SetBranchAddress("JetAK7PRUNEDPF_Et", JetAK7PRUNEDPF_Et, &b_JetAK7PRUNEDPF_Et);
     fChain->SetBranchAddress("JetAK7PRUNEDPF_Pt", JetAK7PRUNEDPF_Pt, &b_JetAK7PRUNEDPF_Pt);
@@ -1461,6 +1660,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK7PRUNEDPF_Y", JetAK7PRUNEDPF_Y, &b_JetAK7PRUNEDPF_Y);
     fChain->SetBranchAddress("JetAK7PRUNEDPF_Mass", JetAK7PRUNEDPF_Mass, &b_JetAK7PRUNEDPF_Mass);
     fChain->SetBranchAddress("JetAK7PRUNEDPF_Area", JetAK7PRUNEDPF_Area, &b_JetAK7PRUNEDPF_Area);
+    fChain->SetBranchAddress("JetAK7PRUNEDPF_JecFactor", JetAK7PRUNEDPF_JecFactor, &b_JetAK7PRUNEDPF_JecFactor);
     fChain->SetBranchAddress("JetAK8PF_nJets", &JetAK8PF_nJets, &b_JetAK8PF_nJets);
     fChain->SetBranchAddress("JetAK8PF_Et", JetAK8PF_Et, &b_JetAK8PF_Et);
     fChain->SetBranchAddress("JetAK8PF_Pt", JetAK8PF_Pt, &b_JetAK8PF_Pt);
@@ -1474,6 +1674,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK8PF_Y", JetAK8PF_Y, &b_JetAK8PF_Y);
     fChain->SetBranchAddress("JetAK8PF_Mass", JetAK8PF_Mass, &b_JetAK8PF_Mass);
     fChain->SetBranchAddress("JetAK8PF_Area", JetAK8PF_Area, &b_JetAK8PF_Area);
+    fChain->SetBranchAddress("JetAK8PF_JecFactor", JetAK8PF_JecFactor, &b_JetAK8PF_JecFactor);
     fChain->SetBranchAddress("JetAK8TRIMMEDPF_nJets", &JetAK8TRIMMEDPF_nJets, &b_JetAK8TRIMMEDPF_nJets);
     fChain->SetBranchAddress("JetAK8TRIMMEDPF_Et", JetAK8TRIMMEDPF_Et, &b_JetAK8TRIMMEDPF_Et);
     fChain->SetBranchAddress("JetAK8TRIMMEDPF_Pt", JetAK8TRIMMEDPF_Pt, &b_JetAK8TRIMMEDPF_Pt);
@@ -1487,6 +1688,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK8TRIMMEDPF_Y", JetAK8TRIMMEDPF_Y, &b_JetAK8TRIMMEDPF_Y);
     fChain->SetBranchAddress("JetAK8TRIMMEDPF_Mass", JetAK8TRIMMEDPF_Mass, &b_JetAK8TRIMMEDPF_Mass);
     fChain->SetBranchAddress("JetAK8TRIMMEDPF_Area", JetAK8TRIMMEDPF_Area, &b_JetAK8TRIMMEDPF_Area);
+    fChain->SetBranchAddress("JetAK8TRIMMEDPF_JecFactor", JetAK8TRIMMEDPF_JecFactor, &b_JetAK8TRIMMEDPF_JecFactor);
     fChain->SetBranchAddress("JetAK8FILTEREDPF_nJets", &JetAK8FILTEREDPF_nJets, &b_JetAK8FILTEREDPF_nJets);
     fChain->SetBranchAddress("JetAK8FILTEREDPF_Et", JetAK8FILTEREDPF_Et, &b_JetAK8FILTEREDPF_Et);
     fChain->SetBranchAddress("JetAK8FILTEREDPF_Pt", JetAK8FILTEREDPF_Pt, &b_JetAK8FILTEREDPF_Pt);
@@ -1500,6 +1702,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK8FILTEREDPF_Y", JetAK8FILTEREDPF_Y, &b_JetAK8FILTEREDPF_Y);
     fChain->SetBranchAddress("JetAK8FILTEREDPF_Mass", JetAK8FILTEREDPF_Mass, &b_JetAK8FILTEREDPF_Mass);
     fChain->SetBranchAddress("JetAK8FILTEREDPF_Area", JetAK8FILTEREDPF_Area, &b_JetAK8FILTEREDPF_Area);
+    fChain->SetBranchAddress("JetAK8FILTEREDPF_JecFactor", JetAK8FILTEREDPF_JecFactor, &b_JetAK8FILTEREDPF_JecFactor);
     fChain->SetBranchAddress("JetAK8PRUNEDPF_nJets", &JetAK8PRUNEDPF_nJets, &b_JetAK8PRUNEDPF_nJets);
     fChain->SetBranchAddress("JetAK8PRUNEDPF_Et", JetAK8PRUNEDPF_Et, &b_JetAK8PRUNEDPF_Et);
     fChain->SetBranchAddress("JetAK8PRUNEDPF_Pt", JetAK8PRUNEDPF_Pt, &b_JetAK8PRUNEDPF_Pt);
@@ -1513,6 +1716,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK8PRUNEDPF_Y", JetAK8PRUNEDPF_Y, &b_JetAK8PRUNEDPF_Y);
     fChain->SetBranchAddress("JetAK8PRUNEDPF_Mass", JetAK8PRUNEDPF_Mass, &b_JetAK8PRUNEDPF_Mass);
     fChain->SetBranchAddress("JetAK8PRUNEDPF_Area", JetAK8PRUNEDPF_Area, &b_JetAK8PRUNEDPF_Area);
+    fChain->SetBranchAddress("JetAK8PRUNEDPF_JecFactor", JetAK8PRUNEDPF_JecFactor, &b_JetAK8PRUNEDPF_JecFactor);
     fChain->SetBranchAddress("JetAK5GENJETSNONU_nJets", &JetAK5GENJETSNONU_nJets, &b_JetAK5GENJETSNONU_nJets);
     fChain->SetBranchAddress("JetAK5GENJETSNONU_Et", JetAK5GENJETSNONU_Et, &b_JetAK5GENJETSNONU_Et);
     fChain->SetBranchAddress("JetAK5GENJETSNONU_Pt", JetAK5GENJETSNONU_Pt, &b_JetAK5GENJETSNONU_Pt);
@@ -1526,6 +1730,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK5GENJETSNONU_Y", JetAK5GENJETSNONU_Y, &b_JetAK5GENJETSNONU_Y);
     fChain->SetBranchAddress("JetAK5GENJETSNONU_Mass", JetAK5GENJETSNONU_Mass, &b_JetAK5GENJETSNONU_Mass);
     fChain->SetBranchAddress("JetAK5GENJETSNONU_Area", JetAK5GENJETSNONU_Area, &b_JetAK5GENJETSNONU_Area);
+    fChain->SetBranchAddress("JetAK5GENJETSNONU_JecFactor", JetAK5GENJETSNONU_JecFactor, &b_JetAK5GENJETSNONU_JecFactor);
     fChain->SetBranchAddress("JetAK7GENJETSNONU_nJets", &JetAK7GENJETSNONU_nJets, &b_JetAK7GENJETSNONU_nJets);
     fChain->SetBranchAddress("JetAK7GENJETSNONU_Et", JetAK7GENJETSNONU_Et, &b_JetAK7GENJETSNONU_Et);
     fChain->SetBranchAddress("JetAK7GENJETSNONU_Pt", JetAK7GENJETSNONU_Pt, &b_JetAK7GENJETSNONU_Pt);
@@ -1539,6 +1744,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK7GENJETSNONU_Y", JetAK7GENJETSNONU_Y, &b_JetAK7GENJETSNONU_Y);
     fChain->SetBranchAddress("JetAK7GENJETSNONU_Mass", JetAK7GENJETSNONU_Mass, &b_JetAK7GENJETSNONU_Mass);
     fChain->SetBranchAddress("JetAK7GENJETSNONU_Area", JetAK7GENJETSNONU_Area, &b_JetAK7GENJETSNONU_Area);
+    fChain->SetBranchAddress("JetAK7GENJETSNONU_JecFactor", JetAK7GENJETSNONU_JecFactor, &b_JetAK7GENJETSNONU_JecFactor);
     fChain->SetBranchAddress("JetAK8GENJETSNONU_nJets", &JetAK8GENJETSNONU_nJets, &b_JetAK8GENJETSNONU_nJets);
     fChain->SetBranchAddress("JetAK8GENJETSNONU_Et", JetAK8GENJETSNONU_Et, &b_JetAK8GENJETSNONU_Et);
     fChain->SetBranchAddress("JetAK8GENJETSNONU_Pt", JetAK8GENJETSNONU_Pt, &b_JetAK8GENJETSNONU_Pt);
@@ -1552,6 +1758,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetAK8GENJETSNONU_Y", JetAK8GENJETSNONU_Y, &b_JetAK8GENJETSNONU_Y);
     fChain->SetBranchAddress("JetAK8GENJETSNONU_Mass", JetAK8GENJETSNONU_Mass, &b_JetAK8GENJETSNONU_Mass);
     fChain->SetBranchAddress("JetAK8GENJETSNONU_Area", JetAK8GENJETSNONU_Area, &b_JetAK8GENJETSNONU_Area);
+    fChain->SetBranchAddress("JetAK8GENJETSNONU_JecFactor", JetAK8GENJETSNONU_JecFactor, &b_JetAK8GENJETSNONU_JecFactor);
     fChain->SetBranchAddress("JetCA8GENJETSNONU_nJets", &JetCA8GENJETSNONU_nJets, &b_JetCA8GENJETSNONU_nJets);
     fChain->SetBranchAddress("JetCA8GENJETSNONU_Et", JetCA8GENJETSNONU_Et, &b_JetCA8GENJETSNONU_Et);
     fChain->SetBranchAddress("JetCA8GENJETSNONU_Pt", JetCA8GENJETSNONU_Pt, &b_JetCA8GENJETSNONU_Pt);
@@ -1565,6 +1772,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     fChain->SetBranchAddress("JetCA8GENJETSNONU_Y", JetCA8GENJETSNONU_Y, &b_JetCA8GENJETSNONU_Y);
     fChain->SetBranchAddress("JetCA8GENJETSNONU_Mass", JetCA8GENJETSNONU_Mass, &b_JetCA8GENJETSNONU_Mass);
     fChain->SetBranchAddress("JetCA8GENJETSNONU_Area", JetCA8GENJETSNONU_Area, &b_JetCA8GENJETSNONU_Area);
+    fChain->SetBranchAddress("JetCA8GENJETSNONU_JecFactor", JetCA8GENJETSNONU_JecFactor, &b_JetCA8GENJETSNONU_JecFactor);
     fChain->SetBranchAddress("event_runNo", &event_runNo, &b_event_runNo);
     fChain->SetBranchAddress("event_evtNo", &event_evtNo, &b_event_evtNo);
     fChain->SetBranchAddress("event_lumi", &event_lumi, &b_event_lumi);
@@ -1618,6 +1826,7 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     otree->Branch("j_ak5_p", &j_ak5_p, "j_ak5_p/D");
     otree->Branch("j_ak5_mass", &j_ak5_mass, "j_ak5_mass/D");
     otree->Branch("j_ak5_area", &j_ak5_area, "j_ak5_area/D");
+    otree->Branch("j_ak5_jecfactor", &j_ak5_jecfactor, "j_ak5_jecfactor/D");
     
     // matching flag
     otree->Branch("j_ak5_match", &j_ak5_match, "j_ak5_match/I");
@@ -1638,6 +1847,8 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     otree->Branch("j_ak8ft_mass", &j_ak8ft_mass, "j_ak8ft_mass/D");
     otree->Branch("j_ca8_mass", &j_ca8_mass, "j_ca8_mass/D");
     otree->Branch("j_ca8pr_mass", &j_ca8pr_mass, "j_ca8pr_mass/D");
+    otree->Branch("j_ca12ft_mass", &j_ca12ft_mass, "j_ca12ft_mass/D");
+    otree->Branch("j_ca12mdft_mass", &j_ca12mdft_mass, "j_ca12mdft_mass/D");
     otree->Branch("j_ak5g_mass", &j_ak5g_mass, "j_ak5g_mass/D");
     otree->Branch("j_ak7g_mass", &j_ak7g_mass, "j_ak7g_mass/D");
     otree->Branch("j_ak8g_mass", &j_ak8g_mass, "j_ak8g_mass/D");
@@ -1656,6 +1867,8 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     otree->Branch("j_ak8ft_pt", &j_ak8ft_pt, "j_ak8ft_pt/D");
     otree->Branch("j_ca8_pt", &j_ca8_pt, "j_ca8_pt/D");
     otree->Branch("j_ca8pr_pt", &j_ca8pr_pt, "j_ca8pr_pt/D");
+    otree->Branch("j_ca12ft_pt", &j_ca12ft_pt, "j_ca12ft_pt/D");
+    otree->Branch("j_ca12mdft_pt", &j_ca12mdft_pt, "j_ca12mdft_pt/D");
     otree->Branch("j_ak5g_pt", &j_ak5g_pt, "j_ak5g_pt/D");
     otree->Branch("j_ak7g_pt", &j_ak7g_pt, "j_ak7g_pt/D");
     otree->Branch("j_ak8g_pt", &j_ak8g_pt, "j_ak8g_pt/D");
@@ -1674,6 +1887,8 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     otree->Branch("j_ak8ft_nJ", &j_ak8ft_nJ, "j_ak8ft_nJ/D");
     otree->Branch("j_ca8_nJ", &j_ca8_nJ, "j_ca8_nJ/D");
     otree->Branch("j_ca8pr_nJ", &j_ca8pr_nJ, "j_ca8pr_nJ/D");
+    otree->Branch("j_ca12ft_nJ", &j_ca12ft_nJ, "j_ca12ft_nJ/D");
+    otree->Branch("j_ca12mdft_nJ", &j_ca12mdft_nJ, "j_ca12mdft_nJ/D");
     otree->Branch("j_ak5g_nJ", &j_ak5g_nJ, "j_ak5g_nJ/D");
     otree->Branch("j_ak7g_nJ", &j_ak7g_nJ, "j_ak7g_nJ/D");
     otree->Branch("j_ak8g_nJ", &j_ak8g_nJ, "j_ak8g_nJ/D");
@@ -1692,10 +1907,32 @@ void vJetSubstructureAnalysis::Init(TTree *tree)
     otree->Branch("j_ak8ft_area", &j_ak8ft_area, "j_ak8ft_area/D");
     otree->Branch("j_ca8_area", &j_ca8_area, "j_ca8_area/D");
     otree->Branch("j_ca8pr_area", &j_ca8pr_area, "j_ca8pr_area/D");
+    otree->Branch("j_ca12ft_area", &j_ca12ft_area, "j_ca12ft_area/D");
+    otree->Branch("j_ca12mdft_area", &j_ca12mdft_area, "j_ca12mdft_area/D");
     otree->Branch("j_ak5g_area", &j_ak5g_area, "j_ak5g_area/D");
     otree->Branch("j_ak7g_area", &j_ak7g_area, "j_ak7g_area/D");
     otree->Branch("j_ak8g_area", &j_ak8g_area, "j_ak8g_area/D");
     otree->Branch("j_ca8g_area", &j_ca8g_area, "j_ca8g_area/D");
+    
+    otree->Branch("j_ak5tr_jecfactor", &j_ak5tr_jecfactor, "j_ak5tr_jecfactor/D");
+    otree->Branch("j_ak5pr_jecfactor", &j_ak5pr_jecfactor, "j_ak5pr_jecfactor/D");
+    otree->Branch("j_ak5ft_jecfactor", &j_ak5ft_jecfactor, "j_ak5ft_jecfactor/D");
+    otree->Branch("j_ak7_jecfactor", &j_ak7_jecfactor, "j_ak7_jecfactor/D");
+    otree->Branch("j_ak7tr_jecfactor", &j_ak7tr_jecfactor, "j_ak7tr_jecfactor/D");
+    otree->Branch("j_ak7pr_jecfactor", &j_ak7pr_jecfactor, "j_ak7pr_jecfactor/D");
+    otree->Branch("j_ak7ft_jecfactor", &j_ak7ft_jecfactor, "j_ak7ft_jecfactor/D");
+    otree->Branch("j_ak8_jecfactor", &j_ak8_jecfactor, "j_ak8_jecfactor/D");
+    otree->Branch("j_ak8tr_jecfactor", &j_ak8tr_jecfactor, "j_ak8tr_jecfactor/D");
+    otree->Branch("j_ak8pr_jecfactor", &j_ak8pr_jecfactor, "j_ak8pr_jecfactor/D");
+    otree->Branch("j_ak8ft_jecfactor", &j_ak8ft_jecfactor, "j_ak8ft_jecfactor/D");
+    otree->Branch("j_ca8_jecfactor", &j_ca8_jecfactor, "j_ca8_jecfactor/D");
+    otree->Branch("j_ca8pr_jecfactor", &j_ca8pr_jecfactor, "j_ca8pr_jecfactor/D");
+    otree->Branch("j_ca12ft_jecfactor", &j_ca12ft_jecfactor, "j_ca12ft_jecfactor/D");
+    otree->Branch("j_ca12mdft_jecfactor", &j_ca12mdft_jecfactor, "j_ca12mdft_jecfactor/D");
+    //otree->Branch("j_ak5g_jecfactor", &j_ak5g_jecfactor, "j_ak5g_jecfactor/D");
+    //otree->Branch("j_ak7g_jecfactor", &j_ak7g_jecfactor, "j_ak7g_jecfactor/D");
+    //otree->Branch("j_ak8g_jecfactor", &j_ak8g_jecfactor, "j_ak8g_jecfactor/D");
+    //otree->Branch("j_ca8g_jecfactor", &j_ca8g_jecfactor, "j_ca8g_jecfactor/D");
     
     otree->Branch("j_ca8pr_m1", &j_ca8pr_m1, "j_ca8pr_m1/D");
     otree->Branch("j_ca8pr_m2", &j_ca8pr_m2, "j_ca8pr_m2/D"); 

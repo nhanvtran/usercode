@@ -14,6 +14,7 @@ class myutils {
     myutils();
     ~myutils();
     TH1F* GetFitSlicesY(TH2F* h2d, int param);
+    //TH1F* GetFitSlicesY_sigma(TH2F* h2d, int param);
 
 
 };

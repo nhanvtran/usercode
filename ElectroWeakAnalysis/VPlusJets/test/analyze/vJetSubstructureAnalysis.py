@@ -26,6 +26,9 @@ parser.add_option('-c', '--channel',
 #### for ploting
 parser.add_option('-p', '--writePlots', action='store_true', dest='writePlots', default=False, 
                   help='include if you want to produce plots')
+parser.add_option('-a', '--addFiles', action='store_true', dest='addFiles', default=False, 
+                  help='when producing plots, if you need to merge histogram files')
+
 
 (options, args) = parser.parse_args()
 
@@ -39,23 +42,50 @@ parser.add_option('-p', '--writePlots', action='store_true', dest='writePlots', 
 
 argv = []
 
-odir = "ntuples_v6"
+odir = "ntuples_v10_clone"
+chan = options.channelToBuild
 
 dataset    = [
-              # ww sample
+              # ww sample (0-2)
               "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WWtoAnything/demo*.root",      
               "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WZtoAnything/demo*.root",         
               "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_ZZtoAnything/demo*.root",      
-              ## w + jets sample, split into 8
-              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_1[0-4]*_*.root",
-              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_1[5-9]*_*.root",
-              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_2[0-4]*_*.root",
-              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_2[5-9]*_*.root",
-              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_3[0-9]*_*.root",
-              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_[1-4][0-9]_*.root",   
-              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_[5-9][0-9]_*.root",   
-              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_[1-9]_*_*.root",
-              ## ttbar sample -- this one is huge, split into 12
+#              ## w + jets sample, split into 8 (3-10)
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_1[0-4]*_*.root",
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_1[5-9]*_*.root",
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_2[0-4]*_*.root",
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_2[5-9]*_*.root",
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_3[0-9]*_*.root",
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_[1-4][0-9]_*.root",   
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_[5-9][0-9]_*.root",   
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets/demo_[1-9]_*_*.root",
+              ## w + jets boosted, madgraph (11-14), 4
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedMadGraph/demo_[1-9]_*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedMadGraph/demo_[1][0-9]_*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedMadGraph/demo_[2][0-9]_*.root",  
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedMadGraph/demo_[3][0-9]_*.root",                
+              ## w + jets boosted, herwig (15-23), 9
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedHerwig/demo_[1-9]_*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedHerwig/demo_[1][0-9]_*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedHerwig/demo_[2][0-9]_*.root",  
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedHerwig/demo_[3][0-9]_*.root",                
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedHerwig/demo_[4][0-9]_*.root",                
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedHerwig/demo_[5][0-9]_*.root",                    
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedHerwig/demo_[6][0-9]_*.root",                
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedHerwig/demo_[7][0-9]_*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_WJets_boostedHerwig/demo_[8][0-9]_*.root",              
+              ## Z + jets inclusive
+              ## Z + jets boosted, madgraph (24-27), 4
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_ZJets_boostedMadGraph/demo_1*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_ZJets_boostedMadGraph/demo_2*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_ZJets_boostedMadGraph/demo_3*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_ZJets_boostedMadGraph/demo_4*.root",              
+              ## Z + jets boosted, herwig (27-30), 4
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_ZJets_boostedHerwig/demo_1*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_ZJets_boostedHerwig/demo_[2-4]*.root",    
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_ZJets_boostedHerwig/demo_[5-7]*.root",                  
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_ZJets_boostedHerwig/demo_[8-9]*.root",                                
+              ## ttbar sample -- this one is huge, split into 12 (31-42)
               "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_TTbar/demo_1[0-1][0-9]_*.root",
               "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_TTbar/demo_1[2-3][0-9]_*.root",
               "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_TTbar/demo_1[4-5][0-9]_*.root",
@@ -68,80 +98,178 @@ dataset    = [
               "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_TTbar/demo_[5-6][0-9]_*.root",
               "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_TTbar/demo_[7-9][0-9]_*.root",
               "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_TTbar/demo_[1-9]_*_*.root",
+              ## single top - 8 samples (43-50)
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_singleTbar_s/demo_*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_singleTbar_t/demo_*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_singleTbar_DR/demo_*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_singleTbar_DS/demo_*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_singleT_s/demo_*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_singleT_t/demo_*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_singleT_DR/demo_*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/ch_singleT_DS/demo_*.root",
               ###################
-              ## data, single el and elehad
-              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleEl_2011A_promptV4/demo_[1-4]*.root",
-              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleEl_2011A_promptV4/demo_[5-9]*.root",
-              ## data, single mu  
+              ###################
+              ###################
+              ## data, single el and elehad (51-61), 11
+              #"/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleEl_2011A_promptV4/demo_[1-4]*.root",
+              #"/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleEl_2011A_promptV4/demo_[5-9]*.root",
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleEl_2011A_May10/demo_[1-3]*.root",
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleEl_2011A_May10/demo_[4-9]*.root",
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_EleHad_2011A_promptV4/demo_[1-4]*.root",
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_EleHad_2011A_promptV4/demo_[5-9]*.root",
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_EleHad_2011A_Aug05/demo_*.root",
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_EleHad_2011A_promptV6/demo_[1-2]*.root",
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_EleHad_2011A_promptV6/demo_[3-9]*.root",              
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_EleHad_2011B_promptV1/demo_[1-2]*.root", 
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_EleHad_2011B_promptV1/demo_[3-4]*.root", 
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_EleHad_2011B_promptV1/demo_[5-6]*.root", 
+#              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_EleHad_2011B_promptV1/demo_[7-9]*.root", 
+              ## data, double el (62-72), 11
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_DoubleEl_2011A_May10/demo_[1-3]*.root",               
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_DoubleEl_2011A_May10/demo_[4-9]*.root",                             
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_DoubleEl_2011A_promptV4/demo_[1-4]*.root", 
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_DoubleEl_2011A_promptV4/demo_[5-9]*.root",                             
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_DoubleEl_2011A_Aug05/demo_*.root",               
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_DoubleEl_2011A_promptV6/demo_[1-2]*.root",               
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_DoubleEl_2011A_promptV6/demo_[3-9]*.root",                             
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_DoubleEl_2011B_promptV1/demo_[1-2]*.root",    
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_DoubleEl_2011B_promptV1/demo_[3-4]*.root",                             
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_DoubleEl_2011B_promptV1/demo_[5-6]*.root",                             
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_DoubleEl_2011B_promptV1/demo_[7-9]*.root",                                           
+              ## data, single mu (73-78), 6
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleMu_2011A_May10/demo_[1-3]*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleMu_2011A_May10/demo_[4-9]*.root",              
               "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleMu_2011A_promptV4/demo_[1-4]*.root",
-              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleMu_2011A_promptV4/demo_[5-9]*.root"              
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleMu_2011A_promptV4/demo_[5-9]*.root",
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleMu_2011A_Aug05/demo_*.root", 
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleMu_2011A_promptV6/demo_[1-2]*.root",                             
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleMu_2011A_promptV6/demo_[3-9]*.root",                             
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleMu_2011B_promptV1/demo_[1-2]*.root",                
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleMu_2011B_promptV1/demo_[3-4]*.root",              
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleMu_2011B_promptV1/demo_[5-6]*.root",              
+              "/eos/uscms/store/user/smpjs/kalanand/tlbsm_v10_FallV2/dat_ch_SingleMu_2011B_promptV1/demo_[7-9]*.root"                            
               ]
 onames     = [
-              odir+"/WW.root",
-              odir+"/WZ.root",
-              odir+"/ZZ.root",
+              odir+"/WW.root",odir+"/WZ.root",odir+"/ZZ.root",
+#              #
+#              odir+"/WJets_1.root",odir+"/WJets_2.root",odir+"/WJets_3.root",odir+"/WJets_4.root",
+#              odir+"/WJets_5.root",odir+"/WJets_6.root",odir+"/WJets_7.root",odir+"/WJets_8.root",
               #
-              odir+"/WJets_1.root",
-              odir+"/WJets_2.root",
-              odir+"/WJets_3.root",
-              odir+"/WJets_4.root",
-              odir+"/WJets_5.root",
-              odir+"/WJets_6.root",
-              odir+"/WJets_7.root",
-              odir+"/WJets_8.root",
+              odir+"/WJets_boostedMadGraph_1.root",odir+"/WJets_boostedMadGraph_2.root",odir+"/WJets_boostedMadGraph_3.root",odir+"/WJets_boostedMadGraph_4.root",
               #
-              odir+"/TTbar_1.root",
-              odir+"/TTbar_2.root",
-              odir+"/TTbar_3.root",
-              odir+"/TTbar_4.root",
-              odir+"/TTbar_5.root",
-              odir+"/TTbar_6.root",
-              odir+"/TTbar_7.root",
-              odir+"/TTbar_8.root",
-              odir+"/TTbar_9.root",
-              odir+"/TTbar_10.root",
-              odir+"/TTbar_11.root",
-              odir+"/TTbar_12.root",
+              odir+"/WJets_boostedHerwig_1.root",odir+"/WJets_boostedHerwig_2.root",odir+"/WJets_boostedHerwig_3.root",odir+"/WJets_boostedHerwig_4.root",
+              odir+"/WJets_boostedHerwig_5.root",odir+"/WJets_boostedHerwig_6.root",odir+"/WJets_boostedHerwig_7.root",odir+"/WJets_boostedHerwig_8.root",
+              odir+"/WJets_boostedHerwig_9.root",
               #
-              odir+"/dat_SingleEl_2011A_promptV4_1.root",
-              odir+"/dat_SingleEl_2011A_promptV4_2.root",             
+              odir+"/ZJets_boostedMadGraph_1.root",odir+"/ZJets_boostedMadGraph_2.root",odir+"/ZJets_boostedMadGraph_3.root",odir+"/ZJets_boostedMadGraph_4.root",
+              odir+"/ZJets_boostedHerwig_1.root",odir+"/ZJets_boostedHerwig_2.root",odir+"/ZJets_boostedHerwig_3.root",odir+"/ZJets_boostedHerwig_4.root",              
               #
+              odir+"/TTbar_1.root",odir+"/TTbar_2.root",odir+"/TTbar_3.root",odir+"/TTbar_4.root",
+              odir+"/TTbar_5.root",odir+"/TTbar_6.root",odir+"/TTbar_7.root",odir+"/TTbar_8.root",
+              odir+"/TTbar_9.root",odir+"/TTbar_10.root",odir+"/TTbar_11.root",odir+"/TTbar_12.root",
+              #
+              odir+"/singleT_s.root",odir+"/singleT_t.root",odir+"/singleT_dr.root",odir+"/singleT_ds.root",
+              odir+"/singleTbar_s.root",odir+"/singleTbar_t.root",odir+"/singleTbar_dr.root",odir+"/singleTbar_ds.root",
+              #
+              #
+              #
+#              odir+"/dat_SingleEl_2011A_May10_1.root",
+#              odir+"/dat_SingleEl_2011A_May10_2.root",             
+#              odir+"/dat_EleHad_2011A_promptV4_1.root",                           
+#              odir+"/dat_EleHad_2011A_promptV4_2.root",                  
+#              odir+"/dat_EleHad_2011A_Aug05_1.root",                  
+#              odir+"/dat_EleHad_2011A_promptV6_1.root",                                
+#              odir+"/dat_EleHad_2011A_promptV6_2.root",
+#              odir+"/dat_EleHad_2011B_promptV1_1.root",              
+#              odir+"/dat_EleHad_2011B_promptV1_2.root",              
+#              odir+"/dat_EleHad_2011B_promptV1_3.root",              
+#              odir+"/dat_EleHad_2011B_promptV1_4.root",                            
+              #
+              odir+"/dat_DoubleEl_2011A_May10_1.root",
+              odir+"/dat_DoubleEl_2011A_May10_2.root",             
+              odir+"/dat_DoubleEl_2011A_promptV4_1.root",                           
+              odir+"/dat_DoubleEl_2011A_promptV4_2.root",                  
+              odir+"/dat_DoubleEl_2011A_Aug05_1.root",                  
+              odir+"/dat_DoubleEl_2011A_promptV6_1.root",                                
+              odir+"/dat_DoubleEl_2011A_promptV6_2.root",
+              odir+"/dat_DoubleEl_2011B_promptV1_1.root",              
+              odir+"/dat_DoubleEl_2011B_promptV1_2.root",              
+              odir+"/dat_DoubleEl_2011B_promptV1_3.root",              
+              odir+"/dat_DoubleEl_2011B_promptV1_4.root",                            
+              #
+              odir+"/dat_SingleMu_2011A_May10_1.root",
+              odir+"/dat_SingleMu_2011A_May10_2.root",             
               odir+"/dat_SingleMu_2011A_promptV4_1.root",
-              odir+"/dat_SingleMu_2011A_promptV4_2.root"              
-             ] 
+              odir+"/dat_SingleMu_2011A_promptV4_2.root",
+              odir+"/dat_SingleMu_2011A_Aug05_1.root",
+              odir+"/dat_SingleMu_2011A_promptV6_1.root",
+              odir+"/dat_SingleMu_2011A_promptV6_2.root",              
+              odir+"/dat_SingleMu_2011B_promptV1_1.root",
+              odir+"/dat_SingleMu_2011B_promptV1_2.root",
+              odir+"/dat_SingleMu_2011B_promptV1_3.root",
+              odir+"/dat_SingleMu_2011B_promptV1_4.root"              
+              ] 
 
 hnames     = [
-              odir+"/hWW",
-              odir+"/hWZ",
-              odir+"/hZZ",
-              
-              odir+"/hWJets_1",
-              odir+"/hWJets_2",
-              odir+"/hWJets_3",
-              odir+"/hWJets_4",
-              odir+"/hWJets_5",
-              odir+"/hWJets_6",
-              odir+"/hWJets_7",
-              odir+"/hWJets_8",
-
-              odir+"/hTTbar_1",
-              odir+"/hTTbar_2",
-              odir+"/hTTbar_3",
-              odir+"/hTTbar_4",
-              odir+"/hTTbar_5",
-              odir+"/hTTbar_6",
-              odir+"/hTTbar_7",
-              odir+"/hTTbar_8",
-              odir+"/hTTbar_9",
-              odir+"/hTTbar_10",
-              odir+"/hTTbar_11",
-              odir+"/hTTbar_12",
-
-              odir+"/h_SingleEl_2011A_promptV4_1",  
-              odir+"/h_SingleEl_2011A_promptV4_2",  
-
-              odir+"/h_SingleMu_2011A_promptV4_1",  
-              odir+"/h_SingleMu_2011A_promptV4_2"  
+              odir+"/hWW",odir+"/hWZ",odir+"/hZZ",
+#              # W jets
+#              odir+"/hWJets_1",odir+"/hWJets_2",odir+"/hWJets_3",odir+"/hWJets_4",
+#              odir+"/hWJets_5",odir+"/hWJets_6",odir+"/hWJets_7",odir+"/hWJets_8",
+              # W jets, boosted madgraph
+              odir+"/hWJets_boostedMadGraph_1",odir+"/hWJets_boostedMadGraph_2",odir+"/hWJets_boostedMadGraph_3",odir+"/hWJets_boostedMadGraph_4",
+              # W jets, boosted herwig
+              odir+"/hWJets_boostedHerwig_1",odir+"/hWJets_boostedHerwig_2",odir+"/hWJets_boostedHerwig_3",odir+"/hWJets_boostedHerwig_4",
+              odir+"/hWJets_boostedHerwig_5",odir+"/hWJets_boostedHerwig_6",odir+"/hWJets_boostedHerwig_7",odir+"/hWJets_boostedHerwig_8",
+              odir+"/hWJets_boostedHerwig_9",
+              # Z jets, boosted madgraph
+              odir+"/hZJets_boostedMadGraph_1",odir+"/hZJets_boostedMadGraph_2",odir+"/hZJets_boostedMadGraph_3",odir+"/hZJets_boostedMadGraph_4",
+              # Z jets, boosted herwig
+              odir+"/hZJets_boostedHerwig_1",odir+"/hZJets_boostedHerwig_2",odir+"/hZJets_boostedHerwig_3",odir+"/hZJets_boostedHerwig_4",
+              #
+              odir+"/hTTbar_1",odir+"/hTTbar_2",odir+"/hTTbar_3",odir+"/hTTbar_4",
+              odir+"/hTTbar_5",odir+"/hTTbar_6",odir+"/hTTbar_7",odir+"/hTTbar_8",
+              odir+"/hTTbar_9",odir+"/hTTbar_10",odir+"/hTTbar_11",odir+"/hTTbar_12",
+              #
+              odir+"/hsingleT_s",odir+"/hsingleT_t",odir+"/hsingleT_dr",odir+"/hsingleT_ds",
+              odir+"/hsingleTbar_s",odir+"/hsingleTbar_t",odir+"/hsingleTbar_dr",odir+"/hsingleTbar_ds",
+              #
+              #
+              #
+#              odir+"/hSingleEl_2011A_May10_1",
+#              odir+"/hSingleEl_2011A_May10_2",             
+#              odir+"/hEleHad_2011A_promptV4_1",                           
+#              odir+"/hEleHad_2011A_promptV4_2",                  
+#              odir+"/hEleHad_2011A_Aug05_1",                  
+#              odir+"/hEleHad_2011A_promptV6_1",                                
+#              odir+"/hEleHad_2011A_promptV6_2",
+#              odir+"/hEleHad_2011B_promptV1_1",              
+#              odir+"/hEleHad_2011B_promptV1_2",              
+#              odir+"/hEleHad_2011B_promptV1_3",              
+#              odir+"/hEleHad_2011B_promptV1_4",                            
+              #
+              odir+"/hDoubleEl_2011A_May10_1",
+              odir+"/hDoubleEl_2011A_May10_2",             
+              odir+"/hDoubleEl_2011A_promptV4_1",                           
+              odir+"/hDoubleEl_2011A_promptV4_2",                  
+              odir+"/hDoubleEl_2011A_Aug05_1",                  
+              odir+"/hDoubleEl_2011A_promptV6_1",                                
+              odir+"/hDoubleEl_2011A_promptV6_2",
+              odir+"/hDoubleEl_2011B_promptV1_1",              
+              odir+"/hDoubleEl_2011B_promptV1_2",              
+              odir+"/hDoubleEl_2011B_promptV1_3",              
+              odir+"/hDoubleEl_2011B_promptV1_4",                            
+              #
+              odir+"/hSingleMu_2011A_May10_1",
+              odir+"/hSingleMu_2011A_May10_2",             
+              odir+"/hSingleMu_2011A_promptV4_1",
+              odir+"/hSingleMu_2011A_promptV4_2",             
+              odir+"/hSingleMu_2011A_Aug05_1",
+              odir+"/hSingleMu_2011A_promptV6_1",
+              odir+"/hSingleMu_2011A_promptV6_2",             
+              odir+"/hSingleMu_2011B_promptV1_1",
+              odir+"/hSingleMu_2011B_promptV1_2",
+              odir+"/hSingleMu_2011B_promptV1_3",
+              odir+"/hSingleMu_2011B_promptV1_4"              
 
               ] 
 hnamesAll  =  odir+"/hAllMC"
@@ -149,24 +277,56 @@ hnamesDat  =  odir+"/hDat"
 
 isData = [
           0,0,0,
-          0,0,0,0,0,0,0,0,
+#          0,0,0,0,0,0,0,0,
+          0,0,0,0,
+          0,0,0,0,0,0,0,0,0,
+          0,0,0,0,
+          0,0,0,0,
           0,0,0,0,0,0,0,0,0,0,0,0,
-          1,1,
-          1,1
+          0,0,0,0,0,0,0,0,
+          #
+          ##1,1,1,1,1,1,1,1,1,1,1,
+          1,1,1,1,1,1,1,1,1,1,1,
+          1,1,1,1,1,1,1,1,1,1,1
           ]
 
-LUMI = 1.
-sf_WW = LUMI*43000./4216917.
-sf_WZ = LUMI*43000./4259651.
-sf_ZZ = LUMI*43000./4173452.
+dummylist = [0,0,0]
+print "ndummy: ",len(dummylist)
+print "number of entries: ",len(isData)
+
+LUMI = 4.980
+sf_WW = LUMI*47000./4216917.
+sf_WZ = LUMI*18600./4259651.
+sf_ZZ = LUMI*6400./4173452.
 sf_Wjets = LUMI*31300000./80978873
+sf_Wjets_bMG = LUMI*251800/8070702
+sf_Wjets_bHW = LUMI*251800/21908218
+sf_Zjets_bMG = LUMI*33540/1134992
+sf_Zjets_bHW = LUMI*33540/2743732
 sf_ttbar = LUMI*163110./59281265
+sf_t_s = LUMI*1440/134808
+sf_t_t = LUMI*22650/1929272
+sf_t_dr = LUMI*7870/319742
+sf_t_ds = LUMI*7870/783022
+sf_tbar_s = LUMI*3190/250958
+sf_tbar_t = LUMI*41920/3760239
+sf_tbar_dr = LUMI*7870/804375
+sf_tbar_ds = LUMI*7870/771637
+
 scaleFactors = [
                 sf_WW,sf_WZ,sf_ZZ,
                 sf_Wjets,sf_Wjets,sf_Wjets,sf_Wjets,sf_Wjets,sf_Wjets,sf_Wjets,sf_Wjets,
+                sf_Wjets_bMG,sf_Wjets_bMG,sf_Wjets_bMG,sf_Wjets_bMG,
+                sf_Wjets_bHW,sf_Wjets_bHW,sf_Wjets_bHW,sf_Wjets_bHW,sf_Wjets_bHW,sf_Wjets_bHW,sf_Wjets_bHW,sf_Wjets_bHW,sf_Wjets_bHW,
+                sf_Zjets_bMG,sf_Zjets_bMG,sf_Zjets_bMG,sf_Zjets_bMG,
+                sf_Zjets_bHW,sf_Zjets_bHW,sf_Zjets_bHW,sf_Zjets_bHW,
                 sf_ttbar,sf_ttbar,sf_ttbar,sf_ttbar,sf_ttbar,sf_ttbar,sf_ttbar,sf_ttbar,sf_ttbar,sf_ttbar,sf_ttbar,sf_ttbar,
-                1.,1.,
-                1.,1.
+                sf_t_s,sf_t_t,sf_t_dr,sf_t_ds,
+                sf_tbar_s,sf_tbar_t,sf_tbar_dr,sf_tbar_ds,
+                #
+                1,1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1,1,1,1,1,1,
+                1,1,1,1,1,1                
                 ]
 
 ############################################################
@@ -179,15 +339,15 @@ if options.runAnalysis and options.runOnFile == -1:
 
 if options.runAnalysis and options.runOnFile >= 0:
     curint = options.runOnFile
-    processNtuples.processNtuples( dataset[curint], onames[curint], isData[curint] )
-
+    if not os.path.isfile(onames[curint]):    
+        processNtuples.processNtuples( dataset[curint], onames[curint], isData[curint] )
+    else:   
+        print "file already exists!"
 
 ############################################################
 ## B U I L D   H I S T O G R A M S
 
 import buildHistos
-chan = options.channelToBuild
-
 if options.makeHistos and options.runOnFile == -1:
     for i in range(len(dataset)):
         # build histos for all MC
@@ -242,9 +402,122 @@ if options.writePlots:
     from ROOT import setTDRStyle
     ROOT.setTDRStyle()
     
+    #gROOT.ProcessLine('.L myutils.C++')
+
+    #### -------------------------------------------------------
     # do the hadd-ing here....
+    # but have to be careful to mix the right samples together with W+jets and Z+jets 
+    # 2 different samples of "boosted" with W/Z herwig or madgraph
     
-    # run plotter
-    #plotter.plotter( hnamesAll, hnamesDat, "figs" )
-    #plotter.plotter1D( "ntuples_v5/hWW.root", "ntuples_v5/hWW.root", "figstest" )
-    plotter.plotter2D( "ntuples_v5/hWW.root", "ntuples_v5/hWW.root", "figstest" )
+    ## MC 
+    ## -------------------------
+    ## Diboson
+    haddCmd_DiBoson = "hadd "+odir+"/hDiboson_all_ch"+str(chan)+".root"
+    for x in range(len(hnames)):
+        if hnames[x].find("WW") >= 0 or hnames[x].find("WZ") >= 0 or hnames[x].find("ZZ") >= 0: 
+            haddCmd_DiBoson += (" "+hnames[x]+"_ch"+str(chan)+".root")
+    
+    ## Wjets, boosted Madgraph
+    haddCmd_Wjets_bMG = "hadd "+odir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root"
+    for x in range(len(hnames)):
+        if hnames[x].find("WJets_boostedMadGraph") >= 0: 
+            haddCmd_Wjets_bMG += (" "+hnames[x]+"_ch"+str(chan)+".root")
+    ## Wjets, boosted Herwig
+    haddCmd_Wjets_bHW = "hadd "+odir+"/hWjets_boostedHerwig_all_ch"+str(chan)+".root"
+    for x in range(len(hnames)):
+        if hnames[x].find("WJets_boostedHerwig") >= 0: 
+            haddCmd_Wjets_bHW += (" "+hnames[x]+"_ch"+str(chan)+".root")
+    
+    ## Zjets, boosted Madgraph
+    haddCmd_Zjets_bMG = "hadd "+odir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root"
+    for x in range(len(hnames)):
+        if hnames[x].find("ZJets_boostedMadGraph") >= 0: 
+            haddCmd_Zjets_bMG += (" "+hnames[x]+"_ch"+str(chan)+".root")
+    ## Zjets, boosted Herwig
+    haddCmd_Zjets_bHW = "hadd "+odir+"/hZjets_boostedHerwig_all_ch"+str(chan)+".root"
+    for x in range(len(hnames)):
+        if hnames[x].find("ZJets_boostedHerwig") >= 0: 
+            haddCmd_Zjets_bHW += (" "+hnames[x]+"_ch"+str(chan)+".root")
+
+    ## ttbar
+    haddCmd_ttbar = "hadd "+odir+"/hTTbar_all_ch"+str(chan)+".root"
+    for x in range(len(hnames)):
+        if hnames[x].find("TTbar") >= 0: 
+            haddCmd_ttbar += (" "+hnames[x]+"_ch"+str(chan)+".root")
+
+    ## single T
+    haddCmd_singleT = "hadd "+odir+"/singleT_all_ch"+str(chan)+".root"
+    for x in range(len(hnames)):
+        if hnames[x].find("singleT") >= 0: 
+            haddCmd_singleT += (" "+hnames[x]+"_ch"+str(chan)+".root")
+
+    ## Data 
+    ## -------------------------
+    ## SingleEl/EleHad
+    haddCmd_SingleEl = "hadd "+odir+"/dat_SingleEl_all_ch"+str(chan)+".root"
+    for x in range(len(hnames)):
+        if hnames[x].find("SingleEl") >= 0 or hnames[x].find("EleHad") >= 0 : 
+            haddCmd_SingleEl += (" "+hnames[x]+"_ch"+str(chan)+".root")
+    ## DoubleEl
+    haddCmd_DoubleEl = "hadd "+odir+"/dat_DoubleEl_all_ch"+str(chan)+".root"
+    for x in range(len(hnames)):
+        if hnames[x].find("DoubleEl") >= 0: 
+            haddCmd_DoubleEl += (" "+hnames[x]+"_ch"+str(chan)+".root")
+    ## SingleMu
+    haddCmd_SingleMu = "hadd "+odir+"/dat_SingleMu_all_ch"+str(chan)+".root"
+    for x in range(len(hnames)):
+        if hnames[x].find("SingleMu") >= 0: 
+            haddCmd_SingleMu += (" "+hnames[x]+"_ch"+str(chan)+".root")
+
+    if options.addFiles:
+        
+        print haddCmd_DiBoson
+        os.system( haddCmd_DiBoson )
+        print haddCmd_Wjets_bMG
+        os.system( haddCmd_Wjets_bMG )
+        os.system( haddCmd_Wjets_bHW )
+        os.system( haddCmd_Zjets_bMG )
+        os.system( haddCmd_Zjets_bHW )
+        os.system( haddCmd_ttbar )
+        os.system( haddCmd_singleT )
+
+        os.system( haddCmd_SingleEl )
+        os.system( haddCmd_DoubleEl )
+        os.system( haddCmd_SingleMu )
+
+        os.system( "hadd "+odir+"/hMC_all_MadGraph_ch"+str(chan)+".root "+odir+"/hDiboson_all_ch"+str(chan)+".root "+odir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root "+odir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root "+odir+"/hTTbar_all_ch"+str(chan)+".root "+odir+"/singleT_all_ch"+str(chan)+".root" )
+        os.system( "hadd "+odir+"/hMC_all_Herwig_ch"+str(chan)+".root "+odir+"/hDiboson_all_ch"+str(chan)+".root "+odir+"/hWjets_boostedHerwig_all_ch"+str(chan)+".root "+odir+"/hZjets_boostedHerwig_all_ch"+str(chan)+".root "+odir+"/hTTbar_all_ch"+str(chan)+".root "+odir+"/singleT_all_ch"+str(chan)+".root" )             
+
+#    #### -------------------------------------------------------
+    stacklist_MadGraph = []
+    stacklist_MadGraph.append(odir+"/hDiboson_all_ch"+str(chan)+".root")
+    stacklist_MadGraph.append(odir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root")
+    stacklist_MadGraph.append(odir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root")
+    stacklist_MadGraph.append(odir+"/hTTbar_all_ch"+str(chan)+".root")
+    stacklist_MadGraph.append(odir+"/singleT_all_ch"+str(chan)+".root")
+
+    stacklist_Herwig = []
+    stacklist_Herwig.append(odir+"/hDiboson_all_ch"+str(chan)+".root")
+    stacklist_Herwig.append(odir+"/hWjets_boostedHerwig_all_ch"+str(chan)+".root")
+    stacklist_Herwig.append(odir+"/hZjets_boostedHerwig_all_ch"+str(chan)+".root")
+    stacklist_Herwig.append(odir+"/hTTbar_all_ch"+str(chan)+".root")
+    stacklist_Herwig.append(odir+"/singleT_all_ch"+str(chan)+".root")
+
+    PD = ""
+    if chan == 1: PD = "SingleEl"
+    elif chan == 2 or chan == 4: PD = "SingleMu"
+    elif chan == 3: PD = "DoubleEl"
+    else: print "-------------> Not a valid channel!"
+
+    ####### for Wmunu and Zmumu
+    plotter.plotterStack( stacklist_MadGraph, odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/dat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
+    plotter.plotter1D( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/dat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+    plotter.plotter2D( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/dat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+    plotter.plotter2D_mass( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/dat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+
+    plotter.plotterStack( stacklist_Herwig, odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/dat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_hw", chan)
+    plotter.plotter1D( odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/dat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_hw" )
+    plotter.plotter2D( odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/dat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_hw" )
+    plotter.plotter2D_mass( odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/dat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_hw" )
+
+

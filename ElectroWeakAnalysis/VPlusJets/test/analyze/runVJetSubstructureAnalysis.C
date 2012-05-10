@@ -15,14 +15,18 @@ void runVJetSubstructureAnalysis(){
     
 	gStyle->SetPadLeftMargin(0.16);
     gSystem->Load("libFWCoreFWLite.so");
-    gSystem->Load("libPhysicsToolsUtilities.so");
-    gSystem->Load("libPhysicsToolsKinFitter.so");
-    gROOT->ProcessLine(".include ../../../..");
+    AutoLibraryLoader::enable();
+    
+    gSystem->Load("libCondFormatsJetMETObjects.so");
+    gSystem->Load("libFWCoreUtilities.so");
+    //gSystem->Load("libPhysicsToolsUtilities.so");
+    //gSystem->Load("libPhysicsToolsKinFitter.so");
+    //gROOT->ProcessLine(".include ../../../..");
     
     gROOT->ProcessLine(".L EffTableReader.cc+");
     gROOT->ProcessLine(".L EffTableLoader.cc+");
     
-    gROOT->ProcessLine(".L vJetSubstructureAnalysis.C+g");
+    gROOT->ProcessLine(".L vJetSubstructureAnalysis.C++");
     gROOT->ProcessLine(".L buildHistos.C+g");
 
     bool b_runAnalysis = true;
@@ -41,10 +45,12 @@ void runVJetSubstructureAnalysis(){
         
         ///*
         //vJetSubstructureAnalysis test_ww("/eos/uscms/store/user/smpjs/ntran/tlbsm_v10/nt_ww_vj/demo*.root","ntuples_v4/test_ww.root");
-        //test_ww.Loop(-1);
+        vJetSubstructureAnalysis test_ww("/eos/uscms/store/user/smpjs/ntran/tlbsm_v10_FallV1/ch_WWtoAnything/demo*.root","ntuples_v4/test_ww.root");
+        test_ww.Loop(100);
+
         
-        vJetSubstructureAnalysis test_wj("/eos/uscms/store/user/smpjs/ntran/tlbsm_v10/nt_wj_vj/demo*.root","ntuples_v4/test_wj_dummy.root");
-        test_wj.Loop(100000);
+        //vJetSubstructureAnalysis test_wj("/eos/uscms/store/user/smpjs/ntran/tlbsm_v10/nt_wj_vj/demo*.root","ntuples_v4/test_wj_dummy.root");
+        //test_wj.Loop(100000);
 
         //vJetSubstructureAnalysis test_tt("/eos/uscms/store/user/smpjs/kalanand/ttbar-Summer11/demo*.root","ntuples_v4/test_tt.root");
         //test_tt.Loop(-1);

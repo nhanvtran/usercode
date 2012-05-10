@@ -5,7 +5,15 @@ import subprocess
 ############################################################
 
 def processNtuples(dirname,oname,isData):
-    print  "setup has been done for inputs "+dirname+"\n"
+    print  "setup has been done for inputs "+dirname
+    print  "it will go into"+oname
+    print  "this is data, "+str(isData)
+    
+    ctr1 = 0
+    ctr2 = 0
+    ctr3 = 0
+    ctr4 = 0
+    
     # Import everything from ROOT
     import ROOT
     from glob import glob
@@ -110,15 +118,20 @@ def processNtuples(dirname,oname,isData):
     jecUnc = ROOT.JetCorrectionUncertainty( jecUncStr )
 
     # ---------- Set up Efficiency table
-    muIDEff = EffTableLoader(            fDir + "muonEffsRecoToIso_ScaleFactors.txt");
-    muHLTEff = EffTableLoader(           fDir + "muonEffsIsoToHLT_data_LP_LWA.txt");
-    eleIdEff = EffTableLoader(           fDir + "eleEffsRecoToWP80_ScaleFactors.txt");
-    eleRecoEff = EffTableLoader(         fDir + "eleEffsSCToReco_ScaleFactors.txt");
-    eleHLTEff = EffTableLoader(          fDir + "eleEffsSingleElectron.txt");
-    eleJ30Eff = EffTableLoader(          fDir + "FullyEfficient.txt");
-    eleJ25NoJ30Eff = EffTableLoader(     fDir + "FullyEfficient_Jet2NoJet1.txt");
-    eleMHTEff = EffTableLoader(          fDir + "FullyEfficient_MHT.txt");
-    eleWMtEff = EffTableLoader(          fDir + "WMt50TriggerEfficiency.txt");
+    muIDEff = EffTableLoader(            fDir + "muonEffsRecoToIso_ScaleFactors.txt")
+    muHLTEff = EffTableLoader(           fDir + "muonEffsIsoToHLT_data_LP_LWA.txt")
+    eleIdEff = EffTableLoader(           fDir + "eleEffsRecoToWP80_ScaleFactors.txt")
+    eleRecoEff = EffTableLoader(         fDir + "eleEffsSCToReco_ScaleFactors.txt")
+    eleHLTEff = EffTableLoader(          fDir + "eleEffsSingleElectron.txt")
+    eleJ30Eff = EffTableLoader(          fDir + "FullyEfficient.txt")
+    eleJ25NoJ30Eff = EffTableLoader(     fDir + "FullyEfficient_Jet2NoJet1.txt")
+    eleMHTEff = EffTableLoader(          fDir + "FullyEfficient_MHT.txt")
+    eleWMtEff = EffTableLoader(          fDir + "WMt50TriggerEfficiency.txt")
+
+    #eleIdEff_WP95 = EffTableLoader(      fDir + "eleEffsRecoToWP95_ScaleFactors.txt")
+    eleIdEff_WP95 = EffTableLoader(      fDir + "eleEffsRecoToWP95_ScaleFactors.txt")
+    #eleHLTEffZee95toEle17 = EffTableLoader(          fDir + "eleEffsHLTZee95toEle17.txt")    
+    eleHLTEffZee95toEle17 = EffTableLoader(          fDir + "eleEffsSCToReco_ScaleFactors.txt")    
     #################################################   
     
 
@@ -126,12 +139,18 @@ def processNtuples(dirname,oname,isData):
     ##### setting up the output tree
     # list of arrays
     # need an array for the pointer to make a tree
+    v_mass_ = array( 'f', [ 0. ] )
     v_mt_ = array( 'f', [ 0. ] )
     #v_mt_ = n.zeros( 1, dtype=float )
     v_pt_ = array( 'f', [ 0. ] )
     l_pt_ = array( 'f', [ 0. ] )
     l_eta_ = array( 'f', [ 0. ] )
-    l_phi_ = array( 'f', [ 0. ] )    
+    l_phi_ = array( 'f', [ 0. ] ) 
+    #### in the case of the Z, the "l" is always minus and the "lplus" is always plus
+    lplus_pt_ = array( 'f', [ 0. ] )
+    lplus_eta_ = array( 'f', [ 0. ] )
+    lplus_phi_ = array( 'f', [ 0. ] )    
+    #### in the case of the Z, the "l" is always minus and the "lplus" is always plus
     e_met_ = array( 'f', [ 0. ] )
     e_nvert_ = array( 'f', [ 0. ] )    
     e_effwt_ = array( 'f', [ 0. ] )  
@@ -158,10 +177,14 @@ def processNtuples(dirname,oname,isData):
         j_nJ_.append( array( 'f', [ 0. ] ) )
 
     to.Branch("v_mt", v_mt_ , "v_mt/F")
+    to.Branch("v_mass", v_mass_ , "v_mass/F")
     to.Branch("v_pt", v_pt_ , "v_pt/F")
     to.Branch("l_pt", l_pt_ , "l_pt/F")
     to.Branch("l_eta", l_eta_ , "l_eta/F")
     to.Branch("l_phi", l_phi_ , "l_phi/F")
+    to.Branch("lplus_pt", lplus_pt_ , "lplus_pt/F")
+    to.Branch("lplus_eta", lplus_eta_ , "lplus_eta/F")
+    to.Branch("lplus_phi", lplus_phi_ , "lplus_phi/F")
     to.Branch("e_met", e_met_ , "e_met/F")
     to.Branch("e_nvert", e_nvert_ , "e_nvert/F")
     to.Branch("j_ca8pr_m1", j_ca8pr_m1_ , "j_ca8pr_m1/F")
@@ -192,8 +215,11 @@ def processNtuples(dirname,oname,isData):
     #entries = 10
          
     ###for envent in chain:
+    passes2AK5 = 0
+    nopasses2AK5 = 0
     #$getattr(ws, "import")(...)
     for i in xrange(entries):
+    #for i in xrange(50000):        
         if i%10000 == 0:   
             print "Entry: " + str(i)
         chain.GetEntry( i )
@@ -218,7 +244,7 @@ def processNtuples(dirname,oname,isData):
         ###################################################################
         # S e l e c t i o n   f o r   t h e   W e n u   e v e n t s
         electroniso = (chain.Wel_electron_trackiso+chain.Wel_electron_hcaliso+chain.Wel_electron_ecaliso-chain.event_fastJetRho*3.141592653589*0.09)/chain.Wel_electron_pt
-        if chain.eventClass == 1 and chain.Wel_electron_isWP80 and chain.Wel_electron_pt > 35 and electroniso < 0.05 and chain.Wel_mt > 50 and chain.Wel_pt > 120 and chain.event_met_pfmet > 25: 
+        if chain.eventClass == 1 and chain.Wel_electron_isWP80 and chain.Wel_electron_pt > 35 and electroniso < 0.05 and chain.Wel_mt > 50 and chain.Wel_pt > 120 and chain.event_met_pfmet > 30: 
 
             passesAsClass1 = True
             e_class_[0] = 1
@@ -243,13 +269,19 @@ def processNtuples(dirname,oname,isData):
 
         ###################################################################
         ###################################################################
-        # S e l e c t i o n   f o r   t h e   W e n u   e v e n t s
+        # S e l e c t i o n   f o r   t h e   W m u n u   e v e n t s
         muoniso = (chain.Wmu_muon_trackiso+chain.Wmu_muon_hcaliso+chain.Wmu_muon_ecaliso-chain.event_fastJetRho*3.1415939*0.09)/chain.Wmu_muon_pt;
-        if chain.eventClass == 2 and muoniso < 0.1 and chain.Wmu_muon_d0bsp < 0.02 and chain.Wmu_muon_pt > 25 and abs(chain.Wmu_muon_eta) < 2.1 and chain.Wmu_mt > 50 and chain.Wmu_pt > 120  and chain.event_met_pfmet > 25: 
+    
+        if chain.eventClass == 2: ctr1 = ctr1 + 1
+        if muoniso < 0.1: ctr2 = ctr2 + 1    
+        if chain.Wmu_pt > 120: ctr3 = ctr3 + 1
+            
+        if chain.eventClass == 2 and muoniso < 0.1 and chain.Wmu_muon_d0bsp < 0.02 and chain.Wmu_muon_pt > 25 and abs(chain.Wmu_muon_eta) < 2.1 and chain.Wmu_muon_numberOfMatches > 0 and chain.Wmu_mt > 50 and chain.Wmu_pt > 120  and chain.event_met_pfmet > 30: 
 
             passesAsClass2 = True
             e_class_[0] = 2
-                
+            ctr4 = ctr4 + 1
+            
             v_mt_[0] = chain.Wmu_mt
             v_pt_[0] = chain.Wmu_pt
             l_pt_[0] = chain.Wmu_muon_pt
@@ -264,8 +296,91 @@ def processNtuples(dirname,oname,isData):
 
         ###################################################################
         ###################################################################
+        # S e l e c t i o n   f o r   t h e   Z e e   e v e n t s
+        eplus_iso = (chain.Zel_eplus_trackiso+chain.Zel_eplus_hcaliso+chain.Zel_eplus_ecaliso-chain.event_fastJetRho*3.141592653589*0.09)/chain.Zel_eplus_pt
+        eminus_iso = (chain.Zel_eminus_trackiso+chain.Zel_eminus_hcaliso+chain.Zel_eminus_ecaliso-chain.event_fastJetRho*3.141592653589*0.09)/chain.Zel_eminus_pt
+        eplusSel =  chain.Zel_eplus_pt > 20 and chain.Zel_eplus_isWP95
+        eminusSel = chain.Zel_eminus_pt > 20 and chain.Zel_eminus_isWP95
+        if chain.eventClass == 3 and eplusSel and eminusSel and chain.Zel_mass > 80 and chain.Zel_mass < 100 and chain.Zel_pt > 120: 
+            
+            passesAsClass3 = True
+            e_class_[0] = 3
+            
+            v_mass_[0] = chain.Zel_mass
+            v_pt_[0] = chain.Zel_pt
+            l_pt_[0] = chain.Zel_eminus_pt
+            l_eta_[0] = chain.Zel_eminus_eta    
+            l_phi_[0] = chain.Zel_eminus_phi    
+            lplus_pt_[0] = chain.Zel_eplus_pt
+            lplus_eta_[0] = chain.Zel_eplus_eta    
+            lplus_phi_[0] = chain.Zel_eplus_phi    
+            e_met_[0] = chain.event_met_pfmet
+            e_nvert_[0] = float(chain.event_nPV)
+            
+            # ------------------   
+            ## Zee efficiencies
+            #print str(l_pt_[0])+" and "+str(l_eta_[0])
+            eff_eleid = eleIdEff_WP95.GetEfficiency( l_pt_[0], l_eta_[0] )
+            eff_eleid2 = eleIdEff_WP95.GetEfficiency(lplus_pt_[0], lplus_eta_[0]) 
+            eff_elereco = eleRecoEff.GetEfficiency(l_pt_[0], l_eta_[0])
+            eff_elereco2 = eleRecoEff.GetEfficiency(lplus_pt_[0], lplus_eta_[0]) 
+            eff_elehlt = eleHLTEffZee95toEle17.GetEfficiency(l_pt_[0], l_eta_[0])
+            eff_elehlt2 = eleHLTEffZee95toEle17.GetEfficiency(lplus_pt_[0], lplus_eta_[0])
+            e_effwt_[0] = eff_eleid*eff_eleid2*eff_elereco*eff_elereco2*(1-(1-eff_elehlt)*(1-eff_elehlt2))
+                
+        ###################################################################
+        ###################################################################
+        # S e l e c t i o n   f o r   t h e   Z m m   e v e n t s
+        muonplus_iso = (chain.Zmu_muplus_trackiso+chain.Zmu_muplus_hcaliso+chain.Zmu_muplus_ecaliso-chain.event_fastJetRho*3.1415939*0.09)/chain.Zmu_muplus_pt;
+        muonminus_iso = (chain.Zmu_muminus_trackiso+chain.Zmu_muminus_hcaliso+chain.Zmu_muminus_ecaliso-chain.event_fastJetRho*3.1415939*0.09)/chain.Zmu_muminus_pt;
+        muonplusSel = muonplus_iso < 0.10 and chain.Zmu_muplus_pt and chain.Zmu_muplus_numberOfMatches > 0
+        muonminusSel = muonminus_iso < 0.10  and chain.Zmu_muminus_pt and chain.Zmu_muminus_numberOfMatches > 0
+        if chain.eventClass == 4 and muonplusSel and muonminusSel and chain.Zmu_mass > 80 and chain.Zmu_mass < 100 and chain.Zmu_pt > 120: 
+            
+            passesAsClass4 = True
+            e_class_[0] = 4
+            
+            v_mass_[0] = chain.Zmu_mass
+            v_pt_[0] = chain.Zmu_pt
+            l_pt_[0] = chain.Zmu_muminus_pt
+            l_eta_[0] = chain.Zmu_muminus_eta    
+            l_phi_[0] = chain.Zmu_muminus_phi    
+            lplus_pt_[0] = chain.Zmu_muplus_pt
+            lplus_eta_[0] = chain.Zmu_muplus_eta    
+            lplus_phi_[0] = chain.Zmu_muplus_phi    
+            e_met_[0] = chain.event_met_pfmet
+            e_nvert_[0] = float(chain.event_nPV)
+         
+            # ------------------   
+            ## Zmm efficiencies
+            eff_muid1 = muIDEff.GetEfficiency(chain.Zmu_muminus_pt, chain.Zmu_muminus_eta)
+            eff_muid2 = muIDEff.GetEfficiency(chain.Zmu_muplus_pt, chain.Zmu_muplus_eta)
+            eff_muhlt1 = muHLTEff.GetEfficiency(chain.Zmu_muminus_pt, chain.Zmu_muminus_eta)
+            eff_muhlt2 = muHLTEff.GetEfficiency(chain.Zmu_muplus_pt, chain.Zmu_muplus_eta)
+            e_effwt_[0] = eff_muid1*eff_muid2*(1.-(1-eff_muhlt1)*(1-eff_muhlt2))
+        
+        ###################################################################
+        ###################################################################
         # F i l l   j e t   i n f o r m a t i o n
         if passesAsClass1 == True or passesAsClass2 == True or passesAsClass3 == True or passesAsClass4 == True:
+            
+            #####################################
+            ##### a little test for david...
+#            if passesAsClass1 == True:
+#                #ca8_j1 = chain.GetLeaf("JetCA8PF_Pt").GetValue(0)
+#                #ca8_j2 = chain.GetLeaf("JetCA8PF_Pt").GetValue(1)            
+#                ca8_j1 = chain.GetLeaf("JetCA12FILTEREDPF_Pt").GetValue(0)
+#                ca8_j2 = chain.GetLeaf("JetCA12FILTEREDPF_Pt").GetValue(1)            
+#                ak5_j1 = chain.GetLeaf("JetAK5PF_Pt").GetValue(0)
+#                ak5_j2 = chain.GetLeaf("JetAK5PF_Pt").GetValue(1)
+#                if ca8_j1 > 125 and ca8_j2 < 25:
+#                    #print "ca8_j1: ",ca8_j1,", ca8_j2: ",ca8_j2
+#                    #print "ak5_j1: ",ak5_j1,", ak5_j2: ",ak5_j2            
+#                    if ak5_j1 > 25 and ak5_j2 > 25: 
+#                        passes2AK5 = passes2AK5+1
+#                    else:
+#                        nopasses2AK5 = nopasses2AK5+1
+            #####################################            
             
             j_ca8pr_m1_[0] = chain.GetLeaf("JetCA8PRUNEDPF_subJet1Mass").GetValue(0)
             j_ca8pr_m2_[0] = chain.GetLeaf("JetCA8PRUNEDPF_subJet2Mass").GetValue(0)
@@ -348,6 +463,10 @@ def processNtuples(dirname,oname,isData):
     fo.cd()
     to.Write()        
     fo.Close()
+
+    totalcounts = passes2AK5+nopasses2AK5
+    print "passes: ",passes2AK5,"/",totalcounts
+    print "ctr1 = ", ctr1,", ctr2 = ", ctr2,", ctr3 = ", ctr3,", ctr4 = ", ctr4
 
 ############################################################
 ############################################################
