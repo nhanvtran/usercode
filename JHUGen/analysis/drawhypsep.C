@@ -28,7 +28,12 @@ void drawsingle(int test, int var, int toy);
 void drawhypsep() {
   
   drawsingle(zeroplusVStwoplus, DPHIMT, pure);
-  
+  drawsingle(zeroplusVStwoplus, DPHI, pure);
+  drawsingle(zeroplusVStwoplus, MLL, pure);
+
+  drawsingle(zeroplusVSzerominus, DPHIMT, pure);
+  drawsingle(zeroplusVSzerominus, DPHI, pure);
+  drawsingle(zeroplusVSzerominus, MLL, pure);
 }
 
 void drawsingle(int test, int var, int toy) 
@@ -49,10 +54,10 @@ void drawsingle(int test, int var, int toy)
   TNtuple *hypTuple = (TNtuple*) file->Get("hypTuple");
   assert(hypTuple);
 
-  TH1F *S_H0 = new TH1F("S_H0", "S_H0", 20, -10, 10);
+  TH1F *S_H0 = new TH1F("S_H0", "S_H0", 40, -10, 10);
   hypTuple->Project("S_H0", "S_H0");
 
-  TH1F *S_H1 = new TH1F("S_H1", "S_H1", 20, -10, 10);
+  TH1F *S_H1 = new TH1F("S_H1", "S_H1", 40, -10, 10);
   hypTuple->Project("S_H1", "S_H1");
 
   TH1F *nSigPullH0 = new TH1F("nSigPullH0", "nSigPullH0", 40, -10, 10);
@@ -86,6 +91,9 @@ void drawsingle(int test, int var, int toy)
   S_H1->SetXTitle("2lnL_{1}/L_{2}");
   S_H0->SetYTitle("experiments");
   S_H1->SetYTitle("experiments");
+  float yMax_S = S_H0->GetMaximum();
+  yMax_S = yMax_S > S_H1->GetMaximum() ? yMax_S : S_H1->GetMaximum();
+
 
   TLegend *leg = new TLegend(0.6, 0.7, 0.85, 0.9);
   leg->SetFillColor(0);
@@ -99,6 +107,7 @@ void drawsingle(int test, int var, int toy)
   }
 
   TCanvas *c1 = new TCanvas();
+  S_H0->SetMaximum(yMax_S * 1.1);
   S_H0->Draw("histe");
   S_H1->Draw("samehiste");
   leg->Draw("same");
