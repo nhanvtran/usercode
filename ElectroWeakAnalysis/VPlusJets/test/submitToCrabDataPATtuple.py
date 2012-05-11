@@ -3,49 +3,61 @@ import string, re
 from time import gmtime, localtime, strftime
 
 dataset    = [ 
-              # Single Electrons done so far
-              ##"/SingleElectron/ntran-ttbsm_v10_SingleElectron_Run2011A-PromptReco-v4-2900f36c5423fd804f580f1efac6dc75/USER",
-              "/SingleElectron/dlopes-ttbsm_v10beta_Run2011A_May10ReReco-2900f36c5423fd804f580f1efac6dc75/USER",
-              "/ElectronHad/dlopes-ttbsm_v10beta_Run2011A_PromptV4-2900f36c5423fd804f580f1efac6dc75/USER",
-              "/ElectronHad/dlopes-ttbsm_v10beta_Run2011A_Aug05-2900f36c5423fd804f580f1efac6dc75/USER",
-              "/ElectronHad/dlopes-ttbsm_v10beta_Run2011A_PromptV6-2900f36c5423fd804f580f1efac6dc75/USER",
-              "/ElectronHad/dlopes-ttbsm_v10beta_Run2011B_PromptV1-2900f36c5423fd804f580f1efac6dc75/USER",
-              # Single Mu
-              "/SingleMu/ntran-ttbsm_v10_SingleMu_Run2011A-May10ReReco-v1-2900f36c5423fd804f580f1efac6dc75/USER",
-              "/SingleMu/ntran-ttbsm_v10_SingleMu_Run2011B-PromptReco-v1-2900f36c5423fd804f580f1efac6dc75/USER",
-              # Double Electron
-              "/DoubleElectron/dlopes-ttbsm_v10beta_Run2011A_May10ReReco-2900f36c5423fd804f580f1efac6dc75/USER",
-              "/DoubleElectron/dlopes-ttbsm_v10beta_Run2011A_PromptRecoV4-2900f36c5423fd804f580f1efac6dc75/USER",
-              "/DoubleElectron/dlopes-ttbsm_v10beta_Run2011A_Aug05ReReco-2900f36c5423fd804f580f1efac6dc75/USER",
-              "/DoubleElectron/dlopes-ttbsm_v10beta_Run2011A_PromptRecoV6-2900f36c5423fd804f580f1efac6dc75/USER",
-              "/DoubleElectron/dlopes-ttbsm_v10beta_Run2011B_PromptRecoV1-2900f36c5423fd804f580f1efac6dc75/USER"
+##               # Single Electrons done so far
+##               ##"/SingleElectron/ntran-ttbsm_v10_SingleElectron_Run2011A-PromptReco-v4-2900f36c5423fd804f580f1efac6dc75/USER",
+##               "/SingleElectron/dlopes-ttbsm_v10beta_Run2011A_May10ReReco-2900f36c5423fd804f580f1efac6dc75/USER",
+##               "/ElectronHad/dlopes-ttbsm_v10beta_Run2011A_PromptV4-2900f36c5423fd804f580f1efac6dc75/USER",
+##               "/ElectronHad/dlopes-ttbsm_v10beta_Run2011A_Aug05-2900f36c5423fd804f580f1efac6dc75/USER",
+##               "/ElectronHad/dlopes-ttbsm_v10beta_Run2011A_PromptV6-2900f36c5423fd804f580f1efac6dc75/USER",
+##               "/ElectronHad/dlopes-ttbsm_v10beta_Run2011B_PromptV1-2900f36c5423fd804f580f1efac6dc75/USER",
+##               # Single Mu
+## ##               "/SingleMu/ntran-ttbsm_v10_SingleMu_Run2011A-May10ReReco-v1-2900f36c5423fd804f580f1efac6dc75/USER",
+##               "/SingleMu/ntran-ttbsm_v10_SingleMu_Run2011B-PromptReco-v1-2900f36c5423fd804f580f1efac6dc75/USER",
+              
+              "/SingleMu/dlopes-ttbsm_v10beta_Run2011A_May10ReReco-2900f36c5423fd804f580f1efac6dc75/USER",
+              "/SingleMu/dlopes-ttbsm_v10beta_Run2011A_PromptV6-2900f36c5423fd804f580f1efac6dc75/USER",
+              "/SingleMu/dlopes-ttbsm_v10beta_Run2011A_Aug05ReReco-2900f36c5423fd804f580f1efac6dc75/USER",
+              
+##               # Double Electron
+##               "/DoubleElectron/dlopes-ttbsm_v10beta_Run2011A_May10ReReco-2900f36c5423fd804f580f1efac6dc75/USER",
+##               "/DoubleElectron/dlopes-ttbsm_v10beta_Run2011A_PromptRecoV4-2900f36c5423fd804f580f1efac6dc75/USER",
+##               "/DoubleElectron/dlopes-ttbsm_v10beta_Run2011A_Aug05ReReco-2900f36c5423fd804f580f1efac6dc75/USER",
+##               "/DoubleElectron/dlopes-ttbsm_v10beta_Run2011A_PromptRecoV6-2900f36c5423fd804f580f1efac6dc75/USER",
+##               "/DoubleElectron/dlopes-ttbsm_v10beta_Run2011B_PromptRecoV1-2900f36c5423fd804f580f1efac6dc75/USER"
               ]
 
 
 channels   = [
-              # Single Electrons done so far
-              "dat_ch_SingleEl_2011A_May10",
-              "dat_ch_EleHad_2011A_promptV4",
-              "dat_ch_EleHad_2011A_Aug05",
-              "dat_ch_EleHad_2011A_promptV6",
-              "dat_ch_EleHad_2011B_promptV1",              
-              # Single Mu
-              "dat_ch_SingleMu_2011A_promptV4",
-              "dat_ch_SingleMu_2011B_promptV1",              
-              # Double Electron
-              "dat_ch_DoubleEl_2011A_May10",
-              "dat_ch_DoubleEl_2011A_promptV4",
-              "dat_ch_DoubleEl_2011A_Aug05",
-              "dat_ch_DoubleEl_2011A_promptV6",
-              "dat_ch_DoubleEl_2011B_promptV1"
+##               # Single Electrons done so far
+##               "dat_ch_SingleEl_2011A_May10",
+##               "dat_ch_EleHad_2011A_promptV4",
+##               "dat_ch_EleHad_2011A_Aug05",
+##               "dat_ch_EleHad_2011A_promptV6",
+##               "dat_ch_EleHad_2011B_promptV1",              
+##               # Single Mu
+##  ##              "dat_ch_SingleMu_2011A_promptV4",
+##               "dat_ch_SingleMu_2011B_promptV1",
+
+              "dat_ch_SingleMu_2011A_May10",
+              "dat_ch_SingleMu_2011A_promptV6",
+              "dat_ch_SingleMu_2011A_Aug05",
+             
+##               # Double Electron
+##               "dat_ch_DoubleEl_2011A_May10",
+##               "dat_ch_DoubleEl_2011A_promptV4",
+##               "dat_ch_DoubleEl_2011A_Aug05",
+##               "dat_ch_DoubleEl_2011A_promptV6",
+##               "dat_ch_DoubleEl_2011B_promptV1"
               ]
 
-condor   = [
-            1,1,1,1,1,
-            1,1,1,1,1,
-            1,1
-            ]
+## condor   = [
+##             1,1,1,1,1,
+##             1,1,1,1,1,
+##             1,1
+##             ]
 
+## condor   = [1,1,1,1,1,1]
+condor   = [1,1,1]
 
 
 def changeCrabTemplateFile(index):

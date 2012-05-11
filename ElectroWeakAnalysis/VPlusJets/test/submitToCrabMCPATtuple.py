@@ -3,15 +3,15 @@ import string, re
 from time import gmtime, localtime, strftime
 
 dataset    = [ 
-              # diboson
-              "/WW_TuneZ2_7TeV_pythia6_tauola/kalanand-ttbsm_v10beta_WWtoAnything_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
-              "/WZ_TuneZ2_7TeV_pythia6_tauola/kalanand-ttbsm_v10beta_WZtoAnything_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
-              "/ZZ_TuneZ2_7TeV_pythia6_tauola/kalanand-ttbsm_v10beta_ZZtoAnything_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
-              # ttbar
-              "/TTJets_TuneZ2_7TeV-madgraph-tauola/kalanand-ttbsm_v10beta_TTJets_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
-              # W+jets
-              "/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola/ntran-ttbsm_v10_WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v1-a326ba49a16ab761c492392538b61378/USER",
-              "/WJetsToLNu_PtW-100_TuneZ2_7TeV-madgraph/dlopesttbsm_v10beta_WJetsToLNu_PtW-100_TuneZ2_7TeV-madgraph-a326ba49a16ab761c492392538b61378/USER",
+##               # diboson
+##               "/WW_TuneZ2_7TeV_pythia6_tauola/kalanand-ttbsm_v10beta_WWtoAnything_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+##               "/WZ_TuneZ2_7TeV_pythia6_tauola/kalanand-ttbsm_v10beta_WZtoAnything_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+##               "/ZZ_TuneZ2_7TeV_pythia6_tauola/kalanand-ttbsm_v10beta_ZZtoAnything_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+##               # ttbar
+##               "/TTJets_TuneZ2_7TeV-madgraph-tauola/kalanand-ttbsm_v10beta_TTJets_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
+##               # W+jets
+##               "/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola/ntran-ttbsm_v10_WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v1-a326ba49a16ab761c492392538b61378/USER",
+              "/WJetsToLNu_PtW-100_TuneZ2_7TeV-madgraph/dlopes-ttbsm_v10beta_WJetsToLNu_PtW-100_TuneZ2_7TeV-madgraph-a326ba49a16ab761c492392538b61378/USER",
               "/WJetsToLNu_Pt-100_7TeV-herwigpp/dlopes-ttbsm_v10beta_WJetsToLNu_Pt-100_7TeV-herwigpp-a326ba49a16ab761c492392538b61378/USER",
               # Z+jets
               "/DYJetsToLL_PtZ-100_TuneZ2_7TeV-madgraph-tauola/mulhearn-mulhearn-ttbsm_DYJetsToLL_PtZ-100_TuneZ2_7TeV-madgraph-tauola_Fall11-a326ba49a16ab761c492392538b61378/USER",
@@ -29,14 +29,14 @@ dataset    = [
 
 
 channels   = [
-##     "WJets",
-    "ch_WWtoAnything",    
-    "ch_WZtoAnything",    
-    "ch_ZZtoAnything",
+## ##     "WJets",
+##     "ch_WWtoAnything",    
+##     "ch_WZtoAnything",    
+##     "ch_ZZtoAnything",
     
-    "ch_TTbar",
+##     "ch_TTbar",
     
-    "ch_WJets_inclusive",
+##     "ch_WJets_inclusive",
     "ch_WJets_boostedMadGraph",
     "ch_WJets_boostedHerwig",
 
@@ -55,7 +55,7 @@ channels   = [
 ]
 
 condor   = [
-            1,1,1,1,1,
+##             1,1,1,1,1,
             1,1,1,1,1,
             1,1,1,1,1,
             1,1
