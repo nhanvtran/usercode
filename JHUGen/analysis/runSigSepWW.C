@@ -1,4 +1,21 @@
-void runSigSepWW(int higgsMass=125, double intLumi=20.0, int nToys = 1000, bool draw=false){
+#include "enums.h"
+
+runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw);
+
+void runSigSepWW() {
+  
+  int higgsMass=125;
+  double intLumi=20.0;
+  int nToys = 1000;
+  bool draw=false;
+  
+  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHI, pure, draw);
+  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLL, pure, draw);
+  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHIMT, pure, draw);
+  
+
+}
+void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw) {
     
     using namespace RooFit;
     
@@ -6,94 +23,133 @@ void runSigSepWW(int higgsMass=125, double intLumi=20.0, int nToys = 1000, bool 
     setTDRStyle();
     gStyle->SetPadLeftMargin(0.16);
     gROOT->ForceStyle();
-    
     gROOT->ProcessLine(".L statsFactory.cc+");
     
-    double lowMll(12.);
-    double highMll = higgsMass;
+    //
+    // set up test kind 
+    // 
+
+    TString testName = getTestName(test);
+    TString varName = getVarName(var);
+    TString toyName = getToyName(toy);
+    
+    std::cout << "Doing " << toyName << " studies on " << testName << " separation based on " << varName << "\n";
+
     double lowMt(0.);
     double highMt = higgsMass;
     double sigRate;
     double bkgRate;
     
     if(higgsMass==125){
-      sigRate = 26.;
-      bkgRate = 600.;
+      sigRate = 25.;
+      bkgRate = 250.;
     }else{
       cout << "HMMMM.... I don't know that mass point...BYE!" << endl;
       return;
     }
-         
-    RooRealVar* mll = new RooRealVar("mll","Dilepton Mass [GeV]",lowMll, highMll);
+    
+    RooRealVar* dphill = new RooRealVar("dphill","#Delta#phi(leptons) [degrees]", 0, TMath::Pi());
+    dphill->setBins(20);
     RooRealVar* mt  = new RooRealVar("mt","transverse higgs mass", lowMt, highMt);
-    RooArgSet* obs2d = new RooArgSet(*mll, *mt);
+    mt->setBins(20);
+    RooRealVar* mll  = new RooRealVar("mll","dilepton mass [GeV]", 12, 80.);
+    mll->setBins(17);
     
-    const char* cuts = Form("mll<%i&&mll>12&&mt<%i", higgsMass, higgsMass);
-    
-    // read 0+
-    TChain *tplus = new TChain("angles");
-    char sigFile[150];
-    sprintf(sigFile,"SMHiggsWW_%i_JHU.root",higgsMass);
-    tplus->Add(sigFile);
-    RooDataSet *zeroPlusData2d = new RooDataSet("sigData2d","sigData2d",tplus,*obs2d, cuts);
-    RooDataHist *zeroPlusHist = zeroPlusData2d->binnedClone();
-    RooHistPdf* zeroPlusPdf = new RooHistPdf("zeroPlusPdf", "zeroPlusPdf", *obs2d, *zeroPlusHist);
+    RooArgSet* obs;
 
-    // read 0-
-    TChain *tminus = new TChain("angles");
-    sprintf(sigFile,"PSHiggsWW_%i_JHU.root",higgsMass);
-    tminus->Add(sigFile);
-    RooDataSet *zeroMinusData2d = new RooDataSet("sigData2d","sigData2d",tminus,*obs2d, cuts);
-    RooDataHist *zeroMinusHist = zeroMinusData2d->binnedClone();
-    RooHistPdf* zeroMinusPdf = new RooHistPdf("zeroMinusPdf", "zeroMinusPdf", *obs2d, *zeroMinusHist);
+    if ( var == DPHI )
+      obs = new RooArgSet(*dphill) ;
+    
+    if ( var == MLL ) 
+      obs = new RooArgSet(*mll) ;
+    
+    if ( var == DPHIMT ) 
+      obs = new RooArgSet(*dphill, *mt) ;
+
+
+    // read signal hypothesis 1
+    TChain *tsigHyp1 = new TChain("angles");
+    if ( test & ( (1ll<<zeroplusVSzerominus) | (1ll<<zeroplusVStwoplus) ) ) 
+      tsigHyp1->Add(Form("datafiles/%i/SMHiggsWW_%i_JHU.root",higgsMass, higgsMass));
+    
+    RooDataSet *sigHyp1Data = new RooDataSet("sigHyp1Data","sigHyp1Data",tsigHyp1,*obs);
+    RooDataHist *sigHyp1Hist = sigHyp1Data->binnedClone(0);
+    RooHistPdf* sigHyp1Pdf = new RooHistPdf("sigHyp1Pdf", "sigHyp1Pdf", *obs, *sigHyp1Hist);
+    
+    // read signal hypothesis 2
+    TChain *tsigHyp2 = new TChain("angles");
+    if ( test & (1ll<<zeroplusVSzerominus) )
+      tsigHyp2->Add(Form("datafiles/%i/PSHiggsWW_%i_JHU.root",higgsMass, higgsMass));
+    if ( test & (1ll<<zeroplusVStwoplus) )
+      tsigHyp2->Add(Form("datafiles/%i/TWW_%i_JHU.root",higgsMass, higgsMass));
+    
+    RooDataSet *sigHyp2Data = new RooDataSet("sigHyp2Data","sigHyp2Data",tsigHyp2,*obs);
+    RooDataHist *sigHyp2Hist = sigHyp2Data->binnedClone(0);
+    RooHistPdf* sigHyp2Pdf = new RooHistPdf("sigHyp2Pdf", "sigHyp2Pdf", *obs, *sigHyp2Hist);
 
     // read background
     TChain *bkgTree = new TChain("angles");
-    bkgTree->Add("WW_madgraph_8TeV.root");
-    RooDataSet *bkgData2d = new RooDataSet("bkgData2d","bkgData2d",bkgTree,*obs2d, cuts);
-    RooDataHist *bkgHist = bkgData2d->binnedClone();
-    RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", *obs2d, *bkgHist);
-    
-    RooPlot* plot1 = mll->frame(20);
-    RooPlot* plot2 = mt->frame(20);
+    bkgTree->Add(Form("datafiles/%i/WW_madgraph_8TeV.root",higgsMass));
+    RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,*obs);
+    RooDataHist *bkgHist = bkgData->binnedClone(0);
+    RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", *obs, *bkgHist);
 
-    if(draw){
+
+    char statResults[25];
+    statsFactory *myHypothesisSeparation;
+    sprintf(statResults,"stat_%s_%s_%s.root",testName.Data(), toyName.Data(), varName.Data());
+    myHypothesisSeparation = new statsFactory(obs, sigHyp1Pdf, sigHyp2Pdf, statResults);
+    // running pure toys
+    myHypothesisSeparation->hypothesisSeparationWithBackground(sigRate*intLumi,sigRate*intLumi,nToys, bkgPdf,bkgRate*intLumi);
+    delete myHypothesisSeparation;
     
-      // plot 1
-      /*
-      zeroPlusData2d->plotOn(plot1,MarkerColor(kRed));
-      zeroPlusPdf->plotOn(plot1,LineColor(kRed), LineStyle(kDashed));
-      */
-      zeroMinusData2d->plotOn(plot1,MarkerColor(kBlue));
-      zeroMinusPdf->plotOn(plot1,LineColor(kBlue), LineStyle(kDashed));
-      /*
-      bkgData2d->plotOn(plot1,MarkerColor(kBlack));
+
+
+    // draw plots 
+    if(draw) {
+      RooPlot* plot1;
+      TString plot1Name;
+      TCanvas* c1 = new TCanvas("c1","c1",400,400); 
+      
+      if ( var == DPHIMT || var == DPHI) {
+	plot1 = dphill->frame();
+	plot1Name = Form("MELAproj_%s_%s_%s_dphi", testName.Data(), toyName.Data(), varName.Data());
+      }
+      if ( var == MLL ) {
+	plot1 = mll->frame();
+	plot1Name = Form("MELAproj_%s_%s_%s_mll", testName.Data(), toyName.Data(), varName.Data());
+      }
+      
+      bkgData->plotOn(plot1,MarkerColor(kBlack));
       bkgPdf->plotOn(plot1, LineColor(kBlack), LineStyle(kDashed));
-      zeroPlusData2d->plotOn(plot2,MarkerColor(kRed));
-      zeroPlusPdf->plotOn(plot2,LineColor(kRed), LineStyle(kDashed));
-      */
-      zeroMinusData2d->plotOn(plot2,MarkerColor(kBlue));
-      zeroMinusPdf->plotOn(plot2,LineColor(kBlue), LineStyle(kDashed));
-      /*
-      bkgData2d->plotOn(plot2,MarkerColor(kBlack));
-      bkgPdf->plotOn(plot2, LineColor(kBlack), LineStyle(kDashed));
-      */
-      TCanvas* fitCan = new TCanvas("fitCan","fitCan",400,400);
+      sigHyp1Data->plotOn(plot1,MarkerColor(kRed));
+      sigHyp1Pdf->plotOn(plot1,LineColor(kRed), LineStyle(kDashed));      
+      sigHyp2Data->plotOn(plot1,MarkerColor(kBlue));
+      sigHyp2Pdf->plotOn(plot1,LineColor(kBlue), LineStyle(kDashed));
+      
+      // draw...
       plot1->Draw();
-      fitCan->SaveAs(Form("plots/epsfiles/MELAproj2d_0plusVS0minus_125GeV_mll.eps"));
+      c1->SaveAs(Form("plots/epsfiles/%s.eps", plot1Name.Data()));
+      c1->SaveAs(Form("plots/pngfiles/%s.png", plot1Name.Data()));
 
-      fitCan->Clear();
-      plot2->Draw();
-      fitCan->SaveAs(Form("plots/epsfiles/MELAproj2d_0plusVS0minus_125GeV_mt.eps"));
+      
+      if ( var  == DPHIMT ) {
+	RooPlot* plot2 = mt->frame();
+	TString	plot2Name;
+	plot2Name = Form("MELAproj_%s_%s_%s_mt", testName.Data(), toyName.Data(), varName.Data());
+	bkgData->plotOn(plot2,MarkerColor(kBlack));
+	bkgPdf->plotOn(plot2, LineColor(kBlack), LineStyle(kDashed));
+	sigHyp1Data->plotOn(plot2,MarkerColor(kRed));
+	sigHyp1Pdf->plotOn(plot2,LineColor(kRed), LineStyle(kDashed));
+	sigHyp2Data->plotOn(plot2,MarkerColor(kBlue));
+	sigHyp2Pdf->plotOn(plot2,LineColor(kBlue), LineStyle(kDashed));
+	c1->Clear();
+	plot2->Draw();
+	c1->SaveAs(Form("plots/epsfiles/%s.eps", plot2Name.Data()));
+	c1->SaveAs(Form("plots/pngfiles/%s.png", plot2Name.Data()));
+      }
+
+      delete c1;
     }
 
-    char statResults2d[25];
-    sprintf(statResults2d,"stat_0plusVS0minus_%iGeV_pure_2d.root",higgsMass);
-    statsFactory *my2dHypothesisSeparation = new statsFactory(obs2d, zeroPlusPdf, zeroMinusPdf, statResults2d);
-    // running the embedded toys
-    // my2dHypothesisSeparation->hypothesisSeparationWithBackground(sigRate*intLumi,sigRate*intLumi,nToys, zeroPlusData2d, zeroMinusData2d, bkgPdf,bkgRate*intLumi, bkgData2d);
-    // running pure toys
-    my2dHypothesisSeparation->hypothesisSeparationWithBackground(sigRate*intLumi,sigRate*intLumi,nToys, bkgPdf,bkgRate*intLumi);
-    delete my2dHypothesisSeparation;
-    
 }
