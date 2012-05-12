@@ -3,8 +3,8 @@
 totalNumberOfFiles=66
 startval=0
 
-processNtuples="False"
-buildHistos="True"
+processNtuples="True"
+buildHistos="False"
 channel="4"
 
 if [ "$processNtuples" == "True" ]; then

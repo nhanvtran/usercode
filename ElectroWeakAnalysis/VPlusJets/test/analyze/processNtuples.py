@@ -79,7 +79,7 @@ def processNtuples(dirname,oname,isData):
     gROOT.ProcessLine(".include ../../../..")
     #gROOT.ProcessLine("#include <iostream>");
     #gROOT.ProcessLine('.L LumiReweightingStandAlone.h+')
-    gROOT.ProcessLine('.L puReweighter.C++')
+    gROOT.ProcessLine('.L puReweighter.C+')
     gROOT.ProcessLine('.L EffTableReader.cc+')
     gROOT.ProcessLine('.L EffTableLoader.cc+')
     from ROOT import EffTableReader, EffTableLoader   
@@ -241,7 +241,7 @@ def processNtuples(dirname,oname,isData):
         ###################################################################
         # S e l e c t i o n   f o r   t h e   W e n u   e v e n t s
         electroniso = (chain.Wel_electron_trackiso+chain.Wel_electron_hcaliso+chain.Wel_electron_ecaliso-chain.event_fastJetRho*3.141592653589*0.09)/chain.Wel_electron_pt
-        if chain.eventClass == 1 and chain.Wel_electron_isWP80 and chain.Wel_electron_pt > 35 and electroniso < 0.05 and chain.Wel_mt > 50 and chain.Wel_pt > 120 and chain.event_met_pfmet > 30: 
+        if chain.eventClass == 1 and chain.Wel_electron_isWP70Good and chain.Wel_electron_pt > 35 and electroniso < 0.05 and chain.Wel_mt > 50 and chain.Wel_pt > 120 and chain.event_met_pfmet > 30: 
 
             passesAsClass1 = True
             e_class_[0] = 1
@@ -268,12 +268,12 @@ def processNtuples(dirname,oname,isData):
         ###################################################################
         # S e l e c t i o n   f o r   t h e   W m u n u   e v e n t s
         muoniso = (chain.Wmu_muon_trackiso+chain.Wmu_muon_hcaliso+chain.Wmu_muon_ecaliso-chain.event_fastJetRho*3.1415939*0.09)/chain.Wmu_muon_pt;
+#        if chain.eventClass == 2: ctr1 = ctr1 + 1
+#        if muoniso < 0.1: ctr2 = ctr2 + 1    
+#        if chain.Wmu_pt > 120: ctr3 = ctr3 + 1
+        muonSel = muoniso < 0.10 and chain.Wmu_muon_pt > 25 and chain.Wmu_muon_numberOfMatches > 0 and chain.Wmu_muon_nchi2 < 10. and chain.Wmu_muon_pixelHits > 0 and chain.Wmu_muon_trackerHits > 10 and chain.Wmu_muon_muonHits > 0
     
-        if chain.eventClass == 2: ctr1 = ctr1 + 1
-        if muoniso < 0.1: ctr2 = ctr2 + 1    
-        if chain.Wmu_pt > 120: ctr3 = ctr3 + 1
-            
-        if chain.eventClass == 2 and muoniso < 0.1 and chain.Wmu_muon_d0bsp < 0.02 and chain.Wmu_muon_pt > 25 and abs(chain.Wmu_muon_eta) < 2.1 and chain.Wmu_muon_numberOfMatches > 0 and chain.Wmu_mt > 50 and chain.Wmu_pt > 120  and chain.event_met_pfmet > 30: 
+        if chain.eventClass == 2 and muonSel and abs(chain.Wmu_muon_eta) < 2.1 and chain.Wmu_mt > 50 and chain.Wmu_pt > 120  and chain.event_met_pfmet > 30: 
 
             passesAsClass2 = True
             e_class_[0] = 2
@@ -298,7 +298,7 @@ def processNtuples(dirname,oname,isData):
         eminus_iso = (chain.Zel_eminus_trackiso+chain.Zel_eminus_hcaliso+chain.Zel_eminus_ecaliso-chain.event_fastJetRho*3.141592653589*0.09)/chain.Zel_eminus_pt
         eplusSel =  chain.Zel_eplus_pt > 20 and chain.Zel_eplus_isWP95
         eminusSel = chain.Zel_eminus_pt > 20 and chain.Zel_eminus_isWP95
-        if chain.eventClass == 3 and eplusSel and eminusSel and chain.Zel_mass > 80 and chain.Zel_mass < 100 and chain.Zel_pt > 120: 
+        if chain.eventClass == 3 and eplusSel and eminusSel and chain.Zel_mass > 80 and chain.Zel_mass < 100 and chain.Zel_pt > 120 and chain.event_met_pfmet < 50: 
             
             passesAsClass3 = True
             e_class_[0] = 3
@@ -330,9 +330,9 @@ def processNtuples(dirname,oname,isData):
         # S e l e c t i o n   f o r   t h e   Z m m   e v e n t s
         muonplus_iso = (chain.Zmu_muplus_trackiso+chain.Zmu_muplus_hcaliso+chain.Zmu_muplus_ecaliso-chain.event_fastJetRho*3.1415939*0.09)/chain.Zmu_muplus_pt;
         muonminus_iso = (chain.Zmu_muminus_trackiso+chain.Zmu_muminus_hcaliso+chain.Zmu_muminus_ecaliso-chain.event_fastJetRho*3.1415939*0.09)/chain.Zmu_muminus_pt;
-        muonplusSel = muonplus_iso < 0.10 and chain.Zmu_muplus_pt and chain.Zmu_muplus_numberOfMatches > 0
-        muonminusSel = muonminus_iso < 0.10  and chain.Zmu_muminus_pt and chain.Zmu_muminus_numberOfMatches > 0
-        if chain.eventClass == 4 and muonplusSel and muonminusSel and chain.Zmu_mass > 80 and chain.Zmu_mass < 100 and chain.Zmu_pt > 120: 
+        muonplusSel = muonplus_iso < 0.10 and chain.Zmu_muplus_pt > 25 and chain.Zmu_muplus_numberOfMatches > 0 and chain.Zmu_muplus_nchi2 < 10. and chain.Zmu_muplus_pixelHits > 0 and chain.Zmu_muplus_trackerHits > 10 and chain.Zmu_muplus_muonHits > 0
+        muonminusSel = muonminus_iso < 0.10  and chain.Zmu_muminus_pt > 25 and chain.Zmu_muminus_numberOfMatches > 0 and chain.Zmu_muminus_nchi2 < 10. and chain.Zmu_muminus_pixelHits > 0 and chain.Zmu_muminus_trackerHits > 10 and chain.Zmu_muminus_muonHits > 0
+        if chain.eventClass == 4 and muonplusSel and muonminusSel and chain.Zmu_mass > 80 and chain.Zmu_mass < 100 and chain.Zmu_pt > 120 and chain.event_met_pfmet < 50: 
             
             passesAsClass4 = True
             e_class_[0] = 4
