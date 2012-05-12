@@ -123,6 +123,13 @@ namespace ewk {
     float mu1_hcaliso;
     float mu1_ecaliso;
     
+    float mu1_nchi2;
+    float mu1_pixelHits;
+    float mu1_trackerHits;
+    float mu1_muonHits;
+    int mu1_isGlobal;     
+    int mu1_isTracker;
+      
     float mu1d0bsp;
     float mu1dz000;
 
@@ -149,6 +156,13 @@ namespace ewk {
     float mu2_trackiso;
     float mu2_hcaliso;
     float mu2_ecaliso;
+      
+    float mu2_nchi2;
+    float mu2_pixelHits;
+    float mu2_trackerHits;
+    float mu2_muonHits;
+    int mu2_isGlobal;     
+    int mu2_isTracker;      
   };
 
 } //namespace
