@@ -70,7 +70,7 @@ def processNtuples(dirname,oname,isData):
     ROOT.gSystem.Load("libDataFormatsPatCandidates.so");
     ROOT.gSystem.Load("libFWCoreUtilities.so");
     ROOT.gSystem.Load("libCondFormatsJetMETObjects.so");    
-    #ROOT.gSystem.Load("libPhysicsToolsUtilities.so");
+    ROOT.gSystem.Load("libPhysicsToolsUtilities.so");
     ROOT.gSystem.Load("libPhysicsToolsKinFitter.so");
     gROOT.ProcessLine(".include ../../../..");
 
@@ -79,13 +79,10 @@ def processNtuples(dirname,oname,isData):
     gROOT.ProcessLine(".include ../../../..")
     #gROOT.ProcessLine("#include <iostream>");
     #gROOT.ProcessLine('.L LumiReweightingStandAlone.h+')
-    gROOT.ProcessLine('.L puReweighter.C+')
+    gROOT.ProcessLine('.L puReweighter.C++')
     gROOT.ProcessLine('.L EffTableReader.cc+')
     gROOT.ProcessLine('.L EffTableLoader.cc+')
     from ROOT import EffTableReader, EffTableLoader   
-
-
-    
     from ROOT import puReweighter
 
     #################################################
