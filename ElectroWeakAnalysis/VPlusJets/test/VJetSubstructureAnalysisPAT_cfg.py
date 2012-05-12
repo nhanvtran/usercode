@@ -112,7 +112,7 @@ process.VplusJetSubstructure = cms.EDAnalyzer("VplusJetSubstructureAnalysis",
 
                                               PatJetCollections = cms.vstring('goodPatJetsPFlow','goodPatJetsCA8PrunedPF','goodPatJetsCA8PF','goodPatJetsCA12FilteredPF','goodPatJetsCA12MassDropFilteredPF'),    
                                               LiteJetCollections = cms.vstring('ak5TrimmedLite','ak5FilteredLite','ak5PrunedLite','ak7Lite','ak7TrimmedLite','ak7FilteredLite','ak7PrunedLite','ak8Lite','ak8TrimmedLite','ak8FilteredLite','ak8PrunedLite'),    
-                                              GenJetCollections = cms.vstring('ak5GenJetsNoNu','ak7GenJetsNoNu','ak8GenJetsNoNu','ca8GenJetsNoNu','caPrunedGen','caFilteredGenJetsNoNu'),    
+                                              GenJetCollections = cms.vstring('ak5GenJetsNoNu','ak7GenJetsNoNu','ak8GenJetsNoNu','ca8GenJetsNoNu'),    
                                               
                                               srcElectrons  = cms.InputTag("selectedPatElectronsPFlow"), # matches VBoson src
                                               srcMet = cms.InputTag("patMETsPFlow"),
