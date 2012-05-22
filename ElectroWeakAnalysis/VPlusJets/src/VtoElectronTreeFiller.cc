@@ -249,6 +249,11 @@ void ewk::VtoElectronTreeFiller::fill(const edm::Event& iEvent, int vecBosonInde
         e1_dcot          = ele1->convDcot();
         e1_convradius    = ele1->convRadius();
         
+        //std::cout << "Iso vars: " << e1_trackiso << ", " << e1_ecaliso << ", " << e1_hcaliso << std::endl;
+        //std::cout << "e1_missingHits: " << e1_missingHits << ", e1_dist: " << e1_dist << ", e1_dcot: " << e1_dcot << std::endl;
+        //std::cout << "e1_DeltaPhiIn: " << e1_DeltaPhiIn << ", e1_DeltaEtaIn: " << e1_DeltaEtaIn << ", e1_HoverE: " << e1_HoverE << ", e1_SigmaIetaIeta: " << e1_SigmaIetaIeta << std::endl;
+        
+        
         if( ele1->isEB() ) {
             ise1WP95      = (e1_missingHits<=1) && (e1_trackiso/e1Et<0.15) && (e1_ecaliso/e1Et<2.0) 
             && (e1_hcaliso/e1Et<0.12) && (e1_SigmaIetaIeta<0.01) && (fabs(e1_DeltaPhiIn)<0.8) 
@@ -261,6 +266,11 @@ void ewk::VtoElectronTreeFiller::fill(const edm::Event& iEvent, int vecBosonInde
             && (e1_trackiso/e1Et<0.05) && (e1_ecaliso/e1Et<0.06) 
             && (e1_hcaliso/e1Et<0.03) && (e1_SigmaIetaIeta<0.01) && (fabs(e1_DeltaPhiIn)<0.03) 
             && (fabs(e1_DeltaEtaIn)<0.004) && (e1_HoverE<0.025);
+            
+            ise1WP70Good      = (e1_missingHits==0) && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02) 
+            && (e1_trackiso/e1Et<0.09) && (e1_ecaliso/e1Et<0.07) 
+            && (e1_hcaliso/e1Et<0.1) && (e1_SigmaIetaIeta<0.01) && (fabs(e1_DeltaPhiIn)<0.03) 
+            && (fabs(e1_DeltaEtaIn)<0.004) && (e1_HoverE<0.04);
         }
         if( ele1->isEE() ) {
             ise1WP95      = (e1_missingHits<=1) && (e1_trackiso/e1Et<0.08) && (e1_ecaliso/e1Et<0.06) 
@@ -274,6 +284,11 @@ void ewk::VtoElectronTreeFiller::fill(const edm::Event& iEvent, int vecBosonInde
             && (e1_trackiso/e1Et<0.025) && (e1_ecaliso/e1Et<0.025) 
             && (e1_hcaliso/e1Et<0.02) && (e1_SigmaIetaIeta<0.03) && (fabs(e1_DeltaPhiIn)<0.02) 
             && (fabs(e1_DeltaEtaIn)<0.005) && (e1_HoverE<0.025);
+            
+            ise1WP70Good      = (e1_missingHits==0)  && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02)  
+            && (e1_trackiso/e1Et<0.08) && (e1_ecaliso/e1Et<0.06) 
+            && (e1_hcaliso/e1Et<0.05) && (e1_SigmaIetaIeta<0.03) && (fabs(e1_DeltaPhiIn)<0.02) 
+            && (fabs(e1_DeltaEtaIn)<0.005) && (e1_HoverE<0.07);
         }
         
         // IP relative to beam spot  & dz relative to vertex
@@ -356,6 +371,11 @@ void ewk::VtoElectronTreeFiller::fill(const edm::Event& iEvent, int vecBosonInde
             && (e2_trackiso/e2Et<0.05) && (e2_ecaliso/e2Et<0.06) 
             && (e2_hcaliso/e2Et<0.03) && (e2_SigmaIetaIeta<0.01) && (fabs(e2_DeltaPhiIn)<0.03) 
             && (fabs(e2_DeltaEtaIn)<0.004) && (e2_HoverE<0.025);
+            
+            ise2WP70Good      = (e1_missingHits==0) && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02) 
+            && (e1_trackiso/e1Et<0.09) && (e1_ecaliso/e1Et<0.07) 
+            && (e1_hcaliso/e1Et<0.1) && (e1_SigmaIetaIeta<0.01) && (fabs(e1_DeltaPhiIn)<0.03) 
+            && (fabs(e1_DeltaEtaIn)<0.004) && (e1_HoverE<0.04);
         }
         if( ele2->isEE() ) {
             ise2WP95      = (e2_missingHits<=1) && (e2_trackiso/e2Et<0.08) && (e2_ecaliso/e2Et<0.06) 
@@ -369,6 +389,11 @@ void ewk::VtoElectronTreeFiller::fill(const edm::Event& iEvent, int vecBosonInde
             && (e2_trackiso/e2Et<0.025) && (e2_ecaliso/e2Et<0.025) 
             && (e2_hcaliso/e2Et<0.02) && (e2_SigmaIetaIeta<0.03) && (fabs(e2_DeltaPhiIn)<0.02) 
             && (fabs(e2_DeltaEtaIn)<0.005) && (e2_HoverE<0.025);
+            
+            ise2WP70Good      = (e1_missingHits==0)  && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02)  
+            && (e1_trackiso/e1Et<0.08) && (e1_ecaliso/e1Et<0.06) 
+            && (e1_hcaliso/e1Et<0.05) && (e1_SigmaIetaIeta<0.03) && (fabs(e1_DeltaPhiIn)<0.02) 
+            && (fabs(e1_DeltaEtaIn)<0.005) && (e1_HoverE<0.07);
         }
     } 
     
@@ -545,6 +570,8 @@ void ewk::VtoElectronTreeFiller::SetBranches()
     SetBranch( &ise1WP95,         lept1+"_isWP95" );
     SetBranch( &ise1WP80,         lept1+"_isWP80" );
     SetBranch( &ise1WP70,         lept1+"_isWP70" );
+    SetBranch( &ise1WP70Good,         lept1+"_isWP70Good" );
+
     
     
     ////////////////////////////////////////////////////////
@@ -602,6 +629,8 @@ void ewk::VtoElectronTreeFiller::SetBranches()
         SetBranch( &ise2WP95,         lept2+"_isWP95" );
         SetBranch( &ise2WP80,         lept2+"_isWP80" );
         SetBranch( &ise2WP70,         lept2+"_isWP70" );
+        SetBranch( &ise2WP70Good,         lept2+"_isWP70Good" );
+        
     }	  
 }
 /////////////////////////////////////////////////////////////////////////
@@ -631,9 +660,11 @@ void ewk::VtoElectronTreeFiller::init()
     ise1WP95          = false;
     ise1WP80          = false;
     ise1WP70          = false;
+    ise1WP70Good          = false;
     ise2WP95          = false;
     ise2WP80          = false;
     ise2WP70          = false;
+    ise2WP70Good          = false;    
     
     e1Classification   = -1; 
     e1Charge           = -10;

@@ -62,7 +62,7 @@ namespace ewk {
         /// To be called once per event to fill the values for jets
         void fill(const edm::Event &iEvent);
         
-        static const int NUM_JET_MAX = 8;
+        static const int NUM_JET_MAX = 9;
         
     protected:
         
@@ -204,9 +204,42 @@ namespace ewk {
         float PFqgLikelihood[NUM_JET_MAX];
         
         // added by Nhan
+        // index over number of jets
         int nJetDaughters[NUM_JET_MAX];
+
+        // for CA8 Pruned
+        // index over number of jets
         float subJet1Mass[NUM_JET_MAX];
         float subJet2Mass[NUM_JET_MAX];
+
+        // for CA12 Filtered
+        // index over number of SUBjets 
+        int sjNumJets; 
+        float sjEt[NUM_JET_MAX];
+        float sjPt[NUM_JET_MAX];
+        float sjEta[NUM_JET_MAX];
+        float sjPhi[NUM_JET_MAX];
+        float sjTheta[NUM_JET_MAX];
+        float sjE[NUM_JET_MAX];
+        float sjMass[NUM_JET_MAX];
+        float sjbDiscriminatorCSV[NUM_JET_MAX];
+
+//        float Jet1subjetMass[NUM_JET_MAX];
+//        float Jet1subjetPt[NUM_JET_MAX];
+//        float Jet1subjetPx[NUM_JET_MAX];
+//        float Jet1subjetPy[NUM_JET_MAX];
+//        float Jet1subjetPz[NUM_JET_MAX];
+//        float Jet1subjetE[NUM_JET_MAX];
+//        float Jet1subjetBtagCSV[NUM_JET_MAX];
+//
+//        
+//        float Jet2subjetMass[NUM_JET_MAX];
+//        float Jet2subjetPt[NUM_JET_MAX];
+//        float Jet2subjetPx[NUM_JET_MAX];
+//        float Jet2subjetPy[NUM_JET_MAX];
+//        float Jet2subjetPz[NUM_JET_MAX];
+//        float Jet2subjetE[NUM_JET_MAX];
+//        float Jet2subjetBtagCSV[NUM_JET_MAX];
         
         
     };
