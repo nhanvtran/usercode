@@ -143,14 +143,14 @@ void ewk::PATJetTreeFiller::SetBranchSingle( int* x, std::string name)
 
 void ewk::PATJetTreeFiller::SetBranch( float* x, std::string name)
 {
-    tree_->Branch( name.c_str(), x, ( name+"[8]/F").c_str() );
+    tree_->Branch( name.c_str(), x, ( name+"[9]/F").c_str() );
     bnames.push_back( name );
 }
 
 
 void ewk::PATJetTreeFiller::SetBranch( int* x, std::string name)
 {
-    tree_->Branch( name.c_str(), x, ( name+"[8]/I").c_str() );
+    tree_->Branch( name.c_str(), x, ( name+"[9]/I").c_str() );
     bnames.push_back( name );
 }
 
@@ -231,58 +231,48 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
             // algo specific
             if (jetCollTag_ == "CA8PRUNEDPF"){
                 subJet1Mass[iJet] = jet->daughter(0)->mass();
+								subJet1Pt[iJet] = jet->daughter(0)->pt();
+								subJet1Px[iJet] = jet->daughter(0)->px();
+								subJet1Py[iJet] = jet->daughter(0)->py();
+								subJet1Pz[iJet] = jet->daughter(0)->pz();
+								subJet1E[iJet] = jet->daughter(0)->energy();
                 subJet2Mass[iJet] = jet->daughter(1)->mass();
+								subJet2Pt[iJet] = jet->daughter(1)->pt();
+								subJet2Px[iJet] = jet->daughter(1)->px();
+								subJet2Py[iJet] = jet->daughter(1)->py();
+								subJet2Pz[iJet] = jet->daughter(1)->pz();
+								subJet2E[iJet] = jet->daughter(1)->energy();
             }
             if (jetCollTag_ == "CA12FILTEREDPF"){
 
                 edm::Handle<edm::View<reco::Jet> > subjets;
                 iEvent.getByLabel( "caFilteredPFlow","SubJets", subjets );
                 sjNumJets = subjets->size(); 
-                std::cout << "NumSubJets: " << sjNumJets << std::endl;
+//                std::cout << "NumSubJets: " << sjNumJets << std::endl;
 
 
                 edm::View<reco::Jet>::const_iterator subjet, endpjets = subjets->end(); 
                 size_t iSubJet = 0;
                 for (subjet = subjets->begin();  subjet != endpjets;  ++subjet, ++iSubJet) {
                     if( !(iSubJet< (unsigned int) NUM_JET_MAX) ) break;   
-                    sjEt[iJet] = subjet->et();
-                    sjPt[iJet] = subjet->pt();
-                    sjEta[iJet] = subjet->eta();
-                    sjPhi[iJet] = subjet->phi();
-                    sjTheta[iJet] = subjet->theta();
-                    sjE[iJet]  = subjet->energy();
-                    sjMass[iJet] = subjet->mass(); 
+                    sjEt[iSubJet] = subjet->et();
+                    sjPt[iSubJet] = subjet->pt();
+                    sjEta[iSubJet] = subjet->eta();
+                    sjPhi[iSubJet] = subjet->phi();
+                    sjTheta[iSubJet] = subjet->theta();
+                    sjE[iSubJet]  = subjet->energy();
+                    sjMass[iSubJet] = subjet->mass();
+// 										std::cout << "sjEta: " << iSubJet << ": " << sjEta[iSubJet] << std::endl;
 //                    sjbDiscriminatorCSV[iJet] = subjet->bDiscriminator("combinedSecondaryVertexBJetTags");
                 }
-							
-//                if (iJet == 0){
-//                    for (int kk = 0; kk < nJetDaughters[0]; kk++){
-//                        Jet1subjetMass[kk] = jet->daughter(kk)->mass();
-//                        Jet1subjetPt[kk] = jet->daughter(kk)->pt();
-//                        Jet1subjetPx[kk] = jet->daughter(kk)->pz();
-//                        Jet1subjetPy[kk] = jet->daughter(kk)->py();
-//                        Jet1subjetPz[kk] = jet->daughter(kk)->pz();
-//                        Jet1subjetE[kk] = jet->daughter(kk)->energy();
-//                        Jet1subjetBtagCSV[kk] = jet->daughter(kk)->bDiscriminator("combinedSecondaryVertexBJetTags");
-//                    }
-//                }
-//                if (iJet == 1){
-//                    for (int kk = 0; kk < nJetDaughters[0]; kk++){
-//                        Jet2subjetMass[kk] = jet->daughter(kk)->mass();
-//                        Jet2subjetPt[kk] = jet->daughter(kk)->pt();
-//                        Jet2subjetPx[kk] = jet->daughter(kk)->pz();
-//                        Jet2subjetPy[kk] = jet->daughter(kk)->py();
-//                        Jet2subjetPz[kk] = jet->daughter(kk)->pz();
-//                        Jet2subjetE[kk] = jet->daughter(kk)->energy();
-//                        Jet2subjetBtagCSV[kk] = jet->daughter(kk)->bDiscriminator("combinedSecondaryVertexBJetTags");
-//                    }
-//                }
-							
             }
         }
         
     }
     else if (jetCollType_ == "LiteJet"){
+        
+        bool isLiteGen = false;
+        if (jetCollTag_.find("GEN") > 0) isLiteGen = true;
         
         
         std::string px_s = jetCollName_ + "_px";        
@@ -297,15 +287,11 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
         edm::Handle< std::vector< float > > j_py;
         edm::Handle< std::vector< float > > j_pz;
         edm::Handle< std::vector< float > > j_e;
-        edm::Handle< std::vector< float > > j_area;
-        edm::Handle< std::vector< float > > j_jecFactor;
 
         iEvent.getByLabel( jetCollName_.c_str(), "px", j_px ); 
         iEvent.getByLabel( jetCollName_.c_str(), "py", j_py ); 
         iEvent.getByLabel( jetCollName_.c_str(), "pz", j_pz ); 
         iEvent.getByLabel( jetCollName_.c_str(), "energy", j_e ); 
-        iEvent.getByLabel( jetCollName_.c_str(), "jetArea", j_area ); 
-        iEvent.getByLabel( jetCollName_.c_str(), "jecFactor", j_jecFactor ); 
 
         NumJets = j_px->size(); 
 
@@ -314,10 +300,8 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
         std::vector< float >::const_iterator jit_py = j_py->begin();
         std::vector< float >::const_iterator jit_pz = j_pz->begin();
         std::vector< float >::const_iterator jit_e = j_e->begin();
-        std::vector< float >::const_iterator jit_area = j_area->begin();
-        std::vector< float >::const_iterator jit_jecFactor = j_jecFactor->begin();
 
-        for (jit_px = j_px->begin();  jit_px != endpjets;  ++jit_px, ++jit_py, ++jit_pz, ++jit_e, ++jit_area, ++jit_jecFactor, ++iJet) {
+        for (jit_px = j_px->begin();  jit_px != endpjets;  ++jit_px, ++jit_py, ++jit_pz, ++jit_e, ++iJet) {
             
             if( !(iJet< (unsigned int) NUM_JET_MAX) ) break;
             
@@ -334,11 +318,31 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
             E[iJet]  = curJet->E();
             Y[iJet]  = curJet->Rapidity();
             Mass[iJet] = curJet->M(); 
-            Area[iJet] = *jit_area;
-            JecFactor[iJet] = *jit_jecFactor;
             
             //std::cout << "p4: " << curJet->Px() << ", " << curJet->Py() << ", " << curJet->Pz() << ", " << curJet->E() << std::endl;
             
+        }
+        
+        if (!isLiteGen){
+            
+            edm::Handle< std::vector< float > > j_area;
+            edm::Handle< std::vector< float > > j_jecFactor;
+
+            iEvent.getByLabel( jetCollName_.c_str(), "jetArea", j_area ); 
+            iEvent.getByLabel( jetCollName_.c_str(), "jecFactor", j_jecFactor ); 
+
+            std::vector< float >::const_iterator jit_area = j_area->begin(), endpjetareas = j_area->end();
+            std::vector< float >::const_iterator jit_jecFactor = j_jecFactor->begin();
+
+            for (jit_area = j_area->begin();  jit_area != endpjetareas;  ++jit_area, ++jit_jecFactor, ++iJet) {
+                
+                if( !(iJet< (unsigned int) NUM_JET_MAX) ) break;
+                
+                Area[iJet] = *jit_area;
+                JecFactor[iJet] = *jit_jecFactor;
+                
+            }
+
         }
     }
     
@@ -414,7 +418,17 @@ void ewk::PATJetTreeFiller::SetBranches()
         
         if (jetCollTag_ == "CA8PRUNEDPF"){
             SetBranch( subJet1Mass, "Jet" + jetCollTag_ + "_subJet1Mass");
+						SetBranch( subJet1Pt, "Jet" + jetCollTag_ + "_subJet1Pt");
+						SetBranch( subJet1Px, "Jet" + jetCollTag_ + "_subJet1Px");
+						SetBranch( subJet1Py, "Jet" + jetCollTag_ + "_subJet1Py");
+						SetBranch( subJet1Pz, "Jet" + jetCollTag_ + "_subJet1Pz");
+						SetBranch( subJet1E, "Jet" + jetCollTag_ + "_subJet1E");
             SetBranch( subJet2Mass, "Jet" + jetCollTag_ + "_subJet2Mass");
+						SetBranch( subJet2Pt, "Jet" + jetCollTag_ + "_subJet2Pt");
+						SetBranch( subJet2Px, "Jet" + jetCollTag_ + "_subJet2Px");
+						SetBranch( subJet2Py, "Jet" + jetCollTag_ + "_subJet2Py");
+						SetBranch( subJet2Pz, "Jet" + jetCollTag_ + "_subJet2Pz");
+						SetBranch( subJet2E, "Jet" + jetCollTag_ + "_subJet2E");
         }
         if (jetCollTag_ == "CA12FILTEREDPF"){
             SetBranchSingle( &sjNumJets, "Jet" + jetCollTag_ + "_sjNumJets");
@@ -463,8 +477,18 @@ void ewk::PATJetTreeFiller::init()
         bDiscriminatorTCHP[j] = -1.0;
         
         subJet1Mass[j] = -1;
+				subJet1Pt[j] = -1;
+				subJet1Px[j] = -9999;
+				subJet1Py[j] = -9999;
+				subJet1Pz[j] = -9999;
+				subJet1E[j] = -1;
         subJet2Mass[j] = -1;
-
+				subJet2Pt[j] = -1;
+				subJet2Px[j] = -9999;
+				subJet2Py[j] = -9999;
+				subJet2Pz[j] = -9999;
+				subJet2E[j] = -1;
+				
         sjEt[j] = 0.;
         sjPt[j] = -1.;
         sjEta[j] = -10.;

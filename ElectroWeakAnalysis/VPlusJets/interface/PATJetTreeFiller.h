@@ -210,8 +210,18 @@ namespace ewk {
         // for CA8 Pruned
         // index over number of jets
         float subJet1Mass[NUM_JET_MAX];
+				float subJet1Pt[NUM_JET_MAX];
+				float subJet1Px[NUM_JET_MAX];
+				float subJet1Py[NUM_JET_MAX];
+				float subJet1Pz[NUM_JET_MAX];
+				float subJet1E[NUM_JET_MAX];
         float subJet2Mass[NUM_JET_MAX];
-
+				float subJet2Pt[NUM_JET_MAX];
+				float subJet2Px[NUM_JET_MAX];
+				float subJet2Py[NUM_JET_MAX];
+				float subJet2Pz[NUM_JET_MAX];
+				float subJet2E[NUM_JET_MAX];
+				
         // for CA12 Filtered
         // index over number of SUBjets 
         int sjNumJets; 
