@@ -1,14 +1,26 @@
 #!/bin/bash
 
-totalNumberOfFiles=66
-startval=0
+###### job steering
+RUN=0; if [[ "$1" == "-r" ]]; then RUN=1; shift; fi;
+PLOT=0; CHAN=0; if [[ "$1" == "-m" ]]; then PLOT=1; CHAN="$2"; shift; shift; fi;
 
-processNtuples="True"
-buildHistos="False"
-channel="4"
+echo $RUN, $PLOT, $CHAN
 
-if [ "$processNtuples" == "True" ]; then
+#totalNumberOfFiles=96
+#startval=0
+totalNumberOfFiles=15
+startval=11
+
+processNtuples=$RUN
+buildHistos=$PLOT
+channel=$CHAN
+
+echo $processNtuples, $buildHistos, $channel
+
+
+if [ $processNtuples == 1 ]; then
     c=$startval
+    echo "Processing Ntuples..."
     while ((c < ${totalNumberOfFiles}))
     do      
         options="-b -r -n $c"
@@ -23,8 +35,9 @@ if [ "$processNtuples" == "True" ]; then
     done
 fi
 
-if [ "$buildHistos" == "True" ]; then
+if [ $buildHistos == 1 ]; then
     c=$startval
+    echo "Building histograms ... channel $CHAN ..."
     while ((c < ${totalNumberOfFiles}))
     do          
         options="-b -m -n $c -c $channel"
