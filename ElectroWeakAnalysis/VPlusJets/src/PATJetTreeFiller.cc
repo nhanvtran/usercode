@@ -243,7 +243,7 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
 								subJet2Pz[iJet] = jet->daughter(1)->pz();
 								subJet2E[iJet] = jet->daughter(1)->energy();
             }
-            if (jetCollTag_ == "CA12FILTEREDPF"){
+             if (jetCollTag_ == "CA12FILTEREDPF"){
 
                 edm::Handle<edm::View<reco::Jet> > subjets;
                 iEvent.getByLabel( "caFilteredPFlow","SubJets", subjets );
@@ -272,9 +272,13 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
     else if (jetCollType_ == "LiteJet"){
         
         bool isLiteGen = false;
-        if (jetCollTag_.find("GEN") > 0) isLiteGen = true;
+
+				//std::cout << "00----jetCollTag_: " << jetCollTag_ << ", isGEN? " << isLiteGen << std::endl;
+				// weird behavior for rfind...if not there, it's a really big number...
+        if ((jetCollTag_.rfind("GEN") > 0)&&(jetCollTag_.rfind("GEN") < 100)) isLiteGen = true;
         
-        
+				//std::cout << "jetCollTag_: " << jetCollTag_ << ", isGEN? " << isLiteGen << ", " << jetCollTag_.rfind("GEN") << std::endl;
+				
         std::string px_s = jetCollName_ + "_px";        
         std::string py_s = jetCollName_ + "_py";
         std::string pz_s = jetCollName_ + "_pz";
@@ -324,7 +328,9 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
         }
         
         if (!isLiteGen){
-            
+
+					//std::cout << "In this loop~!!!!!" << std::endl;
+					
             edm::Handle< std::vector< float > > j_area;
             edm::Handle< std::vector< float > > j_jecFactor;
 
@@ -334,12 +340,14 @@ void ewk::PATJetTreeFiller::fill(const edm::Event& iEvent)
             std::vector< float >::const_iterator jit_area = j_area->begin(), endpjetareas = j_area->end();
             std::vector< float >::const_iterator jit_jecFactor = j_jecFactor->begin();
 
+						iJet = 0;
             for (jit_area = j_area->begin();  jit_area != endpjetareas;  ++jit_area, ++jit_jecFactor, ++iJet) {
                 
                 if( !(iJet< (unsigned int) NUM_JET_MAX) ) break;
                 
                 Area[iJet] = *jit_area;
                 JecFactor[iJet] = *jit_jecFactor;
+								//std::cout << "JecFactor: " << JecFactor[iJet] << std::endl;
                 
             }
 
