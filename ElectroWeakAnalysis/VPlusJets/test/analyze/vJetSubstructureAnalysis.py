@@ -42,7 +42,7 @@ parser.add_option('-a', '--addFiles', action='store_true', dest='addFiles', defa
 
 argv = []
 
-odir = "ntuples_v21_histos"
+odir = "ntuples_v1"
 #odir = "ntuples_v21"
 chan = options.channelToBuild
 

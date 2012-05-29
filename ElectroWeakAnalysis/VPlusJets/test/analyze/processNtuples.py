@@ -47,6 +47,7 @@ def processNtuples(dirname,oname,isData):
         "ca8":12,"ca8pr":13,"ca12ft":14,"ca12mdft":15,
         "ak5g":16,"ak7g":17,"ak8g":18,"ca8g":19,
         "ak7trg":20,"ak7ftg":21,"ak7prg":22}
+    
     #################### --------- special ----------
     
     jtypes_d = ["ak5","ak5tr","ak5ft","ak5pr","ak7","ak7tr","ak7ft","ak7pr","ak8","ak8tr","ak8ft","ak8pr","ca8","ca8pr","ca12ft","ca12mdft"]
@@ -94,26 +95,33 @@ def processNtuples(dirname,oname,isData):
     ROOT.gSystem.Load("libDataFormatsPatCandidates.so");
     ROOT.gSystem.Load("libFWCoreUtilities.so");
     ROOT.gSystem.Load("libCondFormatsJetMETObjects.so");    
-    ROOT.gSystem.Load("libPhysicsToolsUtilities.so");
+#    ROOT.gSystem.Load("libPhysicsToolsUtilities.so");
     ROOT.gSystem.Load("libPhysicsToolsKinFitter.so");
-    gROOT.ProcessLine(".include ../../../..");
+#    gROOT.ProcessLine(".include ../../../..");
 
     #ROOT.gSystem.Load('libFWCoreUtilities')
     #ROOT.gSystem.Load('libPhysicsToolsUtilities')
     gROOT.ProcessLine(".include ../../../..")
     #gROOT.ProcessLine("#include <iostream>");
     #gROOT.ProcessLine('.L LumiReweightingStandAlone.h+')
-    gROOT.ProcessLine('.L puReweighter.C+')
+    #gROOT.ProcessLine('.L puReweighter.C+')
     gROOT.ProcessLine('.L EffTableReader.cc+')
     gROOT.ProcessLine('.L EffTableLoader.cc+')
     from ROOT import EffTableReader, EffTableLoader   
-    from ROOT import puReweighter
+    #from ROOT import puReweighter
 
     #################################################
     fDir = "EfficiencesAndCorrections/";
     # ---------- Set up PU reweighting
-    puWeights = ROOT.puReweighter(fDir+"PUMC_dist.root", fDir+"PUData_dist.root")
-    
+#    puWeights = ROOT.puReweighter(fDir+"PUMC_dist.root", fDir+"PUData_dist.root")
+    ROOT.gSystem.Load('libPhysicsToolsUtilities')    
+    LumiWeights = ROOT.edm.Lumi3DReWeighting(fDir+"PUMC_dist.root", fDir+"PUData_dist.root","pileup", "pileup","Weight_3D.root")  
+    LumiWeights.weight3D_init( 1.08 )
+    up_LumiWeights = ROOT.edm.Lumi3DReWeighting(fDir+"PUMC_dist.root", fDir+"PUData_dist.root","pileup", "pileup","Weight_3D_up.root")  
+    up_LumiWeights.weight3D_init( 1.16 )
+    dn_LumiWeights = ROOT.edm.Lumi3DReWeighting(fDir+"PUMC_dist.root", fDir+"PUData_dist.root","pileup", "pileup","Weight_3D_dn.root")  
+    dn_LumiWeights.weight3D_init( 1.00 )
+
     # ---------- Set up jet corrections on the fly of R >= 0.7 jets
     if isData == 0 :
          jecStr = [
@@ -185,10 +193,17 @@ def processNtuples(dirname,oname,isData):
     j_eta_ = []
     j_phi_ = []
     j_pt_ = []
+    j_px_ = []
+    j_py_ = []
+    j_pz_ = []
+    j_e_ = []
     j_area_ = []
     j_jecfactor_ = []
+    j_jecfactor_up_ = []
+    j_jecfactor_dn_  = []
     j_nJ_ = []
     j_nJ30_ = []
+
 
     j_ca8pr_m1_ = array( 'f', [ 0. ] )    
     j_ca8pr_m2_ = array( 'f', [ 0. ] )    
@@ -205,8 +220,14 @@ def processNtuples(dirname,oname,isData):
         j_eta_.append( array( 'f', [ 0. ] ) )
         j_phi_.append( array( 'f', [ 0. ] ) )
         j_pt_.append( array( 'f', [ 0. ] ) )
+        j_px_.append( array( 'f', [ 0. ] ) )
+        j_py_.append( array( 'f', [ 0. ] ) )
+        j_pz_.append( array( 'f', [ 0. ] ) )
+        j_e_.append( array( 'f', [ 0. ] ) )
         j_area_.append( array( 'f', [ 0. ] ) )
         j_jecfactor_.append( array( 'f', [ 0. ] ) )
+        j_jecfactor_up_.append( array( 'f', [ 0. ] ) )
+        j_jecfactor_dn_.append( array( 'f', [ 0. ] ) )
         j_nJ_.append( array( 'f', [ 0. ] ) )
         j_nJ30_.append( array( 'f', [ 0. ] ) )
 
@@ -277,9 +298,13 @@ def processNtuples(dirname,oname,isData):
         # ------------------  
         ## PU weights
         if isData == 0:
-            e_puwt_[0] = puWeights.Get( chain.GetLeaf("event_mcPU_nvtx").GetValue(0), chain.GetLeaf("event_mcPU_nvtx").GetValue(1), chain.GetLeaf("event_mcPU_nvtx").GetValue(2) )
-            e_puwt_up_[0] = puWeights.GetUp( chain.GetLeaf("event_mcPU_nvtx").GetValue(0), chain.GetLeaf("event_mcPU_nvtx").GetValue(1), chain.GetLeaf("event_mcPU_nvtx").GetValue(2) )
-            e_puwt_dn_[0] = puWeights.GetDown( chain.GetLeaf("event_mcPU_nvtx").GetValue(0), chain.GetLeaf("event_mcPU_nvtx").GetValue(1), chain.GetLeaf("event_mcPU_nvtx").GetValue(2) )        
+            minusV = chain.GetLeaf("event_mcPU_nvtx").GetValue(0)
+            intimeV = chain.GetLeaf("event_mcPU_nvtx").GetValue(1)
+            plusV = chain.GetLeaf("event_mcPU_nvtx").GetValue(2)
+#            print minusV,",",intimeV,",",plusV
+            e_puwt_[0] = LumiWeights.weight3D( int(minusV), int(intimeV), int(plusV) ) 
+            e_puwt_up_[0] = up_LumiWeights.weight3D( int(minusV), int(intimeV), int(plusV) )
+            e_puwt_dn_[0] = dn_LumiWeights.weight3D( int(minusV), int(intimeV), int(plusV) )        
         else:         
             e_puwt_[0] = -1.
             e_puwt_up_[0] = -1.  
@@ -291,6 +316,7 @@ def processNtuples(dirname,oname,isData):
         passesAsClass2 = False
         passesAsClass3 = False
         passesAsClass4 = False
+
         ###################################################################
         ###################################################################
         # S e l e c t i o n   f o r   t h e   W e n u   e v e n t s
@@ -316,8 +342,9 @@ def processNtuples(dirname,oname,isData):
             eff_elehlt = eleHLTEff.GetEfficiency(l_pt_[0], l_eta_[0])
             eff_elemht = eleMHTEff.GetEfficiency(e_met_[0], 0)
             eff_elewmt = eleWMtEff.GetEfficiency(v_mt_[0], l_eta_[0])
-#            e_effwt_[0] = eff_eleid*eff_elereco*eff_elehlt*eff_elemht*eff_elewmt
-            e_effwt_[0] = eff_eleid*eff_elereco*eff_elehlt   
+#            print eff_elewmt,"...wmt"
+            e_effwt_[0] = eff_eleid*eff_elereco*eff_elehlt*eff_elemht*eff_elewmt
+#            e_effwt_[0] = eff_eleid*eff_elereco*eff_elehlt   
 
         ###################################################################
         ###################################################################
@@ -364,7 +391,7 @@ def processNtuples(dirname,oname,isData):
             # ------------------   
             ## Wmunu efficiencies
             e_effwt_[0] =muIDEff.GetEfficiency(chain.Wmu_muon_pt, chain.Wmu_muon_eta) * muHLTEff.GetEfficiency(chain.Wmu_muon_pt, chain.Wmu_muon_eta)
-
+#            print muHLTEff.GetEfficiency(chain.Wmu_muon_pt, chain.Wmu_muon_eta),"...muhlt"
         ###################################################################
         ###################################################################
         # S e l e c t i o n   f o r   t h e   Z e e   e v e n t s
@@ -546,13 +573,30 @@ def processNtuples(dirname,oname,isData):
                         j_eta_[jitr][0] = jdef.Eta()
                         j_phi_[jitr][0] = jdef.Phi()
                         j_pt_[jitr][0] = jdef.Pt()
-                        j_jecfactor_[jitr][0] = factor                    
+                        j_px_[jitr][0] = jdef.Px()
+                        j_py_[jitr][0] = jdef.Py()
+                        j_pz_[jitr][0] = jdef.Pz()                        
+                        j_e_[jitr][0] = jdef.E()                          
+                        j_jecfactor_[jitr][0] = factor    
+                        jecUnc.setJetEta( jdefRaw.Eta() )
+                        jecUnc.setJetPt( jdefRaw.Perp() * factor );                        
+                        j_jecfactor_up_[jitr][0] = jecUnc.getUncertainty( True )
+                        jecUnc.setJetEta( jdefRaw.Eta() )
+                        jecUnc.setJetPt( jdefRaw.Perp() * factor );                        
+                        j_jecfactor_dn_[jitr][0] = jecUnc.getUncertainty( False )   
+#                        print j_jecfactor_up_[jitr][0],",",j_jecfactor_dn_[jitr][0]
                     else:
                         j_mass_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Mass").GetValue(0)
                         j_eta_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Eta").GetValue(0)
                         j_phi_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Phi").GetValue(0)
                         j_pt_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Pt").GetValue(0)
+                        j_px_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Px").GetValue(0)
+                        j_py_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Py").GetValue(0)
+                        j_pz_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Pz").GetValue(0) 
+                        j_e_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_E").GetValue(0)
                         j_jecfactor_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_JecFactor").GetValue(0)
+                        j_jecfactor_up_[jitr][0] = 0.
+                        j_jecfactor_dn_[jitr][0] = 0.                            
                         
                     j_area_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Area").GetValue(0)
                     j_nJ_[jitr][0] = float( chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_nJets").GetValue() )
