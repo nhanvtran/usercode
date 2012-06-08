@@ -475,17 +475,14 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
     //Extended Likelihood Formalism
     double nPoiss1_sig, nPoiss2_sig;
     double nPoiss1_bkg, nPoiss2_bkg;    
-    
-    //nsig->setVal(nsignal);
-    //nbkg->setVal(nbackground);
-    
+        
     // make the composite models
     RooRealVar* nsig0 = new RooRealVar("nsig0","number of signal events", nH0, -1000., nH0*2.0) ;
     RooRealVar* nbkg0 = new RooRealVar("nbkg0","number of background events", nBkg, 0., nBkg*2.0);
     //Construct composite PDF
     RooAddPdf* totalPdf0 = new RooAddPdf("totalPdf0","totalPdf0",RooArgList(*H0pdf,*bkgpdf),RooArgList(*nsig0,*nbkg0));
     // make the composite models
-    RooRealVar* nsig1 = new RooRealVar("nsig1","number of signal events", nH1, -1000., nH1*2.0) ;
+    RooRealVar* nsig1 = new RooRealVar("nsig1","number of signal events", nH1, 0., nH1*2.0) ;
     RooRealVar* nbkg1 = new RooRealVar("nbkg1","number of background events", nBkg, 0., nBkg*2.0);
     //Construct composite PDF
     RooAddPdf* totalPdf1 = new RooAddPdf("totalPdf1","totalPdf1",RooArgList(*H1pdf,*bkgpdf),RooArgList(*nsig1,*nbkg1));
@@ -633,17 +630,14 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
     //Extended Likelihood Formalism
     double nPoiss1, nPoiss2;
     
-    //nsig->setVal(nsignal);
-    //nbkg->setVal(nbackground);
-    
     // make the composite models
-    RooRealVar* nsig0 = new RooRealVar("nsig0","number of signal events", nH0, -1000., nH0*10.0);
-    RooRealVar* nbkg0 = new RooRealVar("nbkg0","number of background events", nBkg, -1000., nBkg*10.0) ;
+    RooRealVar* nsig0 = new RooRealVar("nsig0","number of signal events", nH0, 0., nH0*10.0);
+    RooRealVar* nbkg0 = new RooRealVar("nbkg0","number of background events", nBkg, 0., nBkg*10.0) ;
     //Construct composite PDF
     RooAddPdf* totalPdf0 = new RooAddPdf("totalPdf0","totalPdf0",RooArgList(*H0pdf,*bkgpdf),RooArgList(*nsig0,*nbkg0));
     // make the composite models
-    RooRealVar* nsig1 = new RooRealVar("nsig1","number of signal events", nH1, -1000., nH1*10.0) ;
-    RooRealVar* nbkg1 = new RooRealVar("nbkg1","number of background events", nBkg, -1000., nBkg*10.0);
+    RooRealVar* nsig1 = new RooRealVar("nsig1","number of signal events", nH1, 0., nH1*10.0) ;
+    RooRealVar* nbkg1 = new RooRealVar("nbkg1","number of background events", nBkg, 0., nBkg*10.0);
     //Construct composite PDF
     RooAddPdf* totalPdf1 = new RooAddPdf("totalPdf1","totalPdf1",RooArgList(*H1pdf,*bkgpdf),RooArgList(*nsig1,*nbkg1));
     
@@ -652,8 +646,12 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
     
     std::cout << "Performing " << nToys << " toys..." << std::endl;
     for (int i = 0; i < nToys; i++){
+      if ( i % 100 == 0 ) 
         cout << "toy number " << i << endl;
       
+	nsig0->setVal(nH0);
+	nbkg0->setVal(nBkg);
+	
         nPoiss1 = rng.Poisson(nH0 + nBkg);
         nPoiss2 = rng.Poisson(nH1 + nBkg);
         
@@ -673,6 +671,8 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
         
         //--------------------------------------------------------------------------------------------
         // generating dataset
+	nsig1->setVal(nH1);
+	nbkg1->setVal(nBkg);
         RooDataSet* data_H1 = totalPdf1->generate(*observables, (int) nPoiss2);
         // fit H0
         RooFitResult* r_H1 = totalPdf0->fitTo(*data_H1,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE),PrintLevel(-1));
@@ -682,13 +682,10 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
         double nBkgFitH1 = nbkg1->getVal();
 	double nSigPullH1 = nsig0->getError() > 0 ? (nsig1->getVal() - nH1) / nsig1->getError() : -999;
 	double nBkgPullH1 = nbkg0->getError() > 0 ? (nbkg1->getVal() - nBkg) / nbkg1->getError() : -999;
-
-        
         double s_estimator_H1 = 2.*(r_H1->minNll() - r0_H1->minNll());
-        
-        std::cout << "s_H0: " << s_estimator_H0 << ", s_H1: " << s_estimator_H1 << std::endl;
-	
-        hypTuple->Fill( s_estimator_H0, s_estimator_H1, nSigFitH0, nBkgFitH0, nSigPullH0, nBkgPullH0, nSigFitH1, nBkgFitH1, nSigPullH1, nBkgPullH1 );
+	std::cout << "s_H0: " << s_estimator_H0 << ", s_H1: " << s_estimator_H1 << std::endl;
+	// hypTuple->Fill( s_estimator_H0, s_estimator_H1, nSigFitH0, nBkgFitH0, nSigPullH0, nBkgPullH0, nSigFitH1, nBkgFitH1, nSigPullH1, nBkgPullH1 );
+	hypTuple->Fill( s_estimator_H0, s_estimator_H1, nSigFitH0, nBkgFitH0, nSigPullH0, nBkgPullH0, nSigFitH1, nBkgFitH1, nSigPullH1, nBkgPullH1 );
         
         
         delete data_H0;
