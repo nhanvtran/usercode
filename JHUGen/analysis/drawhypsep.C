@@ -31,13 +31,14 @@ void drawsingle(int test, int var, int toy);
 void drawhypsep() {
  
   drawsingle(zeroplusVSzerominus, MLL, pure);
+  /*
   drawsingle(zeroplusVSzerominus, DPHIMT, pure);
   drawsingle(zeroplusVSzerominus, DPHI, pure);
   
   drawsingle(zeroplusVStwoplus, DPHIMT, pure);
   drawsingle(zeroplusVStwoplus, DPHI, pure);
   drawsingle(zeroplusVStwoplus, MLL, pure);
-  
+  */
 }
 
 void drawsingle(int test, int var, int toy)
@@ -51,19 +52,19 @@ void drawsingle(int test, int var, int toy)
   TString varName = getVarName(var);
   TString toyName = getToyName(toy);
     
-  TString fileName = Form("stat_%s_%s_%s_%.0fb.root", testName.Data(), toyName.Data(), varName.Data(), intLumi );
+  TString fileName = Form("stat_%s_%s_%s_%.0ffb.root", testName.Data(), toyName.Data(), varName.Data(), intLumi );
   TFile *file = new TFile(fileName, "READ");
   std::cout << "Opening " << fileName << "\n";
   TNtuple *hypTuple = (TNtuple*) file->Get("hypTuple");
   assert(hypTuple);
 
   
-  double xmin = -20.;
-  double xmax = 20.;
+  double xmin = -10.;
+  double xmax = 10.;
 
   if ( test & zeroplusVStwoplus) {
-    xmin = -100.;
-    xmax = 100.;
+    xmin = -10.;
+    xmax = 10.;
   }
     
 
