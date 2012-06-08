@@ -7,12 +7,19 @@ void runSigSepWW() {
   int higgsMass=125;
   double intLumi=20.0;
   int nToys = 1000;
-  bool draw=false;
+  bool draw=true;
+
+  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, MLL, pure, draw);
   
-  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHI, pure, draw);
-  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLL, pure, draw);
+  /*
+  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHI, pure, draw);
+  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLL, pure, draw);
   runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHIMT, pure, draw);
   
+  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, DPHI, pure, draw);
+  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, MLL, pure, draw);
+  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, DPHIMT, pure, draw);
+  */
 
 }
 void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw) {
@@ -66,21 +73,23 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
     if ( var == DPHIMT ) 
       obs = new RooArgSet(*dphill, *mt) ;
 
-
     // read signal hypothesis 1
     TChain *tsigHyp1 = new TChain("angles");
-    if ( test & ( (1ll<<zeroplusVSzerominus) | (1ll<<zeroplusVStwoplus) ) ) 
-      tsigHyp1->Add(Form("datafiles/%i/SMHiggsWW_%i_JHU.root",higgsMass, higgsMass));
     
+    if ( test & ( zeroplusVSzerominus | zeroplusVStwoplus) )  {
+      tsigHyp1->Add(Form("datafiles/%i/SMHiggsWW_%i_JHU.root",higgsMass, higgsMass));
+    }
+
     RooDataSet *sigHyp1Data = new RooDataSet("sigHyp1Data","sigHyp1Data",tsigHyp1,*obs);
     RooDataHist *sigHyp1Hist = sigHyp1Data->binnedClone(0);
     RooHistPdf* sigHyp1Pdf = new RooHistPdf("sigHyp1Pdf", "sigHyp1Pdf", *obs, *sigHyp1Hist);
-    
+
+      
     // read signal hypothesis 2
     TChain *tsigHyp2 = new TChain("angles");
-    if ( test & (1ll<<zeroplusVSzerominus) )
+    if ( test & zeroplusVSzerominus ) 
       tsigHyp2->Add(Form("datafiles/%i/PSHiggsWW_%i_JHU.root",higgsMass, higgsMass));
-    if ( test & (1ll<<zeroplusVStwoplus) )
+    if ( test & zeroplusVStwoplus ) 
       tsigHyp2->Add(Form("datafiles/%i/TWW_%i_JHU.root",higgsMass, higgsMass));
     
     RooDataSet *sigHyp2Data = new RooDataSet("sigHyp2Data","sigHyp2Data",tsigHyp2,*obs);
@@ -97,14 +106,12 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
 
     char statResults[25];
     statsFactory *myHypothesisSeparation;
-    sprintf(statResults,"stat_%s_%s_%s.root",testName.Data(), toyName.Data(), varName.Data());
+    sprintf(statResults,"stat_%s_%s_%s_%.0ffb.root",testName.Data(), toyName.Data(), varName.Data(), intLumi);
     myHypothesisSeparation = new statsFactory(obs, sigHyp1Pdf, sigHyp2Pdf, statResults);
     // running pure toys
-    myHypothesisSeparation->hypothesisSeparationWithBackground(sigRate*intLumi,sigRate*intLumi,nToys, bkgPdf,bkgRate*intLumi);
+    myHypothesisSeparation->hypothesisSeparationWithBackground(sigRate*intLumi,sigRate*intLumi,nToys,bkgPdf,bkgRate*intLumi);
     delete myHypothesisSeparation;
     
-
-
     // draw plots 
     if(draw) {
       RooPlot* plot1;
@@ -151,5 +158,6 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
 
       delete c1;
     }
+
 
 }
