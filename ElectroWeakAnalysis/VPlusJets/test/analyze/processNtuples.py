@@ -64,7 +64,7 @@ def processNtuples(dirname,oname,isData):
     jtypetrans = []
     jtypesToI = []
     if isData == 0: 
-        if dirname.find("WJets_boostedMadGraph") > 0 or dirname.find("ZJets_boostedMadGraph") > 0:
+        if dirname.find("WJets_boostedMadGraph") > 0 or dirname.find("ZJets_boostedMadGraph") > 0 or dirname.find("WJets_boostedHerwig") > 0 or dirname.find("ZJets_boostedHerwig") > 0:
             jtypes = jtypes_mv3
             jtypetrans = jtypetrans_mv3
             jtypesToI = jtypesToI_mv3   
@@ -203,6 +203,7 @@ def processNtuples(dirname,oname,isData):
     j_jecfactor_dn_  = []
     j_nJ_ = []
     j_nJ30_ = []
+    j_matchtype_ = [] # -1 for "fake", 0 for "miss", 1 for "match"
 
 
     j_ca8pr_m1_ = array( 'f', [ 0. ] )    
@@ -230,7 +231,7 @@ def processNtuples(dirname,oname,isData):
         j_jecfactor_dn_.append( array( 'f', [ 0. ] ) )
         j_nJ_.append( array( 'f', [ 0. ] ) )
         j_nJ30_.append( array( 'f', [ 0. ] ) )
-
+        j_matchtype_.append( array( 'f', [ 0. ] ) )
 
     to.Branch("v_mt", v_mt_ , "v_mt/F")
     to.Branch("v_mass", v_mass_ , "v_mass/F")
@@ -262,17 +263,23 @@ def processNtuples(dirname,oname,isData):
     to.Branch("e_puwt_up", e_puwt_up_ , "e_puwt_up/F")
     to.Branch("e_puwt_dn", e_puwt_dn_ , "e_puwt_dn/F")
 
-
     for i in range(len(jtypes)):
         #print jtypes[i], " corresponds to ", jtypetrans[jtypes[i]]
         to.Branch("j_"+jtypes[i]+"_mass", j_mass_[i], "j_"+jtypes[i]+"_mass/F")
         to.Branch("j_"+jtypes[i]+"_eta", j_eta_[i], "j_"+jtypes[i]+"_eta/F")
         to.Branch("j_"+jtypes[i]+"_phi", j_phi_[i], "j_"+jtypes[i]+"_phi/F")
         to.Branch("j_"+jtypes[i]+"_pt", j_pt_[i], "j_"+jtypes[i]+"_pt/F")
+        to.Branch("j_"+jtypes[i]+"_px", j_px_[i], "j_"+jtypes[i]+"_px/F")
+        to.Branch("j_"+jtypes[i]+"_py", j_py_[i], "j_"+jtypes[i]+"_py/F")
+        to.Branch("j_"+jtypes[i]+"_pz", j_pz_[i], "j_"+jtypes[i]+"_pz/F")
+        to.Branch("j_"+jtypes[i]+"_e", j_e_[i], "j_"+jtypes[i]+"_pt/F")
         to.Branch("j_"+jtypes[i]+"_area", j_area_[i], "j_"+jtypes[i]+"_area/F")
+        to.Branch("j_"+jtypes[i]+"_jecfactor_up", j_jecfactor_up_[i], "j_"+jtypes[i]+"_jecfactor_up/F")
+        to.Branch("j_"+jtypes[i]+"_jecfactor_dn", j_jecfactor_dn_[i], "j_"+jtypes[i]+"_jecfactor_dn/F")
         to.Branch("j_"+jtypes[i]+"_jecfactor", j_jecfactor_[i], "j_"+jtypes[i]+"_jecfactor/F")
         to.Branch("j_"+jtypes[i]+"_nJ", j_nJ_[i], "j_"+jtypes[i]+"_nJ/F")
         to.Branch("j_"+jtypes[i]+"_nJ30", j_nJ30_[i], "j_"+jtypes[i]+"_nJ30/F")
+        to.Branch("j_"+jtypes[i]+"_matchtype", j_matchtype_[i], "j_"+jtypes[i]+"_matchtype/F")
 
 
     # ------------------------------------------------------
@@ -321,7 +328,7 @@ def processNtuples(dirname,oname,isData):
         ###################################################################
         # S e l e c t i o n   f o r   t h e   W e n u   e v e n t s
         electroniso = (chain.Wel_electron_trackiso+chain.Wel_electron_hcaliso+chain.Wel_electron_ecaliso-chain.event_fastJetRho*3.141592653589*0.09)/chain.Wel_electron_pt
-        if chain.eventClass == 1 and chain.Wel_electron_isWP70Good and chain.Wel_electron_pt > 35 and electroniso < 0.05 and chain.Wel_mt > 50 and chain.Wel_pt > 100 and chain.event_met_pfmet > 30: 
+        if chain.eventClass == 1 and chain.Wel_electron_isWP70Good and chain.Wel_electron_pt > 35 and electroniso < 0.05 and chain.Wel_mt > 50 and chain.Wel_pt > 50 and chain.event_met_pfmet > 30: 
 
             passesAsClass1 = True
             e_class_[0] = 1
@@ -343,8 +350,8 @@ def processNtuples(dirname,oname,isData):
             eff_elemht = eleMHTEff.GetEfficiency(e_met_[0], 0)
             eff_elewmt = eleWMtEff.GetEfficiency(v_mt_[0], l_eta_[0])
 #            print eff_elewmt,"...wmt"
-            e_effwt_[0] = eff_eleid*eff_elereco*eff_elehlt*eff_elemht*eff_elewmt
-#            e_effwt_[0] = eff_eleid*eff_elereco*eff_elehlt   
+#            e_effwt_[0] = eff_eleid*eff_elereco*eff_elehlt*eff_elemht*eff_elewmt
+            e_effwt_[0] = eff_eleid*eff_elereco*eff_elehlt   
 
         ###################################################################
         ###################################################################
@@ -374,7 +381,7 @@ def processNtuples(dirname,oname,isData):
 #        if chain.Wmu_pt > 120: ctr3 = ctr3 + 1
         muonSel = muoniso < 0.10 and chain.Wmu_muon_pt > 25 and chain.Wmu_muon_numberOfMatches > 0 and chain.Wmu_muon_nchi2 < 10. and chain.Wmu_muon_pixelHits > 0 and chain.Wmu_muon_trackerHits > 10 and chain.Wmu_muon_muonHits > 0
     
-        if chain.eventClass == 2 and muonSel and abs(chain.Wmu_muon_eta) < 2.1 and chain.Wmu_mt > 50 and chain.Wmu_pt > 100  and chain.event_met_pfmet > 30: 
+        if chain.eventClass == 2 and muonSel and abs(chain.Wmu_muon_eta) < 2.1 and chain.Wmu_mt > 50 and chain.Wmu_pt > 50  and chain.event_met_pfmet > 30: 
 
             passesAsClass2 = True
             e_class_[0] = 2
@@ -399,7 +406,7 @@ def processNtuples(dirname,oname,isData):
         eminus_iso = (chain.Zel_eminus_trackiso+chain.Zel_eminus_hcaliso+chain.Zel_eminus_ecaliso-chain.event_fastJetRho*3.141592653589*0.09)/chain.Zel_eminus_pt
         eplusSel =  chain.Zel_eplus_pt > 20 and chain.Zel_eplus_isWP95
         eminusSel = chain.Zel_eminus_pt > 20 and chain.Zel_eminus_isWP95
-        if chain.eventClass == 3 and eplusSel and eminusSel and chain.Zel_mass > 80 and chain.Zel_mass < 100 and chain.Zel_pt > 100 and chain.event_met_pfmet < 50: 
+        if chain.eventClass == 3 and eplusSel and eminusSel and chain.Zel_mass > 80 and chain.Zel_mass < 100 and chain.Zel_pt > 50 and chain.event_met_pfmet < 50: 
             
             passesAsClass3 = True
             e_class_[0] = 3
@@ -435,7 +442,7 @@ def processNtuples(dirname,oname,isData):
         muonminus_iso = (chain.Zmu_muminus_trackiso+chain.Zmu_muminus_hcaliso+chain.Zmu_muminus_ecaliso-chain.event_fastJetRho*3.1415939*0.09)/chain.Zmu_muminus_pt;
         muonplusSel = muonplus_iso < 0.10 and chain.Zmu_muplus_pt > 25 and chain.Zmu_muplus_numberOfMatches > 0 and chain.Zmu_muplus_nchi2 < 10. and chain.Zmu_muplus_pixelHits > 0 and chain.Zmu_muplus_trackerHits > 10 and chain.Zmu_muplus_muonHits > 0
         muonminusSel = muonminus_iso < 0.10  and chain.Zmu_muminus_pt > 25 and chain.Zmu_muminus_numberOfMatches > 0 and chain.Zmu_muminus_nchi2 < 10. and chain.Zmu_muminus_pixelHits > 0 and chain.Zmu_muminus_trackerHits > 10 and chain.Zmu_muminus_muonHits > 0
-        if chain.eventClass == 4 and muonplusSel and muonminusSel and chain.Zmu_mass > 80 and chain.Zmu_mass < 100 and chain.Zmu_pt > 100 and chain.event_met_pfmet < 50: 
+        if chain.eventClass == 4 and muonplusSel and muonminusSel and chain.Zmu_mass > 80 and chain.Zmu_mass < 100 and chain.Zmu_pt > 50 and chain.event_met_pfmet < 50: 
             
             passesAsClass4 = True
             e_class_[0] = 4
@@ -596,7 +603,8 @@ def processNtuples(dirname,oname,isData):
                         j_e_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_E").GetValue(0)
                         j_jecfactor_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_JecFactor").GetValue(0)
                         j_jecfactor_up_[jitr][0] = 0.
-                        j_jecfactor_dn_[jitr][0] = 0.                            
+                        j_jecfactor_dn_[jitr][0] = 0.      
+#                        print "factor: ",chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_JecFactor").GetValue(0),", jet pt: ",j_pt_[jitr][0],", jet eta: ",j_eta_[jitr][0]
                         
                     j_area_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Area").GetValue(0)
                     j_nJ_[jitr][0] = float( chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_nJets").GetValue() )
@@ -606,21 +614,22 @@ def processNtuples(dirname,oname,isData):
                             if chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Pt").GetValue(0) > 30: j30ctr = j30ctr + 1
                     
                     j_nJ30_[jitr][0] = float(j30ctr)
+                    j_matchtype_[jitr][0] = -99.
                     
+                ###############################################################
                 # gen jets, have to do matching
-                elif (jtypes[jitr].find("g") > 0) and (isData == 0): 
+                elif (jtypes[jitr].find("g") >= 0) and (isData == 0): 
                     # get matching reco collection
                     scur = jtypes[jitr]
                     scur = scur[:-1]
                     # loop through gen jets and find closest Dr
                     toler = 100.
                     matchindex = -1
+                    
+                    ###############################################################
                     ## hard-coded!
-                    for k in range(6):
-#                        print scur," ---- ",jtypetrans[jtypes[jtypesToI[scur]]]," ---- ",jtypes[jitr]
-                        #print chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Phi").GetValue(k), "and", chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Eta").GetValue(k)
+                    for k in range(9):
                         deta = chain.GetLeaf("Jet"+jtypetrans[jtypes[jtypesToI[scur]]]+"_Eta").GetValue(0) - chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Eta").GetValue(k)
-                        #print str(deta)
                         dphi = chain.GetLeaf("Jet"+jtypetrans[jtypes[jtypesToI[scur]]]+"_Phi").GetValue(0) - chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Phi").GetValue(k)
                         deltaR = math.sqrt( deta*deta+dphi*dphi )
                         if (deltaR < 0.3) and (deltaR < toler): 
@@ -633,9 +642,24 @@ def processNtuples(dirname,oname,isData):
                         j_eta_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Eta").GetValue(matchindex)
                         j_phi_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Phi").GetValue(matchindex)
                         j_pt_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Pt").GetValue(matchindex)
+                        j_px_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Px").GetValue(matchindex)
+                        j_py_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Py").GetValue(matchindex)
+                        j_pz_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_Pz").GetValue(matchindex) 
+                        j_e_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_E").GetValue(matchindex)                        
                         j_jecfactor_[jitr][0] = chain.GetLeaf("Jet"+jtypetrans[jtypes[jitr]]+"_JecFactor").GetValue(matchindex)  
-
-#                    print "RECO: ",chain.GetLeaf("Jet"+jtypetrans[jtypes[jtypesToI[scur]]]+"_Pt").GetValue(0),", GEN: ", j_pt_[jitr][0]
+                        j_matchtype_[jitr][0] = 1.
+                    else:
+                        j_mass_[jitr][0] = 0.
+                        j_eta_[jitr][0] = 0.
+                        j_phi_[jitr][0] = 0.
+                        j_pt_[jitr][0] = 0.
+                        j_px_[jitr][0] = 0.
+                        j_py_[jitr][0] = 0.
+                        j_pz_[jitr][0] = 0.
+                        j_e_[jitr][0] = 0.
+                        j_jecfactor_[jitr][0] = 0.
+                        j_matchtype_[jitr][0] = -1.
+                    ###############################################################
                     
                 else: continue
                 

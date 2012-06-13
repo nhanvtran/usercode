@@ -6,10 +6,10 @@ PLOT=0; CHAN=0; if [[ "$1" == "-m" ]]; then PLOT=1; CHAN="$2"; shift; shift; fi;
 
 echo $RUN, $PLOT, $CHAN
 
-#totalNumberOfFiles=96
-#startval=0
-totalNumberOfFiles=15
-startval=11
+totalNumberOfFiles=96
+startval=0
+#totalNumberOfFiles=15
+#startval=11
 
 processNtuples=$RUN
 buildHistos=$PLOT

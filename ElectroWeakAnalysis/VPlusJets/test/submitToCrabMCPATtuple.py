@@ -2,7 +2,7 @@ import os,sys
 import string, re
 from time import gmtime, localtime, strftime
 
-outputLocationOnEos = "ntran/tlbsm_v10_FallV3"
+outputLocationOnEos = "ntran/tlbsm_v10_FallV10"
 
 dataset    = [ 
 ##               # diboson
@@ -13,11 +13,15 @@ dataset    = [
               "/TTJets_TuneZ2_7TeV-madgraph-tauola/kalanand-ttbsm_v10beta_TTJets_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
 ##               # W+jets
 ##               "/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola/ntran-ttbsm_v10_WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_Fall11-PU_S6_START42_V14B-v1-a326ba49a16ab761c492392538b61378/USER",
-              "/WJetsToLNu_PtW-100_TuneZ2_7TeV-madgraph/dlopes-ttbsm_v10beta_WJetsToLNu_PtW-100_TuneZ2_7TeV-madgraph-a326ba49a16ab761c492392538b61378/USER",
-              "/WJetsToLNu_Pt-100_7TeV-herwigpp/dlopes-ttbsm_v10beta_WJetsToLNu_Pt-100_7TeV-herwigpp-a326ba49a16ab761c492392538b61378/USER",
+#              "/WJetsToLNu_PtW-100_TuneZ2_7TeV-madgraph/dlopes-ttbsm_v10beta_WJetsToLNu_PtW-100_TuneZ2_7TeV-madgraph-a326ba49a16ab761c492392538b61378/USER",
+#              "/WJetsToLNu_Pt-100_7TeV-herwigpp/dlopes-ttbsm_v10beta_WJetsToLNu_Pt-100_7TeV-herwigpp-a326ba49a16ab761c492392538b61378/USER",
+              "/WJetsToLNu_PtW-100_TuneZ2_7TeV-madgraph/dlopes-ttbsm_v10beta_v4_WJetsToLNu_PtW-100_TuneZ2_7TeV-madgraph-95b23b8ff6ec2aea229215f1b6feeec1/USER",
+              "/QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6/dlopes-ttbsm_v10beta_v4_QCD_Pt-15to3000_TuneZ2_Flat_7TeV_pythia6-95b23b8ff6ec2aea229215f1b6feeec1/USER",
               # Z+jets
-              "/DYJetsToLL_PtZ-100_TuneZ2_7TeV-madgraph-tauola/mulhearn-mulhearn-ttbsm_DYJetsToLL_PtZ-100_TuneZ2_7TeV-madgraph-tauola_Fall11-a326ba49a16ab761c492392538b61378/USER",
-              "/ZJetsToLL_Pt-100_7TeV-herwigpp/mulhearn-mulhearn-ttbsm_ZJetsToLL_Pt-100_7TeV-herwigpp_Fall11-a326ba49a16ab761c492392538b61378/USER",
+#              "/DYJetsToLL_PtZ-100_TuneZ2_7TeV-madgraph-tauola/mulhearn-mulhearn-ttbsm_DYJetsToLL_PtZ-100_TuneZ2_7TeV-madgraph-tauola_Fall11-a326ba49a16ab761c492392538b61378/USER",
+#              "/ZJetsToLL_Pt-100_7TeV-herwigpp/mulhearn-mulhearn-ttbsm_ZJetsToLL_Pt-100_7TeV-herwigpp_Fall11-a326ba49a16ab761c492392538b61378/USER",
+              "/DYJetsToLL_PtZ-100_TuneZ2_7TeV-madgraph-tauola/dlopes-ttbsm_v10beta_v4_DYJetsToLL_PtZ-100_TuneZ2_7TeV-madgraph-95b23b8ff6ec2aea229215f1b6feeec1/USER",
+              "/ZJetsToLL_Pt-100_7TeV-herwigpp/dlopes-ttbsm_v10beta_v4_ZJetsToLL_Pt-100_7TeV-herwigpp-95b23b8ff6ec2aea229215f1b6feeec1/USER",
               # single top
               "/Tbar_TuneZ2_s-channel_7TeV-powheg-tauola/kalanand-ttbsm_v10beta_Tbar_s-channel_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
               "/Tbar_TuneZ2_t-channel_7TeV-powheg-tauola/kalanand-ttbsm_v10beta_Tbar_t-channel_Fall11-PU_S6_START42_V14B-a326ba49a16ab761c492392538b61378/USER",
@@ -60,7 +64,7 @@ condor   = [
             1,1,1,1,1,
             1,1,1,1,1,
             1,1,1,1,1,
-            1,1
+            1
             ]
 
 def changeCrabTemplateFile(index):
@@ -103,8 +107,8 @@ def setupFJ3(index):
             
 ###################
 for i in range(len(channels)):
-    changeCrabTemplateFile(i)    
+#    changeCrabTemplateFile(i)    
     submitcommand = "crab -create -cfg " + "crabjob_" + channels[i] + ".cfg"
     child   = os.system(submitcommand)
     setupFJ3(i)
-    child2   = os.system("crab -submit -c "+channels[i])
+#    child2   = os.system("crab -submit -c "+channels[i])

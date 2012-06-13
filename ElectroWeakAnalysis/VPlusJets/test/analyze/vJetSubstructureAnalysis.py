@@ -42,8 +42,8 @@ parser.add_option('-a', '--addFiles', action='store_true', dest='addFiles', defa
 
 argv = []
 
-odir = "ntuples_v1"
-#odir = "ntuples_v21"
+odir = "ntuples_v2"
+hdir = "histos_v2"
 chan = options.channelToBuild
 
 dataset    = [
@@ -236,74 +236,74 @@ onames     = [
               ] 
 
 hnames     = [
-              odir+"/hWW",odir+"/hWZ",odir+"/hZZ",
+              hdir+"/hWW",hdir+"/hWZ",hdir+"/hZZ",
               # W jets
-              odir+"/hWJetsInclusive_1",odir+"/hWJetsInclusive_2",odir+"/hWJetsInclusive_3",odir+"/hWJetsInclusive_4",
-              odir+"/hWJetsInclusive_5",odir+"/hWJetsInclusive_6",odir+"/hWJetsInclusive_7",odir+"/hWJetsInclusive_8",
+              hdir+"/hWJetsInclusive_1",hdir+"/hWJetsInclusive_2",hdir+"/hWJetsInclusive_3",hdir+"/hWJetsInclusive_4",
+              hdir+"/hWJetsInclusive_5",hdir+"/hWJetsInclusive_6",hdir+"/hWJetsInclusive_7",hdir+"/hWJetsInclusive_8",
               # W jets, boosted madgraph
-              odir+"/hWJets_boostedMadGraph_1",odir+"/hWJets_boostedMadGraph_2",odir+"/hWJets_boostedMadGraph_3",odir+"/hWJets_boostedMadGraph_4",
+              hdir+"/hWJets_boostedMadGraph_1",hdir+"/hWJets_boostedMadGraph_2",hdir+"/hWJets_boostedMadGraph_3",hdir+"/hWJets_boostedMadGraph_4",
               # W jets, boosted herwig
-              odir+"/hWJets_boostedHerwig_1",odir+"/hWJets_boostedHerwig_2",odir+"/hWJets_boostedHerwig_3",odir+"/hWJets_boostedHerwig_4",
-              odir+"/hWJets_boostedHerwig_5",odir+"/hWJets_boostedHerwig_6",odir+"/hWJets_boostedHerwig_7",odir+"/hWJets_boostedHerwig_8",
-              odir+"/hWJets_boostedHerwig_9",
+              hdir+"/hWJets_boostedHerwig_1",hdir+"/hWJets_boostedHerwig_2",hdir+"/hWJets_boostedHerwig_3",hdir+"/hWJets_boostedHerwig_4",
+              hdir+"/hWJets_boostedHerwig_5",hdir+"/hWJets_boostedHerwig_6",hdir+"/hWJets_boostedHerwig_7",hdir+"/hWJets_boostedHerwig_8",
+              hdir+"/hWJets_boostedHerwig_9",
               # Z jets
-              odir+"/hZJetsInclusive_1",odir+"/hZJetsInclusive_2",odir+"/hZJetsInclusive_3",
-              odir+"/hZJetsInclusive_4",odir+"/hZJetsInclusive_5",odir+"/hZJetsInclusive_6",
-              odir+"/hZJetsInclusive_7",odir+"/hZJetsInclusive_8",
+              hdir+"/hZJetsInclusive_1",hdir+"/hZJetsInclusive_2",hdir+"/hZJetsInclusive_3",
+              hdir+"/hZJetsInclusive_4",hdir+"/hZJetsInclusive_5",hdir+"/hZJetsInclusive_6",
+              hdir+"/hZJetsInclusive_7",hdir+"/hZJetsInclusive_8",
               # Z jets, boosted madgraph
-              odir+"/hZJets_boostedMadGraph_1",odir+"/hZJets_boostedMadGraph_2",odir+"/hZJets_boostedMadGraph_3",odir+"/hZJets_boostedMadGraph_4",odir+"/hZJets_boostedMadGraph_5",
+              hdir+"/hZJets_boostedMadGraph_1",hdir+"/hZJets_boostedMadGraph_2",hdir+"/hZJets_boostedMadGraph_3",hdir+"/hZJets_boostedMadGraph_4",hdir+"/hZJets_boostedMadGraph_5",
               # Z jets, boosted herwig
-              odir+"/hZJets_boostedHerwig_1",odir+"/hZJets_boostedHerwig_2",odir+"/hZJets_boostedHerwig_3",odir+"/hZJets_boostedHerwig_4",
+              hdir+"/hZJets_boostedHerwig_1",hdir+"/hZJets_boostedHerwig_2",hdir+"/hZJets_boostedHerwig_3",hdir+"/hZJets_boostedHerwig_4",
               #
-              odir+"/hTTbar_1",odir+"/hTTbar_2",odir+"/hTTbar_3",odir+"/hTTbar_4",
-              odir+"/hTTbar_5",odir+"/hTTbar_6",odir+"/hTTbar_7",odir+"/hTTbar_8",
-              odir+"/hTTbar_9",odir+"/hTTbar_10",odir+"/hTTbar_11",odir+"/hTTbar_12",
+              hdir+"/hTTbar_1",hdir+"/hTTbar_2",hdir+"/hTTbar_3",hdir+"/hTTbar_4",
+              hdir+"/hTTbar_5",hdir+"/hTTbar_6",hdir+"/hTTbar_7",hdir+"/hTTbar_8",
+              hdir+"/hTTbar_9",hdir+"/hTTbar_10",hdir+"/hTTbar_11",hdir+"/hTTbar_12",
               #
-              odir+"/hsingleT_s",odir+"/hsingleT_t",odir+"/hsingleT_dr",odir+"/hsingleT_ds",
-              odir+"/hsingleTbar_s",odir+"/hsingleTbar_t",odir+"/hsingleTbar_dr",odir+"/hsingleTbar_ds",
+              hdir+"/hsingleT_s",hdir+"/hsingleT_t",hdir+"/hsingleT_dr",hdir+"/hsingleT_ds",
+              hdir+"/hsingleTbar_s",hdir+"/hsingleTbar_t",hdir+"/hsingleTbar_dr",hdir+"/hsingleTbar_ds",
               #
               #
               #
-              odir+"/hSingleEl_2011A_May10_1",
-              odir+"/hSingleEl_2011A_May10_2",             
-              odir+"/hSingleEl_2011A_promptV4_1",                           
-              odir+"/hSingleEl_2011A_promptV4_2",                  
-              odir+"/hSingleEl_2011A_Aug05_1",                  
-              odir+"/hSingleEl_2011A_promptV6_1",                                
-              odir+"/hSingleEl_2011A_promptV6_2",
-              odir+"/hSingleEl_2011B_promptV1_1",              
-              odir+"/hSingleEl_2011B_promptV1_2",              
-              odir+"/hSingleEl_2011B_promptV1_3",              
-              odir+"/hSingleEl_2011B_promptV1_4",                            
+              hdir+"/hSingleEl_2011A_May10_1",
+              hdir+"/hSingleEl_2011A_May10_2",             
+              hdir+"/hSingleEl_2011A_promptV4_1",                           
+              hdir+"/hSingleEl_2011A_promptV4_2",                  
+              hdir+"/hSingleEl_2011A_Aug05_1",                  
+              hdir+"/hSingleEl_2011A_promptV6_1",                                
+              hdir+"/hSingleEl_2011A_promptV6_2",
+              hdir+"/hSingleEl_2011B_promptV1_1",              
+              hdir+"/hSingleEl_2011B_promptV1_2",              
+              hdir+"/hSingleEl_2011B_promptV1_3",              
+              hdir+"/hSingleEl_2011B_promptV1_4",                            
               #
-              odir+"/hDoubleEl_2011A_May10_1",
-              odir+"/hDoubleEl_2011A_May10_2",             
-              odir+"/hDoubleEl_2011A_promptV4_1",                           
-              odir+"/hDoubleEl_2011A_promptV4_2",                  
-              odir+"/hDoubleEl_2011A_Aug05_1",                  
-              odir+"/hDoubleEl_2011A_promptV6_1",                                
-              odir+"/hDoubleEl_2011A_promptV6_2",
-              odir+"/hDoubleEl_2011B_promptV1_1",              
-              odir+"/hDoubleEl_2011B_promptV1_2",              
-              odir+"/hDoubleEl_2011B_promptV1_3",              
-              odir+"/hDoubleEl_2011B_promptV1_4",                            
+              hdir+"/hDoubleEl_2011A_May10_1",
+              hdir+"/hDoubleEl_2011A_May10_2",             
+              hdir+"/hDoubleEl_2011A_promptV4_1",                           
+              hdir+"/hDoubleEl_2011A_promptV4_2",                  
+              hdir+"/hDoubleEl_2011A_Aug05_1",                  
+              hdir+"/hDoubleEl_2011A_promptV6_1",                                
+              hdir+"/hDoubleEl_2011A_promptV6_2",
+              hdir+"/hDoubleEl_2011B_promptV1_1",              
+              hdir+"/hDoubleEl_2011B_promptV1_2",              
+              hdir+"/hDoubleEl_2011B_promptV1_3",              
+              hdir+"/hDoubleEl_2011B_promptV1_4",                            
               #
-              odir+"/hSingleMu_2011A_May10_1",
-              odir+"/hSingleMu_2011A_May10_2",             
-              odir+"/hSingleMu_2011A_promptV4_1",
-              odir+"/hSingleMu_2011A_promptV4_2",             
-              odir+"/hSingleMu_2011A_Aug05_1",
-              odir+"/hSingleMu_2011A_promptV6_1",
-              odir+"/hSingleMu_2011A_promptV6_2",             
-              odir+"/hSingleMu_2011B_promptV1_1",
-              odir+"/hSingleMu_2011B_promptV1_2",
-              odir+"/hSingleMu_2011B_promptV1_3",
-              odir+"/hSingleMu_2011B_promptV1_4",              
-              odir+"/hSingleMu_2011B_promptV1_5",
-              odir+"/hSingleMu_2011B_promptV1_6"              
+              hdir+"/hSingleMu_2011A_May10_1",
+              hdir+"/hSingleMu_2011A_May10_2",             
+              hdir+"/hSingleMu_2011A_promptV4_1",
+              hdir+"/hSingleMu_2011A_promptV4_2",             
+              hdir+"/hSingleMu_2011A_Aug05_1",
+              hdir+"/hSingleMu_2011A_promptV6_1",
+              hdir+"/hSingleMu_2011A_promptV6_2",             
+              hdir+"/hSingleMu_2011B_promptV1_1",
+              hdir+"/hSingleMu_2011B_promptV1_2",
+              hdir+"/hSingleMu_2011B_promptV1_3",
+              hdir+"/hSingleMu_2011B_promptV1_4",              
+              hdir+"/hSingleMu_2011B_promptV1_5",
+              hdir+"/hSingleMu_2011B_promptV1_6"              
               ] 
-hnamesAll  =  odir+"/hAllMC"
-hnamesDat  =  odir+"/hDat"
+hnamesAll  =  hdir+"/hAllMC"
+hnamesDat  =  hdir+"/hDat"
 
 isData = [
           0,0,0,
@@ -393,8 +393,10 @@ if options.runAnalysis and options.runOnFile >= 0:
 ############################################################
 ## B U I L D   H I S T O G R A M S
 
-import buildHistos
 if options.makeHistos and options.runOnFile == -1:
+
+    import buildHistos
+    
     for i in range(len(dataset)):
         # build histos for all MC
         mc_onames = []
@@ -422,6 +424,9 @@ if options.makeHistos and options.runOnFile == -1:
         buildHistos.buildHistos( data_onames, hnamesDat, data_isData, data_SF, chan )
 
 if options.makeHistos and options.runOnFile >= 0:
+    
+    import buildHistos
+
     i = options.runOnFile
     #print "current file: "+onames[i]
     #print scaleFactors    
@@ -458,50 +463,50 @@ if options.writePlots:
     ## MC 
     ## -------------------------
     ## Diboson
-    haddCmd_DiBoson = "hadd -f "+odir+"/hDiboson_all_ch"+str(chan)+".root"
+    haddCmd_DiBoson = "hadd -f "+hdir+"/hDiboson_all_ch"+str(chan)+".root"
     for x in range(len(hnames)):
         if hnames[x].find("WW") >= 0 or hnames[x].find("WZ") >= 0 or hnames[x].find("ZZ") >= 0: 
             haddCmd_DiBoson += (" "+hnames[x]+"_ch"+str(chan)+".root")
     ## Wjets, Inclusive
-    haddCmd_Wjets_WJI = "hadd -f "+odir+"/hWjetsInclusive_all_ch"+str(chan)+".root"
+    haddCmd_Wjets_WJI = "hadd -f "+hdir+"/hWjetsInclusive_all_ch"+str(chan)+".root"
     for x in range(len(hnames)):
         if hnames[x].find("WJetsInclusive") >= 0: 
             haddCmd_Wjets_WJI += (" "+hnames[x]+"_ch"+str(chan)+".root")
     ## Wjets, boosted Madgraph
-    haddCmd_Wjets_bMG = "hadd -f "+odir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root"
+    haddCmd_Wjets_bMG = "hadd -f "+hdir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root"
     for x in range(len(hnames)):
         if hnames[x].find("WJets_boostedMadGraph") >= 0: 
             haddCmd_Wjets_bMG += (" "+hnames[x]+"_ch"+str(chan)+".root")
     ## Wjets, boosted Herwig
-    haddCmd_Wjets_bHW = "hadd -f "+odir+"/hWjets_boostedHerwig_all_ch"+str(chan)+".root"
+    haddCmd_Wjets_bHW = "hadd -f "+hdir+"/hWjets_boostedHerwig_all_ch"+str(chan)+".root"
     for x in range(len(hnames)):
         if hnames[x].find("WJets_boostedHerwig") >= 0: 
             haddCmd_Wjets_bHW += (" "+hnames[x]+"_ch"+str(chan)+".root")
     
     ## Zjets, Inclusive
-    haddCmd_Zjets_WJI = "hadd -f "+odir+"/hZjetsInclusive_all_ch"+str(chan)+".root"
+    haddCmd_Zjets_WJI = "hadd -f "+hdir+"/hZjetsInclusive_all_ch"+str(chan)+".root"
     for x in range(len(hnames)):
         if hnames[x].find("ZJetsInclusive") >= 0: 
             haddCmd_Zjets_WJI += (" "+hnames[x]+"_ch"+str(chan)+".root")
     ## Zjets, boosted Madgraph
-    haddCmd_Zjets_bMG = "hadd -f "+odir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root"
+    haddCmd_Zjets_bMG = "hadd -f "+hdir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root"
     for x in range(len(hnames)):
         if hnames[x].find("ZJets_boostedMadGraph") >= 0: 
             haddCmd_Zjets_bMG += (" "+hnames[x]+"_ch"+str(chan)+".root")
     ## Zjets, boosted Herwig
-    haddCmd_Zjets_bHW = "hadd -f "+odir+"/hZjets_boostedHerwig_all_ch"+str(chan)+".root"
+    haddCmd_Zjets_bHW = "hadd -f "+hdir+"/hZjets_boostedHerwig_all_ch"+str(chan)+".root"
     for x in range(len(hnames)):
         if hnames[x].find("ZJets_boostedHerwig") >= 0: 
             haddCmd_Zjets_bHW += (" "+hnames[x]+"_ch"+str(chan)+".root")
 
     ## ttbar
-    haddCmd_ttbar = "hadd -f "+odir+"/hTTbar_all_ch"+str(chan)+".root"
+    haddCmd_ttbar = "hadd -f "+hdir+"/hTTbar_all_ch"+str(chan)+".root"
     for x in range(len(hnames)):
         if hnames[x].find("TTbar") >= 0: 
             haddCmd_ttbar += (" "+hnames[x]+"_ch"+str(chan)+".root")
 
     ## single T
-    haddCmd_singleT = "hadd -f "+odir+"/hsingleT_all_ch"+str(chan)+".root"
+    haddCmd_singleT = "hadd -f "+hdir+"/hsingleT_all_ch"+str(chan)+".root"
     for x in range(len(hnames)):
         if hnames[x].find("singleT") >= 0: 
             haddCmd_singleT += (" "+hnames[x]+"_ch"+str(chan)+".root")
@@ -509,17 +514,17 @@ if options.writePlots:
     ## Data 
     ## -------------------------
     ## SingleEl/EleHad
-    haddCmd_SingleEl = "hadd -f "+odir+"/hdat_SingleEl_all_ch"+str(chan)+".root"
+    haddCmd_SingleEl = "hadd -f "+hdir+"/hdat_SingleEl_all_ch"+str(chan)+".root"
     for x in range(len(hnames)):
         if hnames[x].find("SingleEl") >= 0 or hnames[x].find("EleHad") >= 0 : 
             haddCmd_SingleEl += (" "+hnames[x]+"_ch"+str(chan)+".root")
     ## DoubleEl
-    haddCmd_DoubleEl = "hadd -f "+odir+"/hdat_DoubleEl_all_ch"+str(chan)+".root"
+    haddCmd_DoubleEl = "hadd -f "+hdir+"/hdat_DoubleEl_all_ch"+str(chan)+".root"
     for x in range(len(hnames)):
         if hnames[x].find("DoubleEl") >= 0: 
             haddCmd_DoubleEl += (" "+hnames[x]+"_ch"+str(chan)+".root")
     ## SingleMu
-    haddCmd_SingleMu = "hadd -f "+odir+"/hdat_SingleMu_all_ch"+str(chan)+".root"
+    haddCmd_SingleMu = "hadd -f "+hdir+"/hdat_SingleMu_all_ch"+str(chan)+".root"
     for x in range(len(hnames)):
         if hnames[x].find("SingleMu") >= 0: 
             haddCmd_SingleMu += (" "+hnames[x]+"_ch"+str(chan)+".root")
@@ -542,31 +547,31 @@ if options.writePlots:
         os.system( haddCmd_DoubleEl )
         os.system( haddCmd_SingleMu )
 
-        os.system( "hadd -f "+odir+"/hMC_all_Inclusive_ch"+str(chan)+".root "+odir+"/hDiboson_all_ch"+str(chan)+".root "+odir+"/hWjetsInclusive_all_ch"+str(chan)+".root "+odir+"/hZjetsInclusive_all_ch"+str(chan)+".root "+odir+"/hTTbar_all_ch"+str(chan)+".root "+odir+"/hsingleT_all_ch"+str(chan)+".root" )
-        os.system( "hadd -f "+odir+"/hMC_all_MadGraph_ch"+str(chan)+".root "+odir+"/hDiboson_all_ch"+str(chan)+".root "+odir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root "+odir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root "+odir+"/hTTbar_all_ch"+str(chan)+".root "+odir+"/hsingleT_all_ch"+str(chan)+".root" )
-        os.system( "hadd -f "+odir+"/hMC_all_Herwig_ch"+str(chan)+".root "+odir+"/hDiboson_all_ch"+str(chan)+".root "+odir+"/hWjets_boostedHerwig_all_ch"+str(chan)+".root "+odir+"/hZjets_boostedHerwig_all_ch"+str(chan)+".root "+odir+"/hTTbar_all_ch"+str(chan)+".root "+odir+"/hsingleT_all_ch"+str(chan)+".root" )             
+        os.system( "hadd -f "+hdir+"/hMC_all_Inclusive_ch"+str(chan)+".root "+hdir+"/hDiboson_all_ch"+str(chan)+".root "+hdir+"/hWjetsInclusive_all_ch"+str(chan)+".root "+hdir+"/hZjetsInclusive_all_ch"+str(chan)+".root "+hdir+"/hTTbar_all_ch"+str(chan)+".root "+hdir+"/hsingleT_all_ch"+str(chan)+".root" )
+        os.system( "hadd -f "+hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root "+hdir+"/hDiboson_all_ch"+str(chan)+".root "+hdir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root "+hdir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root "+hdir+"/hTTbar_all_ch"+str(chan)+".root "+hdir+"/hsingleT_all_ch"+str(chan)+".root" )
+        os.system( "hadd -f "+hdir+"/hMC_all_Herwig_ch"+str(chan)+".root "+hdir+"/hDiboson_all_ch"+str(chan)+".root "+hdir+"/hWjets_boostedHerwig_all_ch"+str(chan)+".root "+hdir+"/hZjets_boostedHerwig_all_ch"+str(chan)+".root "+hdir+"/hTTbar_all_ch"+str(chan)+".root "+hdir+"/hsingleT_all_ch"+str(chan)+".root" )             
 
 #    #### -------------------------------------------------------
     stacklist_Inclusive = []
-    stacklist_Inclusive.append(odir+"/hDiboson_all_ch"+str(chan)+".root")
-    stacklist_Inclusive.append(odir+"/hWjetsInclusive_all_ch"+str(chan)+".root")
-    stacklist_Inclusive.append(odir+"/hZjetsInclusive_all_ch"+str(chan)+".root")
-    stacklist_Inclusive.append(odir+"/hTTbar_all_ch"+str(chan)+".root")
-    stacklist_Inclusive.append(odir+"/hsingleT_all_ch"+str(chan)+".root")
+    stacklist_Inclusive.append(hdir+"/hDiboson_all_ch"+str(chan)+".root")
+    stacklist_Inclusive.append(hdir+"/hWjetsInclusive_all_ch"+str(chan)+".root")
+    stacklist_Inclusive.append(hdir+"/hZjetsInclusive_all_ch"+str(chan)+".root")
+    stacklist_Inclusive.append(hdir+"/hTTbar_all_ch"+str(chan)+".root")
+    stacklist_Inclusive.append(hdir+"/hsingleT_all_ch"+str(chan)+".root")
 
     stacklist_MadGraph = []
-    stacklist_MadGraph.append(odir+"/hDiboson_all_ch"+str(chan)+".root")
-    stacklist_MadGraph.append(odir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root")
-    stacklist_MadGraph.append(odir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root")
-    stacklist_MadGraph.append(odir+"/hTTbar_all_ch"+str(chan)+".root")
-    stacklist_MadGraph.append(odir+"/hsingleT_all_ch"+str(chan)+".root")
+    stacklist_MadGraph.append(hdir+"/hDiboson_all_ch"+str(chan)+".root")
+    stacklist_MadGraph.append(hdir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root")
+    stacklist_MadGraph.append(hdir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root")
+    stacklist_MadGraph.append(hdir+"/hTTbar_all_ch"+str(chan)+".root")
+    stacklist_MadGraph.append(hdir+"/hsingleT_all_ch"+str(chan)+".root")
 
     stacklist_Herwig = []
-    stacklist_Herwig.append(odir+"/hDiboson_all_ch"+str(chan)+".root")
-    stacklist_Herwig.append(odir+"/hWjets_boostedHerwig_all_ch"+str(chan)+".root")
-    stacklist_Herwig.append(odir+"/hZjets_boostedHerwig_all_ch"+str(chan)+".root")
-    stacklist_Herwig.append(odir+"/hTTbar_all_ch"+str(chan)+".root")
-    stacklist_Herwig.append(odir+"/hsingleT_all_ch"+str(chan)+".root")
+    stacklist_Herwig.append(hdir+"/hDiboson_all_ch"+str(chan)+".root")
+    stacklist_Herwig.append(hdir+"/hWjets_boostedHerwig_all_ch"+str(chan)+".root")
+    stacklist_Herwig.append(hdir+"/hZjets_boostedHerwig_all_ch"+str(chan)+".root")
+    stacklist_Herwig.append(hdir+"/hTTbar_all_ch"+str(chan)+".root")
+    stacklist_Herwig.append(hdir+"/hsingleT_all_ch"+str(chan)+".root")
 
     PD = ""
     if chan == 1: PD = "SingleEl"
@@ -574,37 +579,40 @@ if options.writePlots:
     elif chan == 3: PD = "DoubleEl"
     else: print "-------------> Not a valid channel!"
 
+
+#    plotter.plotterStack( stacklist_MadGraph, hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
+
     ####### for Wmunu and Zmumu
-###    plotter.plotterStack( stacklist_MadGraph, odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
-#    plotter.plotterStack( stacklist_MadGraph, odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", "ntuples_v10_clean/hSingleEl_2011B_promptV1_3_ch1.root", "figstest_ch"+str(chan)+"_mg", chan)
-    ###    plotter.plotterStack( stacklist_Inclusive, odir+"/hMC_all_Inclusive_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
+###    plotter.plotterStack( stacklist_MadGraph, hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
+#    plotter.plotterStack( stacklist_MadGraph, hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", "ntuples_v10_clean/hSingleEl_2011B_promptV1_3_ch1.root", "figstest_ch"+str(chan)+"_mg", chan)
+    ###    plotter.plotterStack( stacklist_Inclusive, hdir+"/hMC_all_Inclusive_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
 
-    #plotter.plotterStack( stacklist_Inclusive, odir+"/hMC_all_Inclusive_ch"+str(chan)+".root", odir+"/h"+PD+"_2011A_May10_1_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
-    #plotter.plotterStack( stacklist_Inclusive, odir+"/hMC_all_Inclusive_ch"+str(chan)+".root", odir+"/h"+PD+"_2011A_promptV6_2_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
-    #plotter.plotterStack( stacklist_Inclusive, odir+"/hMC_all_Inclusive_ch"+str(chan)+".root", odir+"/h"+PD+"_2011B_promptV1_1_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
+    #plotter.plotterStack( stacklist_Inclusive, hdir+"/hMC_all_Inclusive_ch"+str(chan)+".root", hdir+"/h"+PD+"_2011A_May10_1_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
+    #plotter.plotterStack( stacklist_Inclusive, hdir+"/hMC_all_Inclusive_ch"+str(chan)+".root", hdir+"/h"+PD+"_2011A_promptV6_2_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
+    #plotter.plotterStack( stacklist_Inclusive, hdir+"/hMC_all_Inclusive_ch"+str(chan)+".root", hdir+"/h"+PD+"_2011B_promptV1_1_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
 
-#    plotter.plotterStack( stacklist_MadGraph, odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
-#    plotter.plotter1D( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
-#    plotter.plotter1D_MCcomp( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
-#    plotter.plotter2D( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
-##    plotter.plotter_unfolding( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
-    plotter.plotter2D_mass( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
-#    plotter.plotter_unfolding_MCcomp( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+##    plotter.plotterStack( stacklist_MadGraph, hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
+##    plotter.plotter1D( hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+##    plotter.plotter1D_MCcomp( hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hMC_all_Herwig_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+##    plotter.plotter2D( hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+###    plotter.plotter_unfolding( hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+#    plotter.plotter2D_mass( hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+##    plotter.plotter_unfolding_MCcomp( hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hMC_all_Herwig_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+#
+##    if chan==1 or chan==2: plotter.plotterStack_taggers( stacklist_MadGraph, hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
+#    if chan==1 or chan==2: plotter.plotter2D_V3( hdir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+##    if chan==3 or chan==4: plotter.plotter2D_V3( hdir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+##    if chan==1 or chan==2: plotter.plotter_unfolding_MCcomp_V3( hdir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root", hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hMC_all_Herwig_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+##    if chan==3 or chan==4: plotter.plotter_unfolding_MCcomp_V3( hdir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root", hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hMC_all_Herwig_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
 
-#    if chan==1 or chan==2: plotter.plotterStack_taggers( stacklist_MadGraph, odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg", chan)
-    if chan==1 or chan==2: plotter.plotter2D_V3( odir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
-#    if chan==3 or chan==4: plotter.plotter2D_V3( odir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
-#    if chan==1 or chan==2: plotter.plotter_unfolding_MCcomp_V3( odir+"/hWjets_boostedMadGraph_all_ch"+str(chan)+".root", odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
-#    if chan==3 or chan==4: plotter.plotter_unfolding_MCcomp_V3( odir+"/hZjets_boostedMadGraph_all_ch"+str(chan)+".root", odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
-
-#    plotter.plotter1D_MCcomp( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
-#    plotter.plotter2D( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
-#    plotter.plotter2D_mass( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
-#    plotter.plotter_unfolding( odir+"/hMC_all_MadGraph_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+#    plotter.plotter1D_MCcomp( hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hMC_all_Herwig_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+#    plotter.plotter2D( hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+#    plotter.plotter2D_mass( hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
+#    plotter.plotter_unfolding( hdir+"/hMC_all_MadGraph_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_mg" )
     
-#    plotter.plotterStack( stacklist_Herwig, odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_hw", chan)
-#    plotter.plotter1D( odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_hw" )
-#    plotter.plotter2D( odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_hw" )
-#    plotter.plotter2D_mass( odir+"/hMC_all_Herwig_ch"+str(chan)+".root", odir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_hw" )
+#    plotter.plotterStack( stacklist_Herwig, hdir+"/hMC_all_Herwig_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_hw", chan)
+#    plotter.plotter1D( hdir+"/hMC_all_Herwig_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_hw" )
+#    plotter.plotter2D( hdir+"/hMC_all_Herwig_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_hw" )
+#    plotter.plotter2D_mass( hdir+"/hMC_all_Herwig_ch"+str(chan)+".root", hdir+"/hdat_"+PD+"_all_ch"+str(chan)+".root", "figstest_ch"+str(chan)+"_hw" )
 
 
