@@ -27,7 +27,7 @@ real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
-real(8), public, parameter :: M_Reso  = 325d0     *GeV      ! X resonance mass (spin 0, spin 1, spin 2)
+real(8), public, parameter :: M_Reso  = 125d0     *GeV      ! X resonance mass (spin 0, spin 1, spin 2)
 real(8), public, parameter :: Ga_Reso = 5d0       *GeV      ! X resonance width
 real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
                                                             ! overal scale for x-section and in power suppressed
@@ -69,7 +69,7 @@ real(8), public, parameter :: Br_Z_bo = 1d0-Br_Z_up-Br_Z_ch-Br_Z_dn-Br_Z_st  ! b
 
 !-- parameters that define spin 2 coupling to SM fields, see note
 ! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
-  complex(8), public, parameter :: a1 = (1.0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public, parameter :: a1 = (1.0d0,1d0)    ! g1  -- c.f. draft
   complex(8), public, parameter :: a2 = (2.0d0,0d0)    ! g2
   complex(8), public, parameter :: a3 = (3.0d0,0d0)    ! g3
   complex(8), public, parameter :: a4 = (4.0d0,0d0)    ! g4
@@ -79,11 +79,11 @@ real(8), public, parameter :: Br_Z_bo = 1d0-Br_Z_up-Br_Z_ch-Br_Z_dn-Br_Z_st  ! b
   logical, public, parameter :: generate_bis = .true.
   logical, public, parameter :: use_dynamic_MG = .true.
 
-  complex(8), public, parameter :: b1 = (1.0d0,0d0)    !  all b' below are g's in the draft
+  complex(8), public, parameter :: b1 = (1.0d0,1d0)    !  all b' below are g's in the draft
   complex(8), public, parameter :: b2 = (2.0d0,0d0)
   complex(8), public, parameter :: b3 = (3.0d0,0d0)
   complex(8), public, parameter :: b4 = (4.0d0,0d0)
-  complex(8), public, parameter :: b5 = (5.0d0,0d0)
+  complex(8), public, parameter :: b5 = (5.0d0,2d0)
   complex(8), public, parameter :: b6 = (6.0d0,0d0)
   complex(8), public, parameter :: b7 = (7.0d0,0d0)
   complex(8), public, parameter :: b8 = (8.0d0,0d0)
@@ -236,6 +236,10 @@ integer :: Part
       convertLHE =24
   elseif( Part.eq.Wm_) then
       convertLHE =-24
+  elseif( Part.eq.Pho_) then
+      convertLHE =22
+  elseif( Part.lt.-9000) then
+      convertLHE =Part
   else
       print *, "LHE format not implemented for ",Part
       stop
