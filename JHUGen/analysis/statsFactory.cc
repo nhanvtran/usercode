@@ -43,39 +43,41 @@ class statsFactory {
 public:
     
     //Default constructor
-    
-    statsFactory(RooArgSet* set, RooAbsPdf* pdf1, RooAbsPdf* pdf2, std::string outputFileName="test.root");
-    ~statsFactory();
-    
-    RooArgSet* observables; 
-    RooAbsPdf* H0pdf;
-    RooAbsPdf* H1pdf;
-    RooRealVar* nsig;
-    RooRealVar* nbkg;
-    RooAddPdf* totalPdf;
-    
-    TFile* fout;
-    
-    
-    void runSignificance(double nSig, double nBkg, int nToys);
-    void runSignificance(double nSig, double nBkg, int nToys,RooDataSet* sigPoolData,RooDataSet* bkgPoolData);
-    void runUpperLimit(double nSig, double nBkg, int nToys);
-    void runUpperLimit(double nSig, double nBkg, int nToys,RooDataSet* sigPoolData,RooDataSet* bkgPoolData);
-    void hypothesisSeparation(double nH0, double nH1, int nToys);
-    void hypothesisSeparationWithBackground(double nH0, double nH1, int nToys, RooAbsPdf* bkgpdf, double nBkg);
-    void hypothesisSeparationWithBackground(double nH0, double nH1, int nToys, 
-                                            RooDataSet* sig0PoolData, RooDataSet* sig1PoolData,
-                                            RooAbsPdf* bkgpdf, double nBkg, RooDataSet* bkgPoolData);
-
-    
-    double getNUL95( TH1F* histo );
-    
-    TNtuple* signifTuple;
-    TNtuple* signifTuple_em;
-    TNtuple* ulTuple;
-    TNtuple* ulTuple_em;
-    
-    TNtuple* hypTuple;
+  
+  statsFactory(RooArgSet* set, RooAbsPdf* pdf1, RooAbsPdf* pdf2, std::string outputFileName="test.root");
+  ~statsFactory();
+  
+  RooArgSet* observables; 
+  RooAbsPdf* H0pdf;
+  RooAbsPdf* H1pdf;
+  RooRealVar* nsig;
+  RooRealVar* nbkg;
+  RooAddPdf* totalPdf;
+  
+  TFile* fout;
+  
+  
+  void runSignificance(double nSig, double nBkg, int nToys);
+  void runSignificanceWithBackground(double nSig, double nBkg, RooAbsPdf* bkgpdf, int nToys);
+  void runSignificance(double nSig, double nBkg, int nToys,RooDataSet* sigPoolData,RooDataSet* bkgPoolData);
+  void runUpperLimit(double nSig, double nBkg, int nToys);
+  void runUpperLimit(double nSig, double nBkg, int nToys,RooDataSet* sigPoolData,RooDataSet* bkgPoolData);
+  void runUpperLimitWithBackground(double nSig, double nBkg, RooAbsPdf* bkgpdf, int nToys);
+  void hypothesisSeparation(double nH0, double nH1, int nToys);
+  void hypothesisSeparationWithBackground(double nH0, double nH1, int nToys, RooAbsPdf* bkgpdf, double nBkg);
+  void hypothesisSeparationWithBackground(double nH0, double nH1, int nToys, 
+					  RooDataSet* sig0PoolData, RooDataSet* sig1PoolData,
+					  RooAbsPdf* bkgpdf, double nBkg, RooDataSet* bkgPoolData);
+  
+  
+  double getNUL95( TH1F* histo );
+  
+  TNtuple* signifTuple;
+  TNtuple* signifTuple_em;
+  TNtuple* ulTuple;
+  TNtuple* ulTuple_em;
+  
+  TNtuple* hypTuple;
     TNtuple* hypTuple_em_wBkg;
 };
 
@@ -286,6 +288,72 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys){
     delete pullHisto;
 }
 
+// SIGNIFICANCE CALCULATION
+void statsFactory::runSignificanceWithBackground(double nSig, double nBkg,  RooAbsPdf* bkgpdf, int nToys){
+    
+    //Extended Likelihood Formalism
+    double nsignal=nSig;
+    double nbackground=nBkg;
+    double nPoiss;
+    
+    nsig->setVal(nsignal);
+    nbkg->setVal(nbackground);
+    
+    std::cout << "nsignal = " << nsignal << ",\t nbackground = " << nbackground << "\n";
+    
+    RooAddPdf* totalPdf0 = new RooAddPdf("totalPdf0","totalPdf0",RooArgList(*H0pdf,*bkgpdf),RooArgList(*nsig,*nbkg));
+    
+    // --- ntuple
+    TRandom rng;
+    
+    // --- histogram 
+    TH1F* signifHisto = new TH1F("signifHisto","signifHisto",100,0.,20.);    
+    TH1F* pullHisto = new TH1F("pullHisto","pullHisto",100,-5.,5.);    
+    
+    std::cout << "Performing " << nToys << " toys..." << std::endl;
+    for (int i = 0; i < nToys; i++){
+        
+        if(i%100==0) cout << "toy number " << i << endl;
+        
+        nPoiss = rng.Poisson(nsignal+nbackground);
+        nsig->setVal(nsignal);
+        nbkg->setVal(nbackground);
+	std::cout << "nPoiss =" << nPoiss  << ",\t nsignal = " << nsignal << ",\t nbackground = " << nbackground << "\n";
+	
+        //--------------------------------------------------------------------------------------------
+        // generating dataset
+        RooDataSet* data = totalPdf0->generate(*observables, (int) nPoiss);
+        
+        // fit full float
+        nsig->setConstant(kFALSE); nbkg->setConstant(kFALSE);
+        RooFitResult* r = totalPdf0->fitTo(*data,Extended(kTRUE),Minos(kFALSE),Save(kTRUE),Verbose(kFALSE),PrintLevel(-1));
+        /////r->Print();
+        double nSigFit = nsig->getVal();
+        double nBkgFit = nbkg->getVal();
+        
+        // fit fix signal to zero
+	nsig->setVal(0.000001); nsig->setConstant(kTRUE); nbkg->setConstant(kFALSE);
+        RooFitResult* r0 = totalPdf0->fitTo(*data,Extended(kTRUE),Minos(kFALSE),Save(kTRUE),Verbose(kFALSE), PrintLevel(-1));
+                
+        Double_t significance = sqrt(2*fabs(r->minNll() - r0->minNll()));
+        pullHisto->Fill( (nSigFit-nSig)/nsig->getError() );
+        
+        std::cout << significance << ", " << r->minNll() << ", " << r0->minNll() << ", " << nPoiss << ", " << nSigFit << ", " << nBkgFit << std::endl;
+        signifTuple->Fill( significance,r->minNll(),r0->minNll(), nPoiss, nSigFit, nBkgFit );
+        signifHisto->Fill( significance );
+        
+        delete data;
+        delete r;  
+        delete r0;  
+    }
+    
+    fout->cd();
+    signifHisto->Write("h_significance");
+    pullHisto->Write("h_pull");
+    delete signifHisto;
+    delete pullHisto;
+}
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -372,7 +440,7 @@ void statsFactory::runUpperLimit(double nSig, double nBkg, int nToys,
         }
         
         Double_t nUL = getNUL95( h_likeliScan_reScl );
-        ulTuple_em->Fill( nUL, nPoiss );
+	ulTuple_em->Fill( nUL, nPoiss );
         ulHisto->Fill( nUL );
         
         delete data;
@@ -462,6 +530,85 @@ void statsFactory::runUpperLimit(double nSig, double nBkg, int nToys){
     ulHisto->Write("h_nUL");
     
 }
+
+
+// UPPER LIMIT CALCULATION with explicit background
+void statsFactory::runUpperLimitWithBackground(double nSig, double nBkg, RooAbsPdf* bkgpdf, int nToys){
+    
+    // internal parameters
+    int iLoopScans = 200;  // number of steps to take to scan in nSig
+    double sclFactor = nBkg*.03; // how far w.r.t. the input nBkg to scan in 
+    
+    double nsignal=nSig;
+    double nbackground=nBkg;
+    double nPoiss;
+
+    nsig->setVal(nsignal);
+    nbkg->setVal(nbackground);
+    RooAddPdf* totalPdf0 = new RooAddPdf("totalPdf0","totalPdf0",RooArgList(*H0pdf,*bkgpdf),RooArgList(*nsig,*nbkg));
+    
+    double stepSize = nbackground*sclFactor/( (double) iLoopScans);
+    TH1F* ulHisto = new TH1F("ulHisto","ulHisto",100,0,nSig*2);
+    TRandom rng;
+    
+    // start running toys
+    for (int i = 0; i < nToys; i++) {
+        
+        nPoiss = rng.Poisson( 0. + nbackground );  // fix number of signal events to 0
+        
+        nsig->setVal(0.);
+        nbkg->setVal(nbackground);
+        RooDataSet* data = totalPdf0->generate(*observables, (int) nPoiss) ;
+        
+        TH1F* h_chi2Scan = new TH1F( "h_chi2Scan","h_chi2Scan", iLoopScans, 0., nbackground*sclFactor );
+        TH1F* h_chi2Scan_reScl = new TH1F( "h_chi2Scan_reScl","h_chi2Scan_reScl", iLoopScans, 0., nbackground*sclFactor );
+        TH1F* h_likeliScan_reScl = new TH1F( "h_likeliScan_reScl","h_likeliScan_reScl", iLoopScans, 0., nbackground*sclFactor );
+        
+        for (int j = 0; j < iLoopScans; j++){
+            
+	    // std::cout << "Experiment: " << i << ", Loop: " << j << std::endl;
+            
+  	   nsig->setConstant(kFALSE);
+            nbkg->setConstant(kFALSE);
+            
+            const Double_t vall = (Double_t) j*stepSize;            
+            nsig->setVal( vall );
+            
+            RooFitResult* r = totalPdf0->fitTo(*data,Extended(kTRUE),Minos(kTRUE),Save(kTRUE),Verbose(kFALSE), PrintLevel(-1), Warnings(kFALSE), PrintEvalErrors(-1));
+            
+            // fill histo
+            h_chi2Scan->SetBinContent( j+1, (r->minNll()) );
+            
+            delete r; 
+            
+        }
+        
+        std::cout << "min Val of chi2 Scan: " << h_chi2Scan->GetMinimum() << std::endl;
+        Double_t minR = h_chi2Scan->GetMinimum();
+        for (int aa = 1; aa <= iLoopScans; aa++){
+            Double_t curR = h_chi2Scan->GetBinContent( aa );
+            h_chi2Scan_reScl->SetBinContent( aa, curR - minR ); 
+            h_likeliScan_reScl->SetBinContent( aa, exp(minR - curR) );
+        }
+        
+        Double_t nUL = getNUL95( h_likeliScan_reScl );
+	// now do the CMS styple for the UL
+	nUL = (nUL - nBkg) / nSig;
+        ulTuple->Fill( nUL, nPoiss );
+        ulHisto->Fill( nUL );
+        
+        delete data;
+        delete h_likeliScan_reScl;
+        delete h_chi2Scan;
+        delete h_chi2Scan_reScl;
+    }
+    
+    fout->cd();
+    ulHisto->Write("h_nUL");
+    
+}
+
+
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -649,42 +796,46 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
       if ( i % 100 == 0 ) 
         cout << "toy number " << i << endl;
       
-	nsig0->setVal(nH0);
-	nbkg0->setVal(nBkg);
-	
         nPoiss1 = rng.Poisson(nH0 + nBkg);
         nPoiss2 = rng.Poisson(nH1 + nBkg);
         
-        //--------------------------------------------------------------------------------------------
-        // generating dataset
+        //
+        // generating pseduo-dataset based on the H0 + background
+	// 
+	nsig0->setVal(nH0);
+	nbkg0->setVal(nBkg);
         RooDataSet* data_H0 = totalPdf0->generate(*observables, (int) nPoiss1);
         
-	// fit H0
+	// fit H0 and log in the pull of the fit
+        nsig0->setConstant(kFALSE); nbkg0->setConstant(kFALSE);
         RooFitResult* r_H0 = totalPdf0->fitTo(*data_H0,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE),PrintLevel(-1));
 	double nSigFitH0 = nsig0->getVal();
         double nBkgFitH0 = nbkg0->getVal();
 	double nSigPullH0 = nsig0->getError() > 0 ? (nsig0->getVal() - nH0) / nsig0->getError() : -999;
 	double nBkgPullH0 = nbkg0->getError() > 0 ? (nbkg0->getVal() - nBkg) / nbkg0->getError() : -999;
+
 	// fit H1
+        nsig1->setConstant(kFALSE); nbkg1->setConstant(kFALSE);
         RooFitResult* r0_H0 = totalPdf1->fitTo(*data_H0,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE), PrintLevel(-1));
         double s_estimator_H0 = 2.*(r_H0->minNll() - r0_H0->minNll());
         
-        //--------------------------------------------------------------------------------------------
-        // generating dataset
+	//
+	// generating pseduo-dataset based on the H1 + background
+	// 
 	nsig1->setVal(nH1);
 	nbkg1->setVal(nBkg);
         RooDataSet* data_H1 = totalPdf1->generate(*observables, (int) nPoiss2);
         // fit H0
+        nsig0->setConstant(kFALSE); nbkg0->setConstant(kFALSE);
         RooFitResult* r_H1 = totalPdf0->fitTo(*data_H1,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE),PrintLevel(-1));
         // fit H1
+        nsig1->setConstant(kFALSE); nbkg1->setConstant(kFALSE);
         RooFitResult* r0_H1 = totalPdf1->fitTo(*data_H1,Minos(kFALSE),Save(kTRUE),Verbose(kFALSE), PrintLevel(-1));
 	double nSigFitH1 = nsig1->getVal();
         double nBkgFitH1 = nbkg1->getVal();
-	double nSigPullH1 = nsig0->getError() > 0 ? (nsig1->getVal() - nH1) / nsig1->getError() : -999;
-	double nBkgPullH1 = nbkg0->getError() > 0 ? (nbkg1->getVal() - nBkg) / nbkg1->getError() : -999;
+	double nSigPullH1 = nsig1->getError() > 0 ? (nsig1->getVal() - nH1) / nsig1->getError() : -999;
+	double nBkgPullH1 = nbkg1->getError() > 0 ? (nbkg1->getVal() - nBkg) / nbkg1->getError() : -999;
         double s_estimator_H1 = 2.*(r_H1->minNll() - r0_H1->minNll());
-	std::cout << "s_H0: " << s_estimator_H0 << ", s_H1: " << s_estimator_H1 << std::endl;
-	// hypTuple->Fill( s_estimator_H0, s_estimator_H1, nSigFitH0, nBkgFitH0, nSigPullH0, nBkgPullH0, nSigFitH1, nBkgFitH1, nSigPullH1, nBkgPullH1 );
 	hypTuple->Fill( s_estimator_H0, s_estimator_H1, nSigFitH0, nBkgFitH0, nSigPullH0, nBkgPullH0, nSigFitH1, nBkgFitH1, nSigPullH1, nBkgPullH1 );
         
         

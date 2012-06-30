@@ -1,25 +1,24 @@
 #include "enums.h"
 
-runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw);
+void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw);
 
 void runSigSepWW() {
   
   int higgsMass=125;
   double intLumi=20.0;
   int nToys = 1000;
-  bool draw=true;
+  bool draw=false;
 
-  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, MLL, pure, draw);
-  
-  /*
-  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHI, pure, draw);
-  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLL, pure, draw);
-  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHIMT, pure, draw);
-  
-  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, DPHI, pure, draw);
-  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, MLL, pure, draw);
-  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, DPHIMT, pure, draw);
-  */
+  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, MLLMT, pure, draw);
+  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, MLL, pure, draw);
+  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, DPHIMT, pure, draw);
+  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, DPHI, pure, draw);
+
+  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHI, pure, draw);
+  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLL, pure, draw);
+  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHIMT, pure, draw);
+  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLLMT, pure, draw);
+
 
 }
 void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw) {
@@ -55,7 +54,7 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
       return;
     }
     
-    RooRealVar* dphill = new RooRealVar("dphill","#Delta#phi(leptons) [degrees]", 0, TMath::Pi());
+    RooRealVar* dphill = new RooRealVar("dphill","#Delta#phi(leptons) [radian]", 0, TMath::Pi());
     dphill->setBins(20);
     RooRealVar* mt  = new RooRealVar("mt","transverse higgs mass", lowMt, highMt);
     mt->setBins(20);
@@ -70,6 +69,9 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
     if ( var == MLL ) 
       obs = new RooArgSet(*mll) ;
     
+    if ( var == MLLMT ) 
+      obs = new RooArgSet(*mll, *mt) ;
+
     if ( var == DPHIMT ) 
       obs = new RooArgSet(*dphill, *mt) ;
 
@@ -122,7 +124,7 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
 	plot1 = dphill->frame();
 	plot1Name = Form("MELAproj_%s_%s_%s_dphi", testName.Data(), toyName.Data(), varName.Data());
       }
-      if ( var == MLL ) {
+      if ( var == MLL || var == MLLMT) {
 	plot1 = mll->frame();
 	plot1Name = Form("MELAproj_%s_%s_%s_mll", testName.Data(), toyName.Data(), varName.Data());
       }
@@ -140,7 +142,7 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
       c1->SaveAs(Form("plots/pngfiles/%s.png", plot1Name.Data()));
 
       
-      if ( var  == DPHIMT ) {
+      if ( var  == DPHIMT || var == MLLMT ) {
 	RooPlot* plot2 = mt->frame();
 	TString	plot2Name;
 	plot2Name = Form("MELAproj_%s_%s_%s_mt", testName.Data(), toyName.Data(), varName.Data());
