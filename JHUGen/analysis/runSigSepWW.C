@@ -1,27 +1,28 @@
 #include "enums.h"
 
-void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw);
+void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw, const unsigned int seed);
 
-void runSigSepWW() {
+void runSigSepWW(const unsigned int seed) {
   
   int higgsMass=125;
-  double intLumi=20.0;
-  int nToys = 1000;
+  double intLumi=10.0;
+  int  nToys = 1000;
+  
   bool draw=false;
 
   // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, MLLMT, pure, draw);
-  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, MLL, pure, draw);
   // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, DPHIMT, pure, draw);
-  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, DPHI, pure, draw);
 
+  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHIMT, pure, draw, seed);
+  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLLMT, pure, draw, seed);  
+
+  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, MLL, pure, draw);
+  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, DPHI, pure, draw);
   // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHI, pure, draw);
   // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLL, pure, draw);
-  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHIMT, pure, draw);
-  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLLMT, pure, draw);
-
-
+  
 }
-void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw) {
+void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw, const unsigned int seed) {
     
     using namespace RooFit;
     
@@ -29,8 +30,13 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
     setTDRStyle();
     gStyle->SetPadLeftMargin(0.16);
     gROOT->ForceStyle();
-    gROOT->ProcessLine(".L statsFactory.cc+");
-    
+    // gROOT->ProcessLine(".L statsFactory.cc+");
+    gROOT->ProcessLine(".L statsFactory_cc.so");
+    gSystem->Load("libTree.so");
+    gSystem->Load("libPhysics.so");
+    gSystem->Load("libEG.so");
+    gSystem->Load("libMathCore.so");
+
     //
     // set up test kind 
     // 
@@ -106,14 +112,16 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
     RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", *obs, *bkgHist);
 
 
-    char statResults[25];
+    char statResults[50];
     statsFactory *myHypothesisSeparation;
-    sprintf(statResults,"stat_%s_%s_%s_%.0ffb.root",testName.Data(), toyName.Data(), varName.Data(), intLumi);
-    myHypothesisSeparation = new statsFactory(obs, sigHyp1Pdf, sigHyp2Pdf, statResults);
+    sprintf(statResults,"stat_%s_%s_%s_%.0ffb_%u.root",testName.Data(), toyName.Data(), varName.Data(), intLumi, seed);
+    printf(statResults);
+    myHypothesisSeparation = new statsFactory(obs, sigHyp1Pdf, sigHyp2Pdf, seed, statResults);
     // running pure toys
     myHypothesisSeparation->hypothesisSeparationWithBackground(sigRate*intLumi,sigRate*intLumi,nToys,bkgPdf,bkgRate*intLumi);
     delete myHypothesisSeparation;
-    
+    std::cout << "deleted myHypothesisSeparation" << std::endl;
+ 
     // draw plots 
     if(draw) {
       RooPlot* plot1;
@@ -159,7 +167,11 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
       }
 
       delete c1;
+      delete plot1;
+      delete plot2;
     }
+
+    // tidy up
 
 
 }
