@@ -6,20 +6,21 @@ void runsignificancexwwcuts()
 {
 
   int higgsMass=125;
-  double intLumi=20.0;
+  double intLumi=10.0;
   int nToys = 1000;
 
-  // runsignfiancesingle( higgsMass, intLumi, nToys, MLL, zeroplus);
-  // runsignfiancesingle( higgsMass, intLumi, nToys, DPHIMT, zeroplus);
-  // runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, zeroplus);
+  
+  
+  runsignfiancesingle( higgsMass, intLumi, nToys, DPHIMT, zeroplus);
+  runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, zeroplus);
   
   runsignfiancesingle( higgsMass, intLumi, nToys, DPHIMT, zerominus);
-  // runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, zerominus);
+  runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, zerominus);
 
   // runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, twoplus);
   // runsignfiancesingle( higgsMass, intLumi, nToys, DPHIMT, twoplus);
 
-
+  // runsignfiancesingle( higgsMass, intLumi, nToys, MLL, zeroplus);
 
 }  
 
