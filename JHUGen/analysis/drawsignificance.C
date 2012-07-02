@@ -30,17 +30,21 @@ void   drawsignificance ()
 {
   
   double higgsMass = 125.;
-  double intLumi = 20.;
-  
+  double intLumi = 10.;
+
+  drawsingle(higgsMass, intLumi, twoplus, MLLMT, pure);
+  drawsingle(higgsMass, intLumi, twoplus, DPHIMT, pure);
+
   drawsingle(higgsMass, intLumi, zeroplus, DPHIMT, pure);
   drawsingle(higgsMass, intLumi, zeroplus, MLLMT, pure);
 
   drawsingle(higgsMass, intLumi, zerominus, DPHIMT, pure);
   drawsingle(higgsMass, intLumi, zerominus, MLLMT, pure);
 
+  /*
   drawsingle(higgsMass, intLumi, twoplus, DPHIMT, pure);
   drawsingle(higgsMass, intLumi, twoplus, MLLMT, pure);
-
+  */
 }
 
 void drawsingle(double higgsMass, double intLumi, int spin, int var, int toy)
@@ -81,7 +85,7 @@ void drawsingle(double higgsMass, double intLumi, int spin, int var, int toy)
   double ytex_rms = 0.75;
 
   if ( ( spin == zeroplus || spin == zerominus) && var == MLLMT ) 
-    xtex = 0.50;
+    xtex = 0.86;
 
   
   TLatex* tex_test = new TLatex(xtex, ytex_test, Form("%s/%.0ffb/%s", getSpinName(spin).Data(), intLumi, varName.Data()));
@@ -91,14 +95,14 @@ void drawsingle(double higgsMass, double intLumi, int spin, int var, int toy)
   tex_test->SetNDC(1);
 
 
-  TLatex* tex_mean = new TLatex(xtex, ytex_mean, Form("Mean = %.1f +/- %.1f", mean, err_mean));
+  TLatex* tex_mean = new TLatex(xtex, ytex_mean, Form("Mean = %.1f", mean));
   tex_mean->SetTextAlign(32);
   tex_mean->SetTextFont(42);
   tex_mean->SetTextSize(.05);
   tex_mean->SetNDC(1);
 
 
-  TLatex* tex_rms = new TLatex(xtex, ytex_rms, Form("RMS = %.1f +/- %.1f", rms, err_rms));
+  TLatex* tex_rms = new TLatex(xtex, ytex_rms, Form("RMS = %.1f", rms));
   tex_rms->SetTextAlign(32);
   tex_rms->SetTextFont(42);
   tex_rms->SetTextSize(.05);
