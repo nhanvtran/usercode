@@ -27,7 +27,7 @@
 double intLumi = 10.;
 
 void drawsingle(int test, int var, int toy);
-
+int getMedianBin(TH1F& *h);
 void drawhypsep() {
   
   // drawsingle(zeroplusVSzerominus,MLLMT, pure);
@@ -68,15 +68,17 @@ void drawsingle(int test, int var, int toy)
 
   if ( test & zeroplusVStwoplus) {
     if ( var == MLLMT) {
-      xmin = -40.;
-      xmax = 25.;
+      xmin = -50.;
+      xmax = 50.;
     } else {
-      xmin = -25.;
-      xmax = 25.;
+      xmin = -40.;
+      xmax = 40.;
     }
+    nbins = 1000;
   }
 
   if ( (var & DPHIMT) && (test & zeroplusVSzerominus)) {
+    nbins = 40;
     xmin = -10.;
     xmax = 10.;
   }
@@ -85,14 +87,13 @@ void drawsingle(int test, int var, int toy)
 
   TH1F *S_H0 = new TH1F("S_H0", "S_H0", nbins, xmin, xmax);
   hypTuple->Project("S_H0", "S_H0", cut);
-  S_H0->Fit("gaus");
-
+  
   double mean_S_H0 = S_H0->GetMean();
   std::cout << "mean_S_H0 = " << mean_S_H0 << "\t";
   
   TH1F *S_H1 = new TH1F("S_H1", "S_H1", nbins, xmin, xmax);
   hypTuple->Project("S_H1", "S_H1", cut);
-  S_H1->Fit("gaus");
+  
   double mean_S_H1 = S_H1->GetMean();
   std::cout << "mean_S_H1 = " << mean_S_H1 << "\n";
 
@@ -153,10 +154,26 @@ void drawsingle(int test, int var, int toy)
   }  
    
   std::cout << "coverage : " << coverage << ", for bin " << nbin_eq << "\n";
-  sepH = 2*ROOT::Math::normal_quantile_c(1.0 - coverage, 1.0);
+  double sepH = 2*ROOT::Math::normal_quantile_c(1.0 - coverage, 1.0);
   std::cout << "histogram separatino is: " <<  sepH << ", with sigma coverage: " << coverage << std::endl;
   
+  // 
+  // Calculate the fraction of events of the hypothesis 2 in the hyp1's plot
+  //
+  int bin_median_H1 = getMedianBin(S_H1);
+  std::cout << "bin_median_H1 = " << bin_median_H1 << "\n";
   
+  double frac_H0_beyondH1Median = S_H0->Integral(bin_median_H1, nBins) / norm0;
+  double sepH0vsH1 = ROOT::Math::normal_quantile_c(frac_H0_beyondH1Median, 1.0);
+  std::cout << "frac of H0 histogram beyond the H1 median " << frac_H0_beyondH1Median << ", correspond to " << sepH0vsH1 << " sigma\n";
+  
+
+  int bin_median_H0 = getMedianBin(S_H0);
+  std::cout << "bin_median_H0 = " << bin_median_H0 << "\n";
+  
+  double frac_H1_beyondH0Median = S_H1->Integral(1, bin_median_H0) / norm1;
+  double sepH1vsH0 = ROOT::Math::normal_quantile_c(frac_H1_beyondH0Median, 1.0);
+  std::cout << "frac of H1 histogram beyond the H0 median " << frac_H1_beyondH0Median << ", correspond to " << sepH1vsH0 << " sigma\n";
   //
   // Plotting stuff
   // 
@@ -170,8 +187,6 @@ void drawsingle(int test, int var, int toy)
   S_H1->SetXTitle("-2ln(L_{1}/L_{2})");
   S_H0->SetYTitle("experiments");
   S_H1->SetYTitle("experiments");
-  float yMax_S = S_H0->GetMaximum();
-  yMax_S = yMax_S > S_H1->GetMaximum() ? yMax_S : S_H1->GetMaximum();
 
 
   TLegend *leg = new TLegend(0.65, 0.7, 0.85, 0.9);
@@ -187,29 +202,44 @@ void drawsingle(int test, int var, int toy)
   }
 
 
-  TLatex* tex_sepHeader = new TLatex(0.45, 0.88, Form("Seperation %.1f #sigma", sepH));
-  tex_sepHeader->SetTextAlign(32);
-  tex_sepHeader->SetTextFont(42);
-  tex_sepHeader->SetTextSize(.05);
-  tex_sepHeader->SetNDC(1);
-
-  TLatex* tex_sepH = new TLatex(0.40, 0.83, Form("%.1f +/- %.1f #sigma", sepH, coverage));
-  tex_sepH->SetTextAlign(32);
+  TLatex* tex_sepH = new TLatex(0.25, 0.85, Form("S  %.1f #sigma", sepH));
   tex_sepH->SetTextFont(42);
   tex_sepH->SetTextSize(.05);
   tex_sepH->SetNDC(1);
+  
+  TLatex* tex_sepH0vsH1 = new TLatex(0.25, 0.80, Form("S_{1}  %.1f #sigma", sepH0vsH1));
+  tex_sepH0vsH1->SetTextFont(42);
+  tex_sepH0vsH1->SetTextSize(.05);
+  tex_sepH0vsH1->SetNDC(1);
+
+
+  TLatex* tex_sepH1vsH0 = new TLatex(0.25, 0.75, Form("S_{2} %.1f #sigma", sepH1vsH0));
+  tex_sepH1vsH0->SetTextFont(42);
+  tex_sepH1vsH0->SetTextSize(.05);
+  tex_sepH1vsH0->SetNDC(1);
+
+
 
 
   TCanvas *c1 = new TCanvas("c1", "c1", 800, 600);
+  if ( nbins > 100 ) {
+    S_H0->Rebin(int(nbins/100));
+    S_H1->Rebin(int(nbins/100));
+  }
   S_H0->SetMarkerColor(kBlue);
-  // S_H0->SetLineWidth(2.5);
-  // S_H1->SetLineWidth(2.5);
+  float yMax_S = S_H0->GetMaximum();
+  yMax_S = yMax_S > S_H1->GetMaximum() ? yMax_S : S_H1->GetMaximum();
   S_H0->SetMarkerStyle(24);
   S_H0->SetMaximum(yMax_S * 1.2);
+  
+  S_H0->Fit("gaus");
+  S_H1->Fit("gaus");
   S_H0->Draw("e");
   S_H1->Draw("samee");
   leg->Draw("same");
-  tex_sepHeader->Draw("same");
+  tex_sepH->Draw("same");
+  tex_sepH0vsH1->Draw("same");
+  tex_sepH1vsH0->Draw("same");
   c1->SaveAs(Form("plots/epsfiles/hypsep_%s_%s_%s_%.0ffb.eps", testName.Data(), toyName.Data(), varName.Data(), intLumi));
   c1->SaveAs(Form("plots/pngfiles/hypsep_%s_%s_%s_%.0ffb.png", testName.Data(), toyName.Data(), varName.Data(), intLumi));
   
@@ -254,4 +284,29 @@ void drawsingle(int test, int var, int toy)
   delete c1;
   file->Close();
 
+}
+
+
+int getMedianBin(TH1F& *h) {
+  
+  if ( h == 0 ) {
+    return 0;
+  }
+  int nBins = h->GetNbinsX();
+  
+  double norm = h->Integral(1, nBins);
+  int bin_median = 1;
+  double diff = 1;
+
+  for ( int i = 1; i < nBins; i++) {
+    double frac = h->Integral(1, i) / norm;
+    double diff_bin = fabs(frac - 0.5 );
+    if ( diff_bin < diff ) {
+      diff = diff_bin;
+      bin_median = i;
+    }
+    // std::cout << "Bin " << i << ", frac " << frac << ", diff_bin " << diff_bin << "\n";
+  }
+  
+  return bin_median;
 }
