@@ -29,7 +29,7 @@
 #include "RooRealVar.h"
 #include "RooDataSet.h"
 #include "RooFitResult.h"
-#include "TRandom.h"
+#include "TRandom3.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TNtuple.h"
@@ -44,7 +44,9 @@ public:
     
     //Default constructor
   
-  statsFactory(RooArgSet* set, RooAbsPdf* pdf1, RooAbsPdf* pdf2, std::string outputFileName="test.root");
+  statsFactory(RooArgSet* set, RooAbsPdf* pdf1, RooAbsPdf* pdf2, 
+                    const unsigned int seed,
+                    std::string outputFileName="test.root");
   ~statsFactory();
   
   RooArgSet* observables; 
@@ -78,14 +80,18 @@ public:
   TNtuple* ulTuple_em;
   
   TNtuple* hypTuple;
-    TNtuple* hypTuple_em_wBkg;
+  TNtuple* hypTuple_em_wBkg;
+
+    private:
+        unsigned int seed_;
 };
 
 
 // CONSTRUCTOR
-statsFactory::statsFactory(RooArgSet* set, RooAbsPdf* pdf1, RooAbsPdf* pdf2, std::string outputFileName){
+statsFactory::statsFactory(RooArgSet* set, RooAbsPdf* pdf1, RooAbsPdf* pdf2, const unsigned int seed, std::string outputFileName) {
     
     std::cout << "in the constructor!" << std::endl;
+    seed_ = seed;
     observables = set;
     H0pdf = pdf1;
     H1pdf = pdf2;
@@ -119,7 +125,7 @@ statsFactory::~statsFactory(){
     ulTuple_em->Write();
     hypTuple_em_wBkg->Write();
     fout->Close();
-    
+   
 }
 
 // ----------------------------------------------------------------------
@@ -140,18 +146,17 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys,
     nsig->setVal(nsignal);
     nbkg->setVal(nbackground);
     
-    // --- ntuple
-    TRandom rng;
-    
     // --- histogram
     TH1F* signifHisto = new TH1F("signifHisto","signifHisto",100,0.,20.);
     TH1F* pullHisto = new TH1F("pullHisto","pullHisto",100,-5.,5.);
-    
+   
+    TRandom3 rng_;
+    rng_.SetSeed(seed_); 
     std::cout << "Performing " << nToys << " toys..." << std::endl;
     for (int i = 0; i < nToys; i++){
         
-        nPoissSig = rng.Poisson(nsignal);
-        nPoissBkg = rng.Poisson(nbackground);
+        nPoissSig = rng_.Poisson(nsignal);
+        nPoissBkg = rng_.Poisson(nbackground);
         nsig->setVal(nsignal);
         nbkg->setVal(nbackground);
         //--------------------------------------------------------------------------------------------
@@ -235,19 +240,18 @@ void statsFactory::runSignificance(double nSig, double nBkg, int nToys){
     nsig->setVal(nsignal);
     nbkg->setVal(nbackground);
     
-    // --- ntuple
-    TRandom rng;
-    
     // --- histogram 
     TH1F* signifHisto = new TH1F("signifHisto","signifHisto",100,0.,20.);    
     TH1F* pullHisto = new TH1F("pullHisto","pullHisto",100,-5.,5.);    
-    
+   
+    TRandom3 rng_;
+    rng_.SetSeed(seed_); 
     std::cout << "Performing " << nToys << " toys..." << std::endl;
     for (int i = 0; i < nToys; i++){
         
         if(i%100==0) cout << "toy number " << i << endl;
         
-        nPoiss = rng.Poisson(nsignal+nbackground);
+        nPoiss = rng_.Poisson(nsignal+nbackground);
         nsig->setVal(nsignal);
         nbkg->setVal(nbackground);
         //--------------------------------------------------------------------------------------------
@@ -299,26 +303,25 @@ void statsFactory::runSignificanceWithBackground(double nSig, double nBkg,  RooA
     nsig->setVal(nsignal);
     nbkg->setVal(nbackground);
     
-    std::cout << "nsignal = " << nsignal << ",\t nbackground = " << nbackground << "\n";
+    // std::cout << "nsignal = " << nsignal << ",\t nbackground = " << nbackground << "\n";
     
     RooAddPdf* totalPdf0 = new RooAddPdf("totalPdf0","totalPdf0",RooArgList(*H0pdf,*bkgpdf),RooArgList(*nsig,*nbkg));
-    
-    // --- ntuple
-    TRandom rng;
     
     // --- histogram 
     TH1F* signifHisto = new TH1F("signifHisto","signifHisto",100,0.,20.);    
     TH1F* pullHisto = new TH1F("pullHisto","pullHisto",100,-5.,5.);    
-    
+
+    TRandom3 rng_;
+    rng_.SetSeed(seed_);
     std::cout << "Performing " << nToys << " toys..." << std::endl;
     for (int i = 0; i < nToys; i++){
         
         if(i%100==0) cout << "toy number " << i << endl;
         
-        nPoiss = rng.Poisson(nsignal+nbackground);
+        nPoiss = rng_.Poisson(nsignal+nbackground);
         nsig->setVal(nsignal);
         nbkg->setVal(nbackground);
-	std::cout << "nPoiss =" << nPoiss  << ",\t nsignal = " << nsignal << ",\t nbackground = " << nbackground << "\n";
+	// std::cout << "nPoiss =" << nPoiss  << ",\t nsignal = " << nsignal << ",\t nbackground = " << nbackground << "\n";
 	
         //--------------------------------------------------------------------------------------------
         // generating dataset
@@ -338,7 +341,8 @@ void statsFactory::runSignificanceWithBackground(double nSig, double nBkg,  RooA
         Double_t significance = sqrt(2*fabs(r->minNll() - r0->minNll()));
         pullHisto->Fill( (nSigFit-nSig)/nsig->getError() );
         
-        std::cout << significance << ", " << r->minNll() << ", " << r0->minNll() << ", " << nPoiss << ", " << nSigFit << ", " << nBkgFit << std::endl;
+	if(i%100==0)
+	  std::cout << significance << ", " << r->minNll() << ", " << r0->minNll() << ", " << nPoiss << ", " << nSigFit << ", " << nBkgFit << std::endl;
         signifTuple->Fill( significance,r->minNll(),r0->minNll(), nPoiss, nSigFit, nBkgFit );
         signifHisto->Fill( significance );
         
@@ -376,12 +380,13 @@ void statsFactory::runUpperLimit(double nSig, double nBkg, int nToys,
     
     double stepSize = nbackground*sclFactor/( (double) iLoopScans);
     TH1F* ulHisto = new TH1F("ulHisto","ulHisto",100,0,nSig*2);
-    TRandom rng;
-    
+   
+    TRandom3 rng_;
+    rng_.SetSeed(seed_); 
     // start running toys
     for (int i = 0; i < nToys; i++) {
         
-        nPoiss = rng.Poisson( 0. + nbackground );  // fix number of signal events to 0
+        nPoiss = rng_.Poisson( 0. + nbackground );  // fix number of signal events to 0
         
         nsig->setVal(0.);
         nbkg->setVal(nbackground);
@@ -471,12 +476,13 @@ void statsFactory::runUpperLimit(double nSig, double nBkg, int nToys){
     
     double stepSize = nbackground*sclFactor/( (double) iLoopScans);
     TH1F* ulHisto = new TH1F("ulHisto","ulHisto",100,0,nSig*2);
-    TRandom rng;
-    
+   
+    TRandom3 rng_;
+    rng_.SetSeed(seed_); 
     // start running toys
     for (int i = 0; i < nToys; i++) {
         
-        nPoiss = rng.Poisson( 0. + nbackground );  // fix number of signal events to 0
+        nPoiss = rng_.Poisson( 0. + nbackground );  // fix number of signal events to 0
         
         nsig->setVal(0.);
         nbkg->setVal(nbackground);
@@ -549,12 +555,13 @@ void statsFactory::runUpperLimitWithBackground(double nSig, double nBkg, RooAbsP
     
     double stepSize = nbackground*sclFactor/( (double) iLoopScans);
     TH1F* ulHisto = new TH1F("ulHisto","ulHisto",100,0,nSig*2);
-    TRandom rng;
-    
+   
+    TRandom3 rng_;
+    rng_.SetSeed(seed_); 
     // start running toys
     for (int i = 0; i < nToys; i++) {
         
-        nPoiss = rng.Poisson( 0. + nbackground );  // fix number of signal events to 0
+        nPoiss = rng_.Poisson( 0. + nbackground );  // fix number of signal events to 0
         
         nsig->setVal(0.);
         nbkg->setVal(nbackground);
@@ -633,10 +640,9 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
     RooRealVar* nbkg1 = new RooRealVar("nbkg1","number of background events", nBkg, 0., nBkg*2.0);
     //Construct composite PDF
     RooAddPdf* totalPdf1 = new RooAddPdf("totalPdf1","totalPdf1",RooArgList(*H1pdf,*bkgpdf),RooArgList(*nsig1,*nbkg1));
-    
-    // --- ntuple
-    TRandom rng;
-    
+   
+    TRandom3 rng_;
+    rng_.SetSeed(seed_); 
     std::cout << "Performing " << nToys << " toys..." << std::endl;
     int sig0PlaceHolder = 0;
     int sig1PlaceHolder = 0;
@@ -648,10 +654,10 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
 	cout << "sig1PlaceHolder=" << sig1PlaceHolder << endl;
 	cout << "bkgPlaceHolder=" << bkgPlaceHolder << endl;
         
-        nPoiss1_sig = rng.Poisson(nH0);
-        nPoiss2_sig = rng.Poisson(nH1);
-        nPoiss1_bkg = rng.Poisson(nBkg);
-        nPoiss2_bkg = rng.Poisson(nBkg);
+        nPoiss1_sig = rng_.Poisson(nH0);
+        nPoiss2_sig = rng_.Poisson(nH1);
+        nPoiss1_bkg = rng_.Poisson(nBkg);
+        nPoiss2_bkg = rng_.Poisson(nBkg);
         
         //--------------------------------------------------------------------------------------------
         // generating dataset
@@ -787,18 +793,20 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
     RooRealVar* nbkg1 = new RooRealVar("nbkg1","number of background events", nBkg, 0., nBkg*10.0);
     //Construct composite PDF
     RooAddPdf* totalPdf1 = new RooAddPdf("totalPdf1","totalPdf1",RooArgList(*H1pdf,*bkgpdf),RooArgList(*nsig1,*nbkg1));
-    
-    // --- ntuple
-    TRandom rng;
-    
-    std::cout << "Performing " << nToys << " toys..." << std::endl;
+   
+    TRandom3 rng_;
+    rng_.SetSeed(seed_); 
+    std::cout << "pure toy : Performing " << nToys << " toys..." << std::endl;
     for (int i = 0; i < nToys; i++){
       if ( i % 100 == 0 ) 
         cout << "toy number " << i << endl;
       
-        nPoiss1 = rng.Poisson(nH0 + nBkg);
-        nPoiss2 = rng.Poisson(nH1 + nBkg);
+        nPoiss1 = rng_.Poisson(nH0 + nBkg);
+        nPoiss2 = rng_.Poisson(nH1 + nBkg);
         
+	if ( i % 100 == 0 ) {
+	  std::cout << "nPoiss1 = " << nPoiss1 << "\t nPoiss2 = " << nPoiss2 << "\n";
+	}
         //
         // generating pseduo-dataset based on the H0 + background
 	// 
@@ -861,17 +869,16 @@ void statsFactory::hypothesisSeparation(double nH0, double nH1, int nToys){
     
     //nsig->setVal(nsignal);
     //nbkg->setVal(nbackground);
-    
-    // --- ntuple
-    TRandom rng;
-    
+   
+    TRandom3 rng_;
+    rng_.SetSeed(seed_);
     std::cout << "Performing " << nToys << " toys..." << std::endl;
     for (int i = 0; i < nToys; i++){
         
         cout << "toy number " << i << endl;
         
-        nPoiss1 = rng.Poisson(nH0_val);
-        nPoiss2 = rng.Poisson(nH1_val);
+        nPoiss1 = rng_.Poisson(nH0_val);
+        nPoiss2 = rng_.Poisson(nH1_val);
 
         //--------------------------------------------------------------------------------------------
         // generating dataset
