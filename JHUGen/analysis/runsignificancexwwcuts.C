@@ -9,15 +9,13 @@ void runsignificancexwwcuts()
   double intLumi=10.0;
   int nToys = 1000;
 
+  // runsignfiancesingle( higgsMass, intLumi, nToys, DPHIMT, zeroplus);
+  // runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, zeroplus);
   
-  
-  runsignfiancesingle( higgsMass, intLumi, nToys, DPHIMT, zeroplus);
-  runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, zeroplus);
-  
-  runsignfiancesingle( higgsMass, intLumi, nToys, DPHIMT, zerominus);
-  runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, zerominus);
+  // runsignfiancesingle( higgsMass, intLumi, nToys, DPHIMT, zerominus);
+  // runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, zerominus);
 
-  // runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, twoplus);
+  runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, twoplus);
   // runsignfiancesingle( higgsMass, intLumi, nToys, DPHIMT, twoplus);
 
   // runsignfiancesingle( higgsMass, intLumi, nToys, MLL, zeroplus);
@@ -34,6 +32,8 @@ void runsignfiancesingle(int higgsMass, double intLumi, int nToys, int var, int 
   gStyle->SetPadLeftMargin(0.16);
   gROOT->ForceStyle();
   gROOT->ProcessLine(".L statsFactory.cc+");
+
+  const unsigned int seed = 0762073843;
   
   //
   // set up test kind 
@@ -92,10 +92,10 @@ void runsignfiancesingle(int higgsMass, double intLumi, int nToys, int var, int 
   RooDataHist *bkgHist = bkgData->binnedClone(0);
   RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", *obs, *bkgHist);
     
-  char statResults[25];
+  char statResults[50];
   statsFactory *hwwsignficance;
   sprintf(statResults,Form("significance_hww125_%.0ffb_xwwcuts_%s_%s.root", intLumi, varName.Data(), fileName.Data()));
-  hwwsignficance = new statsFactory(obs, sigHyp1Pdf, sigHyp1Pdf, statResults);
+  hwwsignficance = new statsFactory(obs, sigHyp1Pdf, sigHyp1Pdf, seed, statResults);
   hwwsignficance->runSignificanceWithBackground(sigRate*intLumi, bkgRate*intLumi, bkgPdf, nToys);
   delete hwwsignficance;
 }
