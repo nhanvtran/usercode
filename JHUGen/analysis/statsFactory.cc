@@ -846,17 +846,27 @@ void statsFactory::hypothesisSeparationWithBackground(double nH0, double nH1, in
         double s_estimator_H1 = 2.*(r_H1->minNll() - r0_H1->minNll());
 	hypTuple->Fill( s_estimator_H0, s_estimator_H1, nSigFitH0, nBkgFitH0, nSigPullH0, nBkgPullH0, nSigFitH1, nBkgFitH1, nSigPullH1, nBkgPullH1 );
         
-        
         delete data_H0;
         delete data_H1;
         delete r_H0;  
         delete r0_H0;  
         delete r_H1;  
         delete r0_H1;  
-        
     }
     
+
+    //
+    // tidy up
+    // 
+    
+    delete  nsig0;
+    delete  nsig1;
+    delete  nbkg0;
+    delete  nbkg1;
+    delete  totalPdf0;
+    delete  totalPdf1;
 }
+
 
 
 // HYPOTHESIS TESTING
