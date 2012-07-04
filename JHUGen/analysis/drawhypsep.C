@@ -33,7 +33,7 @@ void drawhypsep() {
   // drawsingle(zeroplusVSzerominus,MLLMT, pure);
   // drawsingle(zeroplusVSzerominus, DPHIMT, pure);
 
-  drawsingle(zeroplusVStwoplus, DPHIMT, pure);
+  // drawsingle(zeroplusVStwoplus, DPHIMT, pure);
   drawsingle(zeroplusVStwoplus, MLLMT, pure);
 
   // drawsingle(zeroplusVSzerominus, MLL, pure);

@@ -101,7 +101,7 @@ void plotPdf_5D_XWW() {
     TTree* tin2 = (TTree*) fin2->Get("angles");
     RooDataSet data2("data2","data2",tin2,RooArgSet(*h1,*h2, *hs, *Phi, *Phi1));
     
-    // setting for 2L-
+    // setting for 2L+
     
     RooRealVar* fppVal2L = new RooRealVar("fppVal2L", "fppVal2L", 0.063);
     RooRealVar* fmmVal2L = new RooRealVar("fmmVal2L", "fmmVal2L", 0.063);
@@ -138,7 +138,7 @@ void plotPdf_5D_XWW() {
     box3->SetBorderSize(0);
     box3->AddEntry(dum0,"X#rightarrow WW JP = 2m+","lp");
     box3->AddEntry(dum1,"X#rightarrow WW JP = 2-","lp");
-    box3->AddEntry(dum2,"X#rightarrow WW JP = 2L-","lp");
+    box3->AddEntry(dum2,"X#rightarrow WW JP = 2L+","lp");
     
 
     RooPlot* h1frame =  h1->frame(55);

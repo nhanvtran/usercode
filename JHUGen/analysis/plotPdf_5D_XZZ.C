@@ -101,7 +101,7 @@ void plotPdf_5D_XZZ() {
     
 
 
-    // setting for 2L-
+    // setting for 2L+
     RooRealVar* fppVal2L = new RooRealVar("fppVal2L", "fppVal2L", 0.104);
     RooRealVar* fmmVal2L = new RooRealVar("fmmVal2L", "fmmVal2L", 0.104);
     RooRealVar* fpmVal2L = new RooRealVar("fpmVal2L", "fpmVal2L", 0.);
@@ -136,7 +136,7 @@ void plotPdf_5D_XZZ() {
     box3->SetBorderSize(0);
     box3->AddEntry(dum0,"X#rightarrow ZZ JP = 2m+","lp");
     box3->AddEntry(dum1,"X#rightarrow ZZ JP = 2-","lp");
-    box3->AddEntry(dum2,"X#rightarrow ZZ JP = 2L-","lp");
+    box3->AddEntry(dum2,"X#rightarrow ZZ JP = 2L+","lp");
     
     RooPlot* h1frame =  h1->frame(55);
     data.plotOn(h1frame, LineColor(kBlack));
