@@ -22,8 +22,8 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     gSystem->Load("PDFs/RooHWW.cxx");
 
     // Observables (5D)
-    RooRealVar* m1 = new RooRealVar("w1mass","m1",10,120);
-    RooRealVar* m2 = new RooRealVar("w2mass","m2",10,120);
+    RooRealVar* m1 = new RooRealVar("wplusmass","m1",10,120);
+    RooRealVar* m2 = new RooRealVar("wminusmass","m2",10,120);
     RooRealVar* h1 = new RooRealVar("costheta1","h1",-1,1);
     RooRealVar* h2 = new RooRealVar("costheta2","h2",-1,1);
     RooRealVar* Phi = new RooRealVar("phi","Phi",-TMath::Pi(),TMath::Pi());
@@ -39,11 +39,11 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     RooRealVar* phi1Val = new RooRealVar("phi1Val","phi1Val", 0);
     RooRealVar* a2Val = new RooRealVar("a2Val","a2Val",0);
     RooRealVar* phi2Val = new RooRealVar("phi2Val","phi2Val", 0);
-    RooRealVar* a3Val = new Roo RealVar("a3Val","a3Val",0);
+    RooRealVar* a3Val = new RooRealVar("a3Val","a3Val",0);
     RooRealVar* phi3Val = new RooRealVar("phi3Val","phi3Val",0);
     // Even more parameters, do not have to touch, based on W couplings
     RooRealVar* R1Val = new RooRealVar("R1Val","R1Val",1);
-    RooRealVar* R2Val = new RooRealVar("R2Val","R2Val",-1);
+    RooRealVar* R2Val = new RooRealVar("R2Val","R2Val",1);
     
     // PDF definition SM Higgs (JP = 0+)
     RooHWW_5D *myPDF = new RooHWW_5D("myPDF","myPDF",*m1,*m2,*h1,*h2,*Phi,*a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,*mW,*gamW,*mX,*R1Val,*R2Val);
