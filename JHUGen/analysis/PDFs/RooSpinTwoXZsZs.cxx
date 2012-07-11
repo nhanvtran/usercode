@@ -44,7 +44,9 @@ RooSpinTwoXZsZs::RooSpinTwoXZsZs(const char *name, const char *title,
 				 RooAbsReal& _fz1Val,
 				 RooAbsReal& _fz2Val,
 				 RooAbsReal& _R1Val,
-				 RooAbsReal& _R2Val) :
+				 RooAbsReal& _R2Val,
+				 RooAbsReal& _mZ,
+				 RooAbsReal& _gamZ) :
 RooAbsPdf(name,title), 
 mzz("mzz","mzz",this,_mzz),
 m1("m1","m1",this,_m1),
@@ -71,7 +73,9 @@ phi7("phi7","phi7",this,_phi7),
 fz1Val("fz1Val","fz1Val",this,_fz1Val),
 fz2Val("fz2Val","fz2Val",this,_fz2Val),
 R1Val("R1Val","R1Val",this,_R1Val),
-R2Val("R2Val","R2Val",this,_R2Val)
+R2Val("R2Val","R2Val",this,_R2Val),
+mZ("mZ","mZ",this,_mZ),
+gamZ("gamZ","gamZ",this,_gamZ)
 { 
 } 
 
@@ -103,7 +107,9 @@ phi7("phi7",this,other.phi7),
 fz1Val("fz1Val",this,other.fz1Val),
 fz2Val("fz2Val",this,other.fz2Val),
 R1Val("R1Val",this,other.R1Val),
-R2Val("R2Val",this,other.R2Val)
+R2Val("R2Val",this,other.R2Val),
+mZ("mZ",this,other.mZ),
+gamZ("gamZ",this,other.gamZ)
 { 
 } 
 
@@ -130,8 +136,8 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   Double_t betaValSquared = (1.-(pow(m1-m2,2)/pow(mzz,2)))*(1.-(pow(m1+m2,2)/pow(mzz,2)));
   Double_t betaVal = sqrt(betaValSquared);
 
-  Double_t term1Coeff = (pow(m1,3))/( (pow(m1,2)-pow(91.188,2))*(pow(m1,2)-pow(91.188,2))+pow(91.188,2)*pow(2.5,2) );
-  Double_t term2Coeff = (pow(m2,3))/( (pow(m2,2)-pow(91.188,2))*(pow(m2,2)-pow(91.188,2))+pow(91.188,2)*pow(2.5,2) );
+  Double_t term1Coeff = (pow(m1,3))/( (pow(m1,2)-pow(mZ,2))*(pow(m1,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
+  Double_t term2Coeff = (pow(m2,3))/( (pow(m2,2)-pow(mZ,2))*(pow(m2,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
 
   //-----------------------------------------------------------------------
   // amplitudes 
@@ -616,8 +622,8 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   Double_t betaValSquared =  (1.-(pow(m1-m2,2)/pow(mzz,2)))*(1.-(pow(m1+m2,2)/pow(mzz,2)));
   Double_t betaVal = sqrt(betaValSquared);
 
-  Double_t term1Coeff = (pow(m1,3))/( (pow(m1,2)-pow(91.188,2))*(pow(m1,2)-pow(91.188,2))+pow(91.188,2)*pow(2.5,2) );
-  Double_t term2Coeff = (pow(m2,3))/( (pow(m2,2)-pow(91.188,2))*(pow(m2,2)-pow(91.188,2))+pow(91.188,2)*pow(2.5,2) );
+  Double_t term1Coeff = (pow(m1,3))/( (pow(m1,2)-pow(mZ,2))*(pow(m1,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
+  Double_t term2Coeff = (pow(m2,3))/( (pow(m2,2)-pow(mZ,2))*(pow(m2,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
 
   //-----------------------------------------------------------------------
   // amplitudes

@@ -42,7 +42,9 @@ public:
 		RooAbsReal& _fz1Val,
 		RooAbsReal& _fz2Val,
                 RooAbsReal& _R1Val,
-                RooAbsReal& _R2Val
+		RooAbsReal& _R2Val,
+		RooAbsReal& _mZ,
+   	        RooAbsReal& _gamZ
 		);
 
     RooSpinTwoXZsZs(const RooSpinTwoXZsZs& other, const char* name=0) ;
@@ -80,6 +82,9 @@ protected:
     RooRealProxy fz2Val ;
     RooRealProxy R1Val ;
     RooRealProxy R2Val ;
+    RooRealProxy mZ;
+    RooRealProxy gamZ;
+    
     
     Double_t evaluate() const ;
     
