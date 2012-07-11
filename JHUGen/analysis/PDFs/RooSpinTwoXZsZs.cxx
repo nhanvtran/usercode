@@ -128,10 +128,11 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   Double_t value=0;
   Double_t fz0Val=1-fz1Val-fz2Val;
 
-  Double_t x = (mzz*mzz-m1*m1-m2*m2)/(2*m1*m2);
+  Double_t x = (mzz*mzz-m1*m1-m2*m2)/(2.0*m1*m2);
 
   //-----------------------------------------------------------------------
   // propagator
+  //-----------------------------------------------------------------------
   
   Double_t betaValSquared = (1.-(pow(m1-m2,2)/pow(mzz,2)))*(1.-(pow(m1+m2,2)/pow(mzz,2)));
   Double_t betaVal = sqrt(betaValSquared);
@@ -141,39 +142,40 @@ Double_t RooSpinTwoXZsZs::evaluate() const
 
   //-----------------------------------------------------------------------
   // amplitudes 
+  // See http://www.pha.jhu.edu/~gritsan/FORM/result_spin2.txt
+  // -----------------------------------------------------------------------
 
   Double_t f00Real = 
     + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,3)*pow(m2,3) * ( 3/4 + (x*x-1) )
     + pow(mzz,-4)*pow(sqrt(6),-1)*c2*pow(m1,3)*pow(m2,3) * (  - 4*(x*x-1) - 8*pow(x*x-1,2) )
     + pow(mzz,-4)*pow(sqrt(6),-1)*c3*pow(m1,3)*pow(m2,3) * (  - 8*pow(x*x-1,2) )
 
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*m1*pow(m2,5) * (  - 1/2 - 1/2*(x*x-1) )
+    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*m1*pow(m2,5) * (  - 1.0/2.0 - 1.0/2.0*(x*x-1) )
     + pow(mzz,-4)*pow(sqrt(6),-1)*c2*m1*pow(m2,5) * ( 2*(x*x-1) )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,5)*m2 * (  - 1/2 - 1/2*(x*x-1) )
+    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,5)*m2 * (  - 1.0/2.0 - 1.0/2.0*(x*x-1) )
     + pow(mzz,-4)*pow(sqrt(6),-1)*c2*pow(m1,5)*m2 * ( 2*(x*x-1) )
 
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*(1/m1)*pow(m2,7) * ( 1/8 )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,7)*(1/m2) * ( 1/8 )
+    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*(1.0/m1)*pow(m2,7) * ( 1.0/8.0 )
+    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,7)*(1.0/m2) * ( 1.0/8.0 )
 
-    + pow(sqrt(6),-1)*c1*m1*m2 * ( 1/2 + 1/2*(x*x-1) )
+    + pow(sqrt(6),-1)*c1*m1*m2 * ( 1.0/2.0 + 1.0/2.0*(x*x-1) )
     + pow(sqrt(6),-1)*c2*m1*m2 * (  - 2*(x*x-1) )
     + pow(sqrt(6),-1)*c4*m1*m2 * ( 4*(x*x-1) )
 
-    + pow(sqrt(6),-1)*c1*(1/m1)*pow(m2,3) * (  - 1/4 )
-    + pow(sqrt(6),-1)*c1*pow(m1,3)*(1/m2) * (  - 1/4 )
+    + pow(sqrt(6),-1)*c1*(1.0/m1)*pow(m2,3) * (  - 1.0/4.0 )
+    + pow(sqrt(6),-1)*c1*pow(m1,3)*(1.0/m2) * (  - 1.0/4.0 )
 
-    + pow(mzz,4)*pow(sqrt(6),-1)*c1*(1/m1)*(1/m2) * ( 1/8 );
+    + pow(mzz,4)*pow(sqrt(6),-1)*c1*(1.0/m1)*(1.0/m2) * ( 1.0/8.0 ); 
 
-  Double_t f00Imag=0;
+
+  Double_t f00Imag = 0; 
 
   //-----------------------------------------------------------------------
   Double_t fppReal = 
-    + pow(mzz,2)*pow(sqrt(6),-1)*c1 * ( 1/4 )
-
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m2,4) * (  - 1/4 )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,5) * (  - 1/4 )
-
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1/2 + (x*x-1) )
+    + pow(mzz,2)*pow(sqrt(6),-1)*c1 * ( 1./4. )
+    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m2,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
     + pow(mzz,-2)*pow(sqrt(6),-1)*c2*pow(m1,2)*pow(m2,2) * ( 8*(x*x-1) );
 
   Double_t fppImag = 
@@ -181,15 +183,15 @@ Double_t RooSpinTwoXZsZs::evaluate() const
     + 1*pow(mzz,-4)*pow(sqrt(6),-1)*c5*pow(m1,3)*pow(m2,3) * ( 8*pow(sqrt(x*x-1),3) )
 
     + 1*pow(sqrt(6),-1)*c6*m1*m2 * (  - 4*sqrt(x) );
-
+  
   //-----------------------------------------------------------------------
   Double_t fmmReal = 
-    + pow(mzz,2)*pow(sqrt(6),-1)*c1 * ( 1/4 )
+    + pow(mzz,2)*pow(sqrt(6),-1)*c1 * ( 1.0/4.0 )
 
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,5) * (  - 1/4 )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m2,4) * (  - 1/4 )
+    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m2,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1/2 + (x*x-1) )
+    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
     + pow(mzz,-2)*pow(sqrt(6),-1)*c2*pow(m1,2)*pow(m2,2) * ( 8*(x*x-1) );
 
   Double_t fmmImag = 
@@ -201,173 +203,186 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   //-----------------------------------------------------------------------
 
   Double_t fp0Real = 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m2,5) * (  - 1/8 )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,2)*pow(m2,3) * ( 3/8 + 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m2,5) * (  - 1.0/8.0 )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,5)*m2 * (  - 3/8 - 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,2)*pow(m2,3) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,6)*(1/m2) * ( 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,4)*m2 * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m1,2)*m2 * ( 1/4 + 1/2*(x*x-1) )
-    + (1/mzz)*(1/sqrt(2))*c4*pow(m1,2)*m2 * ( 2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,6)*(1.0/m2) * ( 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m2,3) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,2)*m2 * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c4*pow(m1,2)*m2 * ( 2*(x*x-1) )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m1,5)*(1/m2) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m2,3) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*m2 * ( 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,4)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*pow(m1,2)*(1/m2) * (  - 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*m2 * ( 1.0/8.0 )
 
-    + pow(mzz,3)*(1/sqrt(2))*c1*(1/m2) * ( 1/8 );
+    + mzz*(1.0/sqrt(2))*c1*pow(m1,2)*(1.0/m2) * (  - 1.0/8.0 )
+
+    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m2) * ( 1.0/8.0 );
 
   Double_t fp0Imag = 
 
-    + 1*(1/pow(mzz,3))*(1/sqrt(2))*pow(m1,3)*pow(m2,2) * (  - 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,3)*pow(m2,2) * (  - 4*pow(sqrt(x*x-1),3)*c7 )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*m1*pow(m2,2) * (  - sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*m1*pow(m2,2) * (  - sqrt(x) )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*pow(m1,3) * ( sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,3) * ( sqrt(x) )
 
-    + 1*mzz*(1/sqrt(2))*c6*m1 * (  - sqrt(x) );
+    + 1*mzz*(1.0/sqrt(2))*c6*m1 * (  - sqrt(x) );
+
+
 
   //-----------------------------------------------------------------------
   Double_t f0pReal = 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*(1/m1)*pow(m2,6) * ( 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,6) * ( 1.0/8.0 )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*m1*pow(m2,4) * (  - 3/8 - 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*m1*pow(m2,4) * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,3)*pow(m2,2) * ( 3/8 + 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,3)*pow(m2,2) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,5) * (  - 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,5) * (  - 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*m1*pow(m2,2) * ( 1/4 + 1/2*(x*x-1) )
-    + (1/mzz)*(1/sqrt(2))*c4*m1*pow(m2,2) * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*m1*pow(m2,2) * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c4*m1*pow(m2,2) * ( 2*(x*x-1) )
 
-    + (1/mzz)*(1/sqrt(2))*c1*(1/m1)*pow(m2,4) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,4) * (  - 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m1,3) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,3) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*(1/m1)*pow(m2,2) * (  - 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,2) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*m1 * ( 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*m1 * ( 1.0/8.0 )
 
-    + pow(mzz,3)*(1/sqrt(2))*c1*(1/m1) * ( 1/8 );
+    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m1) * ( 1.0/8.0 );
 
   Double_t f0pImag = 
 
-    + 1*(1/pow(mzz,3))*(1/sqrt(2))*pow(m1,2)*pow(m2,3) * (  - 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,2)*pow(m2,3) * (  - 4*pow(sqrt(x*x-1),3)*c7 )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*pow(m2,3) * ( sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m2,3) * ( sqrt(x) )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*pow(m1,2)*m2 * (  - sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,2)*m2 * (  - sqrt(x) )
 
-    + 1*mzz*(1/sqrt(2))*c6*m2 * (  - sqrt(x) );
+    + 1*mzz*(1.0/sqrt(2))*c6*m2 * (  - sqrt(x) );
 
   //-----------------------------------------------------------------------
 
 
   Double_t f0mReal = 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*(1/m1)*pow(m2,6) * ( 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,6) * ( 1.0/8.0 )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*m1*pow(m2,4) * (  - 3/8 - 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*m1*pow(m2,4) * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,3)*pow(m2,2) * ( 3/8 + 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,3)*pow(m2,2) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,5) * (  - 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,5) * (  - 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*m1*pow(m2,2) * ( 1/4 + 1/2*(x*x-1) )
-    + (1/mzz)*(1/sqrt(2))*c4*m1*pow(m2,2) * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*m1*pow(m2,2) * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c4*m1*pow(m2,2) * ( 2*(x*x-1) )
 
-    + (1/mzz)*(1/sqrt(2))*c1*(1/m1)*pow(m2,4) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,4) * (  - 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m1,3) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,3) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*(1/m1)*pow(m2,2) * (  - 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,2) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*m1 * ( 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*m1 * ( 1.0/8.0 )
 
-    + pow(mzz,3)*(1/sqrt(2))*c1*(1/m1) * ( 1/8 );
+    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m1) * ( 1.0/8.0 );
 
   Double_t f0mImag = 
 
-    + 1*(1/pow(mzz,3))*(1/sqrt(2))*pow(m1,2)*pow(m2,3) * ( 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,2)*pow(m2,3) * ( 4*pow(sqrt(x*x-1),3)*c7 )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*pow(m2,3) * (  - sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m2,3) * (  - sqrt(x) )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*pow(m1,2)*m2 * ( sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,2)*m2 * ( sqrt(x) )
 
-    + 1*mzz*(1/sqrt(2))*c6*m2 * ( sqrt(x) );
+    + 1*mzz*(1.0/sqrt(2))*c6*m2 * ( sqrt(x) );
 
   //-----------------------------------------------------------------------
 
   Double_t fm0Real =
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m2,5) * (  - 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m2,5) * (  - 1.0/8.0 )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,2)*pow(m2,3) * ( 3/8 + 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,2)*pow(m2,3) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,5)*m2 * (  - 3/8 - 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,4)*m2 * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,6)*(1/m2) * ( 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,6)*(1.0/m2) * ( 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m1,2)*m2 * ( 1/4 + 1/2*(x*x-1) )
-    + (1/mzz)*(1/sqrt(2))*c4*pow(m1,2)*m2 * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,2)*m2 * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c4*pow(m1,2)*m2 * ( 2*(x*x-1) )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m2,3) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m2,3) * (  - 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m1,5)*(1/m2) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,4)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*m2 * ( 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*m2 * ( 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*pow(m1,2)*(1/m2) * (  - 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*pow(m1,2)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + pow(mzz,3)*(1/sqrt(2))*c1*(1/m2) * ( 1/8 );
+    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m2) * ( 1.0/8.0 );
 
   Double_t fm0Imag = 
 
-    + 1*(1/pow(mzz,3))*(1/sqrt(2))*pow(m1,3)*pow(m2,2) * ( 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,3)*pow(m2,2) * ( 4*pow(sqrt(x*x-1),3)*c7 )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*m1*pow(m2,2) * ( sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*m1*pow(m2,2) * ( sqrt(x) )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*pow(m1,3) * (  - sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,3) * (  - sqrt(x) )
 
-    + 1*mzz*(1/sqrt(2))*c6*m1 * ( sqrt(x) );
+    + 1*mzz*(1.0/sqrt(2))*c6*m1 * ( sqrt(x) );
 
   //-----------------------------------------------------------------------
   Double_t fpmReal = 
-    + pow(mzz,-2)*c1*pow(m1,5) * (  - 1/4 )
-    + pow(mzz,-2)*c1*pow(m2,4) * (  - 1/4 )
+    + pow(mzz,-2)*c1*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*c1*pow(m2,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1/2 + (x*x-1) )
+    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
 
-    + pow(mzz,2)*c1 * ( 1/4 );
+    + pow(mzz,2)*c1 * ( 1.0/4.0 );
 
   Double_t fpmImag = 0;
 
   //-----------------------------------------------------------------------
 
   Double_t fmpReal = 
-    + pow(mzz,-2)*c1*pow(m2,4) * (  - 1/4 )
-    + pow(mzz,-2)*c1*pow(m1,5) * (  - 1/4 )
+    + pow(mzz,-2)*c1*pow(m2,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*c1*pow(m1,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1/2 + (x*x-1) )
+    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
 
-    + pow(mzz,2)*c1 * ( 1/4 );
+    + pow(mzz,2)*c1 * ( 1.0/4.0 );
 
   Double_t fmpImag = 0;
 
   //-----------------------------------------------------------------------
+  Double_t f00 = f00Imag*f00Imag + f00Real*f00Real;
+  Double_t fpp = fppImag*fppImag + fppReal*fppReal;
+  Double_t fmm = fmmImag*fmmImag + fmmReal*fmmReal;
+  Double_t fp0 = fp0Imag*fp0Imag + fp0Real*fp0Real;
+  Double_t f0p = f0pImag*f0pImag + f0pReal*f0pReal;
+  Double_t fm0 = fm0Imag*fm0Imag + fm0Real*fm0Real;
+  Double_t f0m = f0mImag*f0mImag + f0mReal*f0mReal;
+  Double_t fpm=  fpmImag*fpmImag + fpmReal*fpmReal;
+  Double_t fmp = fmpImag*fmpImag + fmpReal*fmpReal;
   
-  Double_t f00 = sqrt(f00Imag*f00Imag + f00Real*f00Real);
-  Double_t fpp = sqrt(fppImag*fppImag + fppReal*fppReal);
-  Double_t fmm = sqrt(fmmImag*fmmImag + fmmReal*fmmReal);
-  Double_t fp0 = sqrt(fp0Imag*fp0Imag + fp0Real*fp0Real);
-  Double_t f0p = sqrt(f0pImag*f0pImag + f0pReal*f0pReal);
-  Double_t fm0 = sqrt(fm0Imag*fm0Imag + fm0Real*fm0Real);
-  Double_t f0m = sqrt(f0mImag*f0mImag + f0mReal*f0mReal);
-  Double_t fpm= sqrt(fpmImag*fpmImag + fpmReal*fpmReal);
-  Double_t fmp = sqrt(fmpImag*fmpImag + fmpReal*fmpReal);
+  double norm = f00 + fpp + fmm + fp0 + f0p + fm0 + f0m + fpm + fmp; 
+  f00 = f00 / norm;
+  fpp = fpp / norm;
+  fmm = fmm / norm;
+  fp0 = fp0 / norm;
+  f0p = f0p / norm;
+  fm0 = fm0 / norm;
+  f0m = f0m / norm;
+  fpm = fpm / norm;
+  fmp = fmp / norm;
 
   Double_t phi00=atan2(f00Imag,f00Real);
   Double_t phipp=atan2(fppImag,fppReal);
@@ -379,211 +394,241 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   Double_t phipm=atan2(fpmImag,fpmReal);
   Double_t phimp=atan2(fmpImag,fmpReal);
 
-  //========================================================
+  /*
+  // 
+  // Set the value by hand for the mX = 250 2m+
+  // 
 
+  fpp = 0.013;
+  fmm = 0.013;
+  fpm = 0.282;
+  fmp = fpm;
+  fp0 = 0.075;
+  f0p = fp0;
+  f0m = 0.075;
+  fm0 = f0m;
+  f00 = 1.-fpp-fmm-fpm-fmp-fp0-f0p-fm0-f0m;
+
+  phi00 = 0.;
+  phipp = 0.;
+  phimm = 0.;
+  phip0 = 0.;
+  phi0p = 0.;
+  phim0 = 0.;
+  phi0m = 0.;
+  phipm = 0.;
+  phimp = 0.;
+  */
+
+  //========================================================
+  
+  // 
+  //  The 45 terms
+  // 
+  
   value+=(f00*(-1 + Power(h1,2))*(-1 + Power(h2,2))*
     (2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) + 
-     3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/32.;
+     3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/32.; // terms[1]
 
   value+=(fmm*(1 + 2*R1Val*h1 + Power(h1,2))*(1 + 2*R2Val*h2 + Power(h2,2))*
     (2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) + 
-     3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/128.;
+     3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/128.; // terms[2]
 
   value+=(fpp*(-1 + 2*R1Val*h1 - Power(h1,2))*(-1 + 2*R2Val*h2 - Power(h2,2))*
     (2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) + 
-     3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/128.;
+     3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/128.; // terms[3]
 
   value+=(fp0*(-1 + 2*R1Val*h1 - Power(h1,2))*(-1 + Power(h2,2))*
     (fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) - 
-     (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/32.;
+     (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/32.; // terms[4]
 
   value+=-(f0m*(-1 + Power(h1,2))*(1 + 2*R2Val*h2 + Power(h2,2))*
      (fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) - 
-      (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/32.;
+      (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/32.; // terms[5]
 
   value+=(f0p*(-1 + Power(h1,2))*(-1 + 2*R2Val*h2 - Power(h2,2))*
     (fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) - 
-     (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/32.;
+     (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/32.; // terms[6]
 
   value+=-(fm0*(1 + 2*R1Val*h1 + Power(h1,2))*(-1 + Power(h2,2))*
      (fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) - 
-      (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/32.;
+      (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/32.; // terms[7]
 
   value+=-(fpm*(-1 + 2*R1Val*h1 - Power(h1,2))*(1 + 2*R2Val*h2 + Power(h2,2))*
      (4*fz1Val + fz2Val + 6*fz2Val*Power(hs,2) + (-4*fz1Val + fz2Val)*Power(hs,4) + 
-      6*fz0Val*Power(-1 + Power(hs,2),2)))/256.;
+      6*fz0Val*Power(-1 + Power(hs,2),2)))/256.; // terms[8]
 
   value+=-(fmp*(1 + 2*R1Val*h1 + Power(h1,2))*(-1 + 2*R2Val*h2 - Power(h2,2))*
      (4*fz1Val + fz2Val + 6*fz2Val*Power(hs,2) + (-4*fz1Val + fz2Val)*Power(hs,4) + 
-      6*fz0Val*Power(-1 + Power(hs,2),2)))/256.;
+      6*fz0Val*Power(-1 + Power(hs,2),2)))/256.; // terms[9]
 
   value+=(Sqrt(f00)*Sqrt(fmm)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*(R2Val + h2)*
 	  Sqrt(1 - Power(h2,2))*(2*fz0Val + 3*fz2Val - 
 	6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) + 
-	3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*Cos(Phi - phimm))/32.;
+	3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*Cos(Phi - phimm))/32.; // terms[10]
   
   value+=(Sqrt(f00)*Sqrt(fpp)*(-R1Val + h1)*Sqrt(1 - Power(h1,2))*(-R2Val + h2)*
 	  Sqrt(1 - Power(h2,2))*(2*fz0Val + 3*fz2Val - 
 	6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) + 
-	3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*Cos(Phi + phipp))/32.;
+        3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*Cos(Phi + phipp))/32.; // terms[11]
 
   value+=(Sqrt(3)*Sqrt(f00)*Sqrt(fp0)*(-R1Val + h1)*Sqrt(1 - Power(h1,2))*
 	  (-1 + Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(phip0 - Phi1))/16.;
+	  Cos(phip0 - Phi1))/16.; // terms[12]
 
   value+=-(Sqrt(3)*Sqrt(f00)*Sqrt(f0m)*(-1 + Power(h1,2))*(R2Val + h2)*
 	   Sqrt(1 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	   (-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	   Cos(Phi - phi0m + Phi1))/16.;
+	   Cos(Phi - phi0m + Phi1))/16.; // terms[13]
 
   value+=(Sqrt(3)*Sqrt(f00)*Sqrt(f0p)*(-1 + Power(h1,2))*(R2Val - h2)*
 	  Sqrt(1 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(Phi + phi0p + Phi1))/16.;
+	  Cos(Phi + phi0p + Phi1))/16.; // terms[14]
 
   value+=(Sqrt(3)*Sqrt(f00)*Sqrt(fm0)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*
 	  (-1 + Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(phim0 + Phi1))/16.;
+	  Cos(phim0 + Phi1))/16.; // terms[15]
 
   value+=(Sqrt(1.5)*Sqrt(f00)*Sqrt(fpm)*(-R1Val + h1)*Sqrt(1 - Power(h1,2))*(R2Val + h2)*
 	  Sqrt(1 - Power(h2,2))*(-1 + hs)*(1 + hs)*
 	  (-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(Phi - phipm + 2*Phi1))/32.;
+	  Cos(Phi - phipm + 2*Phi1))/32.; // terms[16]
 
   value+=-(Sqrt(f00)*Sqrt(fmp)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*(-R2Val + h2)*
 	   Sqrt(1 - Power(h2,2))*(4*fz1Val + fz2Val + 6*fz2Val*Power(hs,2) + 
   	 (-4*fz1Val + fz2Val)*Power(hs,4) + 6*fz0Val*Power(-1 + Power(hs,2),2))*
-	   Cos(Phi + phimp + 2*Phi1))/64.;
+	   Cos(Phi + phimp + 2*Phi1))/64.; // terms[17]
 
   value+=(Sqrt(fmm)*Sqrt(fpp)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*
 	  (2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) + 
-	   3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*Cos(2*Phi - phimm + phipp))/64.;
+	   3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*Cos(2*Phi - phimm + phipp))/64.; // terms[18]
 
   value+=-(Sqrt(3)*Sqrt(fmm)*Sqrt(fp0)*(-1 + Power(h1,2))*(R2Val + h2)*
 	   Sqrt(1 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	   (-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	   Cos(Phi - phimm + phip0 - Phi1))/32.;
+	   Cos(Phi - phimm + phip0 - Phi1))/32.; // terms[19]
 
   value+=(Sqrt(3)*Sqrt(f0m)*Sqrt(fmm)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*
 	  (1 + 2*R2Val*h2 + Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(phi0m - phimm - Phi1))/32.;
+	  Cos(phi0m - phimm - Phi1))/32.; // terms[20]
 
   value+=(Sqrt(3)*Sqrt(f0p)*Sqrt(fmm)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*
 	  (-1 + Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(2*Phi + phi0p - phimm + Phi1))/32.;
+	  Cos(2*Phi + phi0p - phimm + Phi1))/32.; // terms[21]
 
   value+=-(Sqrt(3)*Sqrt(fm0)*Sqrt(fmm)*(1 + 2*R1Val*h1 + Power(h1,2))*(R2Val + h2)*
 	   Sqrt(1 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	   (-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	   Cos(Phi + phim0 - phimm + Phi1))/32.;
+	   Cos(Phi + phim0 - phimm + Phi1))/32.; // terms[22]
 
   value+=(Sqrt(1.5)*Sqrt(fmm)*Sqrt(fpm)*(-1 + Power(h1,2))*(1 + 2*R2Val*h2 + Power(h2,2))*
 	  (-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(phimm - phipm + 2*Phi1))/64.;
+	  Cos(phimm - phipm + 2*Phi1))/64.; // terms[23]
 
   value+=(Sqrt(1.5)*Sqrt(fmm)*Sqrt(fmp)*(1 + 2*R1Val*h1 + Power(h1,2))*(-1 + Power(h2,2))*
 	  (-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(2*Phi - phimm + phimp + 2*Phi1))/64.;
+	  Cos(2*Phi - phimm + phimp + 2*Phi1))/64.; // terms[24]
   
   value+=(Sqrt(3)*Sqrt(fp0)*Sqrt(fpp)*(-1 + 2*R1Val*h1 - Power(h1,2))*(-R2Val + h2)*
 	  Sqrt(1 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(Phi - phip0 + phipp + Phi1))/32.;
+	  Cos(Phi - phip0 + phipp + Phi1))/32.; // terms[25]
 
   value+=(Sqrt(3)*Sqrt(f0m)*Sqrt(fpp)*(-R1Val + h1)*Sqrt(1 - Power(h1,2))*
 	  (-1 + Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(2*Phi - phi0m + phipp + Phi1))/32.;
+	  Cos(2*Phi - phi0m + phipp + Phi1))/32.; // terms[26]
 
   value+=(Sqrt(3)*Sqrt(f0p)*Sqrt(fpp)*(R1Val - h1)*Sqrt(1 - Power(h1,2))*
 	  (-1 + 2*R2Val*h2 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(phi0p - phipp + Phi1))/32.;
+	  Cos(phi0p - phipp + Phi1))/32.; // terms[27]
 
   value+=(Sqrt(3)*Sqrt(fm0)*Sqrt(fpp)*(-1 + Power(h1,2))*(R2Val - h2)*
 	  Sqrt(1 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(Phi - phim0 + phipp - Phi1))/32.;
+	  Cos(Phi - phim0 + phipp - Phi1))/32.; // terms[28]
 
   value+=-(Sqrt(1.5)*Sqrt(fpm)*Sqrt(fpp)*(-1 + 2*R1Val*h1 - Power(h1,2))*
 	   (-1 + Power(h2,2))*(-1 + hs)*(1 + hs)*
 	   (-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	   Cos(2*Phi - phipm + phipp + 2*Phi1))/64.;
+	   Cos(2*Phi - phipm + phipp + 2*Phi1))/64.; // terms[29]
 
   value+=-(Sqrt(1.5)*Sqrt(fmp)*Sqrt(fpp)*(-1 + Power(h1,2))*
 	   (-1 + 2*R2Val*h2 - Power(h2,2))*(-1 + hs)*(1 + hs)*
 	   (-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	   Cos(phimp - phipp + 2*Phi1))/64.;
+	   Cos(phimp - phipp + 2*Phi1))/64.; // terms[30]
 
   value+=-(Sqrt(f0m)*Sqrt(fp0)*(-R1Val + h1)*Sqrt(1 - Power(h1,2))*(R2Val + h2)*
 	   Sqrt(1 - Power(h2,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) - 
-	 (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*Cos(Phi - phi0m + phip0))/16.;
+           (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*Cos(Phi - phi0m + phip0))/16.; // terms[31]
 
   value+=-(Sqrt(f0p)*Sqrt(fp0)*(-R1Val + h1)*Sqrt(1 - Power(h1,2))*(-R2Val + h2)*
 	   Sqrt(1 - Power(h2,2))*(-1 + Power(hs,2))*
 	   (-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	   Cos(Phi + phi0p - phip0 + 2*Phi1))/16.;
+	   Cos(Phi + phi0p - phip0 + 2*Phi1))/16.; // terms[32]
   
   value+=-(Sqrt(fm0)*Sqrt(fp0)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(-1 + Power(hs,2))*
 	   (-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	   Cos(phim0 - phip0 + 2*Phi1))/16.;
+	   Cos(phim0 - phip0 + 2*Phi1))/16.; // terms[33]
 
   value+=(Sqrt(fp0)*Sqrt(fpm)*(-1 + 2*R1Val*h1 - Power(h1,2))*(R2Val + h2)*
 	  Sqrt(1 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(Phi + phip0 - phipm + Phi1))/(32.*Sqrt(2));
+	  Cos(Phi + phip0 - phipm + Phi1))/(32.*Sqrt(2)); // terms[34]
 
   value+=(Sqrt(fmp)*Sqrt(fp0)*(6*fz0Val - 4*fz1Val + fz2Val)*(-1 + Power(h1,2))*(-R2Val + h2)*
 	  Sqrt(1 - Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*
-	  Cos(Phi + phimp - phip0 + 3*Phi1))/(32.*Sqrt(2));
+	  Cos(Phi + phimp - phip0 + 3*Phi1))/(32.*Sqrt(2)); // terms[35]
   
   value+=-(Sqrt(f0m)*Sqrt(f0p)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(-1 + Power(hs,2))*
 	   (-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	   Cos(2*Phi - phi0m + phi0p + 2*Phi1))/16.;
+	   Cos(2*Phi - phi0m + phi0p + 2*Phi1))/16.; // terms[36]
   
   value+=-(Sqrt(f0m)*Sqrt(fm0)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*(R2Val + h2)*
 	   Sqrt(1 - Power(h2,2))*(-1 + Power(hs,2))*
 	   (-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	   Cos(Phi - phi0m + phim0 + 2*Phi1))/16.;
+	   Cos(Phi - phi0m + phim0 + 2*Phi1))/16.; // terms[37]
   
   value+=(Sqrt(f0m)*Sqrt(fpm)*(-R1Val + h1)*Sqrt(1 - Power(h1,2))*
 	  (1 + 2*R2Val*h2 + Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(phi0m - phipm + Phi1))/(32.*Sqrt(2));
-  
+	  Cos(phi0m - phipm + Phi1))/(32.*Sqrt(2)); // terms[38]
+   
   value+=-(Sqrt(f0m)*Sqrt(fmp)*(6*fz0Val - 4*fz1Val + fz2Val)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*
 	   (-1 + Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*
-	   Cos(2*Phi - phi0m + phimp + 3*Phi1))/(32.*Sqrt(2));
+	   Cos(2*Phi - phi0m + phimp + 3*Phi1))/(32.*Sqrt(2)); // terms[39]
   
   value+=-(Sqrt(f0p)*Sqrt(fm0)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*(-R2Val + h2)*
 	   Sqrt(1 - Power(h2,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) - 
-	 (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*Cos(Phi + phi0p - phim0))/16.;
+           (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*Cos(Phi + phi0p - phim0))/16.; // terms[40]
 
   value+=(Sqrt(f0p)*Sqrt(fpm)*(6*fz0Val - 4*fz1Val + fz2Val)*(R1Val - h1)*Sqrt(1 - Power(h1,2))*
 	  (-1 + Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*
-	  Cos(2*Phi + phi0p - phipm + 3*Phi1))/(32.*Sqrt(2));
+	  Cos(2*Phi + phi0p - phipm + 3*Phi1))/(32.*Sqrt(2)); // terms[41]
   
   value+=-(Sqrt(f0p)*Sqrt(fmp)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*
 	   (-1 + 2*R2Val*h2 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	   (-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	   Cos(phi0p - phimp - Phi1))/(32.*Sqrt(2));
+	   Cos(phi0p - phimp - Phi1))/(32.*Sqrt(2)); // terms[42]
   
   value+=(Sqrt(fm0)*Sqrt(fpm)*(6*fz0Val - 4*fz1Val + fz2Val)*(-1 + Power(h1,2))*(R2Val + h2)*
 	  Sqrt(1 - Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*
-	  Cos(Phi + phim0 - phipm + 3*Phi1))/(32.*Sqrt(2));
+	  Cos(Phi + phim0 - phipm + 3*Phi1))/(32.*Sqrt(2)); // terms[43]
   
   value+=(Sqrt(fm0)*Sqrt(fmp)*(1 + 2*R1Val*h1 + Power(h1,2))*(R2Val - h2)*
 	  Sqrt(1 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(Phi - phim0 + phimp + Phi1))/(32.*Sqrt(2));
+	  Cos(Phi - phim0 + phimp + Phi1))/(32.*Sqrt(2)); // terms[44]
   
   value+=(Sqrt(fmp)*Sqrt(fpm)*(6*fz0Val - 4*fz1Val + fz2Val)*(-1 + Power(h1,2))*
 	  (-1 + Power(h2,2))*Power(-1 + Power(hs,2),2)*
-	  Cos(2*Phi + phimp - phipm + 4*Phi1))/128.;
+	  Cos(2*Phi + phimp - phipm + 4*Phi1))/128.; // terms[45]
 
   return value*term1Coeff*term2Coeff*betaVal;
     
@@ -605,11 +650,11 @@ Int_t RooSpinTwoXZsZs::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& anal
 Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName*/) const
 {
 
-  if( (m1+m2) > mzz ) return 1e-9; 
+  // if( (m1+m2) > mzz ) return 1e-9; 
 
-  double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
+  // double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
   
-  if (nanval != nanval) return 1e-9;
+  //   if (nanval != nanval) return 1e-9;
 
   Double_t integral=0;
   Double_t fz0Val=1-fz1Val-fz2Val;
@@ -626,39 +671,41 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   Double_t term2Coeff = (pow(m2,3))/( (pow(m2,2)-pow(mZ,2))*(pow(m2,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
 
   //-----------------------------------------------------------------------
-  // amplitudes
+  // amplitudes 
+  // See http://www.pha.jhu.edu/~gritsan/FORM/result_spin2.txt
+  // -----------------------------------------------------------------------
+
   Double_t f00Real = 
     + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,3)*pow(m2,3) * ( 3/4 + (x*x-1) )
     + pow(mzz,-4)*pow(sqrt(6),-1)*c2*pow(m1,3)*pow(m2,3) * (  - 4*(x*x-1) - 8*pow(x*x-1,2) )
     + pow(mzz,-4)*pow(sqrt(6),-1)*c3*pow(m1,3)*pow(m2,3) * (  - 8*pow(x*x-1,2) )
 
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*m1*pow(m2,5) * (  - 1/2 - 1/2*(x*x-1) )
+    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*m1*pow(m2,5) * (  - 1.0/2.0 - 1.0/2.0*(x*x-1) )
     + pow(mzz,-4)*pow(sqrt(6),-1)*c2*m1*pow(m2,5) * ( 2*(x*x-1) )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,5)*m2 * (  - 1/2 - 1/2*(x*x-1) )
+    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,5)*m2 * (  - 1.0/2.0 - 1.0/2.0*(x*x-1) )
     + pow(mzz,-4)*pow(sqrt(6),-1)*c2*pow(m1,5)*m2 * ( 2*(x*x-1) )
 
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*(1/m1)*pow(m2,7) * ( 1/8 )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,7)*(1/m2) * ( 1/8 )
+    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*(1.0/m1)*pow(m2,7) * ( 1.0/8.0 )
+    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,7)*(1.0/m2) * ( 1.0/8.0 )
 
-    + pow(sqrt(6),-1)*c1*m1*m2 * ( 1/2 + 1/2*(x*x-1) )
+    + pow(sqrt(6),-1)*c1*m1*m2 * ( 1.0/2.0 + 1.0/2.0*(x*x-1) )
     + pow(sqrt(6),-1)*c2*m1*m2 * (  - 2*(x*x-1) )
     + pow(sqrt(6),-1)*c4*m1*m2 * ( 4*(x*x-1) )
 
-    + pow(sqrt(6),-1)*c1*(1/m1)*pow(m2,3) * (  - 1/4 )
-    + pow(sqrt(6),-1)*c1*pow(m1,3)*(1/m2) * (  - 1/4 )
+    + pow(sqrt(6),-1)*c1*(1.0/m1)*pow(m2,3) * (  - 1.0/4.0 )
+    + pow(sqrt(6),-1)*c1*pow(m1,3)*(1.0/m2) * (  - 1.0/4.0 )
 
-    + pow(mzz,4)*pow(sqrt(6),-1)*c1*(1/m1)*(1/m2) * ( 1/8 );
+    + pow(mzz,4)*pow(sqrt(6),-1)*c1*(1.0/m1)*(1.0/m2) * ( 1.0/8.0 ); 
+
 
   Double_t f00Imag = 0; 
 
   //-----------------------------------------------------------------------
   Double_t fppReal = 
-    + pow(mzz,2)*pow(sqrt(6),-1)*c1 * ( 1/4 )
-
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m2,4) * (  - 1/4 )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,5) * (  - 1/4 )
-
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1/2 + (x*x-1) )
+    + pow(mzz,2)*pow(sqrt(6),-1)*c1 * ( 1./4. )
+    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m2,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
     + pow(mzz,-2)*pow(sqrt(6),-1)*c2*pow(m1,2)*pow(m2,2) * ( 8*(x*x-1) );
 
   Double_t fppImag = 
@@ -666,15 +713,15 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
     + 1*pow(mzz,-4)*pow(sqrt(6),-1)*c5*pow(m1,3)*pow(m2,3) * ( 8*pow(sqrt(x*x-1),3) )
 
     + 1*pow(sqrt(6),-1)*c6*m1*m2 * (  - 4*sqrt(x) );
-
+  
   //-----------------------------------------------------------------------
   Double_t fmmReal = 
-    + pow(mzz,2)*pow(sqrt(6),-1)*c1 * ( 1/4 )
+    + pow(mzz,2)*pow(sqrt(6),-1)*c1 * ( 1.0/4.0 )
 
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,5) * (  - 1/4 )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m2,4) * (  - 1/4 )
+    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m2,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1/2 + (x*x-1) )
+    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
     + pow(mzz,-2)*pow(sqrt(6),-1)*c2*pow(m1,2)*pow(m2,2) * ( 8*(x*x-1) );
 
   Double_t fmmImag = 
@@ -686,174 +733,188 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   //-----------------------------------------------------------------------
 
   Double_t fp0Real = 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m2,5) * (  - 1/8 )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,2)*pow(m2,3) * ( 3/8 + 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m2,5) * (  - 1.0/8.0 )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,5)*m2 * (  - 3/8 - 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,2)*pow(m2,3) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,6)*(1/m2) * ( 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,4)*m2 * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m1,2)*m2 * ( 1/4 + 1/2*(x*x-1) )
-    + (1/mzz)*(1/sqrt(2))*c4*pow(m1,2)*m2 * ( 2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,6)*(1.0/m2) * ( 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m2,3) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,2)*m2 * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c4*pow(m1,2)*m2 * ( 2*(x*x-1) )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m1,5)*(1/m2) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m2,3) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*m2 * ( 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,4)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*pow(m1,2)*(1/m2) * (  - 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*m2 * ( 1.0/8.0 )
 
-    + pow(mzz,3)*(1/sqrt(2))*c1*(1/m2) * ( 1/8 );
+    + mzz*(1.0/sqrt(2))*c1*pow(m1,2)*(1.0/m2) * (  - 1.0/8.0 )
+
+    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m2) * ( 1.0/8.0 );
 
   Double_t fp0Imag = 
 
-    + 1*(1/pow(mzz,3))*(1/sqrt(2))*pow(m1,3)*pow(m2,2) * (  - 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,3)*pow(m2,2) * (  - 4*pow(sqrt(x*x-1),3)*c7 )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*m1*pow(m2,2) * (  - sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*m1*pow(m2,2) * (  - sqrt(x) )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*pow(m1,3) * ( sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,3) * ( sqrt(x) )
 
-    + 1*mzz*(1/sqrt(2))*c6*m1 * (  - sqrt(x) );
+    + 1*mzz*(1.0/sqrt(2))*c6*m1 * (  - sqrt(x) );
+
+
 
   //-----------------------------------------------------------------------
   Double_t f0pReal = 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*(1/m1)*pow(m2,6) * ( 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,6) * ( 1.0/8.0 )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*m1*pow(m2,4) * (  - 3/8 - 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*m1*pow(m2,4) * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,3)*pow(m2,2) * ( 3/8 + 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,3)*pow(m2,2) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,5) * (  - 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,5) * (  - 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*m1*pow(m2,2) * ( 1/4 + 1/2*(x*x-1) )
-    + (1/mzz)*(1/sqrt(2))*c4*m1*pow(m2,2) * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*m1*pow(m2,2) * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c4*m1*pow(m2,2) * ( 2*(x*x-1) )
 
-    + (1/mzz)*(1/sqrt(2))*c1*(1/m1)*pow(m2,4) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,4) * (  - 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m1,3) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,3) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*(1/m1)*pow(m2,2) * (  - 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,2) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*m1 * ( 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*m1 * ( 1.0/8.0 )
 
-    + pow(mzz,3)*(1/sqrt(2))*c1*(1/m1) * ( 1/8 );
+    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m1) * ( 1.0/8.0 );
 
   Double_t f0pImag = 
 
-    + 1*(1/pow(mzz,3))*(1/sqrt(2))*pow(m1,2)*pow(m2,3) * (  - 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,2)*pow(m2,3) * (  - 4*pow(sqrt(x*x-1),3)*c7 )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*pow(m2,3) * ( sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m2,3) * ( sqrt(x) )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*pow(m1,2)*m2 * (  - sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,2)*m2 * (  - sqrt(x) )
 
-    + 1*mzz*(1/sqrt(2))*c6*m2 * (  - sqrt(x) );
+    + 1*mzz*(1.0/sqrt(2))*c6*m2 * (  - sqrt(x) );
 
   //-----------------------------------------------------------------------
 
 
   Double_t f0mReal = 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*(1/m1)*pow(m2,6) * ( 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,6) * ( 1.0/8.0 )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*m1*pow(m2,4) * (  - 3/8 - 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*m1*pow(m2,4) * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,3)*pow(m2,2) * ( 3/8 + 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,3)*pow(m2,2) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,5) * (  - 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,5) * (  - 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*m1*pow(m2,2) * ( 1/4 + 1/2*(x*x-1) )
-    + (1/mzz)*(1/sqrt(2))*c4*m1*pow(m2,2) * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*m1*pow(m2,2) * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c4*m1*pow(m2,2) * ( 2*(x*x-1) )
 
-    + (1/mzz)*(1/sqrt(2))*c1*(1/m1)*pow(m2,4) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,4) * (  - 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m1,3) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,3) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*(1/m1)*pow(m2,2) * (  - 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,2) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*m1 * ( 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*m1 * ( 1.0/8.0 )
 
-    + pow(mzz,3)*(1/sqrt(2))*c1*(1/m1) * ( 1/8 );
+    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m1) * ( 1.0/8.0 );
 
   Double_t f0mImag = 
 
-    + 1*(1/pow(mzz,3))*(1/sqrt(2))*pow(m1,2)*pow(m2,3) * ( 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,2)*pow(m2,3) * ( 4*pow(sqrt(x*x-1),3)*c7 )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*pow(m2,3) * (  - sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m2,3) * (  - sqrt(x) )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*pow(m1,2)*m2 * ( sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,2)*m2 * ( sqrt(x) )
 
-    + 1*mzz*(1/sqrt(2))*c6*m2 * ( sqrt(x) );
+    + 1*mzz*(1.0/sqrt(2))*c6*m2 * ( sqrt(x) );
 
   //-----------------------------------------------------------------------
 
   Double_t fm0Real =
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m2,5) * (  - 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m2,5) * (  - 1.0/8.0 )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,2)*pow(m2,3) * ( 3/8 + 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,2)*pow(m2,3) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,5)*m2 * (  - 3/8 - 1/2*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,4)*m2 * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
 
-    + (1/pow(mzz,3))*(1/sqrt(2))*c1*pow(m1,6)*(1/m2) * ( 1/8 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,6)*(1.0/m2) * ( 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m1,2)*m2 * ( 1/4 + 1/2*(x*x-1) )
-    + (1/mzz)*(1/sqrt(2))*c4*pow(m1,2)*m2 * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,2)*m2 * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2))*c4*pow(m1,2)*m2 * ( 2*(x*x-1) )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m2,3) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m2,3) * (  - 1.0/8.0 )
 
-    + (1/mzz)*(1/sqrt(2))*c1*pow(m1,5)*(1/m2) * (  - 1/8 )
+    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,4)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*m2 * ( 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*m2 * ( 1.0/8.0 )
 
-    + mzz*(1/sqrt(2))*c1*pow(m1,2)*(1/m2) * (  - 1/8 )
+    + mzz*(1.0/sqrt(2))*c1*pow(m1,2)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + pow(mzz,3)*(1/sqrt(2))*c1*(1/m2) * ( 1/8 );
+    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m2) * ( 1.0/8.0 );
 
   Double_t fm0Imag = 
 
-    + 1*(1/pow(mzz,3))*(1/sqrt(2))*pow(m1,3)*pow(m2,2) * ( 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,3)*pow(m2,2) * ( 4*pow(sqrt(x*x-1),3)*c7 )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*m1*pow(m2,2) * ( sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*m1*pow(m2,2) * ( sqrt(x) )
 
-    + 1*(1/mzz)*(1/sqrt(2))*c6*pow(m1,3) * (  - sqrt(x) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,3) * (  - sqrt(x) )
 
-    + 1*mzz*(1/sqrt(2))*c6*m1 * ( sqrt(x) );
+    + 1*mzz*(1.0/sqrt(2))*c6*m1 * ( sqrt(x) );
 
   //-----------------------------------------------------------------------
   Double_t fpmReal = 
-    + pow(mzz,-2)*c1*pow(m1,5) * (  - 1/4 )
-    + pow(mzz,-2)*c1*pow(m2,4) * (  - 1/4 )
+    + pow(mzz,-2)*c1*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*c1*pow(m2,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1/2 + (x*x-1) )
+    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
 
-    + pow(mzz,2)*c1 * ( 1/4 );
+    + pow(mzz,2)*c1 * ( 1.0/4.0 );
 
   Double_t fpmImag = 0;
 
   //-----------------------------------------------------------------------
 
   Double_t fmpReal = 
-    + pow(mzz,-2)*c1*pow(m2,4) * (  - 1/4 )
-    + pow(mzz,-2)*c1*pow(m1,5) * (  - 1/4 )
+    + pow(mzz,-2)*c1*pow(m2,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*c1*pow(m1,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1/2 + (x*x-1) )
+    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
 
-    + pow(mzz,2)*c1 * ( 1/4 );
+    + pow(mzz,2)*c1 * ( 1.0/4.0 );
 
   Double_t fmpImag = 0;
 
   //-----------------------------------------------------------------------
   
-  Double_t f00 = sqrt(f00Imag*f00Imag + f00Real*f00Real);
-  Double_t fpp = sqrt(fppImag*fppImag + fppReal*fppReal);
-  Double_t fmm = sqrt(fmmImag*fmmImag + fmmReal*fmmReal);
-  Double_t fp0 = sqrt(fp0Imag*fp0Imag + fp0Real*fp0Real);
-  Double_t f0p = sqrt(f0pImag*f0pImag + f0pReal*f0pReal);
-  Double_t fm0 = sqrt(fm0Imag*fm0Imag + fm0Real*fm0Real);
-  Double_t f0m = sqrt(f0mImag*f0mImag + f0mReal*f0mReal);
-  Double_t fpm= sqrt(fpmImag*fpmImag + fpmReal*fpmReal);
-  Double_t fmp = sqrt(fmpImag*fmpImag + fmpReal*fmpReal);
-
+  Double_t f00 = f00Imag*f00Imag + f00Real*f00Real;
+  Double_t fpp = fppImag*fppImag + fppReal*fppReal;
+  Double_t fmm = fmmImag*fmmImag + fmmReal*fmmReal;
+  Double_t fp0 = fp0Imag*fp0Imag + fp0Real*fp0Real;
+  Double_t f0p = f0pImag*f0pImag + f0pReal*f0pReal;
+  Double_t fm0 = fm0Imag*fm0Imag + fm0Real*fm0Real;
+  Double_t f0m = f0mImag*f0mImag + f0mReal*f0mReal;
+  Double_t fpm=  fpmImag*fpmImag + fpmReal*fpmReal;
+  Double_t fmp = fmpImag*fmpImag + fmpReal*fmpReal;
+  
+  double norm = f00 + fpp + fmm + fp0 + f0p + fm0 + f0m + fpm + fmp; 
+  f00 = f00 / norm;
+  fpp = fpp / norm;
+  fmm = fmm / norm;
+  fp0 = fp0 / norm;
+  f0p = f0p / norm;
+  fm0 = fm0 / norm;
+  f0m = f0m / norm;
+  fpm = fpm / norm;
+  fmp = fmp / norm;
+  
   Double_t phi00=atan2(f00Imag,f00Real);
   Double_t phipp=atan2(fppImag,fppReal);
   Double_t phimm=atan2(fmmImag,fmmReal);
@@ -863,6 +924,54 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   Double_t phi0m=atan2(f0mImag,f0mReal);
   Double_t phipm=atan2(fpmImag,fpmReal);
   Double_t phimp=atan2(fmpImag,fmpReal);
+
+  /*
+  // 
+  // Set the value by hand
+  // 
+
+  fpp = 0.013;
+  fmm = 0.013;
+  fpm = 0.282;
+  fmp = fpm;
+  fp0 = 0.075;
+  f0p = fp0;
+  f0m = 0.075;
+  fm0 = f0m;
+  f00 = 1.-fpp-fmm-fpm-fmp-fp0-f0p-fm0-f0m;
+
+  phi00 = 0.;
+  phipp = 0.;
+  phimm = 0.;
+  phip0 = 0.;
+  phi0p = 0.;
+  phim0 = 0.;
+  phi0m = 0.;
+  phipm = 0.;
+  phimp = 0.;
+
+  std::cout << "----------------------------\n";
+  std::cout << "f00 = " << f00 << "\n";
+  std::cout << "fpp = " << fpp << "\n";
+  std::cout << "fmm = " << fmm << "\n";
+  std::cout << "fp0 = " << fp0 << "\n";
+  std::cout << "f0p = " << f0p << "\n";
+  std::cout << "fm0 = " << fm0 << "\n";
+  std::cout << "f0m = " << f0m << "\n";
+  std::cout << "fpm = " << fpm << "\n";
+  std::cout << "fmp = " << fmp << "\n";
+ 
+  std::cout << "phi00 = " << phi00 << "\n";
+  std::cout << "phipp = " << phipp << "\n";
+  std::cout << "phimm = " << phimm << "\n";
+  std::cout << "phip0 = " << phip0 << "\n";
+  std::cout << "phi0p = " << phi0p << "\n";
+  std::cout << "phim0 = " << phim0 << "\n";
+  std::cout << "phi0m = " << phi0m << "\n";
+  std::cout << "phipm = " << phipm << "\n";
+  std::cout << "phimp = " << phimp << "\n";
+  std::cout << "----------------------------\n";
+  */
 
   //-----------------------------------------------------------------------
   
