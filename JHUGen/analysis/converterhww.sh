@@ -1,6 +1,12 @@
 #!/bin/bash
 
 f=$1
+if [ ! $# -eq 1 ]; then
+    echo "USAGE: ./converthww.sh file.lhe
+      file - the lhe file "
+    exit 1
+fi
+
 fr="${f%.*}"
 ff="${f%.*}.txt"
 echo $f, $ff
