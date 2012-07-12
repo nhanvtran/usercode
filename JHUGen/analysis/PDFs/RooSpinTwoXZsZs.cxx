@@ -117,9 +117,14 @@ gamZ("gamZ",this,other.gamZ)
 
 Double_t RooSpinTwoXZsZs::evaluate() const 
 { 
-
-
-  if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
+  
+  bool isZZ = true;
+  if ( mZ < 90.) isZZ = false;
+  if ( isZZ ) {
+    if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
+  } else {
+    if( (m1+m2) > mzz ) return 1e-9; 
+  }
 
   double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
   
@@ -649,8 +654,14 @@ Int_t RooSpinTwoXZsZs::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& anal
 }
 Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName*/) const
 {
-
-  if( (m1+m2) > mzz ) return 1e-9; 
+  
+  bool isZZ = true;
+  if ( mZ < 90.) isZZ = false;
+  if ( isZZ ) {
+    if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
+  } else {
+    if( (m1+m2) > mzz ) return 1e-9; 
+  }
   double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
   if (nanval != nanval) return 1e-9;
 
