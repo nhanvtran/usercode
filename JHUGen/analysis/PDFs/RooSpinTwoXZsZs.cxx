@@ -650,11 +650,9 @@ Int_t RooSpinTwoXZsZs::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& anal
 Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName*/) const
 {
 
-  // if( (m1+m2) > mzz ) return 1e-9; 
-
-  // double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
-  
-  //   if (nanval != nanval) return 1e-9;
+  if( (m1+m2) > mzz ) return 1e-9; 
+  double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
+  if (nanval != nanval) return 1e-9;
 
   Double_t integral=0;
   Double_t fz0Val=1-fz1Val-fz2Val;
@@ -977,7 +975,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   
   switch(code)
     {
-            
+      // integrate all angles
     case 6:
       {
   
@@ -1004,6 +1002,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
 
 	return term1Coeff*term2Coeff*betaVal*integral;
       }
+      // projections onto Phi1, integrate all other angles
     case 5:
       {
 
@@ -1028,37 +1027,19 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
 	integral+=
 	  (16*fmp*(fz0Val + fz1Val + fz2Val)*Pi())/45.;
 	integral+=
-	  (Sqrt(f00)*Sqrt(fmm)*(fz0Val + fz1Val + fz2Val)*Power(Pi(),3)*R1Val*R2Val*
-	   Cos(Phi - phimm))/20.;
-	integral+=
-	  (Sqrt(f00)*Sqrt(fpp)*(fz0Val + fz1Val + fz2Val)*Power(Pi(),3)*R1Val*R2Val*
-	   Cos(Phi + phipp))/20.;
-	integral+=
-	  (Sqrt(f00)*Sqrt(fpm)*(-2*(fz0Val + fz1Val) + 3*fz2Val)*Power(Pi(),3)*R1Val*R2Val*
-	   Cos(Phi + 2*Phi1 - phipm))/(40.*Sqrt(6));
-	integral+=
-	  (Sqrt(f00)*Sqrt(fmp)*(fz0Val + fz1Val + fz2Val)*Power(Pi(),3)*R1Val*R2Val*
-	   Cos(Phi + 2*Phi1 + phimp))/20.;
-	integral+=
-	  (8*Sqrt(fmm)*Sqrt(fpp)*(fz0Val + fz1Val + fz2Val)*Pi()*
-	   Cos(2*Phi - phimm + phipp))/45.;
-	integral+=
 	  (-4*Sqrt(0.6666666666666666)*Sqrt(fmm)*Sqrt(fpm)*(2*(fz0Val + fz1Val) - 3*fz2Val)*Pi()*
 	   Cos(2*Phi1 + phimm - phipm))/45.;
-	integral+=
-	  (-4*Sqrt(0.6666666666666666)*Sqrt(fmm)*Sqrt(fmp)*(2*(fz0Val + fz1Val) - 3*fz2Val)*Pi()*
-	   Cos(2*Phi + 2*Phi1 - phimm + phimp))/45.;
-	integral+=
-	  (-4*Sqrt(0.6666666666666666)*Sqrt(fpm)*Sqrt(fpp)*(2*(fz0Val + fz1Val) - 3*fz2Val)*Pi()*
-	   Cos(2*Phi + 2*Phi1 - phipm + phipp))/45.;
 	integral+= 
 	  (-4*Sqrt(0.6666666666666666)*Sqrt(fmp)*Sqrt(fpp)*(2*(fz0Val + fz1Val) - 3*fz2Val)*Pi()*
-	   Cos(2*Phi1 + phimp - phipp))/45.;
-	  
+	   Cos(2*Phi1 + phimp - phipp))/45.; 
+	integral+=
+	  (-8*Sqrt(fm0)*Sqrt(fp0)*(6*fz0Val + fz1Val - 4*fz2Val)*Pi()*
+	   Cos(2*Phi1 + phim0 - phip0))/135.;
 
 	return term1Coeff*term2Coeff*betaVal*integral;
 
       }
+      // projection to Phi, integrate all other angles
     case 4:
       {
 	  
@@ -1100,6 +1081,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
 	return term1Coeff*term2Coeff*betaVal*integral;
 
       }
+      // projections to h2, integrate over all others
     case 3:
       {
 
@@ -1125,6 +1107,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
 	return term1Coeff*term2Coeff*betaVal*integral;
 
       }
+      // projections to h1, integrate all others
     case 2:
       {
 
@@ -1152,6 +1135,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
 	return betaVal*term1Coeff*term2Coeff*integral;
 
       }
+      // projections to hs, integrate all others
     case 1:
       {
 	  
