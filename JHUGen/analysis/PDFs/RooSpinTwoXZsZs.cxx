@@ -956,7 +956,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   phi0m = 0.;
   phipm = 0.;
   phimp = 0.;
-  */
+
   std::cout << "----------------------------\n";
   std::cout << "f00 = " << f00 << "\n";
   std::cout << "fpp = " << fpp << "\n";
@@ -978,7 +978,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   std::cout << "phipm = " << phipm << "\n";
   std::cout << "phimp = " << phimp << "\n";
   std::cout << "----------------------------\n";
-
+  */
 
   //-----------------------------------------------------------------------
   
