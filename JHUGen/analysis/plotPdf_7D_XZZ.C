@@ -12,7 +12,7 @@
 #include "TROOT.h"
 using namespace RooFit ;
 
-void plotPdf_7D_XZZ(double mH = 250, bool draw=true) {
+void plotPdf_7D_XZZ(double mH = 125, bool draw=true) {
     
     gROOT->ProcessLine(".L ~/tdrstyle.C");
     setTDRStyle();
@@ -35,8 +35,8 @@ void plotPdf_7D_XZZ(double mH = 250, bool draw=true) {
     //
     // Observables (7D)
     // 
-    RooRealVar* z1mass = new RooRealVar("z1mass","m_{Z1}",mV,10,120);
-    RooRealVar* z2mass = new RooRealVar("z2mass","m_{Z2}",mV,10,120);
+    RooRealVar* z1mass = new RooRealVar("z1mass","m_{Z1}",mV,2,120);
+    RooRealVar* z2mass = new RooRealVar("z2mass","m_{Z2}",mV,2,120);
     RooRealVar* hs = new RooRealVar("costhetastar","hs",-1,1);
     RooRealVar* h1 = new RooRealVar("costheta1","h1",-1,1);
     RooRealVar* h2 = new RooRealVar("costheta2","h2",-1,1);
@@ -61,7 +61,7 @@ void plotPdf_7D_XZZ(double mH = 250, bool draw=true) {
     // 
     // Alternative definition in terms of g1->g10
     // 
-    RooRealVar* useGTerm = new RooRealVar("useGTerm", "useGTerm", 1.); // set to 1 if using g couplings
+    RooRealVar* useGTerm = new RooRealVar("useGTerm", "useGTerm", 0.); // set to 1 if using g couplings
     RooRealVar* g1Val = new RooRealVar("g1Val", "g1Val", 1);
     RooRealVar* g2Val = new RooRealVar("g2Val", "g2Val", 0.);
     RooRealVar* g3Val = new RooRealVar("g3Val", "g3Val", 0.);
@@ -96,7 +96,16 @@ void plotPdf_7D_XZZ(double mH = 250, bool draw=true) {
 				  *fz1Val, *fz2Val, *R1Val, *R2Val, *mZ, *gamZ);
       
     // dataset for (JP = 2+)
-    TFile* fin = new TFile(Form("TZZ_%.0f_JHU.root", mH));
+    TString fileName;
+    if ( useGTerm->getVal() > 0.) {
+      fileName = Form("TZZ_%.0f_JHU_YY.root", mH);
+    }
+    else {
+      // fileName = Form("TZZ_%.0f_JHU_GenFromC.root", mH);
+      fileName = Form("TZZ_%.0f_JHU_GenFromC_symz1z2.root", mH);
+    }
+    std::cout << "Opening " << fileName << "\n";
+    TFile* fin = new TFile(fileName);
     TTree* tin = (TTree*) fin->Get("angles");
     
     if ( offshell) 
@@ -173,8 +182,15 @@ void plotPdf_7D_XZZ(double mH = 250, bool draw=true) {
       czz->cd(8);
       Phiframe->Draw();
       
-      czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D.eps", mH));
-      czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D.png", mH));
+      if ( useGTerm->getVal() > 0.) {
+	czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromG.eps", mH));
+	czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromG.png", mH));
+      } else {
+	// czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromC.eps", mH));
+	// czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromC.png", mH));
+	czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromC_symz1z2.eps", mH));
+	czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromC_symz1z2.png", mH));
+      }
       
       delete czz;
     }

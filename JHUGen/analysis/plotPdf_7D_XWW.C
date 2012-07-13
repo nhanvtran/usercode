@@ -12,7 +12,7 @@
 #include "TROOT.h"
 using namespace RooFit ;
 
-void plotPdf_7D_XWW(double mH = 250, bool draw=true) {
+void plotPdf_7D_XWW(double mH = 125, bool draw=true) {
     
     gROOT->ProcessLine(".L ~/tdrstyle.C");
     setTDRStyle();
@@ -35,8 +35,8 @@ void plotPdf_7D_XWW(double mH = 250, bool draw=true) {
     //
     // Observables (7D)
     // 
-    RooRealVar* wplusmass = new RooRealVar("wplusmass","m(W+)",mV,4,120);
-    RooRealVar* wminusmass = new RooRealVar("wminusmass","m(W-)",mV,4,120);
+    RooRealVar* wplusmass = new RooRealVar("wplusmass","m(W+)",mV,1e-09,120);
+    RooRealVar* wminusmass = new RooRealVar("wminusmass","m(W-)",mV,1e-09,120);
     RooRealVar* hs = new RooRealVar("costhetastar","hs",-1,1);
     RooRealVar* h1 = new RooRealVar("costheta1","h1",-1,1);
     RooRealVar* h2 = new RooRealVar("costheta2","h2",-1,1);
@@ -67,7 +67,7 @@ void plotPdf_7D_XWW(double mH = 250, bool draw=true) {
     RooRealVar* g2Val = new RooRealVar("g2Val", "g2Val", 0.);
     RooRealVar* g3Val = new RooRealVar("g3Val", "g3Val", 0.);
     RooRealVar* g4Val = new RooRealVar("g4Val", "g4Val", 0.);
-    RooRealVar* g5Val = new RooRealVar("g5Val", "g5Val", 1.);
+    RooRealVar* g5Val = new RooRealVar("g5Val", "g5Val", 0.);
     RooRealVar* g6Val = new RooRealVar("g6Val", "g6Val", 0.);
     RooRealVar* g7Val = new RooRealVar("g7Val", "g7Val", 0.);
     RooRealVar* g8Val = new RooRealVar("g8Val", "g8Val", 0.);
@@ -96,7 +96,16 @@ void plotPdf_7D_XWW(double mH = 250, bool draw=true) {
 				  *useGTerm, *g1Val, *g2Val, *g3Val, *g4Val, *g5Val, *g6Val, *g7Val, *g8Val, *g9Val, *g10Val,
 				  *fz1Val, *fz2Val, *R1Val, *R2Val, *mW, *gamW);
     // dataset for (JP = 2+)
-    TFile* fin = new TFile(Form("TWW_%.0f_JHU.root", mH));
+    TString fileName;
+    if ( useGTerm->getVal() > 0.) {
+      // fileName = Form("TWW_%.0f_JHU.root", mH);
+      fileName = Form("TWW_%.0f_JHU_FromG1.root", mH);
+    }
+    else {
+      fileName = Form("TWW_%.0f_JHU_GenFromC.root", mH);
+    }
+    std::cout << "Opening " << fileName << "\n";
+    TFile* fin = new TFile(fileName);
     TTree* tin = (TTree*) fin->Get("angles");
     
     if ( offshell) 
@@ -173,9 +182,13 @@ void plotPdf_7D_XWW(double mH = 250, bool draw=true) {
       czz->cd(8);
       Phiframe->Draw();
       
-      czz->SaveAs(Form("epsfiles/angles_TWW%.0f_JHU_7D.eps", mH));
-      czz->SaveAs(Form("pngfiles/angles_TWW%.0f_JHU_7D.png", mH));
-      
-      delete czz;
+      if ( useGTerm->getVal() > 0.) {
+	czz->SaveAs(Form("epsfiles/angles_TWW%.0f_JHU_7D_GenFromG1.eps", mH));
+	czz->SaveAs(Form("pngfiles/angles_TWW%.0f_JHU_7D_GenFromG1.png", mH));
+      } else {
+	czz->SaveAs(Form("epsfiles/angles_TWW%.0f_JHU_7D_GenFromC.eps", mH));
+	czz->SaveAs(Form("pngfiles/angles_TWW%.0f_JHU_7D_GenFromC.png", mH));
+      }
     }
+
 }
