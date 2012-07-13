@@ -34,6 +34,17 @@ RooSpinTwoXZsZs::RooSpinTwoXZsZs(const char *name, const char *title,
 				 RooAbsReal& _c5Val,
 				 RooAbsReal& _c6Val,
 				 RooAbsReal& _c7Val,
+				 RooAbsReal& _useGTerm,
+				 RooAbsReal& _g1Val,
+				 RooAbsReal& _g2Val,
+				 RooAbsReal& _g3Val,
+				 RooAbsReal& _g4Val,
+				 RooAbsReal& _g5Val,
+				 RooAbsReal& _g6Val,
+				 RooAbsReal& _g7Val,
+				 RooAbsReal& _g8Val,
+				 RooAbsReal& _g9Val,
+				 RooAbsReal& _g10Val,
 				 RooAbsReal& _fz1Val,
 				 RooAbsReal& _fz2Val,
 				 RooAbsReal& _R1Val,
@@ -56,6 +67,17 @@ c4Val("c4Val","c4Val",this,_c4Val),
 c5Val("c5Val","c5Val",this,_c5Val),
 c6Val("c6Val","c6Val",this,_c6Val),
 c7Val("c7Val","c7Val",this,_c7Val),
+useGTerm("useGTerm","useGTerm",this,_useGTerm),
+g1Val("g1Val","g1Val",this,_g1Val),
+g2Val("g2Val","g2Val",this,_g2Val),
+g3Val("g3Val","g3Val",this,_g3Val),
+g4Val("g4Val","g4Val",this,_g4Val),
+g5Val("g5Val","g5Val",this,_g5Val),
+g6Val("g6Val","g6Val",this,_g6Val),
+g7Val("g7Val","g7Val",this,_g7Val),
+g8Val("g8Val","g8Val",this,_g8Val),
+g9Val("g9Val","g9Val",this,_g9Val),
+g10Val("g10Val","g10Val",this,_g10Val),
 fz1Val("fz1Val","fz1Val",this,_fz1Val),
 fz2Val("fz2Val","fz2Val",this,_fz2Val),
 R1Val("R1Val","R1Val",this,_R1Val),
@@ -83,6 +105,17 @@ c4Val("c4Val",this,other.c4Val),
 c5Val("c5Val",this,other.c5Val),
 c6Val("c6Val",this,other.c6Val),
 c7Val("c7Val",this,other.c7Val),
+useGTerm("useGTerm",this,other.useGTerm),
+g1Val("g1Val",this,other.g1Val),
+g2Val("g2Val",this,other.g2Val),
+g3Val("g3Val",this,other.g3Val),
+g4Val("g4Val",this,other.g4Val),
+g5Val("g5Val",this,other.g5Val),
+g6Val("g6Val",this,other.g6Val),
+g7Val("g7Val",this,other.g7Val),
+g8Val("g8Val",this,other.g8Val),
+g9Val("g9Val",this,other.g9Val),
+g10Val("g10Val",this,other.g10Val),
 fz1Val("fz1Val",this,other.fz1Val),
 fz2Val("fz2Val",this,other.fz2Val),
 R1Val("R1Val",this,other.R1Val),
@@ -96,7 +129,16 @@ gamZ("gamZ",this,other.gamZ)
 
 Double_t RooSpinTwoXZsZs::evaluate() const 
 { 
-  
+  bool isZZ = true;
+  if ( mZ < 90.) isZZ = false;
+  if ( isZZ ) {
+    if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
+  } else {
+    if( (m1+m2) > mzz ) return 1e-9; 
+  }
+  double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
+  if (nanval != nanval) return 1e-9;
+
   // set the c1->c7 terms directly from the inputs
   double c1 = c1Val;
   double c2 = c2Val;
@@ -105,19 +147,21 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   double c5 = c5Val;
   double c6 = c6Val;
   double c7 = c7Val;
-
-  bool isZZ = true;
-  if ( mZ < 90.) isZZ = false;
-  if ( isZZ ) {
-    if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
-  } else {
-    if( (m1+m2) > mzz ) return 1e-9; 
+ 
+  // calculate the c1->c7 from g
+  if ( useGTerm > 0. ) {
+    double Lambda = 1000.; // the new physics cutoff
+    double s = (mzz*mzz-m1*m1-m2*m2)/2.;
+    double kappa =  s / (Lambda*Lambda);
+    c1 = 2*g1Val + 2*g2Val*kappa*pow((1+m1*m2/s),2) + 2*g5Val*(m1*m2)/s;
+    c2 - -0.5*g1Val + g3Val*kappa*(1-m1*m2/s) + 2*g4Val*kappa + g7Val*kappa*m1*m2/s;
+    c3 = -1.0*(g2Val/2.0+g3Val+2.0*g4Val)*kappa*mzz*mzz/s;
+    c4 = -g1Val - g2Val*kappa - (g2Val+g3Val+g6Val)*kappa*(m1*m2/s);
+    c5 = 2*g8Val*kappa*(mzz*mzz)/s;
+    c6 = g9Val;
+    c7 = g10Val*kappa*(mzz*mzz)/s;
   }
-
-  double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
-  
-  if (nanval != nanval) return 1e-9;
-
+ 
   Double_t value=0;
   Double_t fz0Val=1-fz1Val-fz2Val;
 
@@ -642,6 +686,17 @@ Int_t RooSpinTwoXZsZs::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& anal
 }
 Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName*/) const
 {
+
+  bool isZZ = true;
+  if ( mZ < 90.) isZZ = false;
+  if ( isZZ ) {
+    if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
+  } else {
+    if( (m1+m2) > mzz ) return 1e-9; 
+  }
+  double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
+  if (nanval != nanval) return 1e-9;
+
   // set the c1->c7 terms directly from the inputs
   double c1 = c1Val;
   double c2 = c2Val;
@@ -651,17 +706,19 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   double c6 = c6Val;
   double c7 = c7Val;
   
-  bool isZZ = true;
-  if ( mZ < 90.) isZZ = false;
-  if ( isZZ ) {
-    if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
-  } else {
-    if( (m1+m2) > mzz ) return 1e-9; 
+  // calculate the c1->c7 from g
+  if ( useGTerm > 0. ) {
+    double Lambda = 1000.; // the new physics cutoff
+    double s = (mzz*mzz-m1*m1-m2*m2)/2.;
+    double kappa =  s / (Lambda*Lambda);
+    c1 = 2*g1Val + 2*g2Val*kappa*pow((1+m1*m2/s),2) + 2*g5Val*(m1*m2)/s;
+    c2 - -0.5*g1Val + g3Val*kappa*(1-m1*m2/s) + 2*g4Val*kappa + g7Val*kappa*m1*m2/s;
+    c3 = -1.0*(g2Val/2.0+g3Val+2.0*g4Val)*kappa*mzz*mzz/s;
+    c4 = -g1Val - g2Val*kappa - (g2Val+g3Val+g6Val)*kappa*(m1*m2/s);
+    c5 = 2*g8Val*kappa*(mzz*mzz)/s;
+    c6 = g9Val;
+    c7 = g10Val*kappa*(mzz*mzz)/s;
   }
-
-  double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
-  
-  if (nanval != nanval) return 1e-9;
 
   Double_t integral=0;
   Double_t fz0Val=1-fz1Val-fz2Val;

@@ -45,7 +45,8 @@ void plotPdf_7D_XWW(double mH = 250, bool draw=true) {
     
     //
     // coupling constants for 2m+
-    // RooRealVar* mX = new RooRealVar("mX","mX",mH);
+    // See equation 5,6,7 in PRD 91, 075022
+    //
     double s = (mH*mH-2*mV*mV)/2.;
     double c1 = 2*(1+mV*mV/s);
     std::cout << "c1 = " << c1 << "\n"; 
@@ -57,6 +58,21 @@ void plotPdf_7D_XWW(double mH = 250, bool draw=true) {
     RooRealVar* c5Val = new RooRealVar("c5Val", "c5Val", 0.);
     RooRealVar* c6Val = new RooRealVar("c6Val", "c6Val", 0.);
     RooRealVar* c7Val = new RooRealVar("c7Val", "c7Val", 0.);
+    
+    // 
+    // Alternative definition in terms of g1->g10
+    // 
+    RooRealVar* useGTerm = new RooRealVar("useGTerm", "useGTerm", 1.); // set to 1 if using g couplings
+    RooRealVar* g1Val = new RooRealVar("g1Val", "g1Val", 1);
+    RooRealVar* g2Val = new RooRealVar("g2Val", "g2Val", 0.);
+    RooRealVar* g3Val = new RooRealVar("g3Val", "g3Val", 0.);
+    RooRealVar* g4Val = new RooRealVar("g4Val", "g4Val", 0.);
+    RooRealVar* g5Val = new RooRealVar("g5Val", "g5Val", 1.);
+    RooRealVar* g6Val = new RooRealVar("g6Val", "g6Val", 0.);
+    RooRealVar* g7Val = new RooRealVar("g7Val", "g7Val", 0.);
+    RooRealVar* g8Val = new RooRealVar("g8Val", "g8Val", 0.);
+    RooRealVar* g9Val = new RooRealVar("g9Val", "g9Val", 0.);
+    RooRealVar* g10Val = new RooRealVar("g10Val", "g10Val", 0.);
 
     // related to the gg/qq productions 
     RooRealVar* fz1Val = new RooRealVar("fz1Val", "fz1Val", 0);
@@ -70,10 +86,15 @@ void plotPdf_7D_XWW(double mH = 250, bool draw=true) {
     // PDF definition SM Higgs (JP = 2+)
     RooSpinTwoXZsZs *myPDF;
     if ( offshell )
-      myPDF = new RooSpinTwoXZsZs("myPDF","myPDF", *mX, *wplusmass, *wminusmass, *hs, *h1,*h2, *Phi, *Phi1, *c1Val, *c2Val, *c3Val, *c4Val, *c5Val, *c6Val, *c7Val, *fz1Val, *fz2Val, *R1Val, *R2Val, *mW, *gamW);
+      myPDF = new RooSpinTwoXZsZs("myPDF","myPDF", *mX, *wplusmass, *wminusmass, *hs, *h1,*h2, *Phi, *Phi1, 
+				  *c1Val, *c2Val, *c3Val, *c4Val, *c5Val, *c6Val, *c7Val, 
+				  *useGTerm, *g1Val, *g2Val, *g3Val, *g4Val, *g5Val, *g6Val, *g7Val, *g8Val, *g9Val, *g10Val,
+				  *fz1Val, *fz2Val, *R1Val, *R2Val, *mW, *gamW);
     else 
-      myPDF = new RooSpinTwoXZsZs("myPDF","myPDF", *mX, *mW, *mW, *hs, *h1,*h2, *Phi, *Phi1, *c1Val, *c2Val, *c3Val, *c4Val, *c5Val, *c6Val, *c7Val, *fz1Val, *fz2Val, *R1Val, *R2Val, *mW, *gamW);
-      
+      myPDF = new RooSpinTwoXZsZs("myPDF","myPDF", *mX, *mW, *mW, *hs, *h1,*h2, *Phi, *Phi1, 
+				  *c1Val, *c2Val, *c3Val, *c4Val, *c5Val, *c6Val, *c7Val, 
+				  *useGTerm, *g1Val, *g2Val, *g3Val, *g4Val, *g5Val, *g6Val, *g7Val, *g8Val, *g9Val, *g10Val,
+				  *fz1Val, *fz2Val, *R1Val, *R2Val, *mW, *gamW);
     // dataset for (JP = 2+)
     TFile* fin = new TFile(Form("TWW_%.0f_JHU.root", mH));
     TTree* tin = (TTree*) fin->Get("angles");

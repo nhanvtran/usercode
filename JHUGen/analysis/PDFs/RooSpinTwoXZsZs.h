@@ -32,6 +32,17 @@ public:
 		RooAbsReal& _c5Val,
 		RooAbsReal& _c6Val,
 		RooAbsReal& _c7Val,
+		RooAbsReal& _useGTerm,
+		RooAbsReal& _g1Val,
+		RooAbsReal& _g2Val,
+		RooAbsReal& _g3Val,
+		RooAbsReal& _g4Val,
+		RooAbsReal& _g5Val,
+		RooAbsReal& _g6Val,
+		RooAbsReal& _g7Val,
+		RooAbsReal& _g8Val,
+		RooAbsReal& _g9Val,
+		RooAbsReal& _g10Val,
 		RooAbsReal& _fz1Val,
 		RooAbsReal& _fz2Val,
                 RooAbsReal& _R1Val,
@@ -64,6 +75,17 @@ protected:
     RooRealProxy c5Val;
     RooRealProxy c6Val;
     RooRealProxy c7Val;
+    RooRealProxy useGTerm;
+    RooRealProxy g1Val;
+    RooRealProxy g2Val;
+    RooRealProxy g3Val;
+    RooRealProxy g4Val;
+    RooRealProxy g5Val;
+    RooRealProxy g6Val;
+    RooRealProxy g7Val;
+    RooRealProxy g8Val;
+    RooRealProxy g9Val;
+    RooRealProxy g10Val;
     RooRealProxy fz1Val ;
     RooRealProxy fz2Val ;
     RooRealProxy R1Val ;
