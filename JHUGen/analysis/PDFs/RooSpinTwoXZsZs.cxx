@@ -27,20 +27,13 @@ RooSpinTwoXZsZs::RooSpinTwoXZsZs(const char *name, const char *title,
 				 RooAbsReal& _h2,
 				 RooAbsReal& _Phi,
 				 RooAbsReal& _Phi1,
-				 RooAbsReal& _c1,
-				 RooAbsReal& _phi1,
-				 RooAbsReal& _c2,
-				 RooAbsReal& _phi2,
-				 RooAbsReal& _c3,
-				 RooAbsReal& _phi3,
-				 RooAbsReal& _c4,
-				 RooAbsReal& _phi4,
-				 RooAbsReal& _c5,
-				 RooAbsReal& _phi5,
-				 RooAbsReal& _c6,
-				 RooAbsReal& _phi6,
-				 RooAbsReal& _c7,
-				 RooAbsReal& _phi7,
+				 RooAbsReal& _c1Val,
+				 RooAbsReal& _c2Val,
+				 RooAbsReal& _c3Val,
+				 RooAbsReal& _c4Val,
+				 RooAbsReal& _c5Val,
+				 RooAbsReal& _c6Val,
+				 RooAbsReal& _c7Val,
 				 RooAbsReal& _fz1Val,
 				 RooAbsReal& _fz2Val,
 				 RooAbsReal& _R1Val,
@@ -56,20 +49,13 @@ h1("h1","h1",this,_h1),
 h2("h2","h2",this,_h2),
 Phi("Phi","Phi",this,_Phi),
 Phi1("Phi1","Phi1",this,_Phi1),
-c1("c1","c1",this,_c1),
-phi1("phi1","phi1",this,_phi1),
-c2("c2","c2",this,_c2),
-phi2("phi2","phi2",this,_phi2),
-c3("c3","c3",this,_c3),
-phi3("phi3","phi3",this,_phi3),
-c4("c4","c4",this,_c4),
-phi4("phi4","phi4",this,_phi4),
-c5("c5","c5",this,_c5),
-phi5("phi5","phi5",this,_phi5),
-c6("c6","c6",this,_c6),
-phi6("phi6","phi6",this,_phi6),
-c7("c7","c7",this,_c7),
-phi7("phi7","phi7",this,_phi7),
+c1Val("c1Val","c1Val",this,_c1Val),
+c2Val("c2Val","c2Val",this,_c2Val),
+c3Val("c3Val","c3Val",this,_c3Val),
+c4Val("c4Val","c4Val",this,_c4Val),
+c5Val("c5Val","c5Val",this,_c5Val),
+c6Val("c6Val","c6Val",this,_c6Val),
+c7Val("c7Val","c7Val",this,_c7Val),
 fz1Val("fz1Val","fz1Val",this,_fz1Val),
 fz2Val("fz2Val","fz2Val",this,_fz2Val),
 R1Val("R1Val","R1Val",this,_R1Val),
@@ -90,20 +76,13 @@ h1("h1",this,other.h1),
 h2("h2",this,other.h2),
 Phi("Phi",this,other.Phi),
 Phi1("Phi1",this,other.Phi1),
-c1("c1",this,other.c1),
-phi1("phi1",this,other.phi1),
-c2("c2",this,other.c2),
-phi2("phi2",this,other.phi2),
-c3("c3",this,other.c3),
-phi3("phi3",this,other.phi3),
-c4("c4",this,other.c4),
-phi4("phi4",this,other.phi4),
-c5("c5",this,other.c5),
-phi5("phi5",this,other.phi5),
-c6("c6",this,other.c6),
-phi6("phi6",this,other.phi6),
-c7("c7",this,other.c7),
-phi7("phi7",this,other.phi7),
+c1Val("c1Val",this,other.c1Val),
+c2Val("c2Val",this,other.c2Val),
+c3Val("c3Val",this,other.c3Val),
+c4Val("c4Val",this,other.c4Val),
+c5Val("c5Val",this,other.c5Val),
+c6Val("c6Val",this,other.c6Val),
+c7Val("c7Val",this,other.c7Val),
 fz1Val("fz1Val",this,other.fz1Val),
 fz2Val("fz2Val",this,other.fz2Val),
 R1Val("R1Val",this,other.R1Val),
@@ -118,6 +97,15 @@ gamZ("gamZ",this,other.gamZ)
 Double_t RooSpinTwoXZsZs::evaluate() const 
 { 
   
+  // set the c1->c7 terms directly from the inputs
+  double c1 = c1Val;
+  double c2 = c2Val;
+  double c3 = c3Val;
+  double c4 = c4Val;
+  double c5 = c5Val;
+  double c6 = c6Val;
+  double c7 = c7Val;
+
   bool isZZ = true;
   if ( mZ < 90.) isZZ = false;
   if ( isZZ ) {
@@ -358,12 +346,12 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   //-----------------------------------------------------------------------
 
   Double_t fmpReal = 
-    + pow(mzz,-2)*c1*pow(m2,4) * (  - 1.0/4.0 )
-    + pow(mzz,-2)*c1*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*c1Val*pow(m2,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*c1Val*pow(m1,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
+    + pow(mzz,-2)*c1Val*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
 
-    + pow(mzz,2)*c1 * ( 1.0/4.0 );
+    + pow(mzz,2)*c1Val * ( 1.0/4.0 );
 
   Double_t fmpImag = 0;
 
@@ -654,6 +642,14 @@ Int_t RooSpinTwoXZsZs::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& anal
 }
 Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName*/) const
 {
+  // set the c1->c7 terms directly from the inputs
+  double c1 = c1Val;
+  double c2 = c2Val;
+  double c3 = c3Val;
+  double c4 = c4Val;
+  double c5 = c5Val;
+  double c6 = c6Val;
+  double c7 = c7Val;
   
   bool isZZ = true;
   if ( mZ < 90.) isZZ = false;
@@ -662,18 +658,21 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   } else {
     if( (m1+m2) > mzz ) return 1e-9; 
   }
+
   double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
+  
   if (nanval != nanval) return 1e-9;
 
   Double_t integral=0;
   Double_t fz0Val=1-fz1Val-fz2Val;
 
-  Double_t x = (mzz*mzz-m1*m1-m2*m2)/(2*m1*m2);
+  Double_t x = (mzz*mzz-m1*m1-m2*m2)/(2.0*m1*m2);
 
   //-----------------------------------------------------------------------
-  // propogator/phase space factor
-
-  Double_t betaValSquared =  (1.-(pow(m1-m2,2)/pow(mzz,2)))*(1.-(pow(m1+m2,2)/pow(mzz,2)));
+  // propagator
+  //-----------------------------------------------------------------------
+  
+  Double_t betaValSquared = (1.-(pow(m1-m2,2)/pow(mzz,2)))*(1.-(pow(m1+m2,2)/pow(mzz,2)));
   Double_t betaVal = sqrt(betaValSquared);
 
   Double_t term1Coeff = (pow(m1,3))/( (pow(m1,2)-pow(mZ,2))*(pow(m1,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
@@ -892,17 +891,16 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   //-----------------------------------------------------------------------
 
   Double_t fmpReal = 
-    + pow(mzz,-2)*c1*pow(m2,4) * (  - 1.0/4.0 )
-    + pow(mzz,-2)*c1*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*c1Val*pow(m2,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*c1Val*pow(m1,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
+    + pow(mzz,-2)*c1Val*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
 
-    + pow(mzz,2)*c1 * ( 1.0/4.0 );
+    + pow(mzz,2)*c1Val * ( 1.0/4.0 );
 
   Double_t fmpImag = 0;
 
   //-----------------------------------------------------------------------
-  
   Double_t f00 = f00Imag*f00Imag + f00Real*f00Real;
   Double_t fpp = fppImag*fppImag + fppReal*fppReal;
   Double_t fmm = fmmImag*fmmImag + fmmReal*fmmReal;
@@ -923,7 +921,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   f0m = f0m / norm;
   fpm = fpm / norm;
   fmp = fmp / norm;
-  
+
   Double_t phi00=atan2(f00Imag,f00Real);
   Double_t phipp=atan2(fppImag,fppReal);
   Double_t phimm=atan2(fmmImag,fmmReal);
@@ -958,7 +956,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   phi0m = 0.;
   phipm = 0.;
   phimp = 0.;
-
+  */
   std::cout << "----------------------------\n";
   std::cout << "f00 = " << f00 << "\n";
   std::cout << "fpp = " << fpp << "\n";
@@ -980,7 +978,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   std::cout << "phipm = " << phipm << "\n";
   std::cout << "phimp = " << phimp << "\n";
   std::cout << "----------------------------\n";
-  */
+
 
   //-----------------------------------------------------------------------
   

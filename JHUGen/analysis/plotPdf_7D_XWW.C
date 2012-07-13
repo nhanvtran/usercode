@@ -22,12 +22,12 @@ void plotPdf_7D_XWW(double mH = 250, bool draw=true) {
     gROOT->ProcessLine(".L  PDFs/RooSpinTwoXZsZs.cxx+");
 
     // W/Z mass and decay width constants
-    double mV = 80.398;
-    double gamV = 2.1;
+    double mV = 80.399;
+    double gamV = 2.085;
     bool offshell = false;
     if ( mH < 2 * mV ) offshell = true;
     
-    // for the pole mass and decay width of Z 
+    // for the pole mass and decay width of W 
     RooRealVar* mX = new RooRealVar("mX","mX", mH);
     RooRealVar* mW = new RooRealVar("mW","mW", mV);
     RooRealVar* gamW = new RooRealVar("gamW","gamW",gamV);
@@ -35,8 +35,8 @@ void plotPdf_7D_XWW(double mH = 250, bool draw=true) {
     //
     // Observables (7D)
     // 
-    RooRealVar* wplusmass = new RooRealVar("wplusmass","m_{Z1}",mV,4,120);
-    RooRealVar* wminusmass = new RooRealVar("wminusmass","m_{Z2}",mV,4,120);
+    RooRealVar* wplusmass = new RooRealVar("wplusmass","m(W+)",mV,4,120);
+    RooRealVar* wminusmass = new RooRealVar("wminusmass","m(W-)",mV,4,120);
     RooRealVar* hs = new RooRealVar("costhetastar","hs",-1,1);
     RooRealVar* h1 = new RooRealVar("costheta1","h1",-1,1);
     RooRealVar* h2 = new RooRealVar("costheta2","h2",-1,1);
@@ -47,22 +47,16 @@ void plotPdf_7D_XWW(double mH = 250, bool draw=true) {
     // coupling constants for 2m+
     // RooRealVar* mX = new RooRealVar("mX","mX",mH);
     double s = (mH*mH-2*mV*mV)/2.;
-    double c1Val = 2*(1+mV*mV/s);
-    RooRealVar* c1 = new RooRealVar("c1", "c1", c1Val);
-    RooRealVar* c2 = new RooRealVar("c2", "c2", -0.5);
-    RooRealVar* c3 = new RooRealVar("c3", "c3", 0.);
-    RooRealVar* c4 = new RooRealVar("c4", "c4", -1);
-    RooRealVar* c5 = new RooRealVar("c5", "c5", 0.);
-    RooRealVar* c6 = new RooRealVar("c6", "c6", 0.);
-    RooRealVar* c7 = new RooRealVar("c7", "c7", 0.);
+    double c1 = 2*(1+mV*mV/s);
+    std::cout << "c1 = " << c1 << "\n"; 
 
-    RooRealVar* phi1 = new RooRealVar("phi1", "phi1", 0.);
-    RooRealVar* phi2 = new RooRealVar("phi2", "phi2", 0.);
-    RooRealVar* phi3 = new RooRealVar("phi3", "phi3", 0.);
-    RooRealVar* phi4 = new RooRealVar("phi4", "phi4", 0.);
-    RooRealVar* phi5 = new RooRealVar("phi5", "phi5", 0.);
-    RooRealVar* phi6 = new RooRealVar("phi6", "phi6", 0.);
-    RooRealVar* phi7 = new RooRealVar("phi7", "phi7", 0.);
+    RooRealVar* c1Val = new RooRealVar("c1Val", "c1Val", c1);
+    RooRealVar* c2Val = new RooRealVar("c2Val", "c2Val", -0.5);
+    RooRealVar* c3Val = new RooRealVar("c3Val", "c3Val", 0.);
+    RooRealVar* c4Val = new RooRealVar("c4Val", "c4Val", -1);
+    RooRealVar* c5Val = new RooRealVar("c5Val", "c5Val", 0.);
+    RooRealVar* c6Val = new RooRealVar("c6Val", "c6Val", 0.);
+    RooRealVar* c7Val = new RooRealVar("c7Val", "c7Val", 0.);
 
     // related to the gg/qq productions 
     RooRealVar* fz1Val = new RooRealVar("fz1Val", "fz1Val", 0);
@@ -76,9 +70,9 @@ void plotPdf_7D_XWW(double mH = 250, bool draw=true) {
     // PDF definition SM Higgs (JP = 2+)
     RooSpinTwoXZsZs *myPDF;
     if ( offshell )
-      myPDF = new RooSpinTwoXZsZs("myPDF","myPDF", *mX, *wplusmass, *wminusmass, *hs, *h1,*h2, *Phi, *Phi1, *c1, *phi1, *c2, *phi2, *c3, *phi3, *c4, *phi4, *c5, *phi5, *c6, *phi6, *c7, *phi7, *fz1Val, *fz2Val, *R1Val, *R2Val, *mW, *gamW);
+      myPDF = new RooSpinTwoXZsZs("myPDF","myPDF", *mX, *wplusmass, *wminusmass, *hs, *h1,*h2, *Phi, *Phi1, *c1Val, *c2Val, *c3Val, *c4Val, *c5Val, *c6Val, *c7Val, *fz1Val, *fz2Val, *R1Val, *R2Val, *mW, *gamW);
     else 
-      myPDF = new RooSpinTwoXZsZs("myPDF","myPDF", *mX, *mW, *mW, *hs, *h1,*h2, *Phi, *Phi1, *c1, *phi1, *c2, *phi2, *c3, *phi3, *c4, *phi4, *c5, *phi5, *c6, *phi6, *c7, *phi7, *fz1Val, *fz2Val, *R1Val, *R2Val, *mW, *gamW);
+      myPDF = new RooSpinTwoXZsZs("myPDF","myPDF", *mX, *mW, *mW, *hs, *h1,*h2, *Phi, *Phi1, *c1Val, *c2Val, *c3Val, *c4Val, *c5Val, *c6Val, *c7Val, *fz1Val, *fz2Val, *R1Val, *R2Val, *mW, *gamW);
       
     // dataset for (JP = 2+)
     TFile* fin = new TFile(Form("TWW_%.0f_JHU.root", mH));
