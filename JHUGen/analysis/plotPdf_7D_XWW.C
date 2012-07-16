@@ -26,6 +26,7 @@ void plotPdf_7D_XWW(double mH = 125, bool draw=true) {
     double gamV = 2.085;
     bool offshell = false;
     if ( mH < 2 * mV ) offshell = true;
+
     
     // for the pole mass and decay width of W 
     RooRealVar* mX = new RooRealVar("mX","mX", mH);
@@ -49,12 +50,14 @@ void plotPdf_7D_XWW(double mH = 125, bool draw=true) {
     //
     double s = (mH*mH-2*mV*mV)/2.;
     double c1 = 2*(1+mV*mV/s);
+    c1 = c1 * 2.0; // scale up to be consistent with the generator
     std::cout << "c1 = " << c1 << "\n"; 
 
     RooRealVar* c1Val = new RooRealVar("c1Val", "c1Val", c1);
+    // RooRealVar* c1Val = new RooRealVar("c1Val", "c1Val", 2.0); // for the g testing 
     RooRealVar* c2Val = new RooRealVar("c2Val", "c2Val", -0.5);
     RooRealVar* c3Val = new RooRealVar("c3Val", "c3Val", 0.);
-    RooRealVar* c4Val = new RooRealVar("c4Val", "c4Val", -1);
+    RooRealVar* c4Val = new RooRealVar("c4Val", "c4Val", -1.);
     RooRealVar* c5Val = new RooRealVar("c5Val", "c5Val", 0.);
     RooRealVar* c6Val = new RooRealVar("c6Val", "c6Val", 0.);
     RooRealVar* c7Val = new RooRealVar("c7Val", "c7Val", 0.);
@@ -62,12 +65,12 @@ void plotPdf_7D_XWW(double mH = 125, bool draw=true) {
     // 
     // Alternative definition in terms of g1->g10
     // 
-    RooRealVar* useGTerm = new RooRealVar("useGTerm", "useGTerm", 1.); // set to 1 if using g couplings
+    RooRealVar* useGTerm = new RooRealVar("useGTerm", "useGTerm",0.); // set to 1 if using g couplings
     RooRealVar* g1Val = new RooRealVar("g1Val", "g1Val", 1);
     RooRealVar* g2Val = new RooRealVar("g2Val", "g2Val", 0.);
     RooRealVar* g3Val = new RooRealVar("g3Val", "g3Val", 0.);
     RooRealVar* g4Val = new RooRealVar("g4Val", "g4Val", 0.);
-    RooRealVar* g5Val = new RooRealVar("g5Val", "g5Val", 0.);
+    RooRealVar* g5Val = new RooRealVar("g5Val", "g5Val", 1.);
     RooRealVar* g6Val = new RooRealVar("g6Val", "g6Val", 0.);
     RooRealVar* g7Val = new RooRealVar("g7Val", "g7Val", 0.);
     RooRealVar* g8Val = new RooRealVar("g8Val", "g8Val", 0.);
@@ -107,7 +110,7 @@ void plotPdf_7D_XWW(double mH = 125, bool draw=true) {
     std::cout << "Opening " << fileName << "\n";
     TFile* fin = new TFile(fileName);
     TTree* tin = (TTree*) fin->Get("angles");
-    
+
     if ( offshell) 
       RooDataSet data("data","data",tin,RooArgSet(*wplusmass, *wminusmass, *hs, *h1, *h2, *Phi, *Phi1));
     else 
@@ -183,8 +186,10 @@ void plotPdf_7D_XWW(double mH = 125, bool draw=true) {
       Phiframe->Draw();
       
       if ( useGTerm->getVal() > 0.) {
-	czz->SaveAs(Form("epsfiles/angles_TWW%.0f_JHU_7D_GenFromG1.eps", mH));
-	czz->SaveAs(Form("pngfiles/angles_TWW%.0f_JHU_7D_GenFromG1.png", mH));
+	// czz->SaveAs(Form("epsfiles/angles_TWW%.0f_JHU_7D_GenFromG1.eps", mH));
+	// czz->SaveAs(Form("pngfiles/angles_TWW%.0f_JHU_7D_GenFromG1.png", mH));
+	czz->SaveAs(Form("epsfiles/angles_TWW%.0f_JHU_7D.eps", mH));
+	czz->SaveAs(Form("pngfiles/angles_TWW%.0f_JHU_7D.png", mH));
       } else {
 	czz->SaveAs(Form("epsfiles/angles_TWW%.0f_JHU_7D_GenFromC.eps", mH));
 	czz->SaveAs(Form("pngfiles/angles_TWW%.0f_JHU_7D_GenFromC.png", mH));
