@@ -65,7 +65,7 @@ void plotPdf_7D_XWW(double mH = 125, bool draw=true) {
     // 
     // Alternative definition in terms of g1->g10
     // 
-    RooRealVar* useGTerm = new RooRealVar("useGTerm", "useGTerm",0.); // set to 1 if using g couplings
+    RooRealVar* useGTerm = new RooRealVar("useGTerm", "useGTerm",1.); // set to 1 if using g couplings
     RooRealVar* g1Val = new RooRealVar("g1Val", "g1Val", 1);
     RooRealVar* g2Val = new RooRealVar("g2Val", "g2Val", 0.);
     RooRealVar* g3Val = new RooRealVar("g3Val", "g3Val", 0.);
@@ -101,8 +101,8 @@ void plotPdf_7D_XWW(double mH = 125, bool draw=true) {
     // dataset for (JP = 2+)
     TString fileName;
     if ( useGTerm->getVal() > 0.) {
-      // fileName = Form("TWW_%.0f_JHU.root", mH);
-      fileName = Form("TWW_%.0f_JHU_FromG1.root", mH);
+      fileName = Form("TWW_%.0f_JHU.root", mH);
+      //fileName = Form("TWW_%.0f_JHU_FromG1.root", mH);
     }
     else {
       fileName = Form("TWW_%.0f_JHU_GenFromC.root", mH);
