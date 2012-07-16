@@ -390,12 +390,12 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   //-----------------------------------------------------------------------
 
   Double_t fmpReal = 
-    + pow(mzz,-2)*c1Val*pow(m2,4) * (  - 1.0/4.0 )
-    + pow(mzz,-2)*c1Val*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*c1*pow(m2,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*c1*pow(m1,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*c1Val*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
+    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
 
-    + pow(mzz,2)*c1Val * ( 1.0/4.0 );
+    + pow(mzz,2)*c1 * ( 1.0/4.0 );
 
   Double_t fmpImag = 0;
 
@@ -948,12 +948,12 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   //-----------------------------------------------------------------------
 
   Double_t fmpReal = 
-    + pow(mzz,-2)*c1Val*pow(m2,4) * (  - 1.0/4.0 )
-    + pow(mzz,-2)*c1Val*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*c1*pow(m2,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*c1*pow(m1,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*c1Val*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
+    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
 
-    + pow(mzz,2)*c1Val * ( 1.0/4.0 );
+    + pow(mzz,2)*c1 * ( 1.0/4.0 );
 
   Double_t fmpImag = 0;
 
