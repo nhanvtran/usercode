@@ -35,8 +35,8 @@ void plotPdf_7D_XZZ(double mH = 125, bool draw=true) {
     //
     // Observables (7D)
     // 
-    RooRealVar* z1mass = new RooRealVar("z1mass","m_{Z1}",mV,2,120);
-    RooRealVar* z2mass = new RooRealVar("z2mass","m_{Z2}",mV,2,120);
+    RooRealVar* z1mass = new RooRealVar("z1mass","m_{Z1}",mV,1e-09,120);
+    RooRealVar* z2mass = new RooRealVar("z2mass","m_{Z2}",mV,1e-09,120);
     RooRealVar* hs = new RooRealVar("costhetastar","hs",-1,1);
     RooRealVar* h1 = new RooRealVar("costheta1","h1",-1,1);
     RooRealVar* h2 = new RooRealVar("costheta2","h2",-1,1);
@@ -48,9 +48,11 @@ void plotPdf_7D_XZZ(double mH = 125, bool draw=true) {
     // See equation 5,6,7 in PRD 91, 075022
     //
     double s = (mH*mH-2*mV*mV)/2.;
-    double c1 = 2*(1+mV*mV/s);
+    double c1 = 2*(1+mV*mV/s); // definition as in paper
+    c1 = c1 * 2.; // to be consistent with the generator
     std::cout << "c1Value = " << c1 << "\n";
     RooRealVar* c1Val = new RooRealVar("c1Val", "c1Val", c1);
+    // RooRealVar* c1Val = new RooRealVar("c1Val", "c1Val", 2.0);
     RooRealVar* c2Val = new RooRealVar("c2Val", "c2Val", -0.5);
     RooRealVar* c3Val = new RooRealVar("c3Val", "c3Val", 0.);
     RooRealVar* c4Val = new RooRealVar("c4Val", "c4Val", -1);
@@ -61,8 +63,8 @@ void plotPdf_7D_XZZ(double mH = 125, bool draw=true) {
     // 
     // Alternative definition in terms of g1->g10
     // 
-    RooRealVar* useGTerm = new RooRealVar("useGTerm", "useGTerm", 0.); // set to 1 if using g couplings
-    RooRealVar* g1Val = new RooRealVar("g1Val", "g1Val", 1);
+    RooRealVar* useGTerm = new RooRealVar("useGTerm", "useGTerm", 1.); // set to 1 if using g couplings
+    RooRealVar* g1Val = new RooRealVar("g1Val", "g1Val", 1.0);
     RooRealVar* g2Val = new RooRealVar("g2Val", "g2Val", 0.);
     RooRealVar* g3Val = new RooRealVar("g3Val", "g3Val", 0.);
     RooRealVar* g4Val = new RooRealVar("g4Val", "g4Val", 0.);
@@ -98,11 +100,13 @@ void plotPdf_7D_XZZ(double mH = 125, bool draw=true) {
     // dataset for (JP = 2+)
     TString fileName;
     if ( useGTerm->getVal() > 0.) {
-      fileName = Form("TZZ_%.0f_JHU_YY.root", mH);
+      fileName = Form("7T_125G_4l_wResolution.root",mH); // Ian's file
+      // fileName = Form("TZZ_%.0f_JHU_YY.root", mH);
+      // fileName = Form("TZZ_%.0f_JHU_FromG1.root", mH);
     }
     else {
-      // fileName = Form("TZZ_%.0f_JHU_GenFromC.root", mH);
-      fileName = Form("TZZ_%.0f_JHU_GenFromC_symz1z2.root", mH);
+      fileName = Form("TZZ_%.0f_JHU_GenFromC.root", mH);
+      // fileName = Form("TZZ_125_JHU_GenFromC_symz1z2.root", mH);
     }
     std::cout << "Opening " << fileName << "\n";
     TFile* fin = new TFile(fileName);
@@ -183,13 +187,15 @@ void plotPdf_7D_XZZ(double mH = 125, bool draw=true) {
       Phiframe->Draw();
       
       if ( useGTerm->getVal() > 0.) {
-	czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromG.eps", mH));
-	czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromG.png", mH));
+	czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromG_FileFromIan.eps", mH));
+	czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromG_FileFromIan.png", mH));
+	// czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromG1.eps", mH));
+	// czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromG1.png", mH));
       } else {
-	// czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromC.eps", mH));
-	// czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromC.png", mH));
-	czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromC_symz1z2.eps", mH));
-	czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromC_symz1z2.png", mH));
+	czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromC.eps", mH));
+	czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromC.png", mH));
+	// czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromC_symz1z2.eps", mH));
+	// czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromC_symz1z2.png", mH));
       }
       
       delete czz;
