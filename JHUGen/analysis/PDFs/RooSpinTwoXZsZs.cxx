@@ -131,11 +131,11 @@ Double_t RooSpinTwoXZsZs::evaluate() const
 { 
   bool isZZ = true;
   if ( mZ < 90.) isZZ = false;
-  if ( isZZ ) {
-    if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
-  } else {
+  //if ( isZZ ) {
+  //  if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
+  //} else {
     if( (m1+m2) > mzz ) return 1e-9; 
-  }
+    //}
   double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
   if (nanval != nanval) return 1e-9;
 
@@ -183,80 +183,80 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   // -----------------------------------------------------------------------
 
   Double_t f00Real = 
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,3)*pow(m2,3) * ( 3/4 + (x*x-1) )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c2*pow(m1,3)*pow(m2,3) * (  - 4*(x*x-1) - 8*pow(x*x-1,2) )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c3*pow(m1,3)*pow(m2,3) * (  - 8*pow(x*x-1,2) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c1*pow(m1,3)*pow(m2,3) * ( 3./4. + (x*x-1.) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c2*pow(m1,3)*pow(m2,3) * (  - 4.*(x*x-1.) - 8*pow(x*x-1.,2) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c3*pow(m1,3)*pow(m2,3) * (  - 8.*pow(x*x-1.,2) )
 
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*m1*pow(m2,5) * (  - 1.0/2.0 - 1.0/2.0*(x*x-1) )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c2*m1*pow(m2,5) * ( 2*(x*x-1) )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,5)*m2 * (  - 1.0/2.0 - 1.0/2.0*(x*x-1) )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c2*pow(m1,5)*m2 * ( 2*(x*x-1) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c1*m1*pow(m2,5) * (  - 1.0/2.0 - 1.0/2.0*(x*x-1.) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c2*m1*pow(m2,5) * ( 2.*(x*x-1.) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c1*pow(m1,5)*m2 * (  - 1.0/2.0 - 1.0/2.0*(x*x-1.) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c2*pow(m1,5)*m2 * ( 2.*(x*x-1.) )
 
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*(1.0/m1)*pow(m2,7) * ( 1.0/8.0 )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,7)*(1.0/m2) * ( 1.0/8.0 )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c1*(1.0/m1)*pow(m2,7) * ( 1.0/8.0 )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c1*pow(m1,7)*(1.0/m2) * ( 1.0/8.0 )
 
-    + pow(sqrt(6),-1)*c1*m1*m2 * ( 1.0/2.0 + 1.0/2.0*(x*x-1) )
-    + pow(sqrt(6),-1)*c2*m1*m2 * (  - 2*(x*x-1) )
-    + pow(sqrt(6),-1)*c4*m1*m2 * ( 4*(x*x-1) )
+    + pow(sqrt(6.),-1)*c1*m1*m2 * ( 1.0/2.0 + 1.0/2.0*(x*x-1.) )
+    + pow(sqrt(6.),-1)*c2*m1*m2 * (  - 2.*(x*x-1.) )
+    + pow(sqrt(6.),-1)*c4*m1*m2 * ( 4.*(x*x-1.) )
 
-    + pow(sqrt(6),-1)*c1*(1.0/m1)*pow(m2,3) * (  - 1.0/4.0 )
-    + pow(sqrt(6),-1)*c1*pow(m1,3)*(1.0/m2) * (  - 1.0/4.0 )
+    + pow(sqrt(6.),-1)*c1*(1.0/m1)*pow(m2,3) * (  - 1.0/4.0 )
+    + pow(sqrt(6.),-1)*c1*pow(m1,3)*(1.0/m2) * (  - 1.0/4.0 )
 
-    + pow(mzz,4)*pow(sqrt(6),-1)*c1*(1.0/m1)*(1.0/m2) * ( 1.0/8.0 ); 
+    + pow(mzz,4)*pow(sqrt(6.),-1)*c1*(1.0/m1)*(1.0/m2) * ( 1.0/8.0 ); 
 
 
-  Double_t f00Imag = 0; 
+  Double_t f00Imag = 0.; 
 
   //-----------------------------------------------------------------------
   Double_t fppReal = 
-    + pow(mzz,2)*pow(sqrt(6),-1)*c1 * ( 1./4. )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m2,4) * (  - 1.0/4.0 )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,4) * (  - 1.0/4.0 )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c2*pow(m1,2)*pow(m2,2) * ( 8*(x*x-1) );
+    + pow(mzz,2)*pow(sqrt(6.),-1)*c1 * ( 1./4. )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c1*pow(m2,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c1*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1.) )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c2*pow(m1,2)*pow(m2,2) * ( 8.*(x*x-1.) );
 
   Double_t fppImag = 
 
-    + 1*pow(mzz,-4)*pow(sqrt(6),-1)*c5*pow(m1,3)*pow(m2,3) * ( 8*pow(sqrt(x*x-1),3) )
+    + 1*pow(mzz,-4)*pow(sqrt(6.),-1)*c5*pow(m1,3)*pow(m2,3) * ( 8.*pow(sqrt(x*x-1.),3) )
 
-    + 1*pow(sqrt(6),-1)*c6*m1*m2 * (  - 4*sqrt(x*x-1.) );
+    + 1*pow(sqrt(6.),-1)*c6*m1*m2 * (  - 4.*sqrt(x*x-1.) );
   
   //-----------------------------------------------------------------------
   Double_t fmmReal = 
-    + pow(mzz,2)*pow(sqrt(6),-1)*c1 * ( 1.0/4.0 )
+    + pow(mzz,2)*pow(sqrt(6.),-1)*c1 * ( 1.0/4.0 )
 
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,4) * (  - 1.0/4.0 )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m2,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c1*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c1*pow(m2,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c2*pow(m1,2)*pow(m2,2) * ( 8*(x*x-1) );
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1.) )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c2*pow(m1,2)*pow(m2,2) * ( 8.*(x*x-1.) );
 
   Double_t fmmImag = 
 
-    + 1*pow(mzz,-4)*pow(sqrt(6),-1)*c5*pow(m1,3)*pow(m2,3) * (  - 8*pow(sqrt(x*x-1),3) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c5*pow(m1,3)*pow(m2,3) * (  - 8.*pow(sqrt(x*x-1.),3) )
 
-    + 1*pow(sqrt(6),-1)*c6*m1*m2 * ( 4*sqrt(x*x-1.) );
+    + pow(sqrt(6.),-1)*c6*m1*m2 * ( 4.*sqrt(x*x-1.) );
 
   //-----------------------------------------------------------------------
 
   Double_t fp0Real = 
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m2,5) * (  - 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m2,5) * (  - 1.0/8.0 )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,2)*pow(m2,3) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,2)*pow(m2,3) * ( 3.0/8.0 + 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,4)*m2 * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,4)*m2 * (  - 3.0/8.0 - 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,6)*(1.0/m2) * ( 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,6)*(1.0/m2) * ( 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,2)*m2 * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
-    + (1.0/mzz)*(1.0/sqrt(2))*c4*pow(m1,2)*m2 * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m1,2)*m2 * ( 1.0/4.0 + 1.0/2.0*(x*x-1.) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c4*pow(m1,2)*m2 * ( 2.*(x*x-1.) )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m2,3) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m2,3) * (  - 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,4)*(1.0/m2) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m1,4)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*m2 * ( 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*m2 * ( 1.0/8.0 )
 
     + mzz*(1.0/sqrt(2))*c1*pow(m1,2)*(1.0/m2) * (  - 1.0/8.0 )
 
@@ -264,124 +264,124 @@ Double_t RooSpinTwoXZsZs::evaluate() const
 
   Double_t fp0Imag = 
 
-    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,3)*pow(m2,2) * (  - 4*pow(sqrt(x*x-1),3)*c7 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*pow(m1,3)*pow(m2,2) * (  - 4.*pow(sqrt(x*x-1.),3)*c7 )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*m1*pow(m2,2) * (  - sqrt(x*x-1.) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c6*m1*pow(m2,2) * (  - sqrt(x*x-1.) )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,3) * ( sqrt(x*x-1.) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c6*pow(m1,3) * ( sqrt(x*x-1.) )
 
-    + 1*mzz*(1.0/sqrt(2))*c6*m1 * (  - sqrt(x*x-1.) );
+    + mzz*(1.0/sqrt(2.))*c6*m1 * (  - sqrt(x*x-1.) );
 
 
 
   //-----------------------------------------------------------------------
   Double_t f0pReal = 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,6) * ( 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*(1.0/m1)*pow(m2,6) * ( 1.0/8.0 )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*m1*pow(m2,4) * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*m1*pow(m2,4) * (  - 3.0/8.0 - 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,3)*pow(m2,2) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,3)*pow(m2,2) * ( 3.0/8.0 + 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,5) * (  - 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,5) * (  - 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*m1*pow(m2,2) * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
-    + (1.0/mzz)*(1.0/sqrt(2))*c4*m1*pow(m2,2) * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*m1*pow(m2,2) * ( 1.0/4.0 + 1.0/2.0*(x*x-1.) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c4*m1*pow(m2,2) * ( 2.*(x*x-1.) )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,4) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*(1.0/m1)*pow(m2,4) * (  - 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,3) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m1,3) * (  - 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,2) * (  - 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*(1.0/m1)*pow(m2,2) * (  - 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*m1 * ( 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*m1 * ( 1.0/8.0 )
 
-    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m1) * ( 1.0/8.0 );
+    + pow(mzz,3)*(1.0/sqrt(2.))*c1*(1.0/m1) * ( 1.0/8.0 );
 
   Double_t f0pImag = 
 
-    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,2)*pow(m2,3) * (  - 4*pow(sqrt(x*x-1),3)*c7 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*pow(m1,2)*pow(m2,3) * (  - 4.*pow(sqrt(x*x-1.),3)*c7 )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m2,3) * ( sqrt(x*x-1.) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c6*pow(m2,3) * ( sqrt(x*x-1.) )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,2)*m2 * (  - sqrt(x*x-1.) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c6*pow(m1,2)*m2 * (  - sqrt(x*x-1.) )
 
-    + 1*mzz*(1.0/sqrt(2))*c6*m2 * (  - sqrt(x*x-1.) );
+    + mzz*(1.0/sqrt(2.))*c6*m2 * (  - sqrt(x*x-1.) );
 
   //-----------------------------------------------------------------------
 
 
   Double_t f0mReal = 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,6) * ( 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*(1.0/m1)*pow(m2,6) * ( 1.0/8.0 )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*m1*pow(m2,4) * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*m1*pow(m2,4) * (  - 3.0/8.0 - 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,3)*pow(m2,2) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,3)*pow(m2,2) * ( 3.0/8.0 + 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,5) * (  - 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,5) * (  - 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*m1*pow(m2,2) * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
-    + (1.0/mzz)*(1.0/sqrt(2))*c4*m1*pow(m2,2) * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*m1*pow(m2,2) * ( 1.0/4.0 + 1.0/2.0*(x*x-1.) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c4*m1*pow(m2,2) * ( 2*(x*x-1.) )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,4) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*(1.0/m1)*pow(m2,4) * (  - 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,3) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m1,3) * (  - 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,2) * (  - 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*(1.0/m1)*pow(m2,2) * (  - 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*m1 * ( 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*m1 * ( 1.0/8.0 )
 
-    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m1) * ( 1.0/8.0 );
+    + pow(mzz,3)*(1.0/sqrt(2.))*c1*(1.0/m1) * ( 1.0/8.0 );
 
   Double_t f0mImag = 
 
-    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,2)*pow(m2,3) * ( 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2.))*pow(m1,2)*pow(m2,3) * ( 4*pow(sqrt(x*x-1.),3)*c7 )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m2,3) * (  - sqrt(x*x-1.) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2.))*c6*pow(m2,3) * (  - sqrt(x*x-1.) )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,2)*m2 * ( sqrt(x*x-1.) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2.))*c6*pow(m1,2)*m2 * ( sqrt(x*x-1.) )
 
-    + 1*mzz*(1.0/sqrt(2))*c6*m2 * ( sqrt(x*x-1.) );
+    + 1*mzz*(1.0/sqrt(2.))*c6*m2 * ( sqrt(x*x-1.) );
 
   //-----------------------------------------------------------------------
 
   Double_t fm0Real =
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m2,5) * (  - 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m2,5) * (  - 1.0/8.0 )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,2)*pow(m2,3) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,2)*pow(m2,3) * ( 3.0/8.0 + 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,4)*m2 * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,4)*m2 * (  - 3.0/8.0 - 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,6)*(1.0/m2) * ( 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,6)*(1.0/m2) * ( 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,2)*m2 * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
-    + (1.0/mzz)*(1.0/sqrt(2))*c4*pow(m1,2)*m2 * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m1,2)*m2 * ( 1.0/4.0 + 1.0/2.0*(x*x-1.) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c4*pow(m1,2)*m2 * ( 2*(x*x-1.) )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m2,3) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m2,3) * (  - 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,4)*(1.0/m2) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m1,4)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*m2 * ( 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*m2 * ( 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*pow(m1,2)*(1.0/m2) * (  - 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*pow(m1,2)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m2) * ( 1.0/8.0 );
+    + pow(mzz,3)*(1.0/sqrt(2.))*c1*(1.0/m2) * ( 1.0/8.0 );
 
   Double_t fm0Imag = 
 
-    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,3)*pow(m2,2) * ( 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2.))*pow(m1,3)*pow(m2,2) * ( 4*pow(sqrt(x*x-1.),3)*c7 )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*m1*pow(m2,2) * ( sqrt(x*x-1.) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2.))*c6*m1*pow(m2,2) * ( sqrt(x*x-1.) )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,3) * (  - sqrt(x*x-1.) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2.))*c6*pow(m1,3) * (  - sqrt(x*x-1.) )
 
-    + 1*mzz*(1.0/sqrt(2))*c6*m1 * ( sqrt(x*x-1.) );
+    + 1*mzz*(1.0/sqrt(2.))*c6*m1 * ( sqrt(x*x-1.) );
 
   //-----------------------------------------------------------------------
   Double_t fpmReal = 
     + pow(mzz,-2)*c1*pow(m1,4) * (  - 1.0/4.0 )
     + pow(mzz,-2)*c1*pow(m2,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
+    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1.) )
 
     + pow(mzz,2)*c1 * ( 1.0/4.0 );
 
@@ -393,7 +393,7 @@ Double_t RooSpinTwoXZsZs::evaluate() const
     + pow(mzz,-2)*c1*pow(m2,4) * (  - 1.0/4.0 )
     + pow(mzz,-2)*c1*pow(m1,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
+    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1.) )
 
     + pow(mzz,2)*c1 * ( 1.0/4.0 );
 
@@ -617,11 +617,11 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   value+=(Sqrt(fp0)*Sqrt(fpm)*(-1 + 2*R1Val*h1 - Power(h1,2))*(R2Val + h2)*
 	  Sqrt(1 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(Phi + phip0 - phipm + Phi1))/(32.*Sqrt(2)); // terms[34]
+	  Cos(Phi + phip0 - phipm + Phi1))/(32.*sqrt(2.)); // terms[34]
 
   value+=(Sqrt(fmp)*Sqrt(fp0)*(6*fz0Val - 4*fz1Val + fz2Val)*(-1 + Power(h1,2))*(-R2Val + h2)*
 	  Sqrt(1 - Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*
-	  Cos(Phi + phimp - phip0 + 3*Phi1))/(32.*Sqrt(2)); // terms[35]
+	  Cos(Phi + phimp - phip0 + 3*Phi1))/(32.*sqrt(2.)); // terms[35]
   
   value+=-(Sqrt(f0m)*Sqrt(f0p)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(-1 + Power(hs,2))*
 	   (-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
@@ -635,11 +635,11 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   value+=(Sqrt(f0m)*Sqrt(fpm)*(-R1Val + h1)*Sqrt(1 - Power(h1,2))*
 	  (1 + 2*R2Val*h2 + Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(phi0m - phipm + Phi1))/(32.*Sqrt(2)); // terms[38]
+	  Cos(phi0m - phipm + Phi1))/(32.*sqrt(2.)); // terms[38]
    
   value+=-(Sqrt(f0m)*Sqrt(fmp)*(6*fz0Val - 4*fz1Val + fz2Val)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*
 	   (-1 + Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*
-	   Cos(2*Phi - phi0m + phimp + 3*Phi1))/(32.*Sqrt(2)); // terms[39]
+	   Cos(2*Phi - phi0m + phimp + 3*Phi1))/(32.*sqrt(2.)); // terms[39]
   
   value+=-(Sqrt(f0p)*Sqrt(fm0)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*(-R2Val + h2)*
 	   Sqrt(1 - Power(h2,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) - 
@@ -647,21 +647,21 @@ Double_t RooSpinTwoXZsZs::evaluate() const
 
   value+=(Sqrt(f0p)*Sqrt(fpm)*(6*fz0Val - 4*fz1Val + fz2Val)*(R1Val - h1)*Sqrt(1 - Power(h1,2))*
 	  (-1 + Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*
-	  Cos(2*Phi + phi0p - phipm + 3*Phi1))/(32.*Sqrt(2)); // terms[41]
+	  Cos(2*Phi + phi0p - phipm + 3*Phi1))/(32.*sqrt(2.)); // terms[41]
   
   value+=-(Sqrt(f0p)*Sqrt(fmp)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*
 	   (-1 + 2*R2Val*h2 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	   (-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	   Cos(phi0p - phimp - Phi1))/(32.*Sqrt(2)); // terms[42]
+	   Cos(phi0p - phimp - Phi1))/(32.*sqrt(2.)); // terms[42]
   
   value+=(Sqrt(fm0)*Sqrt(fpm)*(6*fz0Val - 4*fz1Val + fz2Val)*(-1 + Power(h1,2))*(R2Val + h2)*
 	  Sqrt(1 - Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*
-	  Cos(Phi + phim0 - phipm + 3*Phi1))/(32.*Sqrt(2)); // terms[43]
+	  Cos(Phi + phim0 - phipm + 3*Phi1))/(32.*sqrt(2.)); // terms[43]
   
   value+=(Sqrt(fm0)*Sqrt(fmp)*(1 + 2*R1Val*h1 + Power(h1,2))*(R2Val - h2)*
 	  Sqrt(1 - Power(h2,2))*hs*Sqrt(1 - Power(hs,2))*
 	  (-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*
-	  Cos(Phi - phim0 + phimp + Phi1))/(32.*Sqrt(2)); // terms[44]
+	  Cos(Phi - phim0 + phimp + Phi1))/(32.*sqrt(2.)); // terms[44]
   
   value+=(Sqrt(fmp)*Sqrt(fpm)*(6*fz0Val - 4*fz1Val + fz2Val)*(-1 + Power(h1,2))*
 	  (-1 + Power(h2,2))*Power(-1 + Power(hs,2),2)*
@@ -689,11 +689,11 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
 
   bool isZZ = true;
   if ( mZ < 90.) isZZ = false;
-  if ( isZZ ) {
-    if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
-  } else {
+  //if ( isZZ ) {
+  //  if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
+  //} else {
     if( (m1+m2) > mzz ) return 1e-9; 
-  }
+    //}
   double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
   if (nanval != nanval) return 1e-9;
 
@@ -712,7 +712,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
     double s = (mzz*mzz-m1*m1-m2*m2)/2.;
     double kappa =  s / (Lambda*Lambda);
     c1 = 2*g1Val + 2*g2Val*kappa*pow((1+mZ*mZ/s),2) + 2*g5Val*(mZ*mZ)/s;
-    c2 - -0.5*g1Val + g3Val*kappa*(1-mZ*mZ/s) + 2*g4Val*kappa + g7Val*kappa*mZ*mZ/s;
+    c2 = -0.5*g1Val + g3Val*kappa*(1-mZ*mZ/s) + 2*g4Val*kappa + g7Val*kappa*mZ*mZ/s;
     c3 = -1.0*(g2Val/2.0+g3Val+2.0*g4Val)*kappa*mzz*mzz/s;
     c4 = -g1Val - g2Val*kappa - (g2Val+g3Val+g6Val)*kappa*(mZ*mZ/s);
     c5 = 2*g8Val*kappa*(mzz*mzz)/s;
@@ -741,205 +741,205 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   // -----------------------------------------------------------------------
 
   Double_t f00Real = 
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,3)*pow(m2,3) * ( 3/4 + (x*x-1) )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c2*pow(m1,3)*pow(m2,3) * (  - 4*(x*x-1) - 8*pow(x*x-1,2) )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c3*pow(m1,3)*pow(m2,3) * (  - 8*pow(x*x-1,2) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c1*pow(m1,3)*pow(m2,3) * ( 3./4. + (x*x-1.) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c2*pow(m1,3)*pow(m2,3) * (  - 4.*(x*x-1.) - 8.*pow(x*x-1.,2) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c3*pow(m1,3)*pow(m2,3) * (  - 8.*pow(x*x-1.,2) )
 
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*m1*pow(m2,5) * (  - 1.0/2.0 - 1.0/2.0*(x*x-1) )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c2*m1*pow(m2,5) * ( 2*(x*x-1) )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,5)*m2 * (  - 1.0/2.0 - 1.0/2.0*(x*x-1) )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c2*pow(m1,5)*m2 * ( 2*(x*x-1) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c1*m1*pow(m2,5) * (  - 1.0/2.0 - 1.0/2.0*(x*x-1.) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c2*m1*pow(m2,5) * ( 2.*(x*x-1.) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c1*pow(m1,5)*m2 * (  - 1.0/2.0 - 1.0/2.0*(x*x-1.) )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c2*pow(m1,5)*m2 * ( 2.*(x*x-1.) )
 
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*(1.0/m1)*pow(m2,7) * ( 1.0/8.0 )
-    + pow(mzz,-4)*pow(sqrt(6),-1)*c1*pow(m1,7)*(1.0/m2) * ( 1.0/8.0 )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c1*(1.0/m1)*pow(m2,7) * ( 1.0/8.0 )
+    + pow(mzz,-4)*pow(sqrt(6.),-1)*c1*pow(m1,7)*(1.0/m2) * ( 1.0/8.0 )
 
-    + pow(sqrt(6),-1)*c1*m1*m2 * ( 1.0/2.0 + 1.0/2.0*(x*x-1) )
-    + pow(sqrt(6),-1)*c2*m1*m2 * (  - 2*(x*x-1) )
-    + pow(sqrt(6),-1)*c4*m1*m2 * ( 4*(x*x-1) )
+    + pow(sqrt(6.),-1)*c1*m1*m2 * ( 1.0/2.0 + 1.0/2.0*(x*x-1.) )
+    + pow(sqrt(6.),-1)*c2*m1*m2 * (  - 2*(x*x-1.) )
+    + pow(sqrt(6.),-1)*c4*m1*m2 * ( 4*(x*x-1.) )
 
-    + pow(sqrt(6),-1)*c1*(1.0/m1)*pow(m2,3) * (  - 1.0/4.0 )
-    + pow(sqrt(6),-1)*c1*pow(m1,3)*(1.0/m2) * (  - 1.0/4.0 )
+    + pow(sqrt(6.),-1)*c1*(1.0/m1)*pow(m2,3) * (  - 1.0/4.0 )
+    + pow(sqrt(6.),-1)*c1*pow(m1,3)*(1.0/m2) * (  - 1.0/4.0 )
 
-    + pow(mzz,4)*pow(sqrt(6),-1)*c1*(1.0/m1)*(1.0/m2) * ( 1.0/8.0 ); 
+    + pow(mzz,4)*pow(sqrt(6.),-1)*c1*(1.0/m1)*(1.0/m2) * ( 1.0/8.0 ); 
 
 
   Double_t f00Imag = 0; 
 
   //-----------------------------------------------------------------------
   Double_t fppReal = 
-    + pow(mzz,2)*pow(sqrt(6),-1)*c1 * ( 1./4. )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m2,4) * (  - 1.0/4.0 )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,4) * (  - 1.0/4.0 )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c2*pow(m1,2)*pow(m2,2) * ( 8*(x*x-1) );
+    + pow(mzz,2)*pow(sqrt(6.),-1)*c1 * ( 1./4. )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c1*pow(m2,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c1*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1.) )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c2*pow(m1,2)*pow(m2,2) * ( 8*(x*x-1.) );
 
   Double_t fppImag = 
 
-    + 1*pow(mzz,-4)*pow(sqrt(6),-1)*c5*pow(m1,3)*pow(m2,3) * ( 8*pow(sqrt(x*x-1),3) )
+    + 1*pow(mzz,-4)*pow(sqrt(6.),-1)*c5*pow(m1,3)*pow(m2,3) * ( 8*pow(sqrt(x*x-1.),3) )
 
-    + 1*pow(sqrt(6),-1)*c6*m1*m2 * (  - 4*sqrt(x*x-1.) );
+    + 1*pow(sqrt(6.),-1)*c6*m1*m2 * (  - 4*sqrt(x*x-1.) );
   
   //-----------------------------------------------------------------------
   Double_t fmmReal = 
-    + pow(mzz,2)*pow(sqrt(6),-1)*c1 * ( 1.0/4.0 )
+    + pow(mzz,2)*pow(sqrt(6.),-1)*c1 * ( 1.0/4.0 )
 
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,4) * (  - 1.0/4.0 )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m2,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c1*pow(m1,4) * (  - 1.0/4.0 )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c1*pow(m2,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
-    + pow(mzz,-2)*pow(sqrt(6),-1)*c2*pow(m1,2)*pow(m2,2) * ( 8*(x*x-1) );
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1.) )
+    + pow(mzz,-2)*pow(sqrt(6.),-1)*c2*pow(m1,2)*pow(m2,2) * ( 8*(x*x-1.) );
 
   Double_t fmmImag = 
 
-    + 1*pow(mzz,-4)*pow(sqrt(6),-1)*c5*pow(m1,3)*pow(m2,3) * (  - 8*pow(sqrt(x*x-1),3) )
+    + 1*pow(mzz,-4)*pow(sqrt(6.),-1)*c5*pow(m1,3)*pow(m2,3) * (  - 8*pow(sqrt(x*x-1.),3) )
 
-    + 1*pow(sqrt(6),-1)*c6*m1*m2 * ( 4*sqrt(x*x-1.) );
+    + 1*pow(sqrt(6.),-1)*c6*m1*m2 * ( 4*sqrt(x*x-1.) );
 
   //-----------------------------------------------------------------------
 
   Double_t fp0Real = 
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m2,5) * (  - 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m2,5) * (  - 1.0/8.0 )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,2)*pow(m2,3) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,2)*pow(m2,3) * ( 3.0/8.0 + 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,4)*m2 * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,4)*m2 * (  - 3.0/8.0 - 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,6)*(1.0/m2) * ( 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,6)*(1.0/m2) * ( 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,2)*m2 * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
-    + (1.0/mzz)*(1.0/sqrt(2))*c4*pow(m1,2)*m2 * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m1,2)*m2 * ( 1.0/4.0 + 1.0/2.0*(x*x-1.) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c4*pow(m1,2)*m2 * ( 2.*(x*x-1.) )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m2,3) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m2,3) * (  - 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,4)*(1.0/m2) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m1,4)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*m2 * ( 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*m2 * ( 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*pow(m1,2)*(1.0/m2) * (  - 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*pow(m1,2)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m2) * ( 1.0/8.0 );
+    + pow(mzz,3)*(1.0/sqrt(2.))*c1*(1.0/m2) * ( 1.0/8.0 );
 
   Double_t fp0Imag = 
 
-    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,3)*pow(m2,2) * (  - 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2.))*pow(m1,3)*pow(m2,2) * (  - 4*pow(sqrt(x*x-1.),3)*c7 )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*m1*pow(m2,2) * (  - sqrt(x*x-1.) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2.))*c6*m1*pow(m2,2) * (  - sqrt(x*x-1.) )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,3) * ( sqrt(x*x-1.) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2.))*c6*pow(m1,3) * ( sqrt(x*x-1.) )
 
-    + 1*mzz*(1.0/sqrt(2))*c6*m1 * (  - sqrt(x*x-1.) );
+    + 1*mzz*(1.0/sqrt(2.))*c6*m1 * (  - sqrt(x*x-1.) );
 
 
 
   //-----------------------------------------------------------------------
   Double_t f0pReal = 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,6) * ( 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*(1.0/m1)*pow(m2,6) * ( 1.0/8.0 )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*m1*pow(m2,4) * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*m1*pow(m2,4) * (  - 3.0/8.0 - 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,3)*pow(m2,2) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,3)*pow(m2,2) * ( 3.0/8.0 + 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,5) * (  - 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,5) * (  - 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*m1*pow(m2,2) * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
-    + (1.0/mzz)*(1.0/sqrt(2))*c4*m1*pow(m2,2) * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*m1*pow(m2,2) * ( 1.0/4.0 + 1.0/2.0*(x*x-1.) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c4*m1*pow(m2,2) * ( 2*(x*x-1.) )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,4) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*(1.0/m1)*pow(m2,4) * (  - 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,3) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m1,3) * (  - 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,2) * (  - 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*(1.0/m1)*pow(m2,2) * (  - 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*m1 * ( 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*m1 * ( 1.0/8.0 )
 
-    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m1) * ( 1.0/8.0 );
+    + pow(mzz,3)*(1.0/sqrt(2.))*c1*(1.0/m1) * ( 1.0/8.0 );
 
   Double_t f0pImag = 
 
-    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,2)*pow(m2,3) * (  - 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2.))*pow(m1,2)*pow(m2,3) * (  - 4*pow(sqrt(x*x-1.),3)*c7 )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m2,3) * ( sqrt(x*x-1.) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2.))*c6*pow(m2,3) * ( sqrt(x*x-1.) )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,2)*m2 * (  - sqrt(x*x-1.) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2.))*c6*pow(m1,2)*m2 * (  - sqrt(x*x-1.) )
 
-    + 1*mzz*(1.0/sqrt(2))*c6*m2 * (  - sqrt(x*x-1.) );
+    + 1*mzz*(1.0/sqrt(2.))*c6*m2 * (  - sqrt(x*x-1.) );
 
   //-----------------------------------------------------------------------
 
 
   Double_t f0mReal = 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,6) * ( 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*(1.0/m1)*pow(m2,6) * ( 1.0/8.0 )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*m1*pow(m2,4) * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*m1*pow(m2,4) * (  - 3.0/8.0 - 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,3)*pow(m2,2) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,3)*pow(m2,2) * ( 3.0/8.0 + 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,5) * (  - 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,5) * (  - 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*m1*pow(m2,2) * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
-    + (1.0/mzz)*(1.0/sqrt(2))*c4*m1*pow(m2,2) * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*m1*pow(m2,2) * ( 1.0/4.0 + 1.0/2.0*(x*x-1.) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c4*m1*pow(m2,2) * ( 2*(x*x-1.) )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,4) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*(1.0/m1)*pow(m2,4) * (  - 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,3) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m1,3) * (  - 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*(1.0/m1)*pow(m2,2) * (  - 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*(1.0/m1)*pow(m2,2) * (  - 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*m1 * ( 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*m1 * ( 1.0/8.0 )
 
-    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m1) * ( 1.0/8.0 );
+    + pow(mzz,3)*(1.0/sqrt(2.))*c1*(1.0/m1) * ( 1.0/8.0 );
 
   Double_t f0mImag = 
 
-    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,2)*pow(m2,3) * ( 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2.))*pow(m1,2)*pow(m2,3) * ( 4*pow(sqrt(x*x-1.),3)*c7 )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m2,3) * (  - sqrt(x*x-1.) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2.))*c6*pow(m2,3) * (  - sqrt(x*x-1.) )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,2)*m2 * ( sqrt(x*x-1.) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2.))*c6*pow(m1,2)*m2 * ( sqrt(x*x-1.) )
 
-    + 1*mzz*(1.0/sqrt(2))*c6*m2 * ( sqrt(x*x-1.) );
+    + 1*mzz*(1.0/sqrt(2.))*c6*m2 * ( sqrt(x*x-1.) );
 
   //-----------------------------------------------------------------------
 
   Double_t fm0Real =
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m2,5) * (  - 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m2,5) * (  - 1.0/8.0 )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,2)*pow(m2,3) * ( 3.0/8.0 + 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,2)*pow(m2,3) * ( 3.0/8.0 + 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,4)*m2 * (  - 3.0/8.0 - 1.0/2.0*(x*x-1) )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,4)*m2 * (  - 3.0/8.0 - 1.0/2.0*(x*x-1.) )
 
-    + (1.0/pow(mzz,3))*(1.0/sqrt(2))*c1*pow(m1,6)*(1.0/m2) * ( 1.0/8.0 )
+    + (1.0/pow(mzz,3))*(1.0/sqrt(2.))*c1*pow(m1,6)*(1.0/m2) * ( 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,2)*m2 * ( 1.0/4.0 + 1.0/2.0*(x*x-1) )
-    + (1.0/mzz)*(1.0/sqrt(2))*c4*pow(m1,2)*m2 * ( 2*(x*x-1) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m1,2)*m2 * ( 1.0/4.0 + 1.0/2.0*(x*x-1.) )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c4*pow(m1,2)*m2 * ( 2*(x*x-1.) )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m2,3) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m2,3) * (  - 1.0/8.0 )
 
-    + (1.0/mzz)*(1.0/sqrt(2))*c1*pow(m1,4)*(1.0/m2) * (  - 1.0/8.0 )
+    + (1.0/mzz)*(1.0/sqrt(2.))*c1*pow(m1,4)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*m2 * ( 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*m2 * ( 1.0/8.0 )
 
-    + mzz*(1.0/sqrt(2))*c1*pow(m1,2)*(1.0/m2) * (  - 1.0/8.0 )
+    + mzz*(1.0/sqrt(2.))*c1*pow(m1,2)*(1.0/m2) * (  - 1.0/8.0 )
 
-    + pow(mzz,3)*(1.0/sqrt(2))*c1*(1.0/m2) * ( 1.0/8.0 );
+    + pow(mzz,3)*(1.0/sqrt(2.))*c1*(1.0/m2) * ( 1.0/8.0 );
 
   Double_t fm0Imag = 
 
-    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2))*pow(m1,3)*pow(m2,2) * ( 4*pow(sqrt(x*x-1),3)*c7 )
+    + 1*(1.0/pow(mzz,3))*(1.0/sqrt(2.))*pow(m1,3)*pow(m2,2) * ( 4*pow(sqrt(x*x-1.),3)*c7 )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*m1*pow(m2,2) * ( sqrt(x*x-1.) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2.))*c6*m1*pow(m2,2) * ( sqrt(x*x-1.) )
 
-    + 1*(1.0/mzz)*(1.0/sqrt(2))*c6*pow(m1,3) * (  - sqrt(x*x-1.) )
+    + 1*(1.0/mzz)*(1.0/sqrt(2.))*c6*pow(m1,3) * (  - sqrt(x*x-1.) )
 
-    + 1*mzz*(1.0/sqrt(2))*c6*m1 * ( sqrt(x*x-1.) );
+    + 1*mzz*(1.0/sqrt(2.))*c6*m1 * ( sqrt(x*x-1.) );
 
   //-----------------------------------------------------------------------
   Double_t fpmReal = 
     + pow(mzz,-2)*c1*pow(m1,4) * (  - 1.0/4.0 )
     + pow(mzz,-2)*c1*pow(m2,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
+    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1.) )
 
     + pow(mzz,2)*c1 * ( 1.0/4.0 );
 
@@ -951,7 +951,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
     + pow(mzz,-2)*c1*pow(m2,4) * (  - 1.0/4.0 )
     + pow(mzz,-2)*c1*pow(m1,4) * (  - 1.0/4.0 )
 
-    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1) )
+    + pow(mzz,-2)*c1*pow(m1,2)*pow(m2,2) * ( 1.0/2.0 + (x*x-1.) )
 
     + pow(mzz,2)*c1 * ( 1.0/4.0 );
 
