@@ -68,7 +68,10 @@ cross section file: mod_CrossSection.f90, mod_Graviton.f90, mod_Zprime.f90, mod_
   the routine itself can be found in mod_Kinematics.f90
 
 
+-----------------------------------------
+Release notes...
+-----------------------------------------
 
-
+V2.0.2: Update random seed for gfort
 
 
