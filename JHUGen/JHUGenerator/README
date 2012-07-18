@@ -27,8 +27,7 @@ command line parameters:
    OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness for Higgs, Z/W boson 1/2, resp.), default 000
    if a parameter is not specified, the default value is chosen
 example call:
-   ./graviton Collider=1 Process=2 VegasNc1=100000 PChannel=2 DecayMode=0 DataFile=testOutput
-   ./graviton Collider=1 Process=0 OffHZZ=011 VegasNc1=100000 PChannel=1 DecayMode=1 DataFile=testOutput
+   ./JHUGen Collider=1 Process=0 VegasNc1=100000 PChannel=0 OffXVV=011 DecayMode1=0 DecayMode2=0 DataFile=test1
    * out-of-the-box: output datafile example is "data/outputTest.lhe" and terminal output is "data/outputTest_terminal.txt"
 
 
@@ -69,7 +68,10 @@ cross section file: mod_CrossSection.f90, mod_Graviton.f90, mod_Zprime.f90, mod_
   the routine itself can be found in mod_Kinematics.f90
 
 
+-----------------------------------------
+Release notes...
+-----------------------------------------
 
-
+V2.0.2: Update random seed for gfort
 
 
