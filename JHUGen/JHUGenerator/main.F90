@@ -268,6 +268,8 @@ real(8) :: yRnd(1:22)
 real(8) :: dum, RES(-5:5,-5:5)
 logical :: warmup
 integer :: i, i1, PChannel_aux, PChannel_aux1
+integer :: n,clock
+integer, dimension(:), allocatable :: gfort_seed
 include 'csmaxvalue.f'
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
@@ -289,8 +291,18 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
     VG = zero
     csmax = zero
-    if (seed_random) call random_seed()
-
+    if (seed_random) then
+#if compiler==1
+call random_seed()
+#elif compiler==2
+call random_seed(size=n)
+allocate(gfort_seed(n))
+call system_clock(count=clock)
+gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
+call random_seed(put = gfort_seed)
+deallocate(gfort_seed)
+#endif
+    endif
     print *, "finding maximal weight"
     do i=1,ncall
         call random_number(yRnd)
@@ -339,8 +351,20 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     AccepCounter = 0
     RejeCounter = 0
     AccepCounter_part = 0
-    if (seed_random) call random_seed()
-
+    
+if (seed_random) then
+#if compiler==1
+call random_seed()
+#elif compiler==2
+call random_seed(size=n)
+allocate(gfort_seed(n))
+call system_clock(count=clock)
+gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
+call random_seed(put = gfort_seed)
+deallocate(gfort_seed)
+#endif
+endif
+        
     print *, "generating events"
     do i=1,ncall
         call random_number(yRnd)
