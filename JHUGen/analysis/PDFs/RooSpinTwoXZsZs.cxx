@@ -131,11 +131,11 @@ Double_t RooSpinTwoXZsZs::evaluate() const
 { 
   bool isZZ = true;
   if ( mZ < 90.) isZZ = false;
-  //if ( isZZ ) {
-  //  if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
-  //} else {
+  if ( isZZ ) {
+    if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
+  } else {
     if( (m1+m2) > mzz ) return 1e-9; 
-    //}
+  }
   double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
   if (nanval != nanval) return 1e-9;
 
@@ -689,11 +689,11 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
 
   bool isZZ = true;
   if ( mZ < 90.) isZZ = false;
-  //if ( isZZ ) {
-  //  if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
-  //} else {
+  if ( isZZ ) {
+    if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
+  } else {
     if( (m1+m2) > mzz ) return 1e-9; 
-    //}
+  }
   double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
   if (nanval != nanval) return 1e-9;
 
@@ -1078,7 +1078,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
 	  (16*f00*(fz0Val + fz1Val + fz2Val)*Pi())/45.;
 	integral+=
 	  (16*fmm*(fz0Val + fz1Val + fz2Val)*Pi())/45.;
-	integral+=
+ 	integral+=
 	  (16*fpp*(fz0Val + fz1Val + fz2Val)*Pi())/45.;
 	integral+=
 	  (16*fp0*(fz0Val + fz1Val + fz2Val)*Pi())/45.;
