@@ -733,6 +733,32 @@ END FUNCTION
 
 
 
+FUNCTION WhichXBin(NHisto,XValue)
+use ModParameters
+implicit none
+integer :: WhichXBin,NHisto
+real(8) :: XValue
+integer :: i
+include "vegas_common.f"
+
+    whichxbin = int( xValue*NPart )!  uniform distribution
+
+
+!    do i=1,50!                         distribution according to vegas grid
+!       if( XValue .lt. xi(i,NHisto) ) then
+!           WhichXBin=i
+!           return
+!       endif
+!    enddo
+RETURN
+END FUNCTION
+
+
+
+
+
+
+
 SUBROUTINE IntoHisto(NHisto,NBin,Value)
 implicit none
 integer :: NHisto,NBin

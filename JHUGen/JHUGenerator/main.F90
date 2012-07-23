@@ -1,3 +1,4 @@
+! If you use this program please cite Phys.Rev. D81 (2010) 075022; arXiv:1001.3396 [hep-ph].
 PROGRAM JHUGenerator
 use ModParameters
 use ModKinematics
@@ -6,9 +7,12 @@ use ModCrossSection
 use ifport
 #endif
 implicit none
-real(8) :: time_start,time_end
 real(8) :: VG_Result,VG_Error
+logical,parameter :: useBetaVersion=.false.! this should be set to .false.
 
+
+
+   call PrintLogo()
    call GetCommandlineArgs()
    call InitPDFs()
    call InitHisto()
@@ -18,10 +22,14 @@ real(8) :: VG_Result,VG_Error
    call OpenFiles()
    call InitOutput()
    print *, "Running"
-   call cpu_time(time_start)
+   if( .not. useBetaVersion ) then
        call StartVegas(VG_Result,VG_Error)
+   else
+       call StartVegas_BETA(VG_Result,VG_Error)
+   endif
    call cpu_time(time_end)
    call WriteHisto(VG_Result,VG_Error,time_end-time_start)
+   write(*,*)  "event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
    call CloseFiles()
    print *, "Done"
 
@@ -36,7 +44,7 @@ use ModParameters
 use ModKinematics
 implicit none
 character :: arg*(31)
-integer :: NumArgs,NArg,OffShell_XVV
+integer :: NumArgs,NArg,OffShell_XVV,iunwgt
 
    Collider=1
    VegasIt1=-1
@@ -65,9 +73,13 @@ integer :: NumArgs,NArg,OffShell_XVV
 #elif compiler==2
    NumArgs = COMMAND_ARGUMENT_COUNT()
 #endif
+
+
    do NArg=1,NumArgs
     call GetArg(NArg,arg)
-    if( arg(1:9).eq."Collider=" ) then
+    if( arg(1:4).eq."help" .or. arg(1:4).eq."Help" .or. arg(1:4).eq."HELP") then
+        call PrintCommandLineArgs()
+    elseif( arg(1:9).eq."Collider=" ) then
         read(arg(10:10),*) Collider
     elseif( arg(1:7).eq."PDFSet=" ) then
         read(arg(8:10),*) PDFSet
@@ -85,6 +97,13 @@ integer :: NumArgs,NArg,OffShell_XVV
         read(arg(12:13),*) DecayMode2
     elseif( arg(1:7) .eq."OffXVV=" ) then
         read(arg(8:10),*) OffShell_XVV
+    elseif( arg(1:11) .eq."Unweighted=" ) then
+        read(arg(12:12),*) iunwgt
+        if( iunwgt.eq.0 ) then
+            Unweighted = .false.
+        else
+            Unweighted = .true.
+        endif
     endif
    enddo
 
@@ -203,6 +222,8 @@ ENDIF
 
 END SUBROUTINE
 
+
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! added by Nhan
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -210,6 +231,7 @@ SUBROUTINE InitOutput
 use ModParameters
 implicit none
 
+    if( unweighted ) then 
         write(14 ,'(A)') '<LesHouchesEvents version="1.0">'
         write(14 ,'(A)') '<!--'
         write(14 ,'(A)') 'Output from the generator given in http://arxiv.org/abs/1001.3396'
@@ -218,7 +240,8 @@ implicit none
         write(14 ,'(A,2F24.16,A)') '2212 2212',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0 10042 10042 3  1'
         write(14 ,'(A)') '0.43538820803E-02  0.72559367904E-05  0.87076000000E-07 100'
         write(14 ,'(A)') '</init>'
-
+    endif
+  
 END SUBROUTINE
 
 
@@ -240,8 +263,8 @@ include "vegas_common.f"
       else
           NDim = NDim + 3    ! integration over mz1, mz2, mg for adjusted kinematics but with on-shell matrix elements
       endif
-      VegasIt1_default = 1
-      VegasNc1_default = 5000000
+      VegasIt1_default = 5
+      VegasNc1_default = 50000000
 
       if( unweighted ) then
           NDim = NDim + 1  ! random number which decides if event is accepted
@@ -268,9 +291,10 @@ real(8) :: yRnd(1:22)
 real(8) :: dum, RES(-5:5,-5:5)
 logical :: warmup
 integer :: i, i1, PChannel_aux, PChannel_aux1
+include 'csmaxvalue.f'
 integer :: n,clock
 integer, dimension(:), allocatable :: gfort_seed
-include 'csmaxvalue.f'
+
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc1.eq.-1 ) VegasNc1 = VegasNc1_default
@@ -291,18 +315,20 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
     VG = zero
     csmax = zero
-    if (seed_random) then
+    if (seed_random) then 
 #if compiler==1
-call random_seed()
+        call random_seed()
 #elif compiler==2
-call random_seed(size=n)
-allocate(gfort_seed(n))
-call system_clock(count=clock)
-gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
-call random_seed(put = gfort_seed)
-deallocate(gfort_seed)
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=clock)
+        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
 #endif
     endif
+
+
     print *, "finding maximal weight"
     do i=1,ncall
         call random_number(yRnd)
@@ -322,6 +348,7 @@ deallocate(gfort_seed)
 
         PChannel = PChannel_aux
     enddo
+
 
 !    print *, PChannel
 !    pause
@@ -351,28 +378,32 @@ deallocate(gfort_seed)
     AccepCounter = 0
     RejeCounter = 0
     AccepCounter_part = 0
-    
-if (seed_random) then
+    if (seed_random) then 
 #if compiler==1
-call random_seed()
+        call random_seed()
 #elif compiler==2
-call random_seed(size=n)
-allocate(gfort_seed(n))
-call system_clock(count=clock)
-gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
-call random_seed(put = gfort_seed)
-deallocate(gfort_seed)
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=clock)
+        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
 #endif
-endif
-        
+    endif
+
+
+
     print *, "generating events"
+    call cpu_time(time_start)
     do i=1,ncall
         call random_number(yRnd)
         dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
     enddo
+    call cpu_time(time_end)
+
 
     print *, "Evaluation Counter: ",EvalCounter
-    print *, "Acceptance  Counter: ",AccepCounter
+    print *, "Acceptance Counter: ",AccepCounter
     print *, "Rejection  Counter: ",RejeCounter
     do i1=-5,5
       print *, "Acceptance  Counter_part: ", i1, AccepCounter_part(i1,-i1)
@@ -388,16 +419,118 @@ END SUBROUTINE
 
 
 
+SUBROUTINE StartVegas_BETA(VG_Result,VG_Error)
+use ModCrossSection
+use ModKinematics
+use ModParameters
+implicit none
+include "vegas_common.f"
+real(8) :: VG_Result,VG_Error,VG_Chi2
+real(8) :: yRnd(1:22)
+real(8) :: dum, RES(-5:5,-5:5)
+logical :: warmup
+integer :: i, i1, PChannel_aux, PChannel_aux1,n1,n2,n3,n4
+include 'csmaxvalue.f'
+
+if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
+if( VegasNc1.eq.-1 ) VegasNc1 = VegasNc1_default
+
+
+
+   warmup = .false.
+   itmx = 5  !VegasIt1   ! overwrite this for development phase
+   ncall= 2000000  !VegasNc1
+
+   PChannel_aux = PChannel
+
+if (unweighted.eqv..false.) then  !----------------------- weighted events
+
+  call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+
+
+
+elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
+
+
+    print *, "scanning the integrand"
+
+    call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+
+!print *, globalMin
+!print *, globalMax
+!pause
+do n1=1,NPart-1
+do n2=1,NPart-1
+!do n3=1,NPart-1
+!do n4=1,NPart-1
+     if( PartitionMax(n1,n2).eq.-1d99 ) then
+          print *, "unfilled partition: ",n1,n2
+         PartitionMax(n1,n2) = globalMax
+     endif
+!      if( PartitionMax(n1,n2,n3,n4).eq.-1d99 ) then
+! !          print *, "unfilled partitions",n1,n2,n3,n4
+!          PartitionMax(n1,n2,n3,n4) = globalMax
+!      endif
+!enddo
+!enddo
+enddo
+enddo
+
+!pause
+   call ClearHisto()
+
+   print *, "generating events"
+   call cpu_time(time_start)
+   do while( AccepCounter.lt.50000 )! generate a fixed number of 50000 events
+!   do i=1,ncall
+         call random_number(yRnd)
+!print *, "generated event no.",AccepCounter
+         dum = EvalUnWeighted_BETA(yRnd)
+   enddo
+   call cpu_time(time_end)
+
+   print *, "globalMin",globalMin
+   print *, "globalMax",globalMax
+   print *, "accepted",AccepCounter
+   print *, "rejected",RejeCounter
+   print *, "efficiency",dble(AccepCounter)/dble(RejeCounter)
+   print *, "time (sec)",time_end-time_start
+   print *, "rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+
+endif
+
+
+return
+END SUBROUTINE
+
+
+
+
+
+
+
+
+
 SUBROUTINE OpenFiles()
 use ModParameters
 implicit none
+logical :: dirresult
+
+
+   call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
    print *, ""
-   print *, "Data file:         "//trim(DataFile)//'.lhe'
-   print *, "Vegas status file: "//trim(DataFile)//'.status'
-   open(unit=14,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')            ! LHE event file
-   open(unit=15,file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')         ! histogram file
+   if( unweighted ) then
+      print *, "LHE file:       "//trim(DataFile)//'.lhe'
+      open(unit=14,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')        ! LHE event file
+      print *, "histogram file: "//trim(DataFile)//'.dat'
+      open(unit=15,file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')        ! histogram file
+   else
+      print *, "histogram file: "//trim(DataFile)//'.dat'
+      open(unit=15,file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')        ! histogram file
+   endif
 
+   
 return
 END SUBROUTINE
 
@@ -412,6 +545,29 @@ implicit none
 
 return
 END SUBROUTINE
+
+
+
+
+SUBROUTINE ClearHisto()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: NHisto
+
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+
+RETURN
+END SUBROUTINE
+
+
 
 
 
@@ -516,14 +672,18 @@ real(8),parameter :: ToGeV=1d2, ToPb=1d-3
 real(8) :: VG_Result,VG_Error,RunTime
 
 
-  write(* ,"(A,2X,1F9.2,A)") "# run time =",RunTime/60d0,"min"
+  write(15,"(A,2X,1F9.2,A)") "#"
+  write(15,"(A,2X,1F9.2,A)") "# column #1=histogram, #2=x-axis bin, #3=binned cross-section, #4=error, #5=number of events "
+  write(15,"(A,2X,1F9.2,A)") "# this can be easily plotted in gnuplot with the commands:"
+  write(15,"(A,2X,1F9.2,A)") "#    NHi=3"
+  write(15,"(A,2X,1F9.2,A)") "#    plot 'output.dat' using ($2):($1==NHi ? $3 : 1/0) w st"
+  write(15,"(A,2X,1F9.2,A)") "# where NHi selects the histogram"
+  write(15,"(A,2X,1F9.2,A)") "#"
+  write(15,"(A,2X,1F9.2,A)") "#"
   write(15,"(A,2X,1F9.2,A)") "# run time =",RunTime/60d0,"min"
-  write(* ,"(A,2X,1PE20.10,2X,1PE20.5)") "# TotCS =",VG_Result,VG_Error
   write(15,"(A,2X,1PE20.10,2X,1PE20.5)") "# TotCS =",VG_Result,VG_Error
-  write(* ,"(A)") "#"
   write(15,"(A)") "#"
   do NHisto=1,NumHistograms
-      write(* ,"(A,I2,A,A)") "# Histogram",NHisto,": ",Histo(NHisto)%Info
       write(15,"(A,I2,A,A)") "# Histogram",NHisto,": ",Histo(NHisto)%Info
       Integral = 0d0
       BinSize = Histo(NHisto)%BinSize * Histo(NHisto)%SetScale
@@ -541,18 +701,60 @@ real(8) :: VG_Result,VG_Error,RunTime
               Integral = Integral + Histo(NHisto)%Value(NBin)/it
               Error  = 1d0/(BinSize)/it * dsqrt( Histo(NHisto)%Value2(NBin) - 1d0/it/ncall*Histo(NHisto)%Value(NBin)**2 )
           endif
-          write(* ,"(I2,A,2X,1PE10.3,A,2X,1PE23.16,A,2X,1PE23.16,A,2X,I9,A)") NHisto,"|",BinVal,"|",Value,"|",Error,"|",Hits,"|"
           write(15,"(I2,A,2X,1PE10.3,A,2X,1PE23.16,A,2X,1PE23.16,A,2X,I9,A)") NHisto,"|",BinVal,"|",Value,"|",Error,"|",Hits,"|"
       enddo
       Integral = Integral + (Histo(NHisto)%Value(0)+Histo(NHisto)%Value(Histo(NHisto)%NBins+1))/it
-      write(*,"(A,2X,1PE23.16)") "# integrated result:",Integral
       write(15,"(A,2X,1PE23.16)") "# integrated result:",Integral
-      write(*,"(A)") "#"
       write(15,"(A)") "#"
   enddo
 
-  write(14, '(A,X,I9,X,A)') '<!-- Number of events:', AccepCounter,' -->'
-  write(14 ,'(A)') '</LesHouchesEvents>'
-
 return
 END SUBROUTINE
+
+
+
+
+SUBROUTINE PrintCommandLineArgs()
+implicit none
+
+        write(*,*) ""
+        write(*,"(2X,A)") "Command line arguments:"
+        write(*,"(4X,A)") "Collider:   1=LHC, 2=Tevatron"
+        write(*,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance"
+        write(*,"(4X,A)") "DecayMode1: decay mode for vector boson 1"
+        write(*,"(4X,A)") "DecayMode2: decay mode for vector boson 2"
+        write(*,"(4X,A)") "              0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu"
+        write(*,"(4X,A)") "              4=W->lnu, 5=W->2q, 6=W->taunu"
+        write(*,"(4X,A)") "              7=gamma"
+        write(*,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
+        write(*,"(4X,A)") "OffXVV:     real off-shell option for resonance(X),or vector bosons(VV)"
+        write(*,"(4X,A)") "PDFSet:     1=CTEQ6L1 (2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40)"
+        write(*,"(4X,A)") "VegasNc1:   number of evaluations"
+        write(*,"(4X,A)") "Unweighted: 0=weighted events, 1=unweighted events"
+        write(*,*) ""
+
+        STOP
+
+END SUBROUTINE
+
+
+
+
+SUBROUTINE PrintLogo()
+implicit none
+    write(*,*) " "
+    write(*,*) " ******************************************************************************"
+    write(*,*) " *                               JHU Generator                                *"
+    write(*,*) " ******************************************************************************"
+    write(*,*) " *                                                                            *"
+    write(*,*) " *    Spin determination of single-produced resonances at hadron colliders    *"
+    write(*,*) " *                                                                            *"
+    write(*,*) " *          Y.Gao, A.Gritsan, Z.Guo, K.Melnikov, M.Schulze, N.Tran            *"
+    write(*,*) " *          Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph]            *"
+    write(*,*) " *                                                                            *"
+    write(*,*) " ******************************************************************************"
+    write(*,*) " "
+return
+END SUBROUTINE
+
+
