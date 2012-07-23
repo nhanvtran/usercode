@@ -114,6 +114,7 @@ do i4 = 1,2
          sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-.mu+
 
          call qqZprimeZZampl(pin,sp,A(1))
+
          if (i1.eq.1) then
             A(1) = qL*A(1)
          elseif(i1.eq.2) then
