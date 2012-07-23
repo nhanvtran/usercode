@@ -21,7 +21,7 @@ void readOutAngles_LMH(std::string filename){
     std::string filenameT = filename + ".txt";
     std::cout << "Processing " << filenameT << std::endl;
 	fin.open(filenameT.c_str());
-	int maxEvents = 10000;
+	int maxEvents = 1000000;
 	
     char oname[192];
     sprintf(oname,"%s.root",filename.c_str());
