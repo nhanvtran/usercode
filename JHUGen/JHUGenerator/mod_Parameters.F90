@@ -35,7 +35,7 @@ real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
 real(8), public, parameter :: M_Reso  = 125d0     *GeV      ! X resonance mass (spin 0, spin 1, spin 2)
-real(8), public, parameter :: Ga_Reso = 5d0       *GeV      ! X resonance width
+real(8), public, parameter :: Ga_Reso = 0.1d0       *GeV      ! X resonance width
 real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
                                                             ! overal scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).
@@ -93,7 +93,7 @@ real(8), public, parameter :: Br_Z_bo = 1d0-Br_Z_up-Br_Z_ch-Br_Z_dn-Br_Z_st  ! b
   complex(8), public, parameter :: b2 = (0.0d0,0d0)
   complex(8), public, parameter :: b3 = (0.0d0,0d0)
   complex(8), public, parameter :: b4 = (0.0d0,0d0)
-  complex(8), public, parameter :: b5 = (0.0d0,0d0)
+  complex(8), public, parameter :: b5 = (1.0d0,0d0)
   complex(8), public, parameter :: b6 = (0.0d0,0d0)
   complex(8), public, parameter :: b7 = (0.0d0,0d0)
   complex(8), public, parameter :: b8 = (0.0d0,0d0)
