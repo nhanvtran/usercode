@@ -11,6 +11,7 @@ integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
 integer(8), public :: AccepCounter_part(-5:5,-5:5)=0
+real(8) :: time_start,time_end
 character :: DataFile*(20)
 
 logical, public, parameter :: seed_random = .true.
@@ -18,6 +19,12 @@ logical, public, parameter :: seed_random = .true.
 logical, public, parameter :: fix_channels_ratio = .true.
 real(8), public, parameter :: channels_ratio_fix = 0.25d0    ! desired ratio of
                                                              ! N_qq/(N_qq+N_gg)
+
+real(8),public :: GlobalMax=-1d99
+real(8),public :: GlobalMin=+1d99
+integer,parameter :: NPart=200
+real(8),public :: PartitionMax(0:NPart,0:NPart)=-1d99
+
 
 real(8),public :: minCS=1d10,maxCS=0d0,avgCS=0d0
 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
@@ -45,19 +52,20 @@ real(8), public, parameter :: Br_Z_st = 0.2229d0  ! branching fraction Ga(strang
 real(8), public, parameter :: Br_Z_bo = 1d0-Br_Z_up-Br_Z_ch-Br_Z_dn-Br_Z_st  ! branching fraction Ga(bottom)/Ga(hadronic)
 
 !-- parameters that define on-shell spin 0 coupling to SM fields, see note
+   logical, public, parameter :: generate_as = .false.
    complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
    complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
    complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
    complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
    complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
 
 !-- parameters that define off-shell spin 0 coupling to SM fields, see note
    complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
-   complex(8), public, parameter :: ghz1 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghz1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
 
@@ -69,35 +77,37 @@ real(8), public, parameter :: Br_Z_bo = 1d0-Br_Z_up-Br_Z_ch-Br_Z_dn-Br_Z_st  ! b
 
 !-- parameters that define spin 2 coupling to SM fields, see note
 ! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
-  complex(8), public, parameter :: a1 = (1.0d0,1d0)    ! g1  -- c.f. draft
-  complex(8), public, parameter :: a2 = (2.0d0,0d0)    ! g2
-  complex(8), public, parameter :: a3 = (3.0d0,0d0)    ! g3
-  complex(8), public, parameter :: a4 = (4.0d0,0d0)    ! g4
-  complex(8), public, parameter :: a5 = (5.0d0,0d0)    ! pseudoscalar, g8
+  complex(8), public, parameter :: a1 = (1.0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
+  complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
+  complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
+  complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
+  complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
+  complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
 
 !-- see mod_Graviton
   logical, public, parameter :: generate_bis = .true.
   logical, public, parameter :: use_dynamic_MG = .true.
 
-  complex(8), public, parameter :: b1 = (1.0d0,1d0)    !  all b' below are g's in the draft
-  complex(8), public, parameter :: b2 = (2.0d0,0d0)
-  complex(8), public, parameter :: b3 = (3.0d0,0d0)
-  complex(8), public, parameter :: b4 = (4.0d0,0d0)
-  complex(8), public, parameter :: b5 = (5.0d0,2d0)
-  complex(8), public, parameter :: b6 = (6.0d0,0d0)
-  complex(8), public, parameter :: b7 = (7.0d0,0d0)
-  complex(8), public, parameter :: b8 = (8.0d0,0d0)
-  complex(8), public, parameter :: b9 = (9.0d0,0d0)
-  complex(8), public, parameter :: b10 = (11.0d0,0d0)
+  complex(8), public, parameter :: b1 = (1.0d0,0d0)    !  all b' below are g's in the draft
+  complex(8), public, parameter :: b2 = (0.0d0,0d0)
+  complex(8), public, parameter :: b3 = (0.0d0,0d0)
+  complex(8), public, parameter :: b4 = (0.0d0,0d0)
+  complex(8), public, parameter :: b5 = (0.0d0,0d0)
+  complex(8), public, parameter :: b6 = (0.0d0,0d0)
+  complex(8), public, parameter :: b7 = (0.0d0,0d0)
+  complex(8), public, parameter :: b8 = (0.0d0,0d0)
+  complex(8), public, parameter :: b9 = (0.0d0,0d0)
+  complex(8), public, parameter :: b10 =(0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
 
 
   complex(8), public, parameter  :: c1 = (1.0d0,0d0)
-  complex(8), public, parameter  :: c2 = (-0.5d0,0d0)
-  complex(8), public, parameter  :: c3 = (2.0d0,0d0)
-  complex(8), public, parameter  :: c4 = (-0.9d0,0d0)
-  complex(8), public, parameter  :: c5 = (3d0,0d0)
-  complex(8), public, parameter  :: c6 = (4d0,0d0)
-  complex(8), public, parameter  :: c7 = (5d0,0d0)
+  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c4 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c6 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c7 = (0.0d0,0d0)
 
 
 ! V-f-fbar couplings:
