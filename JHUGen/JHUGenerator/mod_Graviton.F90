@@ -120,6 +120,9 @@ do i4 = 1,2
          pin(2,:) = p(:,2)
          sp(1,:) = pol_mless2(dcmplx(p(:,1)),-3+2*i1,'in')  ! gluon
          sp(2,:) = pol_mless2(dcmplx(p(:,2)),-3+2*i2,'in')  ! gluon
+!          sp(1,1:4)=pin(1,1:4);print *, "this checks IS gauge invariance"
+!          sp(2,1:4)=pin(2,1:4);print *, "this checks IS gauge invariance"
+
 
 !-------- -1 == left, 1 == right
          if( DecayMode1.ne.7 ) then 
@@ -132,6 +135,8 @@ do i4 = 1,2
             pin(4,:) = p(:,5)
             sp(3,:) = pol_mless2(dcmplx(pin(3,:)),-3+2*i3,'out')  ! photon
             sp(4,:) = pol_mless2(dcmplx(pin(4,:)),-3+2*i4,'out')  ! photon
+!            sp(3,1:4)=pin(3,1:4);print *,"  this checks FS gauge invariance"
+!            sp(4,1:4)=pin(4,1:4);print *,"  this checks FS gauge invariance"
          endif
 
          call ggGZZampl(pin,sp,A(1))
@@ -171,7 +176,7 @@ enddo
       real(dp) :: s, pin(4,4)
       complex(dp) :: A(2), sp(4,4), propG, propZ1, propZ2
       integer :: i1,i2,i3,i4
-      real(dp) :: aL1,aR1,aL2,aR2
+      real(dp) :: aL1,aR1,aL2,aR2,qL,qR
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv
 
@@ -179,6 +184,11 @@ enddo
 !       aL = -one + two*sitW**2
 !       aR = aL+one
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
+
+
+!---- chiral couplings of quarks to gravitons
+      qL = graviton_qq_left
+      qR = graviton_qq_right
 
 !---- the 1/Lambda coupling
       Lambda_inv = 1.0_dp/Lambda
@@ -280,10 +290,17 @@ do i4 = 1,2
             pin(4,:) = p(:,5)
             sp(3,:) = pol_mless2(dcmplx(pin(3,:)),-3+2*i3,'out')  ! photon
             sp(4,:) = pol_mless2(dcmplx(pin(4,:)),-3+2*i4,'out')  ! photon
+!            sp(3,1:4)=pin(3,1:4);print *,"  this checks FS gauge invariance"
+!            sp(4,1:4)=pin(4,1:4);print *,"  this checks FS gauge invariance"
          endif
 
          call qqGZZampl(pin,sp,A(1))
 
+         if (i1.eq.1) then
+            A(1) = qL*A(1)
+         elseif(i1.eq.2) then
+            A(1) = qR*A(1)
+         endif
          if (i3.eq.1) then
             A(1) = aL1*A(1)
           elseif(i3.eq.2) then
@@ -397,14 +414,15 @@ if( DecayMode1.le.3 .or. ((DecayMode1.ge.4) .and. (DecayMode1.le.6)) ) then! dec
           yyy6 = b9
           yyy7 = b10*rr*MG**2/q34
       else
-          yyy1 = (q34)*c1
+          yyy1 = (q34)*c1/2d0
           yyy2 = c2
-          yyy3 = c3
+          yyy3 = c3/MG**2
           yyy4 = c4
           yyy5 = c5
           yyy6 = c6
           yyy7 = c7
       endif
+
 elseif( DecayMode1.eq.7 ) then! decay into photons
       if (generate_bis) then
           rr = q34/Lambda**2
@@ -414,15 +432,15 @@ elseif( DecayMode1.eq.7 ) then! decay into photons
           yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
           yyy5 = two*b8*rr*MG**2/q34
           yyy6 = 0d0
-          yyy7 = b10*rr*MG**2/q34
+          yyy7 = 0d0 ! set to zero because it violates gauge invariance
       else
-          yyy1 = q34*c1
+          yyy1 = q34*c1/2d0
           yyy2 = c2
-          yyy3 = c3
+          yyy3 = c3/MG**2
           yyy4 = c4
           yyy5 = c5
-          yyy6 = c6
-          yyy7 = c7
+          yyy6 = 0d0
+          yyy7 = 0d0 ! set to zero because it violates gauge invariance
       endif
 endif
 
@@ -456,6 +474,8 @@ endif
       et1(e1,e4,q,q4)*e3_q4*yyy7
 
 
+! print *, "res QQB",res
+! pause
 
       end subroutine qqGZZampl
 
@@ -541,48 +561,53 @@ endif
 
 !---- define couplings
       q34 = (MG**2-MZ3**2-MZ4**2)/2d0!  = s = pV1.pV2    = (q_q-MZ3^2-MZ4^2)/2
+
       rr_gam = q_q/two/Lambda**2! kappa for IS
-      xxx1 = (a1 + a2*rr_gam)
+      xxx1 = (a1 + a2*rr_gam)     ! those a's correspond to g's in eq.(7) for the IS
       xxx2 = -a1/two + (a3+two*a4)*rr_gam
-      xxx3 = 4d0*a5*rr_gam
+      xxx3 = 4d0*a5*rr_gam * MG**2/q_q
+
+
 
 if( DecayMode1.le.3 .or. ((DecayMode1.ge.4) .and. (DecayMode1.le.6)) ) then! decay into Z's or W's
       if (generate_bis) then
           rr = q34/Lambda**2! kappa for FS
           yyy1 = q34*(b1 + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)   + b5*M_V**2/q34)
-          yyy2 = -b1/two + b3*rr*(one-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
+          yyy2 = -b1/two + b3*rr*(one-M_V**2/q34) + two*b4*rr + b7*rr*M_V**2/q34
           yyy3 = (-b2/two - b3- two*b4)*rr/q34
           yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
           yyy5 = two*b8*rr*MG**2/q34
           yyy6 = b9
           yyy7 = b10*rr*MG**2/q34
       else
-          yyy1 = q34*c1
+          yyy1 = q34*c1/2d0
           yyy2 = c2
-          yyy3 = c3
+          yyy3 = c3/MG**2
           yyy4 = c4
           yyy5 = c5
           yyy6 = c6
           yyy7 = c7
       endif
+
+
 elseif( DecayMode1.eq.7 ) then! decay into photons
       if (generate_bis) then
           rr = q34/Lambda**2! kappa for FS
           yyy1 = q34*(b1 + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)   + b5*M_V**2/q34)
           yyy2 = -b1/two + b3*rr*(one-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
-          yyy3 = (-b2/two - b3- two*b4)*rr/q34
-          yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
+          yyy3 = (-b2/two - b3- two*b4)*rr/q34             
+          yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34     
           yyy5 = two*b8*rr*MG**2/q34
           yyy6 = 0d0
-          yyy7 = b10*rr*MG**2/q34
+          yyy7 = 0d0 ! set to zero because it violates gauge invariance
       else
-          yyy1 = q34*c1
+          yyy1 = q34*c1/2d0
           yyy2 = c2
-          yyy3 = c3
+          yyy3 = c3/MG**2
           yyy4 = c4
           yyy5 = c5
-          yyy6 = c6
-          yyy7 = c7
+          yyy6 = 0d0
+          yyy7 = 0d0 ! set to zero because it violates gauge invariance
       endif
 endif
 
@@ -797,6 +822,9 @@ endif
 
 
 
+! print *, "res GG",res
+! pause
+
      else
 
 
@@ -827,6 +855,11 @@ endif
       res = res + e1_q3*e2_q4*e3_e4 * ( M_Reso**2 )
       res = res + e1_q4*e2_e3*e4_q3 * (  - M_Reso**2 )
       res = res + e1_q4*e2_q3*e3_e4 * ( M_Reso**2 )
+
+
+!print *, "res GG old",res
+!pause
+
 
      endif
 

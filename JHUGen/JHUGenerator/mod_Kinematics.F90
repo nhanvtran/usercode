@@ -36,7 +36,9 @@ real(8) :: ntRnd
 character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
 
     do i=1,9
+!        print *, "my_idup(i) ",MY_IDUP(i)
         LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+!        print *, "LHE_IDUP(i) ",LHE_IDUP(i)
     enddo
 
     NUP=9
@@ -160,19 +162,27 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1
 
 ! decay product 1 (V1): l-, nu or q
     i=7
-    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L12Mass,Lifetime,Spin
+    if (LHE_IDUP(i).gt.-9000) then
+        write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L12Mass,Lifetime,Spin
+    endif
 
 ! decay product 2 (V1): l+, nubar or qbar
     i=6
-    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L11Mass,Lifetime,Spin
+    if (LHE_IDUP(i).gt.-9000) then
+        write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L11Mass,Lifetime,Spin
+    endif
 
 ! decay product 1 (V2): l-, nu or q
     i=9
-    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L22Mass,Lifetime,Spin
+    if (LHE_IDUP(i).gt.-9000) then
+        write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L22Mass,Lifetime,Spin
+    endif
 
 ! decay product 2 (V2): l+, nubar or qbar
     i=8
-    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
+    if (LHE_IDUP(i).gt.-9000) then
+        write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
+    endif
 
     write(14,"(A)") "</event>"
 
@@ -718,6 +728,32 @@ real(8) :: Value
 
 RETURN
 END FUNCTION
+
+
+
+
+
+FUNCTION WhichXBin(NHisto,XValue)
+use ModParameters
+implicit none
+integer :: WhichXBin,NHisto
+real(8) :: XValue
+integer :: i
+include "vegas_common.f"
+
+    whichxbin = int( xValue*NPart )!  uniform distribution
+
+
+!    do i=1,50!                         distribution according to vegas grid
+!       if( XValue .lt. xi(i,NHisto) ) then
+!           WhichXBin=i
+!           return
+!       endif
+!    enddo
+RETURN
+END FUNCTION
+
+
 
 
 

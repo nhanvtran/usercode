@@ -101,7 +101,7 @@
               aR2 = bR
          elseif( DecayMode2.eq.7 ) then !  photon "decay"
               aL2=1d0
-              aR2=1d0  
+              aR2=1d0 
          else
               aL2=0d0
               aR2=0d0  
@@ -122,6 +122,9 @@ do i4 = 1,2
          pin(2,:) = p(:,2)
          sp(1,:) = pol_mless2(dcmplx(p(:,1)),-3+2*i1,'in')  ! gluon
          sp(2,:) = pol_mless2(dcmplx(p(:,2)),-3+2*i2,'in')  ! gluon
+!          sp(1,1:4)=pin(1,1:4);print *, "this checks IS gauge invariance"
+!          sp(2,1:4)=pin(2,1:4);print *, "this checks IS gauge invariance"
+
 
 !-------- -1 == left, 1 == right
          if( DecayMode1.ne.7 ) then 
@@ -134,9 +137,11 @@ do i4 = 1,2
             pin(4,:) = p(:,5)
             sp(3,:) = pol_mless2(dcmplx(pin(3,:)),-3+2*i3,'out')  ! photon
             sp(4,:) = pol_mless2(dcmplx(pin(4,:)),-3+2*i4,'out')  ! photon
+            !sp(3,1:4)=pin(3,1:4)! this checks gauge invariance
+            !sp(4,1:4)=pin(4,1:4)
          endif
 
-         if( OffShellReson ) then! NEW
+         if( OffShellReson ) then
               call ggOffHZZampl(pin,sp,A(1))
          else
               call ggHZZampl(pin,sp,A(1))
@@ -153,7 +158,7 @@ do i4 = 1,2
          elseif(i4.eq.2) then
             A(1) = aR2*A(1)
          endif
-       
+
          sum = sum + abs(propG*propZ1*propZ2*A(1))**2
 enddo
 enddo
@@ -186,7 +191,9 @@ enddo
       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
       complex(dp) :: xxx1,xxx2,xxx3,yyy1,yyy2,yyy3,yyy4
       real(dp) :: q34
-      logical :: new
+      real(dp) :: MG, MZ3, MZ4, q3_q3, q4_q4
+
+
 
       res = 0d0
 
@@ -204,6 +211,8 @@ enddo
       q = -q1-q2
 
       q_q =sc(q,q)
+      q3_q3 = sc(q3,q3)
+      q4_q4 = sc(q4,q4)
 
 
       q1_q2 = sc(q1,q2)
@@ -234,42 +243,76 @@ enddo
       e3_q4 = sc(e3,q4)
       e4_q3 = sc(e4,q3)
 
+
+      if (cdabs(q_q).lt.-0.1d0.or.(q3_q3).lt.-0.1d0.or.(q4_q4).lt.-0.1d0) return  ! if negative invariant masses return zero
+      MG =dsqrt(cdabs(q_q))
+      MZ3=dsqrt(dabs(q3_q3))
+      MZ4=dsqrt(dabs(q4_q4))
+
+
 !---- data that defines couplings
   if( DecayMode1.le.3 .or. ((DecayMode1.ge.4) .and. (DecayMode1.le.6)) ) then! decay into Z's or W's
 
+    if( generate_as ) then 
       xxx1 = ahg1
       xxx3 = ahg3
-
       yyy1 = ahz1
       yyy2 = ahz2
       yyy3 = ahz3
+    else
+      xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
+      xxx3 = -2d0*ghg4
+      yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
+           + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+      yyy3 = -2d0*ghz4
+    endif
 
-     res=e1_e2*e3_e4*M_Reso**4*yyy1*xxx1                 &
-      + e1_e2*e3_q4*e4_q3*M_Reso**2*yyy2*xxx1            &
-      + et1(e1,e2,q1,q2)*e3_e4*M_Reso**2*yyy1*xxx3       &
-      + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3           &
-      + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3      &
-      + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
+      res = e1_e2*e3_e4*M_Reso**4*yyy1*xxx1                  &
+          + e1_e2*e3_q4*e4_q3*M_Reso**2*yyy2*xxx1            &
+          + et1(e1,e2,q1,q2)*e3_e4*M_Reso**2*yyy1*xxx3       &
+          + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3           &
+          + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3      &
+          + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
 
 
   elseif( DecayMode1.eq.7 ) then! decay into photons
+
+    if( generate_as ) then 
       xxx1 = ahg1
       xxx3 = ahg3
-
       yyy1 = ahz1
-      yyy2 = ahz2
+      yyy2 = -2*ahz1 !ahz2  ! gauge invariance fixes ahz2 in this case
       yyy3 = ahz3
+    else
+      xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
+      xxx3 = -2d0*ghg4
+      yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
+           + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+      yyy3 = -2d0*ghz4
+    endif
 
-     res=e1_e2*e3_e4*M_Reso**4*yyy1*xxx1                 &
-      + e1_e2*e3_q4*e4_q3*M_Reso**2*yyy2*xxx1            &
-      + et1(e1,e2,q1,q2)*e3_e4*M_Reso**2*yyy1*xxx3       &
-      + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3           &
-      + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3      &
-      + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
+
+     res = e1_e2*e3_e4*M_Reso**4*yyy1*xxx1                  &
+         + e1_e2*e3_q4*e4_q3*M_Reso**2*yyy2*xxx1            &
+         + et1(e1,e2,q1,q2)*e3_e4*M_Reso**2*yyy1*xxx3       &
+         + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3           &
+         + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3      &
+         + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
 
   endif
 
+
+! print *, "res",res
+! pause
+
       end subroutine ggHZZampl
+
+
+
 
 
 
@@ -293,7 +336,6 @@ enddo
       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
       complex(dp) :: xxx1,xxx2,xxx3,yyy1,yyy2,yyy3,yyy4
       real(dp) :: q34, MG, MZ3, MZ4, q3_q3, q4_q4
-      logical :: new
 
       res = 0d0
 
@@ -352,47 +394,60 @@ enddo
 
 !---- data that defines couplings
   if( DecayMode1.le.6 ) then! decay into Z's or W's
-      xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
-      xxx3 = ghg4
 
+    if( generate_as ) then 
+      xxx1 = ahg1
+      xxx3 = ahg3
+      yyy1 = ahz1
+      yyy2 = ahz2
+      yyy3 = ahz3
+    else
+      xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
+      xxx3 = -2d0*ghg4
       yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
            + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2!     I think this is wrong: all MZ3 and MZ4 should have a minus sign
+           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+      yyy3 = -2d0*ghz4
+    endif
 
-      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)!   I think this is wrong: MZ3 and MZ4 should have a minus sign!  both corrected
-      yyy3 = ghz4
-
-
-     res=e1_e2*e3_e4*MG**4*yyy1*xxx1                 &
-      + e1_e2*e3_q4*e4_q3*MG**2*yyy2*xxx1            &
-      + et1(e1,e2,q1,q2)*e3_e4*MG**2*yyy1*xxx3       &
-      + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3           &
-      + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3      &
-      + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
+     res = e1_e2*e3_e4*MG**4*yyy1*xxx1                    &
+         + e1_e2*e3_q4*e4_q3*MG**2*yyy2*xxx1              &
+         + et1(e1,e2,q1,q2)*e3_e4*MG**2*yyy1*xxx3         &
+         + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3         &
+         + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3    &
+         + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
 
 
   elseif( DecayMode1.eq.7 ) then! decay into photons
 
-      xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
-      xxx3 = ghg4
 
+    if( generate_as ) then 
+      xxx1 = ahg1
+      xxx3 = ahg3
+      yyy1 = ahz1
+      yyy2 = -2*ahz1 !ahz2  ! gauge invariance fixes ahz2 in this case
+      yyy3 = ahz3
+    else
+      xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
+      xxx3 = -2d0*ghg4
       yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
            + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2!     I think this is wrong: all MZ3 and MZ4 should have a minus sign
+           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+      yyy3 = -2d0*ghz4
+    endif
 
-      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)!   I think this is wrong: MZ3 and MZ4 should have a minus sign!  both corrected
-      yyy3 = ghz4
-
-
-     res=e1_e2*e3_e4*MG**4*yyy1*xxx1                 &
-      + e1_e2*e3_q4*e4_q3*MG**2*yyy2*xxx1            &
-      + et1(e1,e2,q1,q2)*e3_e4*MG**2*yyy1*xxx3       &
-      + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3           &
-      + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3      &
-      + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
-
+     res = e1_e2*e3_e4*MG**4*yyy1*xxx1                    &
+         + e1_e2*e3_q4*e4_q3*MG**2*yyy2*xxx1              &
+         + et1(e1,e2,q1,q2)*e3_e4*MG**2*yyy1*xxx3         &
+         + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3         &
+         + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3    &
+         + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
 
   endif
+
+
       end subroutine ggOffHZZampl
 
 
