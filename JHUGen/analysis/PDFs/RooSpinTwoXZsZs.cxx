@@ -14,6 +14,8 @@
 #include <math.h> 
 #include "TMath.h" 
 
+
+
 using namespace TMath;
 
 ClassImp(RooSpinTwoXZsZs) 
@@ -134,7 +136,7 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   if ( isZZ ) {
     if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
   } else {
-    if( (m1+m2) > mzz ) return 1e-9; 
+  if( (m1+m2) > mzz ) return 1e-9; 
   }
   double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mzz,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mzz,2)));
   if (nanval != nanval) return 1e-9;
@@ -411,15 +413,15 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   Double_t fmp = fmpImag*fmpImag + fmpReal*fmpReal;
   
   double norm = f00 + fpp + fmm + fp0 + f0p + fm0 + f0m + fpm + fmp; 
-  f00 = f00 / norm;
-  fpp = fpp / norm;
-  fmm = fmm / norm;
-  fp0 = fp0 / norm;
-  f0p = f0p / norm;
-  fm0 = fm0 / norm;
-  f0m = f0m / norm;
-  fpm = fpm / norm;
-  fmp = fmp / norm;
+  f00 = f00;// / norm;
+  fpp = fpp;// / norm;
+  fmm = fmm;// / norm;
+  fp0 = fp0;// / norm;
+  f0p = f0p;// / norm;
+  fm0 = fm0;// / norm;
+  f0m = f0m;// / norm;
+  fpm = fpm;// / norm;
+  fmp = fmp;// / norm;
 
   Double_t phi00=atan2(f00Imag,f00Real);
   Double_t phipp=atan2(fppImag,fppReal);
@@ -462,6 +464,28 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   // 
   //  The 45 terms
   // 
+
+  std::cout << "----------------------------\n";
+  std::cout << "f00 = " << f00 << "\n";
+  std::cout << "fpp = " << fpp << "\n";
+  std::cout << "fmm = " << fmm << "\n";
+  std::cout << "fp0 = " << fp0 << "\n";
+  std::cout << "f0p = " << f0p << "\n";
+  std::cout << "fm0 = " << fm0 << "\n";
+  std::cout << "f0m = " << f0m << "\n";
+  std::cout << "fpm = " << fpm << "\n";
+  std::cout << "fmp = " << fmp << "\n";
+ 
+  std::cout << "phi00 = " << phi00 << "\n";
+  std::cout << "phipp = " << phipp << "\n";
+  std::cout << "phimm = " << phimm << "\n";
+  std::cout << "phip0 = " << phip0 << "\n";
+  std::cout << "phi0p = " << phi0p << "\n";
+  std::cout << "phim0 = " << phim0 << "\n";
+  std::cout << "phi0m = " << phi0m << "\n";
+  std::cout << "phipm = " << phipm << "\n";
+  std::cout << "phimp = " << phimp << "\n";
+  std::cout << "----------------------------\n";
   
   value+=(f00*(-1 + Power(h1,2))*(-1 + Power(h2,2))*
     (2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) + 
@@ -690,7 +714,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   bool isZZ = true;
   if ( mZ < 90.) isZZ = false;
   if ( isZZ ) {
-    if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
+  if( (m1+m2) > mzz || m2>m1 ) return 1e-9; 
   } else {
     if( (m1+m2) > mzz ) return 1e-9; 
   }
@@ -969,15 +993,15 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   Double_t fmp = fmpImag*fmpImag + fmpReal*fmpReal;
   
   double norm = f00 + fpp + fmm + fp0 + f0p + fm0 + f0m + fpm + fmp; 
-  f00 = f00 / norm;
-  fpp = fpp / norm;
-  fmm = fmm / norm;
-  fp0 = fp0 / norm;
-  f0p = f0p / norm;
-  fm0 = fm0 / norm;
-  f0m = f0m / norm;
-  fpm = fpm / norm;
-  fmp = fmp / norm;
+  f00 = f00;// / norm;
+  fpp = fpp;// / norm;
+  fmm = fmm;// / norm;
+  fp0 = fp0;// / norm;
+  f0p = f0p;// / norm;
+  fm0 = fm0;// / norm;
+  f0m = f0m;// / norm;
+  fpm = fpm;// / norm;
+  fmp = fmp;// / norm;
 
   Double_t phi00=atan2(f00Imag,f00Real);
   Double_t phipp=atan2(fppImag,fppReal);
@@ -1013,7 +1037,9 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   phi0m = 0.;
   phipm = 0.;
   phimp = 0.;
+  */
 
+  /*
   std::cout << "----------------------------\n";
   std::cout << "f00 = " << f00 << "\n";
   std::cout << "fpp = " << fpp << "\n";
