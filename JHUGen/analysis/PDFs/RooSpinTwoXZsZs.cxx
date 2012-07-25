@@ -412,18 +412,7 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   Double_t fpm=  fpmImag*fpmImag + fpmReal*fpmReal;
   Double_t fmp = fmpImag*fmpImag + fmpReal*fmpReal;
   
-  double norm = f00 + fpp + fmm + fp0 + f0p + fm0 + f0m + fpm + fmp; 
-  f00 = f00;// / norm;
-  fpp = fpp;// / norm;
-  fmm = fmm;// / norm;
-  fp0 = fp0;// / norm;
-  f0p = f0p;// / norm;
-  fm0 = fm0;// / norm;
-  f0m = f0m;// / norm;
-  fpm = fpm;// / norm;
-  fmp = fmp;// / norm;
-
-  Double_t phi00=atan2(f00Imag,f00Real);
+  //Double_t phi00=atan2(f00Imag,f00Real);
   Double_t phipp=atan2(fppImag,fppReal);
   Double_t phimm=atan2(fmmImag,fmmReal);
   Double_t phip0=atan2(fp0Imag,fp0Real);
@@ -433,59 +422,6 @@ Double_t RooSpinTwoXZsZs::evaluate() const
   Double_t phipm=atan2(fpmImag,fpmReal);
   Double_t phimp=atan2(fmpImag,fmpReal);
 
-  /*
-  // 
-  // Set the value by hand for the mX = 250 2m+
-  // 
-
-  fpp = 0.013;
-  fmm = 0.013;
-  fpm = 0.282;
-  fmp = fpm;
-  fp0 = 0.075;
-  f0p = fp0;
-  f0m = 0.075;
-  fm0 = f0m;
-  f00 = 1.-fpp-fmm-fpm-fmp-fp0-f0p-fm0-f0m;
-
-  phi00 = 0.;
-  phipp = 0.;
-  phimm = 0.;
-  phip0 = 0.;
-  phi0p = 0.;
-  phim0 = 0.;
-  phi0m = 0.;
-  phipm = 0.;
-  phimp = 0.;
-  */
-
-  //========================================================
-  
-  // 
-  //  The 45 terms
-  // 
-
-  std::cout << "----------------------------\n";
-  std::cout << "f00 = " << f00 << "\n";
-  std::cout << "fpp = " << fpp << "\n";
-  std::cout << "fmm = " << fmm << "\n";
-  std::cout << "fp0 = " << fp0 << "\n";
-  std::cout << "f0p = " << f0p << "\n";
-  std::cout << "fm0 = " << fm0 << "\n";
-  std::cout << "f0m = " << f0m << "\n";
-  std::cout << "fpm = " << fpm << "\n";
-  std::cout << "fmp = " << fmp << "\n";
- 
-  std::cout << "phi00 = " << phi00 << "\n";
-  std::cout << "phipp = " << phipp << "\n";
-  std::cout << "phimm = " << phimm << "\n";
-  std::cout << "phip0 = " << phip0 << "\n";
-  std::cout << "phi0p = " << phi0p << "\n";
-  std::cout << "phim0 = " << phim0 << "\n";
-  std::cout << "phi0m = " << phi0m << "\n";
-  std::cout << "phipm = " << phipm << "\n";
-  std::cout << "phimp = " << phimp << "\n";
-  std::cout << "----------------------------\n";
   
   value+=(f00*(-1 + Power(h1,2))*(-1 + Power(h2,2))*
     (2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) + 
@@ -992,18 +928,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   Double_t fpm=  fpmImag*fpmImag + fpmReal*fpmReal;
   Double_t fmp = fmpImag*fmpImag + fmpReal*fmpReal;
   
-  double norm = f00 + fpp + fmm + fp0 + f0p + fm0 + f0m + fpm + fmp; 
-  f00 = f00;// / norm;
-  fpp = fpp;// / norm;
-  fmm = fmm;// / norm;
-  fp0 = fp0;// / norm;
-  f0p = f0p;// / norm;
-  fm0 = fm0;// / norm;
-  f0m = f0m;// / norm;
-  fpm = fpm;// / norm;
-  fmp = fmp;// / norm;
-
-  Double_t phi00=atan2(f00Imag,f00Real);
+  //Double_t phi00=atan2(f00Imag,f00Real);
   Double_t phipp=atan2(fppImag,fppReal);
   Double_t phimm=atan2(fmmImag,fmmReal);
   Double_t phip0=atan2(fp0Imag,fp0Real);
@@ -1012,56 +937,6 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
   Double_t phi0m=atan2(f0mImag,f0mReal);
   Double_t phipm=atan2(fpmImag,fpmReal);
   Double_t phimp=atan2(fmpImag,fmpReal);
-
-  /*
-  // 
-  // Set the value by hand
-  // 
-
-  fpp = 0.013;
-  fmm = 0.013;
-  fpm = 0.282;
-  fmp = fpm;
-  fp0 = 0.075;
-  f0p = fp0;
-  f0m = 0.075;
-  fm0 = f0m;
-  f00 = 1.-fpp-fmm-fpm-fmp-fp0-f0p-fm0-f0m;
-
-  phi00 = 0.;
-  phipp = 0.;
-  phimm = 0.;
-  phip0 = 0.;
-  phi0p = 0.;
-  phim0 = 0.;
-  phi0m = 0.;
-  phipm = 0.;
-  phimp = 0.;
-  */
-
-  /*
-  std::cout << "----------------------------\n";
-  std::cout << "f00 = " << f00 << "\n";
-  std::cout << "fpp = " << fpp << "\n";
-  std::cout << "fmm = " << fmm << "\n";
-  std::cout << "fp0 = " << fp0 << "\n";
-  std::cout << "f0p = " << f0p << "\n";
-  std::cout << "fm0 = " << fm0 << "\n";
-  std::cout << "f0m = " << f0m << "\n";
-  std::cout << "fpm = " << fpm << "\n";
-  std::cout << "fmp = " << fmp << "\n";
- 
-  std::cout << "phi00 = " << phi00 << "\n";
-  std::cout << "phipp = " << phipp << "\n";
-  std::cout << "phimm = " << phimm << "\n";
-  std::cout << "phip0 = " << phip0 << "\n";
-  std::cout << "phi0p = " << phi0p << "\n";
-  std::cout << "phim0 = " << phim0 << "\n";
-  std::cout << "phi0m = " << phi0m << "\n";
-  std::cout << "phipm = " << phipm << "\n";
-  std::cout << "phimp = " << phimp << "\n";
-  std::cout << "----------------------------\n";
-  */
 
   //-----------------------------------------------------------------------
   
@@ -1230,7 +1105,7 @@ Double_t RooSpinTwoXZsZs::analyticalIntegral(Int_t code, const char* /*rangeName
       // projections to hs, integrate all others
     case 1:
       {
-	  
+
 	integral=0;
 
 	integral+=	  
