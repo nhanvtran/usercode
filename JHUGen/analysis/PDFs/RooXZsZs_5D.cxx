@@ -137,11 +137,9 @@ Double_t RooXZsZs_5D::evaluate() const
     }
     
     Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
-    //Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-    //Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-    Double_t fppVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1));
-    Double_t fmmVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1));
-
+    Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
+    Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
+    
     //Double_t phi00Val = atan2(a1*sin(phi1)+a2*eta*(chi*chi-1)*sin(phi2),a1*cos(phi1)+a2*eta*(chi*chi-1)*cos(phi2));
     Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val))+TMath::Pi();
     Double_t phippVal = atan2(a1*sin(phi1)+a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)-a3*eta*sqrt(chi*chi-1)*cos(phi3));
@@ -235,10 +233,8 @@ Double_t RooXZsZs_5D::analyticalIntegral(Int_t code, const char* rangeName) cons
 	    }
             
             Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
-            //Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-            //Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-	    Double_t fppVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1));
-	    Double_t fmmVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1));
+            Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
+            Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
 
             //Double_t phi00Val = atan2(a1*sin(phi1)+a2*eta*(chi*chi-1)*sin(phi2),a1*cos(phi1)+a2*eta*(chi*chi-1)*cos(phi2));
 	    Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val))+TMath::Pi();
@@ -315,10 +311,8 @@ Double_t RooXZsZs_5D::analyticalIntegral(Int_t code, const char* rangeName) cons
 	    }
             
             Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
-            //Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-            //Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-	    Double_t fppVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1));
-	    Double_t fmmVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1));
+            Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
+            Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
 
             //Double_t phi00Val = atan2(a1*sin(phi1)+a2*eta*(chi*chi-1)*sin(phi2),a1*cos(phi1)+a2*eta*(chi*chi-1)*cos(phi2));
 	    Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val))+TMath::Pi();
@@ -395,10 +389,9 @@ Double_t RooXZsZs_5D::analyticalIntegral(Int_t code, const char* rangeName) cons
 	    }
             
             Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
-            //Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-            //Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-	    Double_t fppVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1));
-	    Double_t fmmVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1));
+            Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
+            Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
+
             //Double_t phi00Val = atan2(a1*sin(phi1)+a2*eta*(chi*chi-1)*sin(phi2),a1*cos(phi1)+a2*eta*(chi*chi-1)*cos(phi2));
 	    Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val))+TMath::Pi();
             Double_t phippVal = atan2(a1*sin(phi1)+a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)-a3*eta*sqrt(chi*chi-1)*cos(phi3));
@@ -474,10 +467,8 @@ Double_t RooXZsZs_5D::analyticalIntegral(Int_t code, const char* rangeName) cons
 	    }
 
             Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
-            //Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-            //Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-	    Double_t fppVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1));
-	    Double_t fmmVal = (a1Val*a1Val+pow(a3Val,2)*pow(eta,2)*(chi*chi-1));
+            Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
+            Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
 
             //Double_t phi00Val = atan2(a1*sin(phi1)+a2*eta*(chi*chi-1)*sin(phi2),a1*cos(phi1)+a2*eta*(chi*chi-1)*cos(phi2));
 	    Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val))+TMath::Pi();
