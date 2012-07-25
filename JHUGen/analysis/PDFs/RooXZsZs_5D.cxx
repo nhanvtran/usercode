@@ -107,7 +107,13 @@ Double_t RooXZsZs_5D::evaluate() const
     // data should be variable changed to avoid this though
     if (chi<1) chi = 1;
     
-    if (m1 < m2) return 1e-9;
+    bool isZZ = true;
+    if ( mZ < 90.) isZZ = false;
+    if ( isZZ ) {
+      if( (m1+m2) > mX || m2>m1 ) return 1e-9; 
+    } else {
+      if( (m1+m2) > mX ) return 1e-9; 
+    }
     double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mX,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mX,2)));
     if (nanval != nanval) return 1e-9;
 
@@ -184,7 +190,17 @@ Int_t RooXZsZs_5D::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars
 }
 Double_t RooXZsZs_5D::analyticalIntegral(Int_t code, const char* rangeName) const
 {
-    
+
+  bool isZZ = true;
+  if ( mZ < 90.) isZZ = false;
+  if ( isZZ ) {
+      if( (m1+m2) > mX || m2>m1 ) return 1e-9; 
+  } else {
+    if( (m1+m2) > mX ) return 1e-9; 
+  }
+  double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mX,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mX,2)));
+  if (nanval != nanval) return 1e-9;
+  
     switch(code)
     {
             
@@ -202,10 +218,6 @@ Double_t RooXZsZs_5D::analyticalIntegral(Int_t code, const char* rangeName) cons
             // condition to avoid NaN PDF
             // data should be variable changed to avoid this though
             if (chi<1) chi = 1;
-            
-            if (m1 < m2) return 1e-9;
-            double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mX,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mX,2)));
-            if (nanval != nanval) return 1e-9;
 
 	    double s=(mX*mX-2.*m1*m2)/2.;
 	    double kappa=s/(1000*1000);
@@ -280,10 +292,6 @@ Double_t RooXZsZs_5D::analyticalIntegral(Int_t code, const char* rangeName) cons
             // condition to avoid NaN PDF
             // data should be variable changed to avoid this though
             if (chi<1) chi = 1;
-            
-            if (m1 < m2) return 1e-9;
-            double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mX,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mX,2)));
-            if (nanval != nanval) return 1e-9;
 
 	    double s=(mX*mX-2.*m1*m2)/2.;
 	    double kappa=s/(1000*1000);
@@ -359,10 +367,6 @@ Double_t RooXZsZs_5D::analyticalIntegral(Int_t code, const char* rangeName) cons
             // data should be variable changed to avoid this though
             if (chi<1) chi = 1;
             
-            if (m1 < m2) return 1e-9;
-            double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mX,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mX,2)));
-            if (nanval != nanval) return 1e-9;
-
 	    double s=(mX*mX-2.*m1*m2)/2.;
 	    double kappa=s/(1000*1000);
 
@@ -436,10 +440,6 @@ Double_t RooXZsZs_5D::analyticalIntegral(Int_t code, const char* rangeName) cons
             // condition to avoid NaN PDF
             // data should be variable changed to avoid this though
             if (chi<1) chi = 1;
-            
-            if (m1 < m2) return 1e-9;
-            double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mX,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mX,2)));
-            if (nanval != nanval) return 1e-9;
             
 	    double s=(mX*mX-2.*m1*m2)/2.;
 	    double kappa=s/(1000*1000);
