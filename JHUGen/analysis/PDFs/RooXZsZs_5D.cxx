@@ -123,30 +123,25 @@ Double_t RooXZsZs_5D::evaluate() const
     double a1=0,a2=0,a3=0,phi1=0,phi2=0,phi3=0;
 
     if(useGTerm>0.0){
-
       a1 = g1Val*mZ*mZ/(mX*mX) + g2Val*2.*s/(mX*mX) + g3Val*kappa*s/(mX*mX);
       phi1 = 0.0;
       a2 = -2.*g2Val - g3Val*kappa;
       phi2 = 0.0;
       a3 = -2.*g4Val;
       phi3 = 0.0;
-
     }else{
-
       a1=a1Val;
       phi1=phi1Val;
       a2=a2Val;
       phi2=phi2Val;
       a3=a3Val;
       phi3=phi3Val;
-
     }
     
     Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
     Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
     Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
     
-    //Double_t phi00Val = atan2(a1*sin(phi1)+a2*eta*(chi*chi-1)*sin(phi2),a1*cos(phi1)+a2*eta*(chi*chi-1)*cos(phi2));
     Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val))+TMath::Pi();
     Double_t phippVal = atan2(a1*sin(phi1)+a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)-a3*eta*sqrt(chi*chi-1)*cos(phi3));
     Double_t phimmVal = atan2(a1*sin(phi1)-a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)+a3*eta*sqrt(chi*chi-1)*cos(phi3));
@@ -164,16 +159,8 @@ Double_t RooXZsZs_5D::evaluate() const
     Double_t term1E = 4.*sqrt(fmmVal*f00Val)*(R1Val+h1)*(R2Val+h2)*sh1*sh2*cos(Phi-phimmVal+phi00Val);
     Double_t term1F = 2.*sqrt(fppVal*fmmVal)*pow(sh1,2)*pow(sh2,2)*cos(2.*Phi+phippVal-phimmVal);
     Double_t term1 = betaVal*term1Coeff*term2Coeff*(term1A+term1B+term1C+term1D+term1E+term1F);
-    
-    //Double_t para0 = 5.169254e-01;
-    //Double_t para1 =-1.004152e-02;
-    //Double_t para2 = 3.543577e-04;
-    
-    //Double_t accp = para0 + para1*m2 + para2*m2*m2;
+
     Double_t accp = 1.;
-    
-    //std::cout << "term1: " << term1 << "... coeff: " << (term1Coeff*term2Coeff) << std::endl;
-    
     return term1*accp;
     
     
@@ -201,305 +188,120 @@ Double_t RooXZsZs_5D::analyticalIntegral(Int_t code, const char* rangeName) cons
   double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mX,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mX,2)));
   if (nanval != nanval) return 1e-9;
   
-    switch(code)
+  // 
+  //  common variables to use for all cases
+  // 
+  Double_t sh1 = sqrt(1-h1*h1);
+  Double_t sh2 = sqrt(1-h2*h2);     
+  Double_t chi = (mX*mX-m1*m1-m2*m2)/(2.*m2*m1);
+  Double_t eta = (m1*m2)/pow(mX,2);
+  
+  // condition to avoid NaN PDF
+  // data should be variable changed to avoid this though
+  if (chi<1) chi = 1;
+  
+  double s=(mX*mX-2.*m1*m2)/2.;
+  double kappa=s/(1000*1000);
+  
+  double a1=0,a2=0,a3=0,phi1=0,phi2=0,phi3=0;
+  
+  if(useGTerm>0.0){
+    a1 = g1Val*mZ*mZ/(mX*mX) + g2Val*2.*s/(mX*mX) + g3Val*kappa*s/(mX*mX);
+    phi1 = 0.0;
+    a2 = -2.*g2Val - g3Val*kappa;
+    phi2 = 0.0;
+    a3 = -2.*g4Val;
+    phi3 = 0.0;
+    
+  }else{
+    a1=a1Val;
+    phi1=phi1Val;
+    a2=a2Val;
+    phi2=phi2Val;
+    a3=a3Val;
+    phi3=phi3Val;
+  }
+            
+  Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
+  Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
+  Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
+  
+  Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2))+TMath::Pi();
+  Double_t phippVal = atan2(a1*sin(phi1)+a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)-a3*eta*sqrt(chi*chi-1)*cos(phi3));
+  Double_t phimmVal = atan2(a1*sin(phi1)-a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)+a3*eta*sqrt(chi*chi-1)*cos(phi3));
+  
+  Double_t betaValSquared = (1.-(pow(m1-m2,2)/pow(mX,2)))*(1.-(pow(m1+m2,2)/pow(mX,2)));
+  Double_t betaVal = sqrt(betaValSquared);
+  
+  Double_t term1Coeff = (pow(m1,3))/( (pow(m1,2)-pow(mZ,2))*(pow(m1,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
+  Double_t term2Coeff = (pow(m2,3))/( (pow(m2,2)-pow(mZ,2))*(pow(m2,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
+  
+  switch(code)
     {
-            
-        case 3:
-        {
-            // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
-            //   const Double_t VEV = 246.;
-            Double_t sh1 = sqrt(1-h1*h1);
-            Double_t sh2 = sqrt(1-h2*h2);        
-            
-            // definition of helicity amplitudes
-            Double_t chi = (mX*mX-m1*m1-m2*m2)/(2.*m2*m1);
-            Double_t eta = (m1*m2)/pow(mX,2);
-            
-            // condition to avoid NaN PDF
-            // data should be variable changed to avoid this though
-            if (chi<1) chi = 1;
+      
+      // projections to h2 
+    case 3:
+      {
+	// FOR THE INTEGRATIONS, ONLY THESE LINES SHOULD CHANGE
+	// cform --> still have to change "sqrt" and "cos" and "Pi" and "Power" and "R1" and "R2"
+	Double_t term1A = (-32*f00Val*TMath::Pi()*(-1 + TMath::Power(h2,2)))/3.;
+	Double_t term1B = (16*(fmmVal + fppVal)*TMath::Pi()*(1 + TMath::Power(h2,2)))/3.;
+	Double_t term1C = (32*(fmmVal - fppVal)*TMath::Pi()*R2Val*h2)/3.;
+	Double_t term1D = 0;
+	Double_t term1E = 0;
+	Double_t term1F = 0;
+	Double_t term1 = betaVal*term1Coeff*term2Coeff*(term1A+term1B+term1C+term1D+term1E+term1F);
 
-	    double s=(mX*mX-2.*m1*m2)/2.;
-	    double kappa=s/(1000*1000);
+	Double_t accp = 1.;
+	return term1*accp;
+      }
+      // projections to h1 
+    case 4:
+      {
+	// FOR THE INTEGRATIONS, ONLY THESE LINES SHOULD CHANGE
+	// cform --> still have to change "sqrt" and "cos" and "Pi" and "Power" and "R1Val" and "R2"
+	Double_t term1A = (-32*f00Val*TMath::Pi()*(-1 + TMath::Power(h1,2)))/3.;
+	Double_t term1B = (16*(fmmVal + fppVal)*TMath::Pi()*(1 + TMath::Power(h1,2)))/3.;
+	Double_t term1C = (32*(fmmVal - fppVal)*TMath::Pi()*R1Val*h1)/3.;
+	Double_t term1D = 0;
+	Double_t term1E = 0;
+	Double_t term1F = 0;
+	Double_t term1 = betaVal*term1Coeff*term2Coeff*(term1A+term1B+term1C+term1D+term1E+term1F);
+        
+	Double_t accp = 1.;
+	return term1*accp;
+      }
+      // projections to Phi
+    case 5:
+      {
+	// FOR THE INTEGRATIONS, ONLY THESE LINES SHOULD CHANGE
+	// cform --> still have to change "sqrt" and "cos" and "Pi" and "Power" and "R1" and "R2"
+	Double_t term1A = (64*f00Val)/9.;
+	Double_t term1B = (64*(fmmVal + fppVal))/9.;
+	Double_t term1C = 0;
+	Double_t term1D = sqrt(f00Val)*sqrt(fppVal)*TMath::Power(TMath::Pi(),2)*R1Val*R2Val*cos(Phi + phi00Val + phippVal);
+	Double_t term1E = sqrt(f00Val)*sqrt(fmmVal)*TMath::Power(TMath::Pi(),2)*R1Val*R2Val*cos(Phi - phi00Val - phimmVal);
+	Double_t term1F = (32*sqrt(fmmVal)*sqrt(fppVal)*cos(2*Phi - phimmVal + phippVal))/9.;
+	Double_t term1 = betaVal*term1Coeff*term2Coeff*(term1A+term1B+term1C+term1D+term1E+term1F);
+	Double_t accp = 1.;
+	return term1*accp;
+      }
+      // projections to mz1/mz2
+    case 6:
+      {
+	// FOR THE INTEGRATIONS, ONLY THESE LINES SHOULD CHANGE
+	// cform --> still have to change "sqrt" and "cos" and "Pi" and "Power" and "R1" and "R2"
+	Double_t term1A = (128*f00Val*TMath::Pi())/9.;
+	Double_t term1B = (128*(fmmVal + fppVal)*TMath::Pi())/9.;
+	Double_t term1C = 0;
+	Double_t term1D = 0;
+	Double_t term1E = 0;
+	Double_t term1F = 0;
+	Double_t term1 = betaVal*term1Coeff*term2Coeff*(term1A+term1B+term1C+term1D+term1E+term1F);
 
-	    double a1=0,a2=0,a3=0,phi1=0,phi2=0,phi3=0;
-	    
-	    if(useGTerm>0.0){
-	      
-	      a1 = g1Val*mZ*mZ/(mX*mX) + g2Val*2.*s/(mX*mX) + g3Val*kappa*s/(mX*mX);
-	      phi1 = 0.0;
-	      a2 = -2.*g2Val - g3Val*kappa;
-	      phi2 = 0.0;
-	      a3 = -2.*g4Val;
-	      phi3 = 0.0;
-	      
-	    }else{
-
-	      a1=a1Val;
-	      phi1=phi1Val;
-	      a2=a2Val;
-	      phi2=phi2Val;
-	      a3=a3Val;
-	      phi3=phi3Val;
-	      
-	    }
-            
-            Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
-            Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-            Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-
-            //Double_t phi00Val = atan2(a1*sin(phi1)+a2*eta*(chi*chi-1)*sin(phi2),a1*cos(phi1)+a2*eta*(chi*chi-1)*cos(phi2));
-	    Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val))+TMath::Pi();
-            Double_t phippVal = atan2(a1*sin(phi1)+a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)-a3*eta*sqrt(chi*chi-1)*cos(phi3));
-            Double_t phimmVal = atan2(a1*sin(phi1)-a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)+a3*eta*sqrt(chi*chi-1)*cos(phi3));
-            
-            Double_t betaValSquared = (1.-(pow(m1-m2,2)/pow(mX,2)))*(1.-(pow(m1+m2,2)/pow(mX,2)));
-            Double_t betaVal = sqrt(betaValSquared);
-            
-            Double_t term1Coeff = (pow(m1,3))/( (pow(m1,2)-pow(mZ,2))*(pow(m1,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
-            Double_t term2Coeff = (pow(m2,3))/( (pow(m2,2)-pow(mZ,2))*(pow(m2,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
-            
-            // FOR THE INTEGRATIONS, ONLY THESE LINES SHOULD CHANGE
-            // cform --> still have to change "sqrt" and "cos" and "Pi" and "Power" and "R1" and "R2"
-            Double_t term1A = (-32*f00Val*TMath::Pi()*(-1 + TMath::Power(h2,2)))/3.;
-            Double_t term1B = (16*(fmmVal + fppVal)*TMath::Pi()*(1 + TMath::Power(h2,2)))/3.;
-            Double_t term1C = (32*(fmmVal - fppVal)*TMath::Pi()*R2Val*h2)/3.;
-            Double_t term1D = 0;
-            Double_t term1E = 0;
-            Double_t term1F = 0;
-            Double_t term1 = betaVal*term1Coeff*term2Coeff*(term1A+term1B+term1C+term1D+term1E+term1F);
-            
-            //Double_t para0 = 5.169254e-01;
-            //Double_t para1 =-1.004152e-02;
-            //Double_t para2 = 3.543577e-04;
-            
-            //Double_t accp = para0 + para1*m2 + para2*m2*m2;
-            Double_t accp = 1.;
-            //std::cout << "term1: " << term1 << "... coeff: " << (term1Coeff*term2Coeff) << std::endl;
-            return term1*accp;
-        }
-        case 4:
-        {
-            // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
-            //   const Double_t VEV = 246.;
-            Double_t sh1 = sqrt(1-h1*h1);
-            Double_t sh2 = sqrt(1-h2*h2);        
-            
-            // definition of helicity amplitudes
-            Double_t chi = (mX*mX-m1*m1-m2*m2)/(2.*m2*m1);
-            Double_t eta = (m1*m2)/pow(mX,2);
-            
-            // condition to avoid NaN PDF
-            // data should be variable changed to avoid this though
-            if (chi<1) chi = 1;
-
-	    double s=(mX*mX-2.*m1*m2)/2.;
-	    double kappa=s/(1000*1000);
-
-	    double a1=0,a2=0,a3=0,phi1=0,phi2=0,phi3=0;
-	    
-	    if(useGTerm>0.0){
-	      
-	      a1 = g1Val*mZ*mZ/(mX*mX) + g2Val*2.*s/(mX*mX) + g3Val*kappa*s/(mX*mX);
-	      phi1 = 0.0;
-	      a2 = -2.*g2Val - g3Val*kappa;
-	      phi2 = 0.0;
-	      a3 = -2.*g4Val;
-	      phi3 = 0.0;
-	      
-	    }else{
-
-	      a1=a1Val;
-	      phi1=phi1Val;
-	      a2=a2Val;
-	      phi2=phi2Val;
-	      a3=a3Val;
-	      phi3=phi3Val;
-	      
-	    }
-            
-            Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
-            Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-            Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-
-            //Double_t phi00Val = atan2(a1*sin(phi1)+a2*eta*(chi*chi-1)*sin(phi2),a1*cos(phi1)+a2*eta*(chi*chi-1)*cos(phi2));
-	    Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val))+TMath::Pi();
-            Double_t phippVal = atan2(a1*sin(phi1)+a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)-a3*eta*sqrt(chi*chi-1)*cos(phi3));
-            Double_t phimmVal = atan2(a1*sin(phi1)-a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)+a3*eta*sqrt(chi*chi-1)*cos(phi3));
-            
-            Double_t betaValSquared = (1.-(pow(m1-m2,2)/pow(mX,2)))*(1.-(pow(m1+m2,2)/pow(mX,2)));
-            Double_t betaVal = sqrt(betaValSquared);
-            
-            Double_t term1Coeff = (pow(m1,3))/( (pow(m1,2)-pow(mZ,2))*(pow(m1,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
-            Double_t term2Coeff = (pow(m2,3))/( (pow(m2,2)-pow(mZ,2))*(pow(m2,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
-            
-            // FOR THE INTEGRATIONS, ONLY THESE LINES SHOULD CHANGE
-            // cform --> still have to change "sqrt" and "cos" and "Pi" and "Power" and "R1Val" and "R2"
-            Double_t term1A = (-32*f00Val*TMath::Pi()*(-1 + TMath::Power(h1,2)))/3.;
-            Double_t term1B = (16*(fmmVal + fppVal)*TMath::Pi()*(1 + TMath::Power(h1,2)))/3.;
-            Double_t term1C = (32*(fmmVal - fppVal)*TMath::Pi()*R1Val*h1)/3.;
-            Double_t term1D = 0;
-            Double_t term1E = 0;
-            Double_t term1F = 0;
-            Double_t term1 = betaVal*term1Coeff*term2Coeff*(term1A+term1B+term1C+term1D+term1E+term1F);
-            
-            //Double_t para0 = 5.169254e-01;
-            //Double_t para1 =-1.004152e-02;
-            //Double_t para2 = 3.543577e-04;
-            
-            //Double_t accp = para0 + para1*m2 + para2*m2*m2;
-            Double_t accp = 1.;
-            //std::cout << "term1: " << term1 << "... coeff: " << (term1Coeff*term2Coeff) << std::endl;
-            return term1*accp;
-        }
-        case 5:
-        {
-            // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
-            //   const Double_t VEV = 246.;
-            Double_t sh1 = sqrt(1-h1*h1);
-            Double_t sh2 = sqrt(1-h2*h2);        
-            
-            // definition of helicity amplitudes
-            Double_t chi = (mX*mX-m1*m1-m2*m2)/(2.*m2*m1);
-            Double_t eta = (m1*m2)/pow(mX,2);
-            
-            // condition to avoid NaN PDF
-            // data should be variable changed to avoid this though
-            if (chi<1) chi = 1;
-            
-	    double s=(mX*mX-2.*m1*m2)/2.;
-	    double kappa=s/(1000*1000);
-
-	    double a1=0,a2=0,a3=0,phi1=0,phi2=0,phi3=0;
-	    
-	    if(useGTerm>0.0){
-	      
-	      a1 = g1Val*mZ*mZ/(mX*mX) + g2Val*2.*s/(mX*mX) + g3Val*kappa*s/(mX*mX);
-	      phi1 = 0.0;
-	      a2 = -2.*g2Val - g3Val*kappa;
-	      phi2 = 0.0;
-	      a3 = -2.*g4Val;
-	      phi3 = 0.0;
-	      
-	    }else{
-
-	      a1=a1Val;
-	      phi1=phi1Val;
-	      a2=a2Val;
-	      phi2=phi2Val;
-	      a3=a3Val;
-	      phi3=phi3Val;
-	      
-	    }
-            
-            Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
-            Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-            Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-
-            //Double_t phi00Val = atan2(a1*sin(phi1)+a2*eta*(chi*chi-1)*sin(phi2),a1*cos(phi1)+a2*eta*(chi*chi-1)*cos(phi2));
-	    Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val))+TMath::Pi();
-            Double_t phippVal = atan2(a1*sin(phi1)+a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)-a3*eta*sqrt(chi*chi-1)*cos(phi3));
-            Double_t phimmVal = atan2(a1*sin(phi1)-a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)+a3*eta*sqrt(chi*chi-1)*cos(phi3));
-            
-            Double_t betaValSquared = (1.-(pow(m1-m2,2)/pow(mX,2)))*(1.-(pow(m1+m2,2)/pow(mX,2)));
-            Double_t betaVal = sqrt(betaValSquared);
-            
-            Double_t term1Coeff = (pow(m1,3))/( (pow(m1,2)-pow(mZ,2))*(pow(m1,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
-            Double_t term2Coeff = (pow(m2,3))/( (pow(m2,2)-pow(mZ,2))*(pow(m2,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
-            
-            // FOR THE INTEGRATIONS, ONLY THESE LINES SHOULD CHANGE
-            // cform --> still have to change "sqrt" and "cos" and "Pi" and "Power" and "R1" and "R2"
-            Double_t term1A = (64*f00Val)/9.;
-            Double_t term1B = (64*(fmmVal + fppVal))/9.;
-            Double_t term1C = 0;
-            Double_t term1D = sqrt(f00Val)*sqrt(fppVal)*TMath::Power(TMath::Pi(),2)*R1Val*R2Val*cos(Phi + phi00Val + phippVal);
-            Double_t term1E = sqrt(f00Val)*sqrt(fmmVal)*TMath::Power(TMath::Pi(),2)*R1Val*R2Val*cos(Phi - phi00Val - phimmVal);
-            Double_t term1F = (32*sqrt(fmmVal)*sqrt(fppVal)*cos(2*Phi - phimmVal + phippVal))/9.;
-            Double_t term1 = betaVal*term1Coeff*term2Coeff*(term1A+term1B+term1C+term1D+term1E+term1F);
-            
-            //Double_t para0 = 5.169254e-01;
-            //Double_t para1 =-1.004152e-02;
-            //Double_t para2 = 3.543577e-04;
-            
-            //Double_t accp = para0 + para1*m2 + para2*m2*m2;
-            Double_t accp = 1.;
-            //std::cout << "term1: " << term1 << "... coeff: " << (term1Coeff*term2Coeff) << std::endl;
-            return term1*accp;
-        }
-        case 6:
-        {
-            // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
-            //   const Double_t VEV = 246.;
-            Double_t sh1 = sqrt(1-h1*h1);
-            Double_t sh2 = sqrt(1-h2*h2);        
-            
-            // definition of helicity amplitudes
-            Double_t chi = (mX*mX-m1*m1-m2*m2)/(2.*m2*m1);
-            Double_t eta = (m1*m2)/pow(mX,2);
-            
-            // condition to avoid NaN PDF
-            // data should be variable changed to avoid this though
-            if (chi<1) chi = 1;
-            
-	    double s=(mX*mX-2.*m1*m2)/2.;
-	    double kappa=s/(1000*1000);
-
-	    double a1=0,a2=0,a3=0,phi1=0,phi2=0,phi3=0;
-	    
-	    if(useGTerm>0.0){
-	      
-	      a1 = g1Val*mZ*mZ/(mX*mX) + g2Val*2.*s/(mX*mX) + g3Val*kappa*s/(mX*mX);
-	      phi1 = 0.0;
-	      a2 = -2.*g2Val - g3Val*kappa;
-	      phi2 = 0.0;
-	      a3 = -2.*g4Val;
-	      phi3 = 0.0;
-	      
-	    }else{
-
-	      a1=a1Val;
-	      phi1=phi1Val;
-	      a2=a2Val;
-	      phi2=phi2Val;
-	      a3=a3Val;
-	      phi3=phi3Val;
-	      
-	    }
-
-            Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
-            Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-            Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
-
-            //Double_t phi00Val = atan2(a1*sin(phi1)+a2*eta*(chi*chi-1)*sin(phi2),a1*cos(phi1)+a2*eta*(chi*chi-1)*cos(phi2));
-	    Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val))+TMath::Pi();
-            Double_t phippVal = atan2(a1*sin(phi1)+a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)-a3*eta*sqrt(chi*chi-1)*cos(phi3));
-            Double_t phimmVal = atan2(a1*sin(phi1)-a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)+a3*eta*sqrt(chi*chi-1)*cos(phi3));
-            
-            Double_t betaValSquared = (1.-(pow(m1-m2,2)/pow(mX,2)))*(1.-(pow(m1+m2,2)/pow(mX,2)));
-            Double_t betaVal = sqrt(betaValSquared);
-            
-            Double_t term1Coeff = (pow(m1,3))/( (pow(m1,2)-pow(mZ,2))*(pow(m1,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
-            Double_t term2Coeff = (pow(m2,3))/( (pow(m2,2)-pow(mZ,2))*(pow(m2,2)-pow(mZ,2))+pow(mZ,2)*pow(gamZ,2) );
-            
-            // FOR THE INTEGRATIONS, ONLY THESE LINES SHOULD CHANGE
-            // cform --> still have to change "sqrt" and "cos" and "Pi" and "Power" and "R1" and "R2"
-            Double_t term1A = (128*f00Val*TMath::Pi())/9.;
-            Double_t term1B = (128*(fmmVal + fppVal)*TMath::Pi())/9.;
-            Double_t term1C = 0;
-            Double_t term1D = 0;
-            Double_t term1E = 0;
-            Double_t term1F = 0;
-            Double_t term1 = betaVal*term1Coeff*term2Coeff*(term1A+term1B+term1C+term1D+term1E+term1F);
-            
-            //Double_t para0 = 5.169254e-01;
-            //Double_t para1 =-1.004152e-02;
-            //Double_t para2 = 3.543577e-04;
-            
-            //Double_t accp = para0 + para1*m2 + para2*m2*m2;
-            Double_t accp = 1.;
-            //std::cout << "term1: " << term1 << "... coeff: " << (term1Coeff*term2Coeff) << std::endl;
-            return term1*accp;
-        }
+	Double_t accp = 1.;
+	return term1*accp;
+      }
     }
     assert(0) ;
     return 0 ;
