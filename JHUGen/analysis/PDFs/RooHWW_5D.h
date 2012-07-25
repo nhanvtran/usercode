@@ -28,6 +28,11 @@ public:
                 RooAbsReal& _phi2Val,
                 RooAbsReal& _a3Val,
                 RooAbsReal& _phi3Val,
+	        RooAbsReal& _useGTerm,
+                RooAbsReal& _g1Val,
+                RooAbsReal& _g2Val,
+                RooAbsReal& _g3Val,
+                RooAbsReal& _g4Val,
                 RooAbsReal& _mZ,
                 RooAbsReal& _gamZ,
                 RooAbsReal& _mX,
@@ -53,6 +58,11 @@ protected:
     RooRealProxy phi2Val ;
     RooRealProxy a3Val ;
     RooRealProxy phi3Val ;
+    RooRealProxy useGTerm ;
+    RooRealProxy g1Val ;
+    RooRealProxy g2Val ;
+    RooRealProxy g3Val ;
+    RooRealProxy g4Val ;
     RooRealProxy mZ ;
     RooRealProxy gamZ ;
     RooRealProxy mX ;
