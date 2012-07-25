@@ -18,8 +18,8 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     gStyle->SetPadLeftMargin(0.16);
     
     // Declaration of the PDFs to use
-    gROOT->ProcessLine(".L PDFs/RooHWW_5D.cxx+");
-    gSystem->Load("PDFs/RooHWW.cxx");
+    gROOT->ProcessLine(".L PDFs/RooXZsZs_5D.cxx+");
+    gSystem->Load("PDFs/RooXZsZs.cxx");
 
     // Observables (5D)
     RooRealVar* m1 = new RooRealVar("wplusmass","m1",10,120);
@@ -56,24 +56,10 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     RooRealVar* R2Val = new RooRealVar("R2Val","R2Val",1);
     
     // PDF definition SM Higgs (JP = 0+)
-    RooHWW_5D *myPDF = new RooHWW_5D("myPDF","myPDF",*m1,*m2,*h1,*h2,*Phi,
+    RooXZsZs_5D *myPDF = new RooXZsZs_5D("myPDF","myPDF",*m1,*m2,*h1,*h2,*Phi,
 				     *a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,
 				     *useGTerm, *g1Val, *g2Val, *g3Val, *g4Val,
 				     *mW,*gamW,*mX,*R1Val,*R2Val);
-
-    // PDF definition Pseudoscalar Higgs (JP = 0-)
-    RooRealVar* a1Valp = new RooRealVar("a1Valp","a1Valp",0);
-    RooRealVar* a3Valp = new RooRealVar("a3Valp","a3Valp",1);
-    RooRealVar* g1Valp = new RooRealVar("g1Valp", "g1Valp", 0);
-    RooRealVar* g2Valp = new RooRealVar("g2Valp", "g2Valp", 0.);
-    RooRealVar* g3Valp = new RooRealVar("g3Valp", "g3Valp", 0.);
-    RooRealVar* g4Valp = new RooRealVar("g4Valp", "g4Valp", 1.);
-
-    RooHWW_5D *myPDFA = new RooHWW_5D("myPDF","myPDF",*m1,*m2,*h1,*h2,*Phi,
-				      *a1Valp,*phi1Val,*a2Val,*phi2Val,*a3Valp,*phi3Val,
-				      *useGTerm, *g1Valp, *g2Valp, *g3Valp, *g4Valp,
-				      *mW,*gamW,*mX,*R1Val,*R2Val);
-    
     // Grab input file to convert to RooDataSet
     TFile* fin = new TFile(Form("%sHiggsWW_%.0f_%s.root", dataType.Data(), mH, mode.Data()));
     TTree* tin = (TTree*) fin->Get("angles");
@@ -93,6 +79,23 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     }
     */
 
+    // 
+    //  0-
+    // 
+    
+    // PDF definition Pseudoscalar Higgs (JP = 0-)
+    RooRealVar* a1Valp = new RooRealVar("a1Valp","a1Valp",0);
+    RooRealVar* a3Valp = new RooRealVar("a3Valp","a3Valp",1);
+    RooRealVar* g1Valp = new RooRealVar("g1Valp", "g1Valp", 0);
+    RooRealVar* g2Valp = new RooRealVar("g2Valp", "g2Valp", 0.);
+    RooRealVar* g3Valp = new RooRealVar("g3Valp", "g3Valp", 0.);
+    RooRealVar* g4Valp = new RooRealVar("g4Valp", "g4Valp", 1.);
+
+    RooXZsZs_5D *myPDFA = new RooXZsZs_5D("myPDFA","myPDFA",*m1,*m2,*h1,*h2,*Phi,
+				      *a1Valp,*phi1Val,*a2Val,*phi2Val,*a3Valp,*phi3Val,
+				      *useGTerm, *g1Valp, *g2Valp, *g3Valp, *g4Valp,
+				      *mW,*gamW,*mX,*R1Val,*R2Val);
+    
     // read another input file
     TFile* fin2 = new TFile(Form("PSHiggsWW_%.0f_%s.root", mH, mode.Data()));
     TTree* tin2 = (TTree*) fin2->Get("angles");
@@ -106,6 +109,37 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     }
 
     
+    // 
+    // For 0h+
+    // only implemented the g-couplings since the a-couplings are mass-dependent
+    // 
+
+    // PDF definition Pseudoscalar Higgs (JP = 0-)
+    RooRealVar* a1Valhp = new RooRealVar("a1Valhp","a1Valhp",0); // meaningless
+    RooRealVar* a3Valhp = new RooRealVar("a3Valhp","a3Valhp",1); // meaningless
+    RooRealVar* g1Valhp = new RooRealVar("g1Valhp", "g1Valhp", 0);
+    RooRealVar* g2Valhp = new RooRealVar("g2Valhp", "g2Valhp", 1.);
+    RooRealVar* g3Valhp = new RooRealVar("g3Valhp", "g3Valhp", 0.);
+    RooRealVar* g4Valhp = new RooRealVar("g4Valhp", "g4Valhp", 0.);
+
+    RooXZsZs_5D *myPDFHP= new RooXZsZs_5D("myPDFHP","myPDFHP",*m1,*m2,*h1,*h2,*Phi,
+				      *a1Valhp,*phi1Val,*a2Val,*phi2Val,*a3Valhp,*phi3Val,
+				      *useGTerm, *g1Valhp, *g2Valhp, *g3Valhp, *g4Valhp,
+				      *mW,*gamW,*mX,*R1Val,*R2Val);
+    
+    // read another input file
+    TFile* finhp = new TFile(Form("SMHiggsWW_0hplus_%.0f_%s.root", mH, mode.Data()));
+    TTree* tinhp = (TTree*) finhp->Get("angles");
+    
+    // for weighted events
+    if ( mode == "MCFM") {
+      RooDataSet dataTMPhp("dataTMPhp","dataTMPhp",tin,RooArgSet(*m1,*m2,*h1,*h2,*Phi,*wt));
+      RooDataSet datahp("datahp","datahp",RooArgList(*m1,*m2,*h1,*h2,*Phi,*wt), WeightVar("wt"), Import(dataTMPhp));
+    } else {
+      RooDataSet datahp("datahp","datahp",tinhp,RooArgSet(*m1,*m2,*h1,*h2,*Phi));
+    }
+    
+
     // P L O T   . . . 
     // (All parameters fixed, no fitting, just looking at the shape of the PDFs w.r.t. the data)
     TH1F* dum0 = new TH1F("dum0","dum0",1,0,1); dum0->SetLineColor(kRed); dum0->SetMarkerColor(kBlack); dum0->SetLineWidth(3);
@@ -121,26 +155,35 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     RooPlot* w1frame =  m1->frame(55);
     data.plotOn(w1frame, MarkerColor(kBlack));
     myPDF->plotOn(w1frame, LineColor(kRed));
-    data2.plotOn(w1frame, MarkerColor(kBlue), MarkerStyle(24));
+    data2.plotOn(w1frame, MarkerColor(kBlack), MarkerStyle(24));
     myPDFA->plotOn(w1frame, LineColor(kBlack));
+    // datahp.plotOn(w1frame, MarkerColor(kBlack), MarkerStyle(21));
+    // myPDFHP->plotOn(w1frame, LineColor(kGreen));
     
     RooPlot* w2frame =  m2->frame(55);
+    
     data.plotOn(w2frame, MarkerColor(kBlack));
     myPDF->plotOn(w2frame, LineColor(kRed));
     data2.plotOn(w2frame, MarkerColor(kBlack), MarkerStyle(24));
     myPDFA->plotOn(w2frame, LineColor(kBlue));
+    // datahp.plotOn(w2frame, MarkerColor(kBlack), MarkerStyle(21));
+    // myPDFHP->plotOn(w2frame, LineColor(kGreen));
     
     RooPlot* h1frame =  h1->frame(55);
     data.plotOn(h1frame, MarkerColor(kBlack));
     myPDF->plotOn(h1frame, LineColor(kRed));
     data2.plotOn(h1frame, MarkerColor(kBlack), MarkerStyle(24));
     myPDFA->plotOn(h1frame, LineColor(kBlue));
+    // datahp.plotOn(h1frame, MarkerColor(kBlack), MarkerStyle(21));
+    // myPDFHP->plotOn(h1frame, LineColor(kGreen));
     
     RooPlot* h2frame =  h2->frame(55);
     data.plotOn(h2frame, MarkerColor(kBlack));
     myPDF->plotOn(h2frame, LineColor(kRed));
     data2.plotOn(h2frame, MarkerColor(kBlack), MarkerStyle(24));
     myPDFA->plotOn(h2frame, LineColor(kBlue));
+    // datahp.plotOn(h2frame, MarkerColor(kBlack), MarkerStyle(21));
+    // myPDFHP->plotOn(h2frame, LineColor(kGreen));
     
     
     RooPlot* Phiframe =  Phi->frame(55);
@@ -148,7 +191,9 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     myPDF->plotOn(Phiframe, LineColor(kRed));
     data2.plotOn(Phiframe, MarkerColor(kBlack), MarkerStyle(24));
     myPDFA->plotOn(Phiframe, LineColor(kBlue));
-    
+    // datahp.plotOn(Phiframe, MarkerColor(kBlack), MarkerStyle(21));
+    // myPDFHP->plotOn(Phiframe, LineColor(kGreen));    
+
     TCanvas* cww = new TCanvas( "cww", "cww", 1000, 600 );
 
     cww->Divide(3,2);
