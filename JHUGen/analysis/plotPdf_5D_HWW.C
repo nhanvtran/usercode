@@ -116,19 +116,21 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
 
     // PDF definition Pseudoscalar Higgs (JP = 0-)
     RooRealVar* a1Valhp = new RooRealVar("a1Valhp","a1Valhp",0); // meaningless
-    RooRealVar* a3Valhp = new RooRealVar("a3Valhp","a3Valhp",1); // meaningless
+    RooRealVar* a2Valhp = new RooRealVar("a2Valhp","a2Valhp",1.); // meaningless
+    RooRealVar* a3Valhp = new RooRealVar("a3Valhp","a3Valhp",0); // meaningless
     RooRealVar* g1Valhp = new RooRealVar("g1Valhp", "g1Valhp", 0);
     RooRealVar* g2Valhp = new RooRealVar("g2Valhp", "g2Valhp", 1.);
     RooRealVar* g3Valhp = new RooRealVar("g3Valhp", "g3Valhp", 0.);
     RooRealVar* g4Valhp = new RooRealVar("g4Valhp", "g4Valhp", 0.);
 
     RooXZsZs_5D *myPDFHP= new RooXZsZs_5D("myPDFHP","myPDFHP",*m1,*m2,*h1,*h2,*Phi,
-				      *a1Valhp,*phi1Val,*a2Val,*phi2Val,*a3Valhp,*phi3Val,
+				      *a1Valhp,*phi1Val,*a2Valhp,*phi2Val,*a3Valhp,*phi3Val,
 				      *useGTerm, *g1Valhp, *g2Valhp, *g3Valhp, *g4Valhp,
 				      *mW,*gamW,*mX,*R1Val,*R2Val);
     
     // read another input file
     TFile* finhp = new TFile(Form("SMHiggsWW_0hplus_%.0f_%s.root", mH, mode.Data()));
+    // TFile* finhp = new TFile(Form("SMHiggsWW_a2_%.0f_%s.root", mH, mode.Data()));
     TTree* tinhp = (TTree*) finhp->Get("angles");
     
     // for weighted events
@@ -141,6 +143,9 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     
 
     // P L O T   . . . 
+    bool drawsm = false;
+    bool drawhminus = false;
+    bool drawhplus = true;
     // (All parameters fixed, no fitting, just looking at the shape of the PDFs w.r.t. the data)
     TH1F* dum0 = new TH1F("dum0","dum0",1,0,1); dum0->SetLineColor(kRed); dum0->SetMarkerColor(kBlack); dum0->SetLineWidth(3);
     TH1F* dum1 = new TH1F("dum1","dum1",1,0,1); dum1->SetLineColor(kBlue); dum1->SetMarkerColor(kBlack); dum1->SetMarkerStyle(24), dum1->SetLineWidth(3);
@@ -148,52 +153,80 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     TLegend * box3 = new TLegend(0.1,0.1,0.9,0.92);
     box3->SetFillColor(0);
     box3->SetBorderSize(0);
-    box3->AddEntry(dum0,Form("X(%.0f)#rightarrow WW: JP = 0+", mH),"lp");
-    box3->AddEntry(dum1,Form("X(%.0f)#rightarrow WW: JP = 0-", mH),"lp");
-    box3->AddEntry(dum2,Form("X(%.0f)#rightarrow WW: JP = 0h+", mH),"lp");
+    if ( drawsm ) 
+      box3->AddEntry(dum0,Form("X(%.0f)#rightarrow WW: JP = 0+", mH),"lp");
+    if ( drawhminus )
+      box3->AddEntry(dum1,Form("X(%.0f)#rightarrow WW: JP = 0-", mH),"lp");
+    if ( drawhplus ) 
+      box3->AddEntry(dum2,Form("X(%.0f)#rightarrow WW: JP = 0h+", mH),"lp");
 
     RooPlot* w1frame =  m1->frame(55);
-    data.plotOn(w1frame, MarkerColor(kBlack));
-    myPDF->plotOn(w1frame, LineColor(kRed));
-    data2.plotOn(w1frame, MarkerColor(kBlack), MarkerStyle(24));
-    myPDFA->plotOn(w1frame, LineColor(kBlack));
-    // datahp.plotOn(w1frame, MarkerColor(kBlack), MarkerStyle(21));
-    // myPDFHP->plotOn(w1frame, LineColor(kGreen));
-    
+    if ( drawsm ) {
+      data.plotOn(w1frame, MarkerColor(kBlack));
+      myPDF->plotOn(w1frame, LineColor(kRed));
+    }
+    if ( drawhminus ) {
+      data2.plotOn(w1frame, MarkerColor(kBlack), MarkerStyle(24));
+      myPDFA->plotOn(w1frame, LineColor(kBlack));
+    }
+    if ( drawhplus ) {
+      datahp.plotOn(w1frame, MarkerColor(kBlack), MarkerStyle(21));
+      myPDFHP->plotOn(w1frame, LineColor(kGreen));
+    }
     RooPlot* w2frame =  m2->frame(55);
-    
-    data.plotOn(w2frame, MarkerColor(kBlack));
-    myPDF->plotOn(w2frame, LineColor(kRed));
-    data2.plotOn(w2frame, MarkerColor(kBlack), MarkerStyle(24));
-    myPDFA->plotOn(w2frame, LineColor(kBlue));
-    // datahp.plotOn(w2frame, MarkerColor(kBlack), MarkerStyle(21));
-    // myPDFHP->plotOn(w2frame, LineColor(kGreen));
+    if ( drawsm ) {
+      data.plotOn(w2frame, MarkerColor(kBlack));
+      myPDF->plotOn(w2frame, LineColor(kRed));
+    }
+    if ( drawhminus ) {
+      data2.plotOn(w2frame, MarkerColor(kBlack), MarkerStyle(24));
+      myPDFA->plotOn(w2frame, LineColor(kBlue));
+    }
+    if ( drawhplus ) {
+      datahp.plotOn(w2frame, MarkerColor(kBlack), MarkerStyle(21));
+      myPDFHP->plotOn(w2frame, LineColor(kGreen));
+    }
     
     RooPlot* h1frame =  h1->frame(55);
-    data.plotOn(h1frame, MarkerColor(kBlack));
-    myPDF->plotOn(h1frame, LineColor(kRed));
-    data2.plotOn(h1frame, MarkerColor(kBlack), MarkerStyle(24));
-    myPDFA->plotOn(h1frame, LineColor(kBlue));
-    // datahp.plotOn(h1frame, MarkerColor(kBlack), MarkerStyle(21));
-    // myPDFHP->plotOn(h1frame, LineColor(kGreen));
-    
+    if ( drawsm ) {
+      data.plotOn(h1frame, MarkerColor(kBlack));
+      myPDF->plotOn(h1frame, LineColor(kRed));
+    }
+    if ( drawhminus ) {
+      data2.plotOn(h1frame, MarkerColor(kBlack), MarkerStyle(24));
+      myPDFA->plotOn(h1frame, LineColor(kBlue));
+    }
+    if ( drawhplus ) {
+      datahp.plotOn(h1frame, MarkerColor(kBlack), MarkerStyle(21));
+      myPDFHP->plotOn(h1frame, LineColor(kGreen));
+    }
     RooPlot* h2frame =  h2->frame(55);
-    data.plotOn(h2frame, MarkerColor(kBlack));
-    myPDF->plotOn(h2frame, LineColor(kRed));
-    data2.plotOn(h2frame, MarkerColor(kBlack), MarkerStyle(24));
-    myPDFA->plotOn(h2frame, LineColor(kBlue));
-    // datahp.plotOn(h2frame, MarkerColor(kBlack), MarkerStyle(21));
-    // myPDFHP->plotOn(h2frame, LineColor(kGreen));
-    
+    if ( drawsm ) {
+      data.plotOn(h2frame, MarkerColor(kBlack));
+      myPDF->plotOn(h2frame, LineColor(kRed));
+    }
+    if ( drawhminus ) {
+      data2.plotOn(h2frame, MarkerColor(kBlack), MarkerStyle(24));
+      myPDFA->plotOn(h2frame, LineColor(kBlue));
+    }
+    if ( drawhplus ) {
+      datahp.plotOn(h2frame, MarkerColor(kBlack), MarkerStyle(21));
+      myPDFHP->plotOn(h2frame, LineColor(kGreen));
+    }
     
     RooPlot* Phiframe =  Phi->frame(55);
-    data.plotOn(Phiframe, MarkerColor(kBlack));
-    myPDF->plotOn(Phiframe, LineColor(kRed));
-    data2.plotOn(Phiframe, MarkerColor(kBlack), MarkerStyle(24));
-    myPDFA->plotOn(Phiframe, LineColor(kBlue));
-    // datahp.plotOn(Phiframe, MarkerColor(kBlack), MarkerStyle(21));
-    // myPDFHP->plotOn(Phiframe, LineColor(kGreen));    
-
+    if ( drawsm ) {
+      data.plotOn(Phiframe, MarkerColor(kBlack));
+      myPDF->plotOn(Phiframe, LineColor(kRed));
+    }
+    if ( drawhminus ) {
+      data2.plotOn(Phiframe, MarkerColor(kBlack), MarkerStyle(24));
+      myPDFA->plotOn(Phiframe, LineColor(kBlue));
+    }
+    if ( drawhplus ) {
+      datahp.plotOn(Phiframe, MarkerColor(kBlack), MarkerStyle(21));
+      myPDFHP->plotOn(Phiframe, LineColor(kGreen));    
+    }
     TCanvas* cww = new TCanvas( "cww", "cww", 1000, 600 );
 
     cww->Divide(3,2);
@@ -212,6 +245,9 @@ void plotPdf_5D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     
     cww->Print(Form("epsfiles/angles_HWW%.0f_%s.eps", mH, mode.Data()));
     cww->Print(Form("pngfiles/angles_HWW%.0f_%s.png", mH, mode.Data()));
+
+    // cww->Print(Form("epsfiles/angles_HWW%.0f_%s_Froma2.eps", mH, mode.Data()));
+    // cww->Print(Form("pngfiles/angles_HWW%.0f_%s_Froma2.png", mH, mode.Data()));
 
 
 }
