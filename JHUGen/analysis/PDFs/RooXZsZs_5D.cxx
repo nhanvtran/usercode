@@ -14,6 +14,9 @@
 #include <math.h> 
 #include "TMath.h" 
 
+using namespace TMath;
+
+
 ClassImp(RooXZsZs_5D) 
 
 RooXZsZs_5D::RooXZsZs_5D(const char *name, const char *title, 
@@ -98,15 +101,7 @@ Double_t RooXZsZs_5D::evaluate() const
     //   const Double_t VEV = 246.;
     Double_t sh1 = sqrt(1-h1*h1);
     Double_t sh2 = sqrt(1-h2*h2);        
-    
-    // definition of helicity amplitudes
-    Double_t chi = (mX*mX-m1*m1-m2*m2)/(2.*m2*m1);
-    Double_t eta = (m1*m2)/pow(mX,2);
-    
-    // condition to avoid NaN PDF
-    // data should be variable changed to avoid this though
-    if (chi<1) chi = 1;
-    
+      
     bool isZZ = true;
     if ( mZ < 90.) isZZ = false;
     if ( isZZ ) {
@@ -117,18 +112,19 @@ Double_t RooXZsZs_5D::evaluate() const
     double nanval = sqrt((1 - TMath::Power(m1 - m2,2)/TMath::Power(mX,2))*(1 - TMath::Power(m1 + m2,2)/TMath::Power(mX,2)));
     if (nanval != nanval) return 1e-9;
 
-    double s=(mX*mX-2.*m1*m2)/2.;
+    double s=(mX*mX-m1*m1-m2*m2)/2.;
     double kappa=s/(1000*1000);
     
     double a1=0,a2=0,a3=0,phi1=0,phi2=0,phi3=0;
 
     if(useGTerm>0.0){
       a1 = g1Val*mZ*mZ/(mX*mX) + g2Val*2.*s/(mX*mX) + g3Val*kappa*s/(mX*mX);
-      phi1 = 0.0;
+      phi1 = atan2(0., a1);
       a2 = -2.*g2Val - g3Val*kappa;
-      phi2 = 0.0;
+      phi2 = atan2(0.,a2);
       a3 = -2.*g4Val;
-      phi3 = 0.0;
+      phi3 = atan2(0.,a3);
+      
     }else{
       a1=a1Val;
       phi1=phi1Val;
@@ -138,6 +134,11 @@ Double_t RooXZsZs_5D::evaluate() const
       phi3=phi3Val;
     }
     
+    /*
+    // these were derived from the B-paper, page 197, Eqs.(3.3)-(3.6): http://prd.aps.org/pdf/PRD/v45/i1/p193_1
+    Double_t chi = (mX*mX-m1*m1-m2*m2)/(2.*m2*m1);
+    Double_t eta = (m1*m2)/pow(mX,2);
+    if (chi<1) chi = 1;
     Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
     Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
     Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
@@ -145,6 +146,31 @@ Double_t RooXZsZs_5D::evaluate() const
     Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val))+TMath::Pi();
     Double_t phippVal = atan2(a1*sin(phi1)+a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)-a3*eta*sqrt(chi*chi-1)*cos(phi3));
     Double_t phimmVal = atan2(a1*sin(phi1)-a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)+a3*eta*sqrt(chi*chi-1)*cos(phi3));
+    */
+
+    // From the form output in terms of the g couplings 
+    // https://dl.dropbox.com/u/86680464/result_spin0.txt
+    Double_t x = (mX*mX-m1*m1-m2*m2)/(2.0*m1*m2);
+    Double_t f00Real = 
+      a2 * (  - (x*x-1)*m1*m2 )
+      + a1 * ( 1./4.*TMath::Power(m1, -1)*TMath::Power(m2, 3) - 1./2.*m1*m2 + 1./4.*TMath::Power(m1,3)*TMath::Power(m2,-1) - (x*x-1)*m1*m2 )
+      + TMath::Power(mX,4)*a1 * (  - 1./4.*TMath::Power(m1,-1)*TMath::Power(m2,-1) );
+    Double_t f00Imag = 0.;
+    
+    Double_t fppReal = TMath::Power(mX, 2)*a1;
+    Double_t fppImag = a3*sqrt(x*x-1)*m1*m2 ;
+    
+    Double_t fmmReal = fppReal;
+    Double_t fmmImag =  - fppImag;
+    
+    Double_t f00Val = f00Imag*f00Imag + f00Real*f00Real;
+    Double_t fppVal = fppImag*fppImag + fppReal*fppReal;
+    Double_t fmmVal = fmmImag*fmmImag + fmmReal*fmmReal;
+    
+    Double_t phi00Val=atan2(f00Imag,f00Real);
+    Double_t phippVal=atan2(fppImag,fppReal);
+    Double_t phimmVal=atan2(fmmImag,fmmReal);
+    
     
     Double_t betaValSquared = (1.-(pow(m1-m2,2)/pow(mX,2)))*(1.-(pow(m1+m2,2)/pow(mX,2)));
     Double_t betaVal = sqrt(betaValSquared);
@@ -193,26 +219,19 @@ Double_t RooXZsZs_5D::analyticalIntegral(Int_t code, const char* rangeName) cons
   // 
   Double_t sh1 = sqrt(1-h1*h1);
   Double_t sh2 = sqrt(1-h2*h2);     
-  Double_t chi = (mX*mX-m1*m1-m2*m2)/(2.*m2*m1);
-  Double_t eta = (m1*m2)/pow(mX,2);
-  
-  // condition to avoid NaN PDF
-  // data should be variable changed to avoid this though
-  if (chi<1) chi = 1;
-  
-  double s=(mX*mX-2.*m1*m2)/2.;
+  double s=(mX*mX-m1*m1-m2*m2)/2.;
   double kappa=s/(1000*1000);
   
   double a1=0,a2=0,a3=0,phi1=0,phi2=0,phi3=0;
   
   if(useGTerm>0.0){
     a1 = g1Val*mZ*mZ/(mX*mX) + g2Val*2.*s/(mX*mX) + g3Val*kappa*s/(mX*mX);
-    phi1 = 0.0;
+    phi1 = atan2(0., a1);
     a2 = -2.*g2Val - g3Val*kappa;
-    phi2 = 0.0;
+    phi2 = atan2(0.,a2);
     a3 = -2.*g4Val;
-    phi3 = 0.0;
-    
+    // phi3 = atan2(0.,a3);    
+    phi3 = 0.;
   }else{
     a1=a1Val;
     phi1=phi1Val;
@@ -221,14 +240,45 @@ Double_t RooXZsZs_5D::analyticalIntegral(Int_t code, const char* rangeName) cons
     a3=a3Val;
     phi3=phi3Val;
   }
-            
+  
+  /*
+  // these were derived from the B-paper, page 197, Eqs.(3.3)-(3.6): http://prd.aps.org/pdf/PRD/v45/i1/p193_1
+  Double_t chi = (mX*mX-m1*m1-m2*m2)/(2.*m2*m1);
+  Double_t eta = (m1*m2)/pow(mX,2);
+  if (chi<1) chi = 1;
   Double_t f00Val = (a1*a1*chi*chi+pow(a2,2)*pow(eta,2)*(chi*chi-1.)*(chi*chi-1.)+2.*a1*a2*chi*(chi*chi-1)*eta*cos(phi1-phi2));
   Double_t fppVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
   Double_t fmmVal = (a1*a1+pow(a3,2)*pow(eta,2)*(chi*chi-1)+2.*a1*a3*chi*sqrt(chi*chi-1)*eta*cos(phi1-phi3));
   
-  Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2))+TMath::Pi();
+  Double_t phi00Val = atan2(a1Val*sin(phi1Val)+a2Val*eta*(chi*chi-1)*sin(phi2Val),a1Val*cos(phi1Val)+a2Val*eta*(chi*chi-1)*cos(phi2Val))+TMath::Pi();
   Double_t phippVal = atan2(a1*sin(phi1)+a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)-a3*eta*sqrt(chi*chi-1)*cos(phi3));
   Double_t phimmVal = atan2(a1*sin(phi1)-a3*eta*sqrt(chi*chi-1)*sin(phi3),a1*cos(phi3)+a3*eta*sqrt(chi*chi-1)*cos(phi3));
+  */
+  
+
+  
+  // From the form output in terms of the g couplings 
+  // https://dl.dropbox.com/u/86680464/result_spin0.txt
+  Double_t x = (mX*mX-m1*m1-m2*m2)/(2.0*m1*m2);
+  Double_t f00Real = 
+    a2 * (  - (x*x-1)*m1*m2 )
+    + a1 * ( 1./4.*TMath::Power(m1, -1)*TMath::Power(m2, 3) - 1./2.*m1*m2 + 1./4.*TMath::Power(m1,3)*TMath::Power(m2,-1) - (x*x-1)*m1*m2 )
+    + TMath::Power(mX,4)*a1 * (  - 1./4.*TMath::Power(m1,-1)*TMath::Power(m2,-1) );
+  Double_t f00Imag = 0.;
+  
+  Double_t fppReal = TMath::Power(mX, 2)*a1;
+  Double_t fppImag = a3*sqrt(x*x-1)*m1*m2 ;
+  
+  Double_t fmmReal = fppReal;
+  Double_t fmmImag =  - fppImag;
+  
+  Double_t f00Val = f00Imag*f00Imag + f00Real*f00Real;
+  Double_t fppVal = fppImag*fppImag + fppReal*fppReal;
+  Double_t fmmVal = fmmImag*fmmImag + fmmReal*fmmReal;
+  
+  Double_t phi00Val=atan2(f00Imag,f00Real);
+  Double_t phippVal=atan2(fppImag,fppReal);
+  Double_t phimmVal=atan2(fmmImag,fmmReal);
   
   Double_t betaValSquared = (1.-(pow(m1-m2,2)/pow(mX,2)))*(1.-(pow(m1+m2,2)/pow(mX,2)));
   Double_t betaVal = sqrt(betaValSquared);
