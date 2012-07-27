@@ -4,15 +4,17 @@
 # configuration
 #
 
-if [ ! $# -eq 2 ]; then
-    echo "USAGE: ./submit.sh NTOYS SEEDS
+if [ ! $# -eq 3 ]; then
+    echo "USAGE: ./wrapper.sh SEED NTOYS TESTTYPE
+        SEED  - the random seed
         NTOYS - the number of toys
-        SEED  - the random seed"
+        TESTTYPE - the TestType (see enums.h)"
     exit 1
 fi
 
-NTOYS=$1
-SEED=$2
+SEED=$1
+NTOYS=$2
+TESTTYPE=$3
 
 #
 # set up environment
@@ -45,8 +47,8 @@ mv input.tar tmp/
 cd tmp/
 tar -xvf input.tar
 
-echo "[wrapper] running root -b -q runSigSepWW.C\(${NTOYS},${SEED}\)"
-root -b -q runSigSepWW.C\(${NTOYS},${SEED}\)
+echo "[wrapper] running root -b -q runSigSepWW.C\(${SEED},${NTOYS},${TESTTYPE}\)"
+root -b -q runSigSepWW.C\(${SEED},${NTOYS},${TESTTYPE}\)
 
 #
 # clean up

@@ -1,8 +1,8 @@
 #include "enums.h"
 
-void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw, const unsigned int seed);
+void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType test, int var, int toy, bool draw, const unsigned int seed);
 
-void runSigSepWW(const unsigned int nToys, const unsigned int seedOffset) {
+void runSigSepWW(const unsigned int seedOffset, const unsigned int nToys, const TestType test) {
 
     //
     // load libraries
@@ -37,10 +37,11 @@ void runSigSepWW(const unsigned int nToys, const unsigned int seedOffset) {
     //
     // run the code
     //
-    runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLLMT, pure, draw, seed);  
+
+    runSigSepWWSingle(higgsMass, intLumi, nToys, test, MLLMT, pure, draw, seed);  
 }
 
-void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw, const unsigned int seed) {
+void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType test, int var, int toy, bool draw, const unsigned int seed) {
 
     // location of data
     const char *dataLocation = "/hadoop/cms/store/user/dlevans/HWWAngular/datafiles";

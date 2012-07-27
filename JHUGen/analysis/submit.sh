@@ -9,17 +9,20 @@
 # configuration
 #
 
-if [ ! $# -eq 3 ]; then
-    echo "USAGE: ./submit.sh NJOBS NTOYS
+if [ ! $# -eq 4 ]; then
+    echo "USAGE: ./submit.sh RUN NJOBS NTOYS TESTTYPE
+        RUN - name of run (will be a directory for this job)
         NJOBS - the number of jobs to submit
         NTOYS - the number of toys per job
-        RUN - name of run (will be a directory for this job)"
+        TESTTYPE - the TestType (see enums.h)"
     exit 1
 fi
 
-NJOBS=$1
-NTOYS=$2
-RUN=$3
+RUN=$1
+NJOBS=$2
+NTOYS=$3
+TESTTYPE=$4
+
 PROXY="/tmp/x509up_u${UID}"
 
 #
@@ -28,7 +31,7 @@ PROXY="/tmp/x509up_u${UID}"
 
 if [ -d "${RUN}" ]; 
 then 
-    echo "Job directory already exists"
+    echo "Job directory ${RUN} already exists"
     exit 1
 else 
     mkdir -p ${RUN}/log
@@ -56,7 +59,7 @@ x509userproxy=${PROXY}
 # job parameters
 Executable=wrapper.sh
 transfer_input_files=input.tar
-arguments=${NTOYS} \$(Process)
+arguments= \$(Process) ${NTOYS} ${TESTTYPE}
 Error=log/err_\$(Cluster).\$(Process)
 Output=log/out_\$(Cluster).\$(Process)
 Log=log/log_\$(Cluster).log
