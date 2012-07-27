@@ -2,40 +2,48 @@
 
 void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw, const unsigned int seed);
 
-void runSigSepWW(const unsigned int seed) {
-  
-  int higgsMass=125;
-  double intLumi=10.0;
-  int  nToys = 1000;
-  
-  bool draw=false;
+void runSigSepWW(const unsigned int nToys, const unsigned int seedOffset) {
 
-  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, MLLMT, pure, draw);
-  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, DPHIMT, pure, draw);
+    //
+    // load libraries
+    //
 
-  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHIMT, pure, draw, seed);
-  runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLLMT, pure, draw, seed);  
-
-  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, MLL, pure, draw);
-  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVSzerominus, DPHI, pure, draw);
-  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, DPHI, pure, draw);
-  // runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLL, pure, draw);
-  
-}
-void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw, const unsigned int seed) {
-    
     using namespace RooFit;
-    
-    gROOT->ProcessLine(".L ~/tdrstyle.C");
+    gSystem->AddIncludePath(" -I/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms5/include/");
+
+    // for plotting
+    gROOT->ProcessLine(".L tdrstyle.C");
     setTDRStyle();
     gStyle->SetPadLeftMargin(0.16);
     gROOT->ForceStyle();
-    // gROOT->ProcessLine(".L statsFactory.cc+");
-    gROOT->ProcessLine(".L statsFactory_cc.so");
+
+    // load libraries
+    gROOT->ProcessLine(".L statsFactory.cc++");
     gSystem->Load("libTree.so");
     gSystem->Load("libPhysics.so");
     gSystem->Load("libEG.so");
     gSystem->Load("libMathCore.so");
+
+    //
+    // configuration
+    //
+  
+    const int higgsMass=125;
+    const double intLumi=10.0;
+    const bool draw=false;
+    const unsigned int seed = 4126 + seedOffset;
+    RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
+
+    //
+    // run the code
+    //
+    runSigSepWWSingle(higgsMass, intLumi, nToys,  zeroplusVStwoplus, MLLMT, pure, draw, seed);  
+}
+
+void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int var, int toy, bool draw, const unsigned int seed) {
+
+    // location of data
+    const char *dataLocation = "/hadoop/cms/store/user/dlevans/HWWAngular/datafiles";
 
     //
     // set up test kind 
@@ -85,7 +93,7 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
     TChain *tsigHyp1 = new TChain("angles");
     
     if ( test & ( zeroplusVSzerominus | zeroplusVStwoplus) )  {
-      tsigHyp1->Add(Form("datafiles/%i/SMHiggsWW_%i_JHU.root",higgsMass, higgsMass));
+      tsigHyp1->Add(Form("%s/%i/SMHiggsWW_%i_JHU.root", dataLocation, higgsMass, higgsMass));
     }
 
     RooDataSet *sigHyp1Data = new RooDataSet("sigHyp1Data","sigHyp1Data",tsigHyp1,*obs);
@@ -96,9 +104,9 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
     // read signal hypothesis 2
     TChain *tsigHyp2 = new TChain("angles");
     if ( test & zeroplusVSzerominus ) 
-      tsigHyp2->Add(Form("datafiles/%i/PSHiggsWW_%i_JHU.root",higgsMass, higgsMass));
+      tsigHyp2->Add(Form("%s/%i/PSHiggsWW_%i_JHU.root",dataLocation, higgsMass, higgsMass));
     if ( test & zeroplusVStwoplus ) 
-      tsigHyp2->Add(Form("datafiles/%i/TWW_%i_JHU.root",higgsMass, higgsMass));
+      tsigHyp2->Add(Form("%s/%i/TWW_%i_JHU.root",dataLocation, higgsMass, higgsMass));
     
     RooDataSet *sigHyp2Data = new RooDataSet("sigHyp2Data","sigHyp2Data",tsigHyp2,*obs);
     RooDataHist *sigHyp2Hist = sigHyp2Data->binnedClone(0);
@@ -106,7 +114,7 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
 
     // read background
     TChain *bkgTree = new TChain("angles");
-    bkgTree->Add(Form("datafiles/%i/WW_madgraph_8TeV.root",higgsMass));
+    bkgTree->Add(Form("%s/%i/WW_madgraph_8TeV.root",dataLocation,higgsMass));
     RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,*obs);
     RooDataHist *bkgHist = bkgData->binnedClone(0);
     RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", *obs, *bkgHist);
@@ -173,5 +181,19 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
 
     // tidy up
 
+    delete dphill;
+    delete mt;
+    delete mll;
+    delete obs;
+    delete tsigHyp1;
+    delete sigHyp1Data;
+    delete sigHyp1Pdf;
+    delete tsigHyp2;
+    delete sigHyp2Data;
+    delete sigHyp2Pdf;
+    delete bkgTree;
+    delete bkgData;
+    delete bkgPdf;
+    delete myHypothesisSeparation;
 
 }
