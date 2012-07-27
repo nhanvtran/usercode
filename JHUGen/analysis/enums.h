@@ -1,32 +1,35 @@
+// 
+// Do not change the order of the enums, always append
+// 
 enum TestType{
-  zeroplusVSzerominus = 1UL<<0,
-  zeroplusVStwoplus   = 1UL<<1,
+  zeroplusVSzerominus = 0, 
+  zeroplusVStwoplus   = 1,
 };
 
 enum VarType{
-  DPHI,
-  MLL,
-  DPHIMT,
-  MLLMT,
+  DPHI = 0,
+  MLL = 1,
+  DPHIMT = 2,
+  MLLMT = 3,
 };
 
 enum spinType{
-  zeroplus,
-  zerominus,
-  twoplus,
+  zeroplus = 0 ,
+  zerominus = 1,
+  twoplus = 2,
 };
 
 
 enum ToyType {
-  embed,
-  pure,
+  embed = 0,
+  pure = 1,
 };
 
 TString getTestName( int test )
 {
-  if ( test & zeroplusVSzerominus) 
+  if ( test == zeroplusVSzerominus) 
     return "0plusVS0minus";
-  if ( test & zeroplusVStwoplus) 
+  if ( test == zeroplusVStwoplus) 
     return "0plusVS2plus";
   
   return "unKnown";

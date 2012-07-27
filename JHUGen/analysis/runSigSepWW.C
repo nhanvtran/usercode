@@ -92,7 +92,7 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
     // read signal hypothesis 1
     TChain *tsigHyp1 = new TChain("angles");
     
-    if ( test & ( zeroplusVSzerominus | zeroplusVStwoplus) )  {
+    if ( test == zeroplusVSzerominus || test == zeroplusVStwoplus )  {
       tsigHyp1->Add(Form("%s/%i/SMHiggsWW_%i_JHU.root", dataLocation, higgsMass, higgsMass));
     }
 
@@ -103,9 +103,9 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  int test, int 
       
     // read signal hypothesis 2
     TChain *tsigHyp2 = new TChain("angles");
-    if ( test & zeroplusVSzerominus ) 
+    if ( test == zeroplusVSzerominus ) 
       tsigHyp2->Add(Form("%s/%i/PSHiggsWW_%i_JHU.root",dataLocation, higgsMass, higgsMass));
-    if ( test & zeroplusVStwoplus ) 
+    if ( test == zeroplusVStwoplus ) 
       tsigHyp2->Add(Form("%s/%i/TWW_%i_JHU.root",dataLocation, higgsMass, higgsMass));
     
     RooDataSet *sigHyp2Data = new RooDataSet("sigHyp2Data","sigHyp2Data",tsigHyp2,*obs);
