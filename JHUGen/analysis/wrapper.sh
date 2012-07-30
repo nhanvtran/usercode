@@ -4,18 +4,20 @@
 # configuration
 #
 
-if [ ! $# -eq 3 ]; then
-    echo "USAGE: ./wrapper.sh SEED NTOYS TESTTYPE
+if [ ! $# -eq 4 ]; then
+    echo "USAGE: ./wrapper.sh SEED NTOYS TESTTYPE 
         SEED  - the random seed
         NTOYS - the number of toys
-        TESTTYPE - the TestType (see enums.h)"
+        TESTTYPE - the TestType (see enums.h)
+	ANA - the anaysis, either hypsep or sig	"
     exit 1
 fi
 
 SEED=$1
 NTOYS=$2
 TESTTYPE=$3
-
+ANA=$4
+ 
 #
 # set up environment
 #
@@ -33,9 +35,9 @@ export PYTHONPATH=$ROOTSYS/lib:$PYTHONPATH
 # print debug information
 #
 
-hostname
-date
-ls
+#hostname
+#date
+#ls
 
 #
 # untar and run
@@ -47,8 +49,17 @@ mv input.tar tmp/
 cd tmp/
 tar -xvf input.tar
 
-echo "[wrapper] running root -b -q runSigSepWW.C\(${SEED},${NTOYS},${TESTTYPE}\)"
-root -b -q runSigSepWW.C\(${SEED},${NTOYS},${TESTTYPE}\)
+if [ "${ANA}" == "hypsep" ]; then
+    echo "[wrapper] running root -b -q runSigSepWW.C\(${SEED},${NTOYS},${TESTTYPE}\)"
+    root -b -q runSigSepWW.C\(${SEED},${NTOYS},${TESTTYPE}\)
+fi
+
+
+if [ "${ANA}" == "sig" ]; then
+    echo "[wrapper] running root -b -q runsignificancexwwcuts.C\(${SEED},${NTOYS},${TESTTYPE}\)"
+    root -b -q runsignificancexwwcuts.C\(${SEED},${NTOYS},${TESTTYPE}\)
+fi
+
 
 #
 # clean up

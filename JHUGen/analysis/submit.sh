@@ -9,12 +9,13 @@
 # configuration
 #
 
-if [ ! $# -eq 4 ]; then
-    echo "USAGE: ./submit.sh RUN NJOBS NTOYS TESTTYPE
+if [ ! $# -eq 5 ]; then
+    echo "USAGE: ./submit.sh RUN NJOBS NTOYS TESTTYPE ANA
         RUN - name of run (will be a directory for this job)
         NJOBS - the number of jobs to submit
         NTOYS - the number of toys per job
-        TESTTYPE - the TestType (see enums.h)"
+        TESTTYPE - the TestType (see enums.h)
+	ANA  - the analysis, choose from hypsep and sig"
     exit 1
 fi
 
@@ -22,6 +23,7 @@ RUN=$1
 NJOBS=$2
 NTOYS=$3
 TESTTYPE=$4
+ANA=$5
 
 PROXY="/tmp/x509up_u${UID}"
 
@@ -38,7 +40,7 @@ else
 fi
 
 if [ -e input.tar ]; then rm input.tar; fi   
-tar -cf input.tar statsFactory.cc tdrstyle.C runSigSepWW.C enums.h
+tar -cf input.tar statsFactory.cc tdrstyle.C runSigSepWW.C enums.h runsignificancexwwcuts.C
 mv input.tar ${RUN}
 cp wrapper.sh ${RUN}
 
@@ -59,7 +61,7 @@ x509userproxy=${PROXY}
 # job parameters
 Executable=wrapper.sh
 transfer_input_files=input.tar
-arguments= \$(Process) ${NTOYS} ${TESTTYPE}
+arguments= \$(Process) ${NTOYS} ${TESTTYPE} ${ANA}
 Error=log/err_\$(Cluster).\$(Process)
 Output=log/out_\$(Cluster).\$(Process)
 Log=log/log_\$(Cluster).log

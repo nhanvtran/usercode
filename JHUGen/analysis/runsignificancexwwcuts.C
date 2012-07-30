@@ -17,13 +17,13 @@ void runsignificancexwwcuts(const unsigned int seedOffset, const unsigned int nT
 {
   using namespace RooFit;
   
-  gROOT->ProcessLine(".L ~/tdrstyle.C");
+  gROOT->ProcessLine(".L tdrstyle.C");
   setTDRStyle();
   gStyle->SetPadLeftMargin(0.16);
   gROOT->ForceStyle();
 
    // for the ucsd batch submission
-  // gSystem->AddIncludePath(" -I/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms5/include/");
+  gSystem->AddIncludePath(" -I/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms5/include/");
   gROOT->ProcessLine(".L statsFactory.cc++");
 
   //
@@ -67,27 +67,27 @@ void runsignificancexwwcuts(const unsigned int seedOffset, const unsigned int nT
     obs = new RooArgSet(*dphill, *mt) ;
   
   // for the ucsd batch submission
-  // const char *dataLocation = "/hadoop/cms/store/user/yygao/HWWAngular/datafiles/";
-  const char *dataLocation = "datafiles/";
+  const char *dataLocation = "/hadoop/cms/store/user/yygao/HWWAngular/datafiles/";
+  // const char *dataLocation = "datafiles/";
   
   // read signal hypothesis
   TChain *tsigHyp1 = new TChain("angles");
   TString sigFileName = getInputName(spin);
-  tsigHyp1->Add(Form("%s/%i/%s_%i_JHU.root", dataLocation.Data(), higgsMass, sigFileName.Data(), higgsMass));
+  tsigHyp1->Add(Form("%s/%i/%s_%i_JHU.root", dataLocation, higgsMass, sigFileName.Data(), higgsMass));
   RooDataSet *sigHyp1Data = new RooDataSet("sigHyp1Data","sigHyp1Data",tsigHyp1,*obs);
   RooDataHist *sigHyp1Hist = sigHyp1Data->binnedClone(0);
   RooHistPdf* sigHyp1Pdf = new RooHistPdf("sigHyp1Pdf", "sigHyp1Pdf", *obs, *sigHyp1Hist);
 
   // read background
   TChain *bkgTree = new TChain("angles");
-  bkgTree->Add(Form("datafiles/%i/WW_madgraph_8TeV.root",higgsMass));
+  bkgTree->Add(Form("%s/%i/WW_madgraph_8TeV.root",dataLocation, higgsMass));
   RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,*obs);
   RooDataHist *bkgHist = bkgData->binnedClone(0);
   RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", *obs, *bkgHist);
     
   char statResults[50];
   statsFactory *hwwsignficance;
-  sprintf(statResults,Form("significance_%.0ffb_xww%.0fcuts_%s_%s.root", intLumi, float(higgsMass), varName.Data(), sigFileName.Data()));
+  sprintf(statResults,Form("significance_%.0ffb_xww%.0fcuts_%s_%s_%u.root", intLumi, float(higgsMass), varName.Data(), sigFileName.Data(), seed));
   hwwsignficance = new statsFactory(obs, sigHyp1Pdf, sigHyp1Pdf, seed, statResults);
   hwwsignficance->runSignificanceWithBackground(sigRate*intLumi, bkgRate*intLumi, bkgPdf, nToys);
   delete hwwsignficance;
