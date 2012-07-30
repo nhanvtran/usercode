@@ -19,7 +19,7 @@ void runSigSepWW(const unsigned int seedOffset, const unsigned int nToys, const 
     gROOT->ForceStyle();
 
     // load libraries
-    gROOT->ProcessLine(".L statsFactory.cc+");
+    gROOT->ProcessLine(".L statsFactory.cc++");
     gSystem->Load("libTree.so");
     gSystem->Load("libPhysics.so");
     gSystem->Load("libEG.so");
