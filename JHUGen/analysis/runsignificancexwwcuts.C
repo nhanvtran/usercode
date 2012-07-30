@@ -1,29 +1,19 @@
 #include "enums.h"
 
-void runsignfiancesingle(int higgsMass, double intLumi, int nToys, int var, int spin);
+void runsignfiancesingle(int higgsMass, double intLumi, int nToys, int var, const spinType spin, const unsigned int seed);
 
-void runsignificancexwwcuts() 
-{
+void runsignificancexwwcuts(const unsigned int seedOffset, const unsigned int nToys, const spinType spin) {
 
   int higgsMass=125;
   double intLumi=10.0;
-  int nToys = 1000;
-
-  // runsignfiancesingle( higgsMass, intLumi, nToys, DPHIMT, zeroplus);
-  // runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, zeroplus);
+  const unsigned int seed = 4126 + seedOffset;
   
-  // runsignfiancesingle( higgsMass, intLumi, nToys, DPHIMT, zerominus);
-  // runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, zerominus);
-
-  runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, twoplus);
-  // runsignfiancesingle( higgsMass, intLumi, nToys, DPHIMT, twoplus);
-
-  // runsignfiancesingle( higgsMass, intLumi, nToys, MLL, zeroplus);
-
+  runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, spin, seed);
+  
 }  
 
 
-void runsignfiancesingle(int higgsMass, double intLumi, int nToys, int var, int spin)
+ void runsignfiancesingle(int higgsMass, double intLumi, int nToys, int var, const spinType spin, const unsigned int seed)
 {
   using namespace RooFit;
   
@@ -31,10 +21,11 @@ void runsignfiancesingle(int higgsMass, double intLumi, int nToys, int var, int 
   setTDRStyle();
   gStyle->SetPadLeftMargin(0.16);
   gROOT->ForceStyle();
-  gROOT->ProcessLine(".L statsFactory.cc+");
 
-  const unsigned int seed = 0762073843;
-  
+   // for the ucsd batch submission
+  // gSystem->AddIncludePath(" -I/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms5/include/");
+  gROOT->ProcessLine(".L statsFactory.cc++");
+
   //
   // set up test kind 
   // 
@@ -75,12 +66,14 @@ void runsignfiancesingle(int higgsMass, double intLumi, int nToys, int var, int 
   if ( var == DPHIMT ) 
     obs = new RooArgSet(*dphill, *mt) ;
   
+  // for the ucsd batch submission
+  // const char *dataLocation = "/hadoop/cms/store/user/yygao/HWWAngular/datafiles/";
+  const char *dataLocation = "datafiles/";
   
-  TString fileName = getInputName(spin);
-  
-  // read signal hypothesis 1
+  // read signal hypothesis
   TChain *tsigHyp1 = new TChain("angles");
-  tsigHyp1->Add(Form("datafiles/%i/%s_%i_JHU.root",higgsMass, fileName.Data(), higgsMass));
+  TString sigFileName = getInputName(spin);
+  tsigHyp1->Add(Form("%s/%i/%s_%i_JHU.root", dataLocation.Data(), higgsMass, sigFileName.Data(), higgsMass));
   RooDataSet *sigHyp1Data = new RooDataSet("sigHyp1Data","sigHyp1Data",tsigHyp1,*obs);
   RooDataHist *sigHyp1Hist = sigHyp1Data->binnedClone(0);
   RooHistPdf* sigHyp1Pdf = new RooHistPdf("sigHyp1Pdf", "sigHyp1Pdf", *obs, *sigHyp1Hist);
@@ -94,7 +87,7 @@ void runsignfiancesingle(int higgsMass, double intLumi, int nToys, int var, int 
     
   char statResults[50];
   statsFactory *hwwsignficance;
-  sprintf(statResults,Form("significance_hww125_%.0ffb_xwwcuts_%s_%s.root", intLumi, varName.Data(), fileName.Data()));
+  sprintf(statResults,Form("significance_%.0ffb_xww%.0fcuts_%s_%s.root", intLumi, float(higgsMass), varName.Data(), sigFileName.Data()));
   hwwsignficance = new statsFactory(obs, sigHyp1Pdf, sigHyp1Pdf, seed, statResults);
   hwwsignficance->runSignificanceWithBackground(sigRate*intLumi, bkgRate*intLumi, bkgPdf, nToys);
   delete hwwsignficance;
