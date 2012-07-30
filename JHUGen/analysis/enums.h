@@ -21,7 +21,12 @@ enum VarType{
 enum spinType{
   zeroplus = 0 ,
   zerominus = 1,
-  twoplus = 2,
+  zerohplus = 2,
+  oneplus = 3,
+  oneminus = 4,
+  twoplus = 5,
+  twohplus = 6,
+  twohminus = 7,
 };
 
 
@@ -71,7 +76,7 @@ TString getTestName( int test )
 TString getSecondHypInputName (int test, float higgsMass )
 {
   switch ( test )    { 
-    
+  
   case zeroplusVSzerominus:
     return Form("PSHiggsWW_%.0f_JHU.root", higgsMass) ;
     break;
@@ -106,6 +111,8 @@ TString getSecondHypInputName (int test, float higgsMass )
   }
 }
 
+
+
 TString getVarName( int var) {
   if ( var == DPHIMT ) 
     return "2ddphimt";
@@ -132,8 +139,18 @@ TString getInputName(int spin) {
     return "SMHiggsWW";
   if ( spin == zerominus )
     return "PSHiggsWW";
+  if ( spin == zerohplus )
+    return "SMHiggsWW_0hplus";
+  if ( spin == oneminus )
+    return "VWW";
+  if ( spin == oneminus )
+    return "AVWW";
   if ( spin == twoplus ) 
-    return "TWW";
+    return "TWW_2mplus";
+  if ( spin == twohplus )
+    return "TWW_2hplus";
+  if ( spin == twohminus )
+    return "TWW_2hminus";
   return "unKnown";
 }
 
