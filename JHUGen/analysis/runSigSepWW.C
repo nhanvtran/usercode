@@ -44,7 +44,7 @@ void runSigSepWW(const unsigned int seedOffset, const unsigned int nToys, const 
 void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType test, int var, int toy, bool draw, const unsigned int seed) {
 
     // location of data
-    const char *dataLocation = "/hadoop/cms/store/user/dlevans/HWWAngular/datafiles";
+    const char *dataLocation = "/hadoop/cms/store/user/yygao/HWWAngular/datafiles";
 
     //
     // set up test kind 
