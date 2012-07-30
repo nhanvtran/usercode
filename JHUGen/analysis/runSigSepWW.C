@@ -31,7 +31,7 @@ void runSigSepWW(const unsigned int seedOffset, const unsigned int nToys, const 
   
     const int higgsMass=125;
     const double intLumi=10.0;
-    const bool draw=true;
+    const bool draw=false;
     const unsigned int seed = 4126 + seedOffset;
     RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
 
