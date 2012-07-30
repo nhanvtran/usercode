@@ -4,6 +4,11 @@
 enum TestType{
   zeroplusVSzerominus = 0, 
   zeroplusVStwoplus   = 1,
+  zeroplusVSzerohplus   = 2,
+  zeroplusVSoneplus   = 3,
+  zeroplusVSoneminus   = 4,
+  zeroplusVStwohplus  = 5,
+  zeroplusVStwohminus  = 6,
 };
 
 enum VarType{
@@ -27,14 +32,79 @@ enum ToyType {
 
 TString getTestName( int test )
 {
-  if ( test == zeroplusVSzerominus) 
-    return "0plusVS0minus";
-  if ( test == zeroplusVStwoplus) 
-    return "0plusVS2plus";
+  switch (test ) {
   
-  return "unKnown";
+  case zeroplusVSzerominus:
+    return "0plusVS0minus";
+    break;
+  
+  case zeroplusVStwoplus:
+    return "0plusVS2plus";
+    break;
+  
+  case zeroplusVSzerohplus:
+    return "0plusVS0hplus";
+    break;
+    
+  case zeroplusVSoneminus:
+    return "0plusVS1minus";
+    break;
+
+  case zeroplusVSoneplus:
+    return "0plusVS1plus";
+    break;
+
+  case zeroplusVStwohplus:
+    return "0plusVS2hplus";
+    break;
+
+  case zeroplusVStwohminus:
+    return "0plusVS2hminus";
+    break;
+    
+  default: 
+    return "unKnown";
+    break;
+  }
 }
 
+TString getSecondHypInputName (int test, float higgsMass )
+{
+  switch ( test )    { 
+    
+  case zeroplusVSzerominus:
+    return Form("PSHiggsWW_%.0f_JHU.root", higgsMass) ;
+    break;
+    
+  case zeroplusVSzerohplus:
+    return Form("SMHiggsWW_0hplus_%.0f_JHU.root", higgsMass) ;
+    break;
+
+  case zeroplusVSoneminus:
+    return Form("VWW_%.0f_JHU.root", higgsMass) ;
+    return;
+
+  case zeroplusVSoneplus:
+    return Form("AVWW_%.0f_JHU.root", higgsMass) ;
+    return;
+
+  case zeroplusVStwoplus:
+    return Form("TWW_2mplus_%.0f_JHU.root", higgsMass) ;
+    break;
+
+  case zeroplusVStwohplus:
+    return Form("TWW_2hplus_%.0f_JHU.root", higgsMass) ;
+    break;
+
+  case zeroplusVStwohminus:
+    return Form("TWW_2hminus_%.0f_JHU.root", higgsMass) ;
+    break;
+
+  default:
+    return "unKnown";
+    break;
+  }
+}
 
 TString getVarName( int var) {
   if ( var == DPHIMT ) 

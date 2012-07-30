@@ -9,6 +9,7 @@ void runSigSepWW(const unsigned int seedOffset, const unsigned int nToys, const 
     //
 
     using namespace RooFit;
+    // for the ucsd batch submission
     gSystem->AddIncludePath(" -I/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms5/include/");
 
     // for plotting
@@ -18,7 +19,7 @@ void runSigSepWW(const unsigned int seedOffset, const unsigned int nToys, const 
     gROOT->ForceStyle();
 
     // load libraries
-    gROOT->ProcessLine(".L statsFactory.cc++");
+    gROOT->ProcessLine(".L statsFactory.cc+");
     gSystem->Load("libTree.so");
     gSystem->Load("libPhysics.so");
     gSystem->Load("libEG.so");
@@ -30,7 +31,7 @@ void runSigSepWW(const unsigned int seedOffset, const unsigned int nToys, const 
   
     const int higgsMass=125;
     const double intLumi=10.0;
-    const bool draw=false;
+    const bool draw=true;
     const unsigned int seed = 4126 + seedOffset;
     RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
 
@@ -44,7 +45,11 @@ void runSigSepWW(const unsigned int seedOffset, const unsigned int nToys, const 
 void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType test, int var, int toy, bool draw, const unsigned int seed) {
 
     // location of data
-    const char *dataLocation = "/hadoop/cms/store/user/yygao/HWWAngular/datafiles";
+    // for ucsd batch submission
+    const char *dataLocation = "/hadoop/cms/store/user/yygao/HWWAngular/datafiles/";
+    // for local tests
+    // const char *dataLocation = "datafiles/";
+    
 
     //
     // set up test kind 
@@ -90,24 +95,22 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType
     if ( var == DPHIMT ) 
       obs = new RooArgSet(*dphill, *mt) ;
 
-    // read signal hypothesis 1
+    //
+    // read signal hypothesis 1 always SMHiggs
+    // 
     TChain *tsigHyp1 = new TChain("angles");
+    tsigHyp1->Add(Form("%s/%i/SMHiggsWW_%i_JHU.root", dataLocation, higgsMass, higgsMass));
     
-    if ( test == zeroplusVSzerominus || test == zeroplusVStwoplus )  {
-      tsigHyp1->Add(Form("%s/%i/SMHiggsWW_%i_JHU.root", dataLocation, higgsMass, higgsMass));
-    }
-
     RooDataSet *sigHyp1Data = new RooDataSet("sigHyp1Data","sigHyp1Data",tsigHyp1,*obs);
     RooDataHist *sigHyp1Hist = sigHyp1Data->binnedClone(0);
     RooHistPdf* sigHyp1Pdf = new RooHistPdf("sigHyp1Pdf", "sigHyp1Pdf", *obs, *sigHyp1Hist);
-
       
     // read signal hypothesis 2
     TChain *tsigHyp2 = new TChain("angles");
-    if ( test == zeroplusVSzerominus ) 
-      tsigHyp2->Add(Form("%s/%i/PSHiggsWW_%i_JHU.root",dataLocation, higgsMass, higgsMass));
-    if ( test == zeroplusVStwoplus ) 
-      tsigHyp2->Add(Form("%s/%i/TWW_%i_JHU.root",dataLocation, higgsMass, higgsMass));
+    TString secondhypName = getSecondHypInputName(test, float(higgsMass));
+    tsigHyp2->Add(Form("%s/%i/%s",dataLocation, higgsMass, secondhypName.Data()));
+    
+    std::cout << secondhypName << "\n";
     
     RooDataSet *sigHyp2Data = new RooDataSet("sigHyp2Data","sigHyp2Data",tsigHyp2,*obs);
     RooDataHist *sigHyp2Hist = sigHyp2Data->binnedClone(0);
@@ -130,7 +133,8 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType
     myHypothesisSeparation->hypothesisSeparationWithBackground(sigRate*intLumi,sigRate*intLumi,nToys,bkgPdf,bkgRate*intLumi);
     delete myHypothesisSeparation;
     std::cout << "deleted myHypothesisSeparation" << std::endl;
- 
+
+    
     // draw plots 
     if(draw) {
       RooPlot* plot1;
