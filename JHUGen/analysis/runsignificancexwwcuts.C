@@ -87,7 +87,7 @@ void runsignificancexwwcuts(const unsigned int seedOffset, const unsigned int nT
     
   char statResults[50];
   statsFactory *hwwsignficance;
-  sprintf(statResults,Form("significance_%.0ffb_xww%.0fcuts_%s_%s_%u.root", intLumi, float(higgsMass), varName.Data(), sigFileName.Data(), seed));
+  sprintf(statResults,Form("significance_xww%.0fcuts_%s_%s_%.0ffb_%u.root", float(higgsMass), varName.Data(), sigFileName.Data(), intLumi, seed));
   hwwsignficance = new statsFactory(obs, sigHyp1Pdf, sigHyp1Pdf, seed, statResults);
   hwwsignficance->runSignificanceWithBackground(sigRate*intLumi, bkgRate*intLumi, bkgPdf, nToys);
   delete hwwsignficance;
