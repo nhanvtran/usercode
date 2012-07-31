@@ -144,9 +144,9 @@ void plotPdf_7D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     
 
     // P L O T   . . . 
-    bool drawsm = true;
-    bool drawhminus = true;
-    bool drawhplus = true;
+    bool drawsm = false;
+    bool drawhminus = false;
+    bool drawhplus = true;;
     // (All parameters fixed, no fitting, just looking at the shape of the PDFs w.r.t. the data)
     TH1F* dum0 = new TH1F("dum0","dum0",1,0,1); dum0->SetLineColor(kRed); dum0->SetMarkerColor(kBlack); dum0->SetLineWidth(3);
     TH1F* dum1 = new TH1F("dum1","dum1",1,0,1); dum1->SetLineColor(kBlue); dum1->SetMarkerColor(kBlack); dum1->SetMarkerStyle(24), dum1->SetLineWidth(3);
