@@ -32,19 +32,9 @@ void   drawsignificance ()
   double higgsMass = 125.;
   double intLumi = 10.;
 
-  drawsingle(higgsMass, intLumi, twoplus, MLLMT, pure);
-  drawsingle(higgsMass, intLumi, twoplus, DPHIMT, pure);
-
-  drawsingle(higgsMass, intLumi, zeroplus, DPHIMT, pure);
+  // drawsingle(higgsMass, intLumi, twoplus, MLLMT, pure);
   drawsingle(higgsMass, intLumi, zeroplus, MLLMT, pure);
-
-  drawsingle(higgsMass, intLumi, zerominus, DPHIMT, pure);
-  drawsingle(higgsMass, intLumi, zerominus, MLLMT, pure);
-
-  /*
-  drawsingle(higgsMass, intLumi, twoplus, DPHIMT, pure);
-  drawsingle(higgsMass, intLumi, twoplus, MLLMT, pure);
-  */
+  // drawsingle(higgsMass, intLumi, zerominus, MLLMT, pure);
 }
 
 void drawsingle(double higgsMass, double intLumi, int spin, int var, int toy)
@@ -58,7 +48,7 @@ void drawsingle(double higgsMass, double intLumi, int spin, int var, int toy)
   TString toyName = getToyName(toy);
   TString inputName = getInputName(spin);
   
-  TString fileName = Form("significance_hww%.0f_%.0ffb_xwwcuts_%s_%s.root", higgsMass, intLumi, varName.Data(), inputName.Data());
+  TString fileName = Form("significance_xww%.0fcuts_%s_%s_%.0ffb.root", higgsMass, varName.Data(), inputName.Data(), intLumi);
   
   TFile *file = new TFile(fileName, "READ");
   std::cout << "Opening " << fileName << "\n";
