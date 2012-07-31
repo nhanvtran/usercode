@@ -113,14 +113,14 @@ Double_t RooSpinOne_7D::evaluate() const
     + Power(mzz,-2.)*Power(m1,4)*Power(m2,-1)*g2Val * (  - 1./2. )
     + m2*g2Val * (  - 1./2. )
     + m1*m1*Power(m2,-1)*g2Val * ( 1./2. );
-  
+
+
   Double_t f0pReal = m2*g1Val * (  - sqrt(x*x-1) );
   Double_t f0pImag = Power(mzz,-2.)*Power(m1,-1)*Power(m2,4)*g2Val * ( 1./2. )
     + Power(mzz,-2.)*m1*Power(m2,2)*g2Val * (  - 1 - 2*(x*x-1) )
     + Power(mzz,-2.)*Power(m1,3)*g2Val * ( 1./2. )
     + Power(m1,-1)*Power(m2,2)*g2Val * (  - 1./2. )
     + m1*g2Val * ( 1./2. );
-
   
   Double_t f0mReal =  m2*g1Val * (  - sqrt(x*x-1) );
   Double_t f0mImag =  Power(mzz,-2.)*Power(m1,-1)*Power(m2,4)*g2Val * (  - 1./2. )
@@ -146,21 +146,25 @@ Double_t RooSpinOne_7D::evaluate() const
   Double_t phim0=atan2(fm0Imag,fm0Real);
   Double_t phi0m=atan2(f0mImag,f0mReal);
 
-  Double_t norm = fp0 + f0p + fm0 + f0m;
-
-
-  // term 1-10
   Double_t value=0;
-  value +=  (fp0*(-1 + 2.*R1Val*h1 - Power(h1,2))*(-1 + Power(h2,2))*(1 + Power(hs,2)))/32.; // terms[1]
-  value += -(f0m*(-1 + Power(h1,2))*(1 + 2.*R2Val*h2 + Power(h2,2))*(1 + Power(hs,2)))/32.; // terms[2]
-  value += (f0p*(-1 + Power(h1,2))*(-1 + 2.*R2Val*h2 - Power(h2,2))*(1 + Power(hs,2)))/32.; // terms[3]
-  value += -(fm0*(1 + 2.*R1Val*h1 + Power(h1,2))*(-1 + Power(h2,2))*(1 + Power(hs,2)))/32.; // terms[4]
-  value += (Sqrt(f0m)*Sqrt(fp0)*(R1Val - h1)*Sqrt(1 - Power(h1,2))*(R2Val + h2)*Sqrt(1 - Power(h2,2))*(1 + Power(hs,2))*Cos(Phi - phi0m + phip0))/16.; // terms[5]
-  value += -(Sqrt(f0p)*Sqrt(fp0)*(-R1Val + h1)*Sqrt(1 - Power(h1,2))*(-R2Val + h2)*Sqrt(1 - Power(h2,2))*(-1 + Power(hs,2))*Cos(Phi + phi0p - phip0 + 2.*Phi1))/16.; // terms[6]
-  value += -(Sqrt(fm0)*Sqrt(fp0)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(-1 + Power(hs,2))*Cos(phim0 - phip0 + 2.*Phi))/16.; // terms[7]
-  value += -(Sqrt(f0m)*Sqrt(f0p)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(-1 + Power(hs,2))* Cos(2.*Phi - phi0m + phi0p + 2.*Phi1))/16.; // terms[8]
-  value += -(Sqrt(f0m)*Sqrt(fm0)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*(R2Val + h2)*Sqrt(1 - Power(h2,2))*(-1 + Power(hs,2))* Cos(Phi - phi0m + phim0 + 2.*Phi1))/16.; // terms[9]
-  value += (Sqrt(f0p)*Sqrt(fm0)*(R1Val + h1)*Sqrt(1 - Power(h1,2))*(R2Val - h2)* Sqrt(1 - Power(h2,2))*(1 + Power(hs,2))*Cos(Phi + phi0p - phim0))/16.; // terms[10]
+  value += -(fp0*(-1 + TMath::Power(h2,2))*(1 + TMath::Power(hs,2))*(1 + TMath::Power(h1,2) + 2*h1*R1Val))/32.; 
+  value += -(f0m*(-1 + TMath::Power(h1,2))*(1 + TMath::Power(hs,2))*(1 + TMath::Power(h2,2) - 2*h2*R2Val))/32.;
+  value += -(f0p*(-1 + TMath::Power(h1,2))*(1 + TMath::Power(hs,2))*(1 + TMath::Power(h2,2) + 2*h2*R2Val))/32.;
+  value += -(fm0*(-1 + TMath::Power(h1,2))*(1 + TMath::Power(hs,2))*(1 + TMath::Power(h2,2) + 2*h2*R2Val))/32.;
+  value += -(Sqrt(f0m)*Sqrt(fp0)*Sqrt(1 - TMath::Power(h1,2))*Sqrt(1 - TMath::Power(h2,2))*
+	     (1 + TMath::Power(hs,2))*(h1 + R1Val)*(h2 - R2Val)*Cos(Phi - phi0m + phip0))/16.;
+  value += -(Sqrt(f0p)*Sqrt(fp0)*Sqrt(1 - TMath::Power(h1,2))*Sqrt(1 - TMath::Power(h2,2))*
+	     (-1 + TMath::Power(hs,2))*(h1 + R1Val)*(h2 + R2Val)*
+	     Cos(Phi + phi0p + 2*Phi1 - phip0))/16.;
+  value += -(Sqrt(fm0)*Sqrt(fp0)*(-1 + TMath::Power(h1,2))*(-1 + TMath::Power(h2,2))*
+	     (-1 + TMath::Power(hs,2))*Cos(2*Phi1 + phim0 - phip0))/16.;
+  value += -(Sqrt(f0m)*Sqrt(f0p)*(-1 + TMath::Power(h1,2))*(-1 + TMath::Power(h2,2))*
+	     (-1 + TMath::Power(hs,2))*Cos(2*Phi - phi0m + phi0p + 2*Phi1))/16.;
+  value += -(Sqrt(f0m)*Sqrt(fm0)*Sqrt(1 - TMath::Power(h1,2))*Sqrt(1 - TMath::Power(h2,2))*
+	     (-1 + TMath::Power(hs,2))*(h1 - R1Val)*(h2 - R2Val)*
+	     Cos(Phi - phi0m + 2*Phi1 + phim0))/16.;
+  value += -(Sqrt(f0p)*Sqrt(fm0)*Sqrt(1 - TMath::Power(h1,2))*Sqrt(1 - TMath::Power(h2,2))*
+	     (1 + TMath::Power(hs,2))*(h1 - R1Val)*(h2 + R2Val)*Cos(Phi + phi0p - phim0))/16.;
   return value*term1Coeff*term2Coeff*betaVal;
   
 } 
@@ -220,7 +224,6 @@ Double_t RooSpinOne_7D::analyticalIntegral(Int_t code, const char* rangeName) co
     + Power(mzz,-2.)*Power(m1,3)*g2Val * ( 1./2. )
     + Power(m1,-1)*Power(m2,2)*g2Val * (  - 1./2. )
     + m1*g2Val * ( 1./2. );
-
   
   Double_t f0mReal =  m2*g1Val * (  - sqrt(x*x-1) );
   Double_t f0mImag =  Power(mzz,-2.)*Power(m1,-1)*Power(m2,4)*g2Val * (  - 1./2. )
@@ -246,6 +249,8 @@ Double_t RooSpinOne_7D::analyticalIntegral(Int_t code, const char* rangeName) co
   Double_t phim0=atan2(fm0Imag,fm0Real);
   Double_t phi0m=atan2(f0mImag,f0mReal);
 
+
+
   Double_t integral=0;
 
   switch(code)
@@ -254,13 +259,13 @@ Double_t RooSpinOne_7D::analyticalIntegral(Int_t code, const char* rangeName) co
       {
 	integral = 0.;
 	integral+= 
-	  (32.*fp0*Power(Pi(),2))/27.;
+	  (32.*fp0*TMath::Power(Pi(),2))/27.;
 	integral+= 
-	  (32.*f0m*Power(Pi(),2))/27.;
+	  (32.*f0m*TMath::Power(Pi(),2))/27.;
 	integral+= 
-	  (32.*f0p*Power(Pi(),2))/27.;
+	  (32.*f0p*TMath::Power(Pi(),2))/27.;
 	integral+= 
-	  (32.*fm0*Power(Pi(),2))/27.;
+	  (32.*fm0*TMath::Power(Pi(),2))/27.;
 	return term1Coeff*term2Coeff*betaVal*integral;
 
       }
@@ -295,10 +300,10 @@ Double_t RooSpinOne_7D::analyticalIntegral(Int_t code, const char* rangeName) co
 	integral += 
 	  (16*fm0*Pi())/27.;
 	integral += 
-	  (Sqrt(f0m)*Sqrt(fp0)*Power(Pi(),3)*R1Val*R2Val*
+	  (Sqrt(f0m)*Sqrt(fp0)*TMath::Power(Pi(),3)*R1Val*R2Val*
 	   Cos(Phi - phi0m + phip0))/12.;
 	integral +=
-	  (Sqrt(f0p)*Sqrt(fm0)*Power(Pi(),3)*R1Val*R2Val*
+	  (Sqrt(f0p)*Sqrt(fm0)*TMath::Power(Pi(),3)*R1Val*R2Val*
 		Cos(Phi + phi0p - phim0))/12.;
 	return term1Coeff*term2Coeff*betaVal*integral;
       }
@@ -306,30 +311,29 @@ Double_t RooSpinOne_7D::analyticalIntegral(Int_t code, const char* rangeName) co
       // projections to h2, integrate over all others
     case 3:
       {
-     integral = 0.;
-     integral += 
-       (-8*fp0*Power(Pi(),2)*(-1 + Power(h2,2)))/9.;
-     integral += 
-       (4*f0m*Power(Pi(),2)*(1 + 2.*R2Val*h2 + Power(h2,2)))/9.;
-     integral += 
-       (4*f0p*Power(Pi(),2)*(1 - 2.*R2Val*h2 + Power(h2,2)))/9.;
-     integral += 
-       (-8*fm0*Power(Pi(),2)*(-1 + Power(h2,2)))/9.;
-     return term1Coeff*term2Coeff*betaVal*integral;
+	integral = 0.;
+	integral += 
+	  (-8*fp0*(-1 + TMath::Power(h2,2))*TMath::Power(TMath::Pi(),2))/9.;
+	integral += 
+	  (4*f0m*TMath::Power(TMath::Pi(),2)*(1 + TMath::Power(h2,2) - 2*h2*R2Val))/9.;
+	integral += 
+	  (4*f0p*TMath::Power(TMath::Pi(),2)*(1 + TMath::Power(h2,2) + 2*h2*R2Val))/9.;
+	integral += 
+	  (-8*fm0*(-1 + TMath::Power(h2,2))*TMath::Power(TMath::Pi(),2))/9.;
+	return term1Coeff*term2Coeff*betaVal*integral;
    }
       // projections to h1, integrate all others
     case 2:
       {
 	integral=0.;
 	integral += 
-	  (4*fp0*Power(Pi(),2)*(1 - 2.*R1Val*h1 + Power(h1,2)))/9.;
+	  (4*fp0*TMath::Power(TMath::Pi(),2)*(1 + TMath::Power(h1,2) + 2*h1*R1Val))/9.;
 	integral += 
-	  (-8*f0m*Power(Pi(),2)*(-1 + Power(h1,2)))/9.;
+	  (-8*f0m*(-1 + TMath::Power(h1,2))*TMath::Power(TMath::Pi(),2))/9.;
 	integral += 
-	  (-8*f0p*Power(Pi(),2)*(-1 + Power(h1,2)))/9.;
+	  (-8*f0p*(-1 + TMath::Power(h1,2))*TMath::Power(TMath::Pi(),2))/9.;
 	integral += 
-	  (4*fm0*Power(Pi(),2)*(1 + 2.*R1Val*h1 + Power(h1,2)))/9.;
-	
+	  (4*fm0*TMath::Power(TMath::Pi(),2)*(1 + TMath::Power(h1,2) - 2*h1*R1Val))/9.;
 	return term1Coeff*term2Coeff*betaVal*integral;	
       }
 
@@ -338,13 +342,13 @@ Double_t RooSpinOne_7D::analyticalIntegral(Int_t code, const char* rangeName) co
       {
 	integral = 0.;
 	integral += 
-	  (4*fp0*Power(Pi(),2)*(1 + Power(hs,2)))/9.;
+	  (4.*fp0*TMath::Power(Pi(),2)*(1. + TMath::Power(hs,2)))/9.;
 	integral += 
-	  (4*f0m*Power(Pi(),2)*(1 + Power(hs,2)))/9.;
+	  (4.*f0m*TMath::Power(Pi(),2)*(1. + TMath::Power(hs,2)))/9.;
 	integral += 
-	  (4*f0p*Power(Pi(),2)*(1 + Power(hs,2)))/9.;
+	  (4.*f0p*TMath::Power(Pi(),2)*(1. + TMath::Power(hs,2)))/9.;
 	integral += 
-	  (4*fm0*Power(Pi(),2)*(1 + Power(hs,2)))/9.;
+	  (4.*fm0*TMath::Power(Pi(),2)*(1. + TMath::Power(hs,2)))/9.;
 	return term1Coeff*term2Coeff*betaVal*integral;	
 
       }
