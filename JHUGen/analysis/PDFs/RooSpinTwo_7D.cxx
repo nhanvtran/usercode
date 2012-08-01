@@ -412,7 +412,7 @@ Double_t f0m = f0mImag*f0mImag + f0mReal*f0mReal;
 Double_t fpm=  fpmImag*fpmImag + fpmReal*fpmReal;
 Double_t fmp = fmpImag*fmpImag + fmpReal*fmpReal;
 
-//Double_t phi00=atan2(f00Imag,f00Real);
+Double_t phi00=atan2(f00Imag,f00Real);
 Double_t phipp=atan2(fppImag,fppReal)-phi00;
 Double_t phimm=atan2(fmmImag,fmmReal)-phi00;
 Double_t phip0=atan2(fp0Imag,fp0Real)-phi00;
@@ -814,7 +814,7 @@ Double_t f0m = f0mImag*f0mImag + f0mReal*f0mReal;
 Double_t fpm=  fpmImag*fpmImag + fpmReal*fpmReal;
 Double_t fmp = fmpImag*fmpImag + fmpReal*fmpReal;
 
-//Double_t phi00=atan2(f00Imag,f00Real);
+Double_t phi00=atan2(f00Imag,f00Real);
 Double_t phipp=atan2(fppImag,fppReal)-phi00;
 Double_t phimm=atan2(fmmImag,fmmReal)-phi00;
 Double_t phip0=atan2(fp0Imag,fp0Real)-phi00;
