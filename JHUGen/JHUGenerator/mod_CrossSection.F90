@@ -15,8 +15,8 @@ contains
  use ifport
 #endif
  implicit none
- real(8) :: EvalWeighted,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt
- real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
+ real(8) :: EvalWeighted,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
+ real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac,PDFFac1,PDFFac2
  real(8) :: pdf(-6:6,1:2)
  integer :: NBin(1:11),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
  real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
@@ -166,21 +166,34 @@ contains
 
 
    if (PChannel.eq.1.or.PChannel.eq.2) then
-      PDFFac = pdf(Up_,1) *pdf(AUp_,2)  + pdf(Dn_,1) *pdf(ADn_,2)   &
-             + pdf(Chm_,1)*pdf(AChm_,2) + pdf(Str_,1)*pdf(AStr_,2)  &
-             + pdf(Bot_,1)*pdf(ABot_,2)                             &
-             + pdf(Up_,2) *pdf(AUp_,1)  + pdf(Dn_,2) *pdf(ADn_,1)   &
-             + pdf(Chm_,2)*pdf(AChm_,1) + pdf(Str_,2)*pdf(AStr_,1)  &
-             + pdf(Bot_,2)*pdf(ABot_,1)
-
+!       PDFFac = pdf(Up_,1) *pdf(AUp_,2)  + pdf(Dn_,1) *pdf(ADn_,2)   &
+!              + pdf(Chm_,1)*pdf(AChm_,2) + pdf(Str_,1)*pdf(AStr_,2)  &
+!              + pdf(Bot_,1)*pdf(ABot_,2)                             &
+!              + pdf(Up_,2) *pdf(AUp_,1)  + pdf(Dn_,2) *pdf(ADn_,1)   &
+!              + pdf(Chm_,2)*pdf(AChm_,1) + pdf(Str_,2)*pdf(AStr_,1)  &
+!              + pdf(Bot_,2)*pdf(ABot_,1)
+      PDFFac1 = pdf(Up_,1) *pdf(AUp_,2)  + pdf(Dn_,1) *pdf(ADn_,2)   &
+              + pdf(Chm_,1)*pdf(AChm_,2) + pdf(Str_,1)*pdf(AStr_,2)  &
+              + pdf(Bot_,1)*pdf(ABot_,2)                            
+      PDFFac2 = pdf(Up_,2) *pdf(AUp_,1)  + pdf(Dn_,2) *pdf(ADn_,1)   &
+              + pdf(Chm_,2)*pdf(AChm_,1) + pdf(Str_,2)*pdf(AStr_,1)  &
+              + pdf(Bot_,2)*pdf(ABot_,1)
       if (Process.eq.1) then
-         call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+!          call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+         call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
+         call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
       elseif(Process.eq.2) then
-         call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+!          call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+         call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
+         call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
       endif
-      LO_Res_Unpol = LO_Res_Unpol * SpinAvg * QuarkColAvg**2
+!       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * QuarkColAvg**2
+!       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
+      LO_Res_Unpol1 = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2 * PDFFac1
+      LO_Res_Unpol2 = LO_Res_Unpol2 * SpinAvg * QuarkColAvg**2 * PDFFac2
+      LO_Res_Unpol = LO_Res_Unpol1 + LO_Res_Unpol2
+      PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac
 
-      PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       EvalWeighted = LO_Res_Unpol * PreFac
@@ -224,7 +237,7 @@ use ifport
 #endif
 implicit none
 real(8) :: RES(-5:5,-5:5)
-real(8) :: EvalUnWeighted,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt
+real(8) :: EvalUnWeighted,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
 real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
 real(8) :: pdf(-6:6,1:2)
 integer :: NBin(1:11),NHisto,i
@@ -412,80 +425,91 @@ IF( GENEVT ) THEN
 
    else
 
+      if (Process.eq.1) then
+         call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
+         call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
+      elseif(Process.eq.2) then
+         call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
+         call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
+      endif
+
       if (ifound.eq.2) then
           PDFFac = pdf(Bot_,2)*pdf(ABot_,1)
           i2 = -5
           MY_IDUP(1:2)=(/ABot_,Bot_/)
           ICOLUP(1:2,1) = (/0,502/)
           ICOLUP(1:2,2) = (/502,0/)
+          LO_Res_Unpol = LO_Res_Unpol2 * SpinAvg * QuarkColAvg**2 * PDFFac
       elseif(ifound.eq.3) then
           PDFFac = pdf(Chm_,2)*pdf(AChm_,1)
           i2 = -4
           MY_IDUP(1:2)=(/AChm_,Chm_/)
           ICOLUP(1:2,1) = (/0,502/)
           ICOLUP(1:2,2) = (/502,0/)
+          LO_Res_Unpol = LO_Res_Unpol2 * SpinAvg * QuarkColAvg**2 * PDFFac
       elseif(ifound.eq.4) then
           PDFFac = pdf(Str_,2)*pdf(AStr_,1)
           i2 = -3
           MY_IDUP(1:2)=(/AStr_,Str_/)
           ICOLUP(1:2,1) = (/0,502/)
           ICOLUP(1:2,2) = (/502,0/)
+          LO_Res_Unpol = LO_Res_Unpol2 * SpinAvg * QuarkColAvg**2 * PDFFac
       elseif(ifound.eq.5) then
           PDFFac = pdf(Up_,2) *pdf(AUp_,1)
           i2 = -2
           MY_IDUP(1:2)=(/AUp_,Up_/)
           ICOLUP(1:2,1) = (/0,502/)
           ICOLUP(1:2,2) = (/502,0/)
+          LO_Res_Unpol = LO_Res_Unpol2 * SpinAvg * QuarkColAvg**2 * PDFFac
       elseif(ifound.eq.6) then
           PDFFac = pdf(Dn_,2) *pdf(ADn_,1)
           i2 = -1
           MY_IDUP(1:2)=(/ADn_,Dn_/)
           ICOLUP(1:2,1) = (/0,502/)
           ICOLUP(1:2,2) = (/502,0/)
+          LO_Res_Unpol = LO_Res_Unpol2 * SpinAvg * QuarkColAvg**2 * PDFFac
       elseif (ifound.eq.7) then
           PDFFac = pdf(Dn_,1) *pdf(ADn_,2)
           i2 = 1
           MY_IDUP(1:2)=(/Dn_,ADn_/)
           ICOLUP(1:2,1) = (/501,0/)
           ICOLUP(1:2,2) = (/0,501/)
+          LO_Res_Unpol = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2 * PDFFac
       elseif(ifound.eq.8) then
           PDFFac = pdf(Up_,1) *pdf(AUp_,2)
           i2 = 2
           MY_IDUP(1:2)=(/Up_,AUp_/)
           ICOLUP(1:2,1) = (/501,0/)
           ICOLUP(1:2,2) = (/0,501/)
+          LO_Res_Unpol = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2 * PDFFac
       elseif(ifound.eq.9) then
           PDFFac = pdf(Str_,1)*pdf(AStr_,2)
           i2 = 3
           MY_IDUP(1:2)=(/Str_,AStr_/)
           ICOLUP(1:2,1) = (/501,0/)
           ICOLUP(1:2,2) = (/0,501/)
+          LO_Res_Unpol = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2 * PDFFac
       elseif(ifound.eq.10) then
           PDFFac = pdf(Chm_,1)*pdf(AChm_,2)
           i2 = 4
           MY_IDUP(1:2)=(/Chm_,AChm_/)
           ICOLUP(1:2,1) = (/501,0/)
           ICOLUP(1:2,2) = (/0,501/)
+          LO_Res_Unpol = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2 * PDFFac
        elseif(ifound.eq.11) then
           PDFFac = pdf(Bot_,1)*pdf(ABot_,2)
           i2 = 5
           MY_IDUP(1:2)=(/Bot_,ABot_/)
           ICOLUP(1:2,1) = (/501,0/)
           ICOLUP(1:2,2) = (/0,501/)
+          LO_Res_Unpol = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2 * PDFFac
        endif
        parton(i2,-i2) = 1
        CS_max = csmax(i2,-i2)
 
-      if (Process.eq.1) then
-         call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
-      elseif(Process.eq.2) then
-         call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
-      endif
-
-      LO_Res_Unpol = LO_Res_Unpol * SpinAvg * QuarkColAvg**2
    endif
 
-   PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
+   PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac
    if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
    if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
    EvalUnWeighted = LO_Res_Unpol * PreFac
@@ -537,12 +561,15 @@ ELSE! GENEVT
 
    if (PChannel.eq.1.or.PChannel.eq.2) then
       if (Process.eq.1) then
-         call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+         call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
+         call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
       elseif(Process.eq.2) then
-         call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+         call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
+         call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
       endif
 
-      LO_Res_Unpol = LO_Res_Unpol * SpinAvg * QuarkColAvg**2
+      LO_Res_Unpol1 = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2
+      LO_Res_Unpol2 = LO_Res_Unpol2 * SpinAvg * QuarkColAvg**2
       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt *   SymmFac
@@ -550,29 +577,38 @@ ELSE! GENEVT
       do i1 = -5,5
          if (i1.eq.-5) then
           PDFFac = pdf(Bot_,2)*pdf(ABot_,1)
+          EvalUnWeighted = LO_Res_Unpol2 * PreFac *PDFFac
          elseif(i1.eq.-4) then
           PDFFac = pdf(Chm_,2)*pdf(AChm_,1)
+          EvalUnWeighted = LO_Res_Unpol2 * PreFac *PDFFac
          elseif(i1.eq.-3) then
           PDFFac = pdf(Str_,2)*pdf(AStr_,1)
+          EvalUnWeighted = LO_Res_Unpol2 * PreFac *PDFFac
          elseif(i1.eq.-2) then
           PDFFac = pdf(Up_,2) *pdf(AUp_,1)
+          EvalUnWeighted = LO_Res_Unpol2 * PreFac *PDFFac
          elseif(i1.eq.-1) then
           PDFFac = pdf(Dn_,2) *pdf(ADn_,1)
+          EvalUnWeighted = LO_Res_Unpol2 * PreFac *PDFFac
          elseif (i1.eq.0) then
           PDFFac = 0d0
          elseif (i1.eq.1) then
           PDFFac = pdf(Dn_,1) *pdf(ADn_,2)
+          EvalUnWeighted = LO_Res_Unpol1 * PreFac *PDFFac
          elseif (i1.eq.2) then
           PDFFac = pdf(Up_,1) *pdf(AUp_,2)
+          EvalUnWeighted = LO_Res_Unpol1 * PreFac *PDFFac
          elseif(i1.eq.3) then
           PDFFac = pdf(Str_,1)*pdf(AStr_,2)
+          EvalUnWeighted = LO_Res_Unpol1 * PreFac *PDFFac
          elseif(i1.eq.4) then
           PDFFac = pdf(Chm_,1)*pdf(AChm_,2)
+          EvalUnWeighted = LO_Res_Unpol1 * PreFac *PDFFac
           elseif(i1.eq.5) then
           PDFFac = pdf(Bot_,1)*pdf(ABot_,2)
+          EvalUnWeighted = LO_Res_Unpol1 * PreFac *PDFFac
           endif
 
-          EvalUnWeighted = LO_Res_Unpol * PreFac *PDFFac
           RES(i1,-i1) = EvalUnWeighted
           if (EvalUnWeighted.gt.csmax(i1,-i1)) csmax(i1,-i1) = EvalUnWeighted
       enddo
