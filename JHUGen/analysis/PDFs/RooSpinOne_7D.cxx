@@ -153,13 +153,14 @@ Double_t RooSpinOne_7D::evaluate() const
   Double_t f0p = f0pImag*f0pImag + f0pReal*f0pReal;
   Double_t fm0 = fm0Imag*fm0Imag + fm0Real*fm0Real;
   Double_t f0m = f0mImag*f0mImag + f0mReal*f0mReal;
-  
-  Double_t phipp=atan2(fppImag,fppReal);
-  Double_t phimm=atan2(fmmImag,fmmReal);
-  Double_t phip0=atan2(fp0Imag,fp0Real);
-  Double_t phi0p=atan2(f0pImag,f0pReal);
-  Double_t phim0=atan2(fm0Imag,fm0Real);
-  Double_t phi0m=atan2(f0mImag,f0mReal);
+
+  Double_t phi00=atan2(f00Imag,f00Real);
+  Double_t phipp=atan2(fppImag,fppReal)-phi00;
+  Double_t phimm=atan2(fmmImag,fmmReal)-phi00;
+  Double_t phip0=atan2(fp0Imag,fp0Real)-phi00;
+  Double_t phi0p=atan2(f0pImag,f0pReal)-phi00;
+  Double_t phim0=atan2(fm0Imag,fm0Real)-phi00;
+  Double_t phi0m=atan2(f0mImag,f0mReal)-phi00;
 
   Double_t value=0;
 
@@ -297,12 +298,13 @@ Double_t RooSpinOne_7D::analyticalIntegral(Int_t code, const char* rangeName) co
   Double_t fm0 = fm0Imag*fm0Imag + fm0Real*fm0Real;
   Double_t f0m = f0mImag*f0mImag + f0mReal*f0mReal;
   
-  Double_t phipp=atan2(fppImag,fppReal);
-  Double_t phimm=atan2(fmmImag,fmmReal);
-  Double_t phip0=atan2(fp0Imag,fp0Real);
-  Double_t phi0p=atan2(f0pImag,f0pReal);
-  Double_t phim0=atan2(fm0Imag,fm0Real);
-  Double_t phi0m=atan2(f0mImag,f0mReal);
+  Double_t phi00=atan2(f00Imag,f00Real);
+  Double_t phipp=atan2(fppImag,fppReal)-phi00;
+  Double_t phimm=atan2(fmmImag,fmmReal)-phi00;
+  Double_t phip0=atan2(fp0Imag,fp0Real)-phi00;
+  Double_t phi0p=atan2(f0pImag,f0pReal)-phi00;
+  Double_t phim0=atan2(fm0Imag,fm0Real)-phi00;
+  Double_t phi0m=atan2(f0mImag,f0mReal)-phi00;
 
   Double_t integral=0;
 
