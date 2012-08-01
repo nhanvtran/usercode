@@ -30,12 +30,17 @@ void drawsingle(int test, int var, int toy);
 int getMedianBin(TH1F& *h);
 void drawhypsep() {
   
-  // drawsingle(zeroplusVSzerominus,MLLMT, pure);
-  // drawsingle(zeroplusVSzerominus, DPHIMT, pure);
-
-  // drawsingle(zeroplusVStwoplus, DPHIMT, pure);
+  drawsingle(zeroplusVSzerominus,MLLMT, pure);
   drawsingle(zeroplusVStwoplus, MLLMT, pure);
-
+  drawsingle(zeroplusVSzerohplus, MLLMT, pure);
+  drawsingle(zeroplusVSoneplus, MLLMT, pure);
+  drawsingle(zeroplusVSoneminus, MLLMT, pure);
+  drawsingle(zeroplusVStwohminus, MLLMT, pure);
+  drawsingle(zeroplusVStwohplus, MLLMT, pure);
+    
+  // not used 
+  // drawsingle(zeroplusVSzerominus, DPHIMT, pure);
+  // drawsingle(zeroplusVStwoplus, DPHIMT, pure);
   // drawsingle(zeroplusVSzerominus, MLL, pure);
   //  drawsingle(zeroplusVSzerominus, DPHI, pure);
   
@@ -51,6 +56,10 @@ void drawsingle(int test, int var, int toy)
   gROOT->ProcessLine("setTDRStyle();");
   gROOT->ForceStyle();
   
+  TGaxis *gaxis = new TGaxis();
+  gaxis->SetMaxDigits(3);
+
+
   TString testName = getTestName(test);
   TString varName = getVarName(var);
   TString toyName = getToyName(toy);
@@ -62,28 +71,41 @@ void drawsingle(int test, int var, int toy)
   assert(hypTuple);
 
   
-  int nbins = 100;
+  int nbins = 5000;
   double xmin = -10.;
   double xmax = 10.;
 
-  if ( test & zeroplusVStwoplus) {
-    if ( var == MLLMT) {
-      xmin = -50.;
-      xmax = 50.;
-    } else {
-      xmin = -40.;
-      xmax = 40.;
-    }
-    nbins = 1000;
-  }
-
-  if ( (var & DPHIMT) && (test & zeroplusVSzerominus)) {
-    nbins = 40;
+  switch (test) {
+    
+  case zeroplusVSzerominus:
     xmin = -10.;
     xmax = 10.;
+    break;
+
+  case zeroplusVSzerohplus:
+  case zeroplusVStwohplus:
+  case zeroplusVSoneplus:
+    xmin = -20.;
+    xmax = 20.;
+    break;
+
+  case zeroplusVSoneminus:
+  case zeroplusVStwohminus:
+    xmin = -30.;
+    xmax = 30.;
+    break;
+    
+  case zeroplusVStwoplus:
+    xmin = -40.;
+    xmax = 40.;
+    break;
+  default:
+    break;
   }
-   
-  TCut cut("nSigFitH1>0.1");
+  
+  
+  // TCut cut("nSigFitH1>0.1");
+  TCut cut("1");
 
   TH1F *S_H0 = new TH1F("S_H0", "S_H0", nbins, xmin, xmax);
   hypTuple->Project("S_H0", "S_H0", cut);
@@ -189,18 +211,36 @@ void drawsingle(int test, int var, int toy)
   S_H1->SetYTitle("experiments");
 
 
-  TLegend *leg = new TLegend(0.65, 0.7, 0.85, 0.9);
+  TLegend *leg = new TLegend(0.65, 0.7, 0.8, 0.9);
   leg->SetFillColor(0);
   leg->SetTextSize(0.05);
-  if ( test & zeroplusVSzerominus ) {
-    leg->AddEntry(S_H0, "Hyp1: 0+", "lp");
+  leg->SetTextFont(42);
+  leg->AddEntry(S_H0, "Hyp1: 0m+", "lp");
+  switch (test ) {
+  case zeroplusVSzerominus:
     leg->AddEntry(S_H1, "Hyp2: 0-", "lp");
-  }
-  if ( test & zeroplusVStwoplus ) {
-    leg->AddEntry(S_H0, "Hyp1: 0+", "lp");
+    break;
+  case zeroplusVSzerohplus:
+    leg->AddEntry(S_H1, "Hyp2: 0h+", "lp");
+    break;
+  case zeroplusVSoneplus:
+    leg->AddEntry(S_H1, "Hyp2: 1+", "lp");
+    break;
+  case zeroplusVSoneminus:
+    leg->AddEntry(S_H1, "Hyp2: 1-", "lp");
+    break;
+  case zeroplusVStwoplus:
     leg->AddEntry(S_H1, "Hyp2: 2+", "lp");
+    break;
+  case zeroplusVStwohplus:
+    leg->AddEntry(S_H1, "Hyp2: 2h+", "lp");
+    break;
+  case zeroplusVStwohminus:
+    leg->AddEntry(S_H1, "Hyp2: 2h-", "lp");
+    break;
+  default:
+    break;
   }
-
 
   TLatex* tex_sepH = new TLatex(0.25, 0.85, Form("S  %.1f #sigma", sepH));
   tex_sepH->SetTextFont(42);
