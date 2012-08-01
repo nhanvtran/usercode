@@ -174,8 +174,8 @@ Double_t fpp = fppImag*fppImag + fppReal*fppReal;
 Double_t fmm = fmmImag*fmmImag + fmmReal*fmmReal;
 
 Double_t phi00=atan2(f00Imag,f00Real);
-Double_t phipp=atan2(fppImag,fppReal);
-Double_t phimm=atan2(fmmImag,fmmReal);
+Double_t phipp=atan2(fppImag,fppReal)-phi00;
+Double_t phimm=atan2(fmmImag,fmmReal)-phi00;
 
 
 Double_t betaValSquared = (1.-(pow(m1-m2,2)/pow(mX,2)))*(1.-(pow(m1+m2,2)/pow(mX,2)));
@@ -296,8 +296,8 @@ Double_t fpp = fppImag*fppImag + fppReal*fppReal;
 Double_t fmm = fmmImag*fmmImag + fmmReal*fmmReal;
 
 Double_t phi00=atan2(f00Imag,f00Real);
-Double_t phipp=atan2(fppImag,fppReal);
-Double_t phimm=atan2(fmmImag,fmmReal);
+Double_t phipp=atan2(fppImag,fppReal)-phi00;
+Double_t phimm=atan2(fmmImag,fmmReal)-phi00;
 
 Double_t betaValSquared = (1.-(pow(m1-m2,2)/pow(mX,2)))*(1.-(pow(m1+m2,2)/pow(mX,2)));
 Double_t betaVal = sqrt(betaValSquared);
