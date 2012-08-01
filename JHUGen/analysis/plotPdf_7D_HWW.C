@@ -11,14 +11,20 @@
 #include "RooPlot.h"
 using namespace RooFit ;
 
-void plotPdf_7D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM"){
-    
+void plotPdf_7D_HWW(float mH = 125) {
+  
     gROOT->ProcessLine(".L ~/tdrstyle.C");
     setTDRStyle();
     gStyle->SetPadLeftMargin(0.16);
     
     // Declaration of the PDFs to use
     gROOT->ProcessLine(".L PDFs/RooSpinZero_7D.cxx+");
+
+    // W/Z mass and decay width constants
+    double mV = 80.399;
+    double gamV = 2.085;
+    bool offshell = false;
+    if ( mH < 2 * mV ) offshell = true;
 
     // Observables (5D)
     RooRealVar* m1 = new RooRealVar("wplusmass","m1",10,120);
@@ -57,29 +63,28 @@ void plotPdf_7D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     RooRealVar* R2Val = new RooRealVar("R2Val","R2Val",1);
     
     // PDF definition SM Higgs (JP = 0+)
-    RooSpinZero_7D *myPDF = new RooSpinZero_7D("myPDF","myPDF",*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,
+    RooSpinZero_7D *myPDF;
+    if ( offshell ) 
+      myPDF = new RooSpinZero_7D("myPDF","myPDF",*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,
 				     *a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,
 				     *useGTerm, *g1Val, *g2Val, *g3Val, *g4Val,
 				     *mW,*gamW,*mX,*R1Val,*R2Val);
+    else 
+      myPDF = new RooSpinZero_7D("myPDF","myPDF",*mW,*mW,*h1,*h2,*hs,*Phi,*Phi1,
+				     *a1Val,*phi1Val,*a2Val,*phi2Val,*a3Val,*phi3Val,
+				     *useGTerm, *g1Val, *g2Val, *g3Val, *g4Val,
+				     *mW,*gamW,*mX,*R1Val,*R2Val);
+
     // Grab input file to convert to RooDataSet
-    TFile* fin = new TFile(Form("%sHiggsWW_%.0f_%s.root", dataType.Data(), mH, mode.Data()));
+    TFile* fin = new TFile(Form("SMHiggsWW_%.0f_JHU.root", mH));
     TTree* tin = (TTree*) fin->Get("angles");
     
     // for weighted events
-    if ( mode == "MCFM") {
-      RooDataSet dataTMP("dataTMP","dataTMP",tin,RooArgSet(*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,*wt));
-      RooDataSet data("data","data",RooArgList(*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,*wt), WeightVar("wt"), Import(dataTMP));
-    } else {
+    if ( offshell ) 
       RooDataSet data("data","data",tin,RooArgSet(*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1));
-    }
-    /*
-    for (int i=1;i<10;i++) {
-      RooArgSet* row = data.get(i);
-      row->Print("v");
-      std::cout << "weight: " << data.weight() << std::endl;
-    }
-    */
-
+    else 
+      RooDataSet data("data","data",tin,RooArgSet(*h1,*h2,*hs,*Phi,*Phi1));
+    
     // 
     //  0-
     // 
@@ -92,23 +97,27 @@ void plotPdf_7D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     RooRealVar* g3Valp = new RooRealVar("g3Valp", "g3Valp", 0.);
     RooRealVar* g4Valp = new RooRealVar("g4Valp", "g4Valp", 1.);
 
-    RooSpinZero_7D *myPDFA = new RooSpinZero_7D("myPDFA","myPDFA",*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,
+    RooSpinZero_7D *myPDFA;
+    if ( offshell ) 
+      myPDFA = new RooSpinZero_7D("myPDFA","myPDFA",*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,
 				      *a1Valp,*phi1Val,*a2Val,*phi2Val,*a3Valp,*phi3Val,
 				      *useGTerm, *g1Valp, *g2Valp, *g3Valp, *g4Valp,
 				      *mW,*gamW,*mX,*R1Val,*R2Val);
-    
+    else
+      myPDFA = new RooSpinZero_7D("myPDFA","myPDFA",*mW,*mW,*h1,*h2,*hs,*Phi,*Phi1,
+				      *a1Valp,*phi1Val,*a2Val,*phi2Val,*a3Valp,*phi3Val,
+				      *useGTerm, *g1Valp, *g2Valp, *g3Valp, *g4Valp,
+				      *mW,*gamW,*mX,*R1Val,*R2Val);
+
+
     // read another input file
-    TFile* fin2 = new TFile(Form("PSHiggsWW_%.0f_%s.root", mH, mode.Data()));
+    TFile* fin2 = new TFile(Form("PSHiggsWW_%.0f_JHU.root", mH));
     TTree* tin2 = (TTree*) fin2->Get("angles");
     
-    // for weighted events
-    if ( mode == "MCFM") {
-      RooDataSet dataTMP2("dataTMP2","dataTMP2",tin,RooArgSet(*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,*wt));
-      RooDataSet data2("data2","data2",RooArgList(*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,*wt), WeightVar("wt"), Import(dataTMP));
-    } else {
+    if ( offshell ) 
       RooDataSet data2("data2","data2",tin2,RooArgSet(*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1));
-    }
-
+    else 
+      RooDataSet data2("data2","data2",tin2,RooArgSet(*h1,*h2,*hs,*Phi,*Phi1));
     
     // 
     // For 0h+
@@ -124,29 +133,33 @@ void plotPdf_7D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     RooRealVar* g3Valhp = new RooRealVar("g3Valhp", "g3Valhp", 0.);
     RooRealVar* g4Valhp = new RooRealVar("g4Valhp", "g4Valhp", 0.);
 
-    RooSpinZero_7D *myPDFHP= new RooSpinZero_7D("myPDFHP","myPDFHP",*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,
+    RooSpinZero_7D *myPDFHP; 
+    if ( offshell ) 
+      myPDFHP = new RooSpinZero_7D("myPDFHP","myPDFHP",*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,
+				      *a1Valhp,*phi1Val,*a2Valhp,*phi2Val,*a3Valhp,*phi3Val,
+				      *useGTerm, *g1Valhp, *g2Valhp, *g3Valhp, *g4Valhp,
+				      *mW,*gamW,*mX,*R1Val,*R2Val);
+    else 
+      myPDFHP = new RooSpinZero_7D("myPDFHP","myPDFHP",*mW,*mW,*h1,*h2,*hs,*Phi,*Phi1,
 				      *a1Valhp,*phi1Val,*a2Valhp,*phi2Val,*a3Valhp,*phi3Val,
 				      *useGTerm, *g1Valhp, *g2Valhp, *g3Valhp, *g4Valhp,
 				      *mW,*gamW,*mX,*R1Val,*R2Val);
     
     // read another input file
-    TFile* finhp = new TFile(Form("SMHiggsWW_0hplus_%.0f_%s.root", mH, mode.Data()));
-    // TFile* finhp = new TFile(Form("SMHiggsWW_a2_%.0f_%s.root", mH, mode.Data()));
+    // TFile* finhp = new TFile(Form("SMHiggsWW_0hplus_%.0f_JHU.root", mH));
+    TFile* finhp = new TFile(Form("SMHiggsWW_0hplus_125_JHU.root", mH));
     TTree* tinhp = (TTree*) finhp->Get("angles");
     
-    // for weighted events
-    if ( mode == "MCFM") {
-      RooDataSet dataTMPhp("dataTMPhp","dataTMPhp",tin,RooArgSet(*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1*wt));
-      RooDataSet datahp("datahp","datahp",RooArgList(*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1,*wt), WeightVar("wt"), Import(dataTMPhp));
-    } else {
+    if ( offshell ) 
       RooDataSet datahp("datahp","datahp",tinhp,RooArgSet(*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1));
-    }
+    else 
+      RooDataSet datahp("datahp","datahp",tinhp,RooArgSet(*h1,*h2,*hs,*Phi,*Phi1));
     
 
     // P L O T   . . . 
-    bool drawsm = false;
-    bool drawhminus = false;
-    bool drawhplus = true;;
+    bool drawsm = true;
+    bool drawhminus = true;
+    bool drawhplus = false;;
     // (All parameters fixed, no fitting, just looking at the shape of the PDFs w.r.t. the data)
     TH1F* dum0 = new TH1F("dum0","dum0",1,0,1); dum0->SetLineColor(kRed); dum0->SetMarkerColor(kBlack); dum0->SetLineWidth(3);
     TH1F* dum1 = new TH1F("dum1","dum1",1,0,1); dum1->SetLineColor(kBlue); dum1->SetMarkerColor(kBlack); dum1->SetMarkerStyle(24), dum1->SetLineWidth(3);
@@ -161,31 +174,33 @@ void plotPdf_7D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     if ( drawhplus ) 
       box3->AddEntry(dum2,Form("X(%.0f)#rightarrow WW: JP = 0h+", mH),"lp");
 
-    RooPlot* w1frame =  m1->frame(55);
-    if ( drawsm ) {
-      data.plotOn(w1frame, MarkerColor(kBlack));
-      myPDF->plotOn(w1frame, LineColor(kRed));
-    }
-    if ( drawhminus ) {
-      data2.plotOn(w1frame, MarkerColor(kBlack), MarkerStyle(24));
-      myPDFA->plotOn(w1frame, LineColor(kBlack));
-    }
-    if ( drawhplus ) {
-      datahp.plotOn(w1frame, MarkerColor(kBlack), MarkerStyle(21));
-      myPDFHP->plotOn(w1frame, LineColor(kGreen));
-    }
-    RooPlot* w2frame =  m2->frame(55);
-    if ( drawsm ) {
-      data.plotOn(w2frame, MarkerColor(kBlack));
-      myPDF->plotOn(w2frame, LineColor(kRed));
-    }
-    if ( drawhminus ) {
-      data2.plotOn(w2frame, MarkerColor(kBlack), MarkerStyle(24));
-      myPDFA->plotOn(w2frame, LineColor(kBlue));
-    }
-    if ( drawhplus ) {
-      datahp.plotOn(w2frame, MarkerColor(kBlack), MarkerStyle(21));
-      myPDFHP->plotOn(w2frame, LineColor(kGreen));
+    if ( offshell ) {
+      RooPlot* w1frame =  m1->frame(55);
+      if ( drawsm ) {
+	data.plotOn(w1frame, MarkerColor(kBlack));
+	myPDF->plotOn(w1frame, LineColor(kRed));
+      }
+      if ( drawhminus ) {
+	data2.plotOn(w1frame, MarkerColor(kBlack), MarkerStyle(24));
+	myPDFA->plotOn(w1frame, LineColor(kBlack));
+      }
+      if ( drawhplus ) {
+	datahp.plotOn(w1frame, MarkerColor(kBlack), MarkerStyle(21));
+	myPDFHP->plotOn(w1frame, LineColor(kGreen));
+      }
+      RooPlot* w2frame =  m2->frame(55);
+      if ( drawsm ) {
+	data.plotOn(w2frame, MarkerColor(kBlack));
+	myPDF->plotOn(w2frame, LineColor(kRed));
+      }
+      if ( drawhminus ) {
+	data2.plotOn(w2frame, MarkerColor(kBlack), MarkerStyle(24));
+	myPDFA->plotOn(w2frame, LineColor(kBlue));
+      }
+      if ( drawhplus ) {
+	datahp.plotOn(w2frame, MarkerColor(kBlack), MarkerStyle(21));
+	myPDFHP->plotOn(w2frame, LineColor(kGreen));
+      }
     }
     
     RooPlot* h1frame =  h1->frame(55);
@@ -257,10 +272,12 @@ void plotPdf_7D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     TCanvas* cww = new TCanvas( "cww", "cww", 1000, 600 );
 
     cww->Divide(4,2);
-    cww->cd(1);
-    w1frame->Draw();
-    cww->cd(2);
-    w2frame->Draw();
+    if ( offshell ) {
+      cww->cd(1);
+      w1frame->Draw();
+      cww->cd(2);
+      w2frame->Draw();
+    }
     cww->cd(3);
     hsframe->Draw();
     cww->cd(4);
@@ -274,6 +291,6 @@ void plotPdf_7D_HWW(float mH = 125, TString mode="JHU", TString dataType = "SM")
     cww->cd(8);
     Phiframe->Draw();
     
-    cww->Print(Form("epsfiles/angles_HWW%.0f_%s_7D.eps", mH, mode.Data()));
-    cww->Print(Form("pngfiles/angles_HWW%.0f_%s_7D.png", mH, mode.Data()));
+    cww->Print(Form("epsfiles/angles_HWW%.0f_JHU_7D.eps", mH));
+    cww->Print(Form("pngfiles/angles_HWW%.0f_JHU_7D.png", mH));
 }
