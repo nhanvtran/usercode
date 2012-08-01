@@ -65,7 +65,6 @@ void plotPdf_7D_VWW(double mH=125) {
     
     // Grab input file to convert to RooDataSet
     TFile* finV = new TFile(Form("VWW_%.0f_JHU.root", mH));
-    // TFile* finV = new TFile(Form("VWW_%.0f_LProd_JHU.root", mH));
     TTree* tinV = (TTree*) finV->Get("angles");
     if ( offshell ) 
       RooDataSet dataV("dataV","dataV",tinV,RooArgSet(*wplusmass, *wminusmass, *h1,*h2, *hs, *Phi, *Phi1));
@@ -79,7 +78,7 @@ void plotPdf_7D_VWW(double mH=125) {
     
 
     // 
-    // 1-
+    // 1+
     // 
     RooRealVar* g1ValA = new RooRealVar("g1ValA","g1ValA",0);
     RooRealVar* g2ValA = new RooRealVar("g2ValA","g2ValA",1);
