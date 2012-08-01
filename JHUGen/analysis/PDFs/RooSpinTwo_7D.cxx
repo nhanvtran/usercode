@@ -413,134 +413,104 @@ Double_t fpm=  fpmImag*fpmImag + fpmReal*fpmReal;
 Double_t fmp = fmpImag*fmpImag + fmpReal*fmpReal;
 
 //Double_t phi00=atan2(f00Imag,f00Real);
-Double_t phipp=atan2(fppImag,fppReal);
-Double_t phimm=atan2(fmmImag,fmmReal);
-Double_t phip0=atan2(fp0Imag,fp0Real);
-Double_t phi0p=atan2(f0pImag,f0pReal);
-Double_t phim0=atan2(fm0Imag,fm0Real);
-Double_t phi0m=atan2(f0mImag,f0mReal);
-Double_t phipm=atan2(fpmImag,fpmReal);
-Double_t phimp=atan2(fmpImag,fmpReal);
+Double_t phipp=atan2(fppImag,fppReal)-phi00;
+Double_t phimm=atan2(fmmImag,fmmReal)-phi00;
+Double_t phip0=atan2(fp0Imag,fp0Real)-phi00;
+Double_t phi0p=atan2(f0pImag,f0pReal)-phi00;
+Double_t phim0=atan2(fm0Imag,fm0Real)-phi00;
+Double_t phi0m=atan2(f0mImag,f0mReal)-phi00;
+Double_t phipm=atan2(fpmImag,fpmReal)-phi00;
+Double_t phimp=atan2(fmpImag,fmpReal)-phi00;
 
+value += (f00*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) +3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/32.;
 
-value += (f00*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) +3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4)))/32.; // terms[1]
- 
-value += (fmm*(2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) +3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(-1 - Power(h1,2) + 2*h1*R1Val)*(-1 - Power(h2,2) + 2*h2*R2Val))/128.; // terms[2]
+value += (fmm*(2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) +3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(-1 - Power(h1,2) + 2*h1*R1Val)*(-1 - Power(h2,2) + 2*h2*R2Val))/128.;
 
-value += (fpp*(2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) +3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(1 + Power(h1,2) + 2*h1*R1Val)*(1 + Power(h2,2) + 2*h2*R2Val))/128.; // terms[3]
+value += (fpp*(2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) +3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(1 + Power(h1,2) + 2*h1*R1Val)*(1 + Power(h2,2) + 2*h2*R2Val))/128.;
 
-value += -(fp0*(-1 + Power(h2,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) -(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(1 + Power(h1,2) + 2*h1*R1Val))/32.; // terms[4]
+value += -(fp0*(-1 + Power(h2,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) -(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(1 + Power(h1,2) + 2*h1*R1Val))/32.;
 
-value += (f0m*(-1 + Power(h1,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) -(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(-1 - Power(h2,2) + 2*h2*R2Val))/32.; // terms[5]
+value += (f0m*(-1 + Power(h1,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) -(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(-1 - Power(h2,2) + 2*h2*R2Val))/32.;
 
-value += -(f0p*(-1 + Power(h1,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) -(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(1 + Power(h2,2) + 2*h2*R2Val))/32.; // terms[6]
+value += -(f0p*(-1 + Power(h1,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) -(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(1 + Power(h2,2) + 2*h2*R2Val))/32.;
 
-value += (fm0*(-1 + Power(h2,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) -(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(-1 - Power(h1,2) + 2*h1*R1Val))/32.; // terms[7]
+value += (fm0*(-1 + Power(h2,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) -(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(-1 - Power(h1,2) + 2*h1*R1Val))/32.;
 
-value += -(fpm*(4*fz1Val + fz2Val + 6*fz2Val*Power(hs,2) + (-4*fz1Val + fz2Val)*Power(hs,4) +6*fz0Val*Power(-1 + Power(hs,2),2))*(1 + Power(h1,2) + 2*h1*R1Val)*(-1 - Power(h2,2) + 2*h2*R2Val))/256.; // terms[8]
+value += -(fpm*(4*fz1Val + fz2Val + 6*fz2Val*Power(hs,2) + (-4*fz1Val + fz2Val)*Power(hs,4) +6*fz0Val*Power(-1 + Power(hs,2),2))*(1 + Power(h1,2) + 2*h1*R1Val)*(-1 - Power(h2,2) + 2*h2*R2Val))/256.;
 
-value += -(fmp*(4*fz1Val + fz2Val + 6*fz2Val*Power(hs,2) + (-4*fz1Val + fz2Val)*Power(hs,4) +6*fz0Val*Power(-1 + Power(hs,2),2))*(-1 - Power(h1,2) + 2*h1*R1Val)*(1 + Power(h2,2) + 2*h2*R2Val))/256.; // terms[9]
+value += -(fmp*(4*fz1Val + fz2Val + 6*fz2Val*Power(hs,2) + (-4*fz1Val + fz2Val)*Power(hs,4) +6*fz0Val*Power(-1 + Power(hs,2),2))*(-1 - Power(h1,2) + 2*h1*R1Val)*(1 + Power(h2,2) + 2*h2*R2Val))/256.;
 
-value += (sqrt(f00)*sqrt(fmm)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) +3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(h1 - R1Val)*(h2 - R2Val)*Cos(Phi - phimm))/32.; // terms[10]
+value += (sqrt(f00)*sqrt(fmm)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) +3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(h1 - R1Val)*(h2 - R2Val)*Cos(Phi - phimm))/32.;
 
-value += (sqrt(f00)*sqrt(fpp)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) +3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(h1 + R1Val)*(h2 + R2Val)*Cos(Phi + phipp))/32.; // terms[11]
+value += (sqrt(f00)*sqrt(fpp)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) +3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(h1 + R1Val)*(h2 + R2Val)*Cos(Phi + phipp))/32.;
 
-value += -(sqrt(3)*sqrt(f00)*sqrt(fp0)*sqrt(1 - Power(h1,2))*(-1 + Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 + R1Val)*Cos(Phi1 + phip0))/16.; // terms[12] 
-// YY Phi1 + phip0
+value += -(sqrt(3)*sqrt(f00)*sqrt(fp0)*sqrt(1 - Power(h1,2))*(-1 + Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 + R1Val)*Cos(Phi1 - phip0))/16.;
 
-value += (sqrt(3)*sqrt(f00)*sqrt(f0m)*(-1 + Power(h1,2))*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h2 - R2Val)*Cos(Phi - phi0m - Phi1))/16.; // terms[13] 
-// YY Phi - phi0m + Phi1
+value += (sqrt(3)*sqrt(f00)*sqrt(f0m)*(-1 + Power(h1,2))*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h2 - R2Val)*Cos(Phi - phi0m + Phi1))/16.;
 
-value += (sqrt(3)*sqrt(f00)*sqrt(f0p)*(-1 + Power(h1,2))*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h2 + R2Val)*Cos(Phi + phi0p - Phi1))/16.; // terms[14]
-// YY Phi + phi0p + Phi1
+value += (sqrt(3)*sqrt(f00)*sqrt(f0p)*(-1 + Power(h1,2))*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h2 + R2Val)*Cos(Phi + phi0p + Phi1))/16.;
 
-value += (sqrt(3)*sqrt(f00)*sqrt(fm0)*sqrt(1 - Power(h1,2))*(-1 + Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-h1 + R1Val)*Cos(Phi1 - phim0))/16.; // terms[15] 
-// YY Phi1 + phim0
+value += (sqrt(3)*sqrt(f00)*sqrt(fm0)*sqrt(1 - Power(h1,2))*(-1 + Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-h1 + R1Val)*Cos(Phi1 + phim0))/16.;
 
-value += (sqrt(1.5)*sqrt(f00)*sqrt(fpm)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 + R1Val)*(h2 - R2Val)*Cos(Phi - 2*Phi1 - phipm))/32.; // terms[16]
-// YY Phi + 2*Phi1 - phipm
+value += (sqrt(1.5)*sqrt(f00)*sqrt(fpm)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 + R1Val)*(h2 - R2Val)*Cos(Phi + 2*Phi1 - phipm))/32.;
 
-value += (sqrt(1.5)*sqrt(f00)*sqrt(fmp)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 - R1Val)*(h2 + R2Val)*Cos(Phi - 2*Phi1 + phimp))/32.; // terms[17] 
-// YY Phi + 2*Phi1 + phimp
+value += (sqrt(1.5)*sqrt(f00)*sqrt(fmp)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 - R1Val)*(h2 + R2Val)*Cos(Phi + 2*Phi1 + phimp))/32.;
 
-value += (sqrt(fmm)*sqrt(fpp)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) +3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*Cos(2*Phi - phimm + phipp))/64.; // terms[18]
+value += (sqrt(fmm)*sqrt(fpp)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(2*fz0Val + 3*fz2Val - 6*(2*fz0Val - 2*fz1Val + fz2Val)*Power(hs,2) +3*(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*Cos(2*Phi - phimm + phipp))/64.;
 
-value += (sqrt(3)*sqrt(fmm)*sqrt(fp0)*(-1 + Power(h1,2))*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h2 - R2Val)*Cos(Phi + Phi1 - phimm + phip0))/32.; // terms[19]
-// YY Phi - Phi1 - phimm + phip0
+value += (sqrt(3)*sqrt(fmm)*sqrt(fp0)*(-1 + Power(h1,2))*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h2 - R2Val)*Cos(Phi - Phi1 - phimm + phip0))/32.;
 
-value += (sqrt(3)*sqrt(f0m)*sqrt(fmm)*sqrt(1 - Power(h1,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 - R1Val)*(-1 - Power(h2,2) + 2*h2*R2Val)*Cos(phi0m + Phi1 - phimm))/32.; // terms[20]
-// YY phi0m - Phi1 - phimm
+value += (sqrt(3)*sqrt(f0m)*sqrt(fmm)*sqrt(1 - Power(h1,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 - R1Val)*(-1 - Power(h2,2) + 2*h2*R2Val)*Cos(phi0m - Phi1 - phimm))/32.;
 
-value += (sqrt(3)*sqrt(f0p)*sqrt(fmm)*sqrt(1 - Power(h1,2))*(-1 + Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-h1 + R1Val)*Cos(2*Phi + phi0p - Phi1 - phimm))/32.; // terms[21] 
-// YY 2*Phi + phi0p + Phi1 - phimm
+value += (sqrt(3)*sqrt(f0p)*sqrt(fmm)*sqrt(1 - Power(h1,2))*(-1 + Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-h1 + R1Val)*Cos(2*Phi + phi0p + Phi1 - phimm))/32.;
 
-value += (sqrt(3)*sqrt(fm0)*sqrt(fmm)*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-1 - Power(h1,2) + 2*h1*R1Val)*(-h2 + R2Val)*Cos(Phi - Phi1 + phim0 - phimm))/32.; // terms[22] 
+value += (sqrt(3)*sqrt(fm0)*sqrt(fmm)*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-1 - Power(h1,2) + 2*h1*R1Val)*(-h2 + R2Val)*Cos(Phi + Phi1 + phim0 - phimm))/32.;
 
-value += -(sqrt(1.5)*sqrt(fmm)*sqrt(fpm)*(-1 + Power(h1,2))*(-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-1 - Power(h2,2) + 2*h2*R2Val)*Cos(2*Phi1 - phimm + phipm))/64.; // terms[23] 
-// YY 2*Phi1 + phimm - phipm
+value += -(sqrt(1.5)*sqrt(fmm)*sqrt(fpm)*(-1 + Power(h1,2))*(-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-1 - Power(h2,2) + 2*h2*R2Val)*Cos(2*Phi1 + phimm - phipm))/64.;
 
-value += -(sqrt(1.5)*sqrt(fmm)*sqrt(fmp)*(-1 + Power(h2,2))*(-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-1 - Power(h1,2) + 2*h1*R1Val)*Cos(2*Phi - 2*Phi1 - phimm + phimp))/64.; // terms[24] 
-// YY 2*Phi + 2*Phi1 - phimm + phimp
+value += -(sqrt(1.5)*sqrt(fmm)*sqrt(fmp)*(-1 + Power(h2,2))*(-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-1 - Power(h1,2) + 2*h1*R1Val)*Cos(2*Phi + 2*Phi1 - phimm + phimp))/64.;
 
-value += (sqrt(3)*sqrt(fp0)*sqrt(fpp)*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(1 + Power(h1,2) + 2*h1*R1Val)*(h2 + R2Val)*Cos(Phi - Phi1 - phip0 + phipp))/32.; // terms[25] 
-// YY Phi + Phi1 - phip0 + phipp
+value += (sqrt(3)*sqrt(fp0)*sqrt(fpp)*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(1 + Power(h1,2) + 2*h1*R1Val)*(h2 + R2Val)*Cos(Phi + Phi1 - phip0 + phipp))/32.;
 
-value += -(sqrt(3)*sqrt(f0m)*sqrt(fpp)*sqrt(1 - Power(h1,2))*(-1 + Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 + R1Val)*Cos(2*Phi - phi0m - Phi1 + phipp))/32.; // terms[26] 
-// YY 2*Phi - phi0m + Phi1 + phipp
+value += -(sqrt(3)*sqrt(f0m)*sqrt(fpp)*sqrt(1 - Power(h1,2))*(-1 + Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 + R1Val)*Cos(2*Phi - phi0m + Phi1 + phipp))/32.;
 
-value += -(sqrt(3)*sqrt(f0p)*sqrt(fpp)*sqrt(1 - Power(h1,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 + R1Val)*(1 + Power(h2,2) + 2*h2*R2Val)*Cos(phi0p - Phi1 - phipp))/32.; // terms[27] 
-// YY phi0p + Phi1 - phipp
+value += -(sqrt(3)*sqrt(f0p)*sqrt(fpp)*sqrt(1 - Power(h1,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 + R1Val)*(1 + Power(h2,2) + 2*h2*R2Val)*Cos(phi0p + Phi1 - phipp))/32.;
 
-value += (sqrt(3)*sqrt(fm0)*sqrt(fpp)*(-1 + Power(h1,2))*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h2 + R2Val)*Cos(Phi + Phi1 - phim0 + phipp))/32.; // terms[28] 
-// YY Phi - Phi1 - phim0 + phipp
+value += (sqrt(3)*sqrt(fm0)*sqrt(fpp)*(-1 + Power(h1,2))*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-2*fz0Val + 2*fz1Val - fz2Val +(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h2 + R2Val)*Cos(Phi - Phi1 - phim0 + phipp))/32.;
 
-value += (sqrt(1.5)*sqrt(fpm)*sqrt(fpp)*(-1 + Power(h2,2))*(-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(1 + Power(h1,2) + 2*h1*R1Val)*Cos(2*Phi - 2*Phi1 - phipm + phipp))/64.; // terms[29]
-// YY 2*Phi + 2*Phi1 - phipm + phipp
+value += (sqrt(1.5)*sqrt(fpm)*sqrt(fpp)*(-1 + Power(h2,2))*(-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(1 + Power(h1,2) + 2*h1*R1Val)*Cos(2*Phi + 2*Phi1 - phipm + phipp))/64.;
 
-value += (sqrt(1.5)*sqrt(fmp)*sqrt(fpp)*(-1 + Power(h1,2))*(-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(1 + Power(h2,2) + 2*h2*R2Val)*Cos(2*Phi1 - phimp + phipp))/64.; // terms[30]
-// YY 2*Phi1 + phimp - phipp
+value += (sqrt(1.5)*sqrt(fmp)*sqrt(fpp)*(-1 + Power(h1,2))*(-1 + hs)*(1 + hs)*(-2*fz0Val + fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(1 + Power(h2,2) + 2*h2*R2Val)*Cos(2*Phi1 + phimp - phipp))/64.;
 
-value += -(sqrt(f0m)*sqrt(fp0)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) -(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(h1 + R1Val)*(h2 - R2Val)*Cos(Phi - phi0m + phip0))/16.; // terms[31]
+value += -(sqrt(f0m)*sqrt(fp0)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) -(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(h1 + R1Val)*(h2 - R2Val)*Cos(Phi - phi0m + phip0))/16.;
 
-value += -(sqrt(f0p)*sqrt(fp0)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(-1 + Power(hs,2))*(-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 + R1Val)*(h2 + R2Val)*Cos(Phi + phi0p - 2*Phi1 - phip0))/16.; // terms[32]
+value += -(sqrt(f0p)*sqrt(fp0)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(-1 + Power(hs,2))*(-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 + R1Val)*(h2 + R2Val)*Cos(Phi + phi0p + 2*Phi1 - phip0))/16.;
 
-value += -(sqrt(fm0)*sqrt(fp0)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(-1 + Power(hs,2))*(-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*Cos(2*Phi1 - phim0 + phip0))/16.; // terms[33]
-// YY 2*Phi1 + phim0 - phip0
+value += -(sqrt(fm0)*sqrt(fp0)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(-1 + Power(hs,2))*(-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*Cos(2*Phi1 + phim0 - phip0))/16.;
 
-value += (sqrt(fp0)*sqrt(fpm)*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(1 + Power(h1,2) + 2*h1*R1Val)*(h2 - R2Val)*Cos(Phi - Phi1 + phip0 - phipm))/(32.*sqrt(2)); // terms[34] 
-// YY Phi + Phi1 + phip0 - phipm
+value += (sqrt(fp0)*sqrt(fpm)*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(1 + Power(h1,2) + 2*h1*R1Val)*(h2 - R2Val)*Cos(Phi + Phi1 + phip0 - phipm))/(32.*sqrt(2));
 
-value += -(sqrt(fmp)*sqrt(fp0)*(6*fz0Val - 4*fz1Val + fz2Val)*(-1 + Power(h1,2))*sqrt(1 - Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*(h2 + R2Val)*Cos(Phi - 3*Phi1 + phimp - phip0))/(32.*sqrt(2)); // terms[35]
-// YY Phi + 3*Phi1 + phimp - phip0
+value += -(sqrt(fmp)*sqrt(fp0)*(6*fz0Val - 4*fz1Val + fz2Val)*(-1 + Power(h1,2))*sqrt(1 - Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*(h2 + R2Val)*Cos(Phi + 3*Phi1 + phimp - phip0))/(32.*sqrt(2));
 
-value += -(sqrt(f0m)*sqrt(f0p)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(-1 + Power(hs,2))*(-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*Cos(2*Phi - phi0m + phi0p - 2*Phi1))/16.; // terms[36] 
-// YY 2*Phi - phi0m + phi0p + 2*Phi1
+value += -(sqrt(f0m)*sqrt(f0p)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*(-1 + Power(hs,2))*(-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*Cos(2*Phi - phi0m + phi0p + 2*Phi1))/16.;
 
-value += -(sqrt(f0m)*sqrt(fm0)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(-1 + Power(hs,2))*(-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 - R1Val)*(h2 - R2Val)*Cos(Phi - phi0m - 2*Phi1 + phim0))/16.; // terms[37]
-// YY Phi - phi0m + 2*Phi1 + phim0
+value += -(sqrt(f0m)*sqrt(fm0)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(-1 + Power(hs,2))*(-fz1Val + fz2Val - (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 - R1Val)*(h2 - R2Val)*Cos(Phi - phi0m + 2*Phi1 + phim0))/16.;
 
-value += (sqrt(f0m)*sqrt(fpm)*sqrt(1 - Power(h1,2))*hs*sqrt(1 - Power(hs,2))*(-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 + R1Val)*(-1 - Power(h2,2) + 2*h2*R2Val)*Cos(phi0m - Phi1 - phipm))/(32.*sqrt(2)); // terms[38]
-// YY phi0m + Phi1 - phipm
+value += (sqrt(f0m)*sqrt(fpm)*sqrt(1 - Power(h1,2))*hs*sqrt(1 - Power(hs,2))*(-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(h1 + R1Val)*(-1 - Power(h2,2) + 2*h2*R2Val)*Cos(phi0m + Phi1 - phipm))/(32.*sqrt(2));
 
-value += (sqrt(f0m)*sqrt(fmp)*(6*fz0Val - 4*fz1Val + fz2Val)*sqrt(1 - Power(h1,2))*(-1 + Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*(h1 - R1Val)*Cos(2*Phi - phi0m - 3*Phi1 + phimp))/(32.*sqrt(2)); // terms[39]
-// YY 2*Phi - phi0m + 3*Phi1 + phimp
+value += (sqrt(f0m)*sqrt(fmp)*(6*fz0Val - 4*fz1Val + fz2Val)*sqrt(1 - Power(h1,2))*(-1 + Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*(h1 - R1Val)*Cos(2*Phi - phi0m + 3*Phi1 + phimp))/(32.*sqrt(2));
 
-value += -(sqrt(f0p)*sqrt(fm0)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) -(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(h1 - R1Val)*(h2 + R2Val)*Cos(Phi + phi0p - phim0))/16.; // terms[40]
+value += -(sqrt(f0p)*sqrt(fm0)*sqrt(1 - Power(h1,2))*sqrt(1 - Power(h2,2))*(fz1Val + fz2Val - 3*(-2*fz0Val + fz1Val)*Power(hs,2) -(6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,4))*(h1 - R1Val)*(h2 + R2Val)*Cos(Phi + phi0p - phim0))/16.;
 
-value += (sqrt(f0p)*sqrt(fpm)*(6*fz0Val - 4*fz1Val + fz2Val)*sqrt(1 - Power(h1,2))*(-1 + Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*(h1 + R1Val)*Cos(2*Phi + phi0p - 3*Phi1 - phipm))/(32.*sqrt(2)); // terms[41]
-// YY 2*Phi + phi0p + 3*Phi1 - phipm
+value += (sqrt(f0p)*sqrt(fpm)*(6*fz0Val - 4*fz1Val + fz2Val)*sqrt(1 - Power(h1,2))*(-1 + Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*(h1 + R1Val)*Cos(2*Phi + phi0p + 3*Phi1 - phipm))/(32.*sqrt(2));
 
-value += (sqrt(f0p)*sqrt(fmp)*sqrt(1 - Power(h1,2))*hs*sqrt(1 - Power(hs,2))*(-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-h1 + R1Val)*(1 + Power(h2,2) + 2*h2*R2Val)*Cos(phi0p + Phi1 - phimp))/(32.*sqrt(2)); // terms[42]
-// YY phi0p - Phi1 - phimp
+value += (sqrt(f0p)*sqrt(fmp)*sqrt(1 - Power(h1,2))*hs*sqrt(1 - Power(hs,2))*(-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-h1 + R1Val)*(1 + Power(h2,2) + 2*h2*R2Val)*Cos(phi0p - Phi1 - phimp))/(32.*sqrt(2));
 
-value += (sqrt(fm0)*sqrt(fpm)*(6*fz0Val - 4*fz1Val + fz2Val)*(-1 + Power(h1,2))*sqrt(1 - Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*(-h2 + R2Val)*Cos(Phi - 3*Phi1 + phim0 - phipm))/(32.*sqrt(2)); // terms[43]
-// YY Phi + 3*Phi1 + phim0 - phipm
+value += (sqrt(fm0)*sqrt(fpm)*(6*fz0Val - 4*fz1Val + fz2Val)*(-1 + Power(h1,2))*sqrt(1 - Power(h2,2))*hs*Power(1 - Power(hs,2),1.5)*(-h2 + R2Val)*Cos(Phi + 3*Phi1 + phim0 - phipm))/(32.*sqrt(2));
 
-value += -(sqrt(fm0)*sqrt(fmp)*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-1 - Power(h1,2) + 2*h1*R1Val)*(h2 + R2Val)*Cos(Phi - Phi1 - phim0 + phimp))/(32.*sqrt(2)); // terms[44]
-// YY Phi + Phi1 - phim0 + phimp
+value += -(sqrt(fm0)*sqrt(fmp)*sqrt(1 - Power(h2,2))*hs*sqrt(1 - Power(hs,2))*(-6*fz0Val + 3*fz2Val + (6*fz0Val - 4*fz1Val + fz2Val)*Power(hs,2))*(-1 - Power(h1,2) + 2*h1*R1Val)*(h2 + R2Val)*Cos(Phi + Phi1 - phim0 + phimp))/(32.*sqrt(2));
 
-value += (sqrt(fmp)*sqrt(fpm)*(6*fz0Val - 4*fz1Val + fz2Val)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*Power(-1 + Power(hs,2),2)*Cos(2*Phi - 4*Phi1 + phimp - phipm))/128.; // terms[45]
-// YY 2*Phi + 4*Phi1 + phimp - phipm
+value += (sqrt(fmp)*sqrt(fpm)*(6*fz0Val - 4*fz1Val + fz2Val)*(-1 + Power(h1,2))*(-1 + Power(h2,2))*Power(-1 + Power(hs,2),2)*Cos(2*Phi + 4*Phi1 + phimp - phipm))/128.;
 
 
 return value*term1Coeff*term2Coeff*betaVal;
@@ -845,14 +815,14 @@ Double_t fpm=  fpmImag*fpmImag + fpmReal*fpmReal;
 Double_t fmp = fmpImag*fmpImag + fmpReal*fmpReal;
 
 //Double_t phi00=atan2(f00Imag,f00Real);
-Double_t phipp=atan2(fppImag,fppReal);
-Double_t phimm=atan2(fmmImag,fmmReal);
-Double_t phip0=atan2(fp0Imag,fp0Real);
-Double_t phi0p=atan2(f0pImag,f0pReal);
-Double_t phim0=atan2(fm0Imag,fm0Real);
-Double_t phi0m=atan2(f0mImag,f0mReal);
-Double_t phipm=atan2(fpmImag,fpmReal);
-Double_t phimp=atan2(fmpImag,fmpReal);
+Double_t phipp=atan2(fppImag,fppReal)-phi00;
+Double_t phimm=atan2(fmmImag,fmmReal)-phi00;
+Double_t phip0=atan2(fp0Imag,fp0Real)-phi00;
+Double_t phi0p=atan2(f0pImag,f0pReal)-phi00;
+Double_t phim0=atan2(fm0Imag,fm0Real)-phi00;
+Double_t phi0m=atan2(f0mImag,f0mReal)-phi00;
+Double_t phipm=atan2(fpmImag,fpmReal)-phi00;
+Double_t phimp=atan2(fmpImag,fmpReal)-phi00;
 
 //-----------------------------------------------------------------------
 
@@ -883,10 +853,11 @@ value += (32*fpm*(fz0Val + fz1Val + fz2Val)*Power(Pi(),2))/45.;
 value += (32*fmp*(fz0Val + fz1Val + fz2Val)*Power(Pi(),2))/45.;
 
 
+
 integral = value;
 return term1Coeff*term2Coeff*betaVal*integral;
 }
-// projections onto Phi1, integrate all other angles 
+// projections onto Phi1, integrate all other angles
 case 5:
 {
 
@@ -910,14 +881,12 @@ value += (16*fpm*(fz0Val + fz1Val + fz2Val)*Pi())/45.;
 
 value += (16*fmp*(fz0Val + fz1Val + fz2Val)*Pi())/45.;
 
-value += (-4*sqrt(0.6666666666666666)*sqrt(fmm)*sqrt(fpm)*(2*(fz0Val + fz1Val) - 3*fz2Val)*Pi()*Cos(2*Phi1 - phimm + phipm))/45.; 
-// YY: 2*Phi1 + phimm - phipm
+value += (-4*sqrt(0.6666666666666666)*sqrt(fmm)*sqrt(fpm)*(2*(fz0Val + fz1Val) - 3*fz2Val)*Pi()*Cos(2*Phi1 + phimm - phipm))/45.;
 
-value += (-4*sqrt(0.6666666666666666)*sqrt(fmp)*sqrt(fpp)*(2*(fz0Val + fz1Val) - 3*fz2Val)*Pi()*Cos(2*Phi1 - phimp + phipp))/45.;
-// YY: 2*Phi1 + phimp - phipp
+value += (-4*sqrt(0.6666666666666666)*sqrt(fmp)*sqrt(fpp)*(2*(fz0Val + fz1Val) - 3*fz2Val)*Pi()*Cos(2*Phi1 + phimp - phipp))/45.;
 
-value += (-8*sqrt(fm0)*sqrt(fp0)*(6*fz0Val + fz1Val - 4*fz2Val)*Pi()*Cos(2*Phi1 - phim0 + phip0))/135.;
-// YY: 2*Phi1 + phim0 - phip0
+value += (-8*sqrt(fm0)*sqrt(fp0)*(6*fz0Val + fz1Val - 4*fz2Val)*Pi()*Cos(2*Phi1 + phim0 - phip0))/135.;
+
 
 integral = value;
 return term1Coeff*term2Coeff*betaVal*integral;
