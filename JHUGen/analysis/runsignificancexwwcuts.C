@@ -27,6 +27,13 @@ void runsignificancexwwcuts(const Site site, const unsigned int seedOffset, cons
   gStyle->SetPadLeftMargin(0.16);
   gROOT->ForceStyle();
 
+  // load libraries
+  gROOT->ProcessLine(".L statsFactory.cc++");
+  gSystem->Load("libTree.so");
+  gSystem->Load("libPhysics.so");
+  gSystem->Load("libEG.so");
+  gSystem->Load("libMathCore.so");
+
   int higgsMass=125;
   double intLumi=10.0;
   const unsigned int seed = 4126 + seedOffset;
