@@ -156,10 +156,20 @@ TString getInputName(int spin) {
 
 TString getSpinName(int spin) {
   if ( spin == zeroplus )
-    return "0+";
+    return "0m+";
   if ( spin == zerominus )
     return "0-";
+  if ( spin == zerohplus )
+    return "0h+";
+  if ( spin == oneplus )
+    return "1+";
+  if ( spin == oneminus )
+    return "1-";
   if ( spin == twoplus ) 
-    return "2+";
+    return "2m+";
+  if ( spin == twohminus ) 
+    return "2-";
+  if ( spin == twohplus ) 
+    return "2h+";
   return "unKnown";
 }
