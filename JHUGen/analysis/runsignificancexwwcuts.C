@@ -2,11 +2,36 @@
 
 void runsignfiancesingle(int higgsMass, double intLumi, int nToys, int var, const spinType spin, const unsigned int seed);
 
-void runsignificancexwwcuts(const unsigned int seedOffset, const unsigned int nToys, const spinType spin) {
+void runsignificancexwwcuts(const Site site, const unsigned int seedOffset, const unsigned int nToys, const spinType spin) {
+
+  //
+  // load libraries
+  //
+
+  // site specific configuration
+  std::string includePath = "";
+  if (site == FNAL) {
+    includePath = " -I/uscmst1/prod/sw/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms5/include/";
+  } else if (site == UCSD) {
+    includePath = " -I/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms5/include/";
+  } else {
+    std::cout << "Invalid site - exiting" << std::endl;
+    return;
+  }
+
+  using namespace RooFit;
+  gSystem->AddIncludePath(includePath.c_str());
+  
+  gROOT->ProcessLine(".L tdrstyle.C");
+  setTDRStyle();
+  gStyle->SetPadLeftMargin(0.16);
+  gROOT->ForceStyle();
 
   int higgsMass=125;
   double intLumi=10.0;
   const unsigned int seed = 4126 + seedOffset;
+
+
   
   runsignfiancesingle( higgsMass, intLumi, nToys, MLLMT, spin, seed);
   
@@ -15,17 +40,6 @@ void runsignificancexwwcuts(const unsigned int seedOffset, const unsigned int nT
 
  void runsignfiancesingle(int higgsMass, double intLumi, int nToys, int var, const spinType spin, const unsigned int seed)
 {
-  using namespace RooFit;
-  
-  gROOT->ProcessLine(".L tdrstyle.C");
-  setTDRStyle();
-  gStyle->SetPadLeftMargin(0.16);
-  gROOT->ForceStyle();
-
-   // for the ucsd batch submission
-  gSystem->AddIncludePath(" -I/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms5/include/");
-  gROOT->ProcessLine(".L statsFactory.cc++");
-
   //
   // set up test kind 
   // 
@@ -67,7 +81,7 @@ void runsignificancexwwcuts(const unsigned int seedOffset, const unsigned int nT
     obs = new RooArgSet(*dphill, *mt) ;
   
   // for the ucsd batch submission
-  const char *dataLocation = "/hadoop/cms/store/user/yygao/HWWAngular/datafiles/";
+  const char *dataLocation =  "root://xrootd.unl.edu//store/user/yygao/HWWAngular/datafiles/";
   // const char *dataLocation = "datafiles/";
   
   // read signal hypothesis
