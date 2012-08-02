@@ -143,7 +143,7 @@ TString getInputName(int spin) {
     return "SMHiggsWW_0hplus";
   if ( spin == oneminus )
     return "VWW";
-  if ( spin == oneminus )
+  if ( spin == oneplus )
     return "AVWW";
   if ( spin == twoplus ) 
     return "TWW_2mplus";
