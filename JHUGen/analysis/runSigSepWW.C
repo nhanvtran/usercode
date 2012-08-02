@@ -2,15 +2,27 @@
 
 void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType test, int var, int toy, bool draw, const unsigned int seed);
 
-void runSigSepWW(const unsigned int seedOffset, const unsigned int nToys, const TestType test) {
+void runSigSepWW(const Site site, 
+	const unsigned int seedOffset, const unsigned int nToys, const TestType test) {
 
     //
     // load libraries
     //
 
+    // site specific configuration
+    std::string includePath = "";
+    if (site == FNAL)  {
+	includePath = " -I/uscmst1/prod/sw/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms5/include/";
+    } else if (site == UCSD) {
+	includePath = " -I/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms5/include/";
+    } else {
+	std::cout << "Invalid site - exiting" << std::endl;
+	return;
+    }
+
+    // roofit
     using namespace RooFit;
-    // for the ucsd batch submission
-    gSystem->AddIncludePath(" -I/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms5/include/");
+    gSystem->AddIncludePath(includePath.c_str());
 
     // for plotting
     gROOT->ProcessLine(".L tdrstyle.C");
@@ -46,7 +58,7 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType
 
     // location of data
     // for ucsd batch submission
-    const char *dataLocation = "/hadoop/cms/store/user/yygao/HWWAngular/datafiles/";
+    const char *dataLocation = "root://xrootd.unl.edu//store/user/yygao/HWWAngular/datafiles/";
     // for local tests
     // const char *dataLocation = "datafiles/";
     

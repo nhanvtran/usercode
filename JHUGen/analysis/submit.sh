@@ -9,8 +9,9 @@
 # configuration
 #
 
-if [ ! $# -eq 5 ]; then
-    echo "USAGE: ./submit.sh RUN NJOBS NTOYS TESTTYPE ANA
+if [ ! $# -eq 6 ]; then
+    echo "USAGE: ./submit.sh SITE RUN NJOBS NTOYS TESTTYPE ANA
+	SITE - UCSD=0, FNAL=1
         RUN - name of run (will be a directory for this job)
         NJOBS - the number of jobs to submit
         NTOYS - the number of toys per job
@@ -19,11 +20,12 @@ if [ ! $# -eq 5 ]; then
     exit 1
 fi
 
-RUN=$1
-NJOBS=$2
-NTOYS=$3
-TESTTYPE=$4
-ANA=$5
+SITE=$1
+RUN=$2
+NJOBS=$3
+NTOYS=$4
+TESTTYPE=$5
+ANA=$6
 
 PROXY="/tmp/x509up_u${UID}"
 
@@ -48,12 +50,20 @@ cp wrapper.sh ${RUN}
 # print the submit file
 #
 
+DESIRED_SITE=""
+if [ $SITE == 0 ]; then
+    DESIRED_SITE="UCSD"
+elif [ $SITE == 1 ]; then
+    DESIRED_SITE="FNAL"
+fi
+
+
 echo "
 # condor parameters
 universe=vanilla
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
-+DESIRED_Sites=\"UCSD\"
++DESIRED_Sites=\"${DESIRED_SITE}\"
 +Owner = undefined
 notification=Never
 x509userproxy=${PROXY}
@@ -61,7 +71,7 @@ x509userproxy=${PROXY}
 # job parameters
 Executable=wrapper.sh
 transfer_input_files=input.tar
-arguments= \$(Process) ${NTOYS} ${TESTTYPE} ${ANA}
+arguments= $SITE \$(Process) ${NTOYS} ${TESTTYPE} ${ANA}
 Error=log/err_\$(Cluster).\$(Process)
 Output=log/out_\$(Cluster).\$(Process)
 Log=log/log_\$(Cluster).log

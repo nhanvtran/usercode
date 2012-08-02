@@ -35,6 +35,11 @@ enum ToyType {
   pure = 1,
 };
 
+enum Site {
+   UCSD=0,
+   FNAL=1,
+};
+
 TString getTestName( int test )
 {
   switch (test ) {
