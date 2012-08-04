@@ -3,7 +3,7 @@
 void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType test, int var, int toy, bool draw, const unsigned int seed);
 
 void runSigSepWW(const Site site, 
-		 const unsigned int seeedOffset, const unsigned int nToys, const TestType test, double intLumi) {
+		 const unsigned int seedOffset, const unsigned int nToys, const TestType test, double intLumi) {
 
     //
     // load libraries
