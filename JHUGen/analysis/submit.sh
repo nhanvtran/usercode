@@ -1,21 +1,17 @@
 #!/bin/bash
 
 #
-# Note, you need to have the same version of the root for the library, do this first
-# root [0] gSystem->AddIncludePath(" -I/code/osgcode/cmssoft/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms5/include/");
-# root [1] .L statsFactory.cc++
-
-#
 # configuration
 #
 
-if [ ! $# -eq 6 ]; then
+if [ ! $# -eq 7 ]; then
     echo "USAGE: ./submit.sh SITE RUN NJOBS NTOYS TESTTYPE ANA
 	SITE - UCSD=0, FNAL=1
         RUN - name of run (will be a directory for this job)
         NJOBS - the number of jobs to submit
         NTOYS - the number of toys per job
         TESTTYPE - the TestType (see enums.h)
+        LUMI -  luminosity in /fb  in integer
 	ANA  - the analysis, choose from hypsep and sig"
     exit 1
 fi
@@ -25,7 +21,8 @@ RUN=$2
 NJOBS=$3
 NTOYS=$4
 TESTTYPE=$5
-ANA=$6
+LUMI=$6
+ANA=$7
 
 PROXY="/tmp/x509up_u${UID}"
 
@@ -71,7 +68,7 @@ x509userproxy=${PROXY}
 # job parameters
 Executable=wrapper.sh
 transfer_input_files=input.tar
-arguments= $SITE \$(Process) ${NTOYS} ${TESTTYPE} ${ANA}
+arguments= $SITE \$(Process) ${NTOYS} ${TESTTYPE} ${LUMI} ${ANA}
 Error=log/err_\$(Cluster).\$(Process)
 Output=log/out_\$(Cluster).\$(Process)
 Log=log/log_\$(Cluster).log

@@ -3,7 +3,7 @@
 void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType test, int var, int toy, bool draw, const unsigned int seed);
 
 void runSigSepWW(const Site site, 
-	const unsigned int seedOffset, const unsigned int nToys, const TestType test) {
+		 const unsigned int seeedOffset, const unsigned int nToys, const TestType test, double intLumi) {
 
     //
     // load libraries
@@ -42,7 +42,6 @@ void runSigSepWW(const Site site,
     //
   
     const int higgsMass=125;
-    const double intLumi=10.0;
     const bool draw=false;
     const unsigned int seed = 4126 + seedOffset;
     RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
@@ -79,8 +78,8 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType
     double bkgRate;
     
     if(higgsMass==125){
-      sigRate = 25.;
-      bkgRate = 250.;
+      sigRate = 13.4;
+      bkgRate = 162.;
     }else{
       cout << "HMMMM.... I don't know that mass point...BYE!" << endl;
       return;
@@ -88,10 +87,10 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType
     
     RooRealVar* dphill = new RooRealVar("dphill","#Delta#phi(leptons) [radian]", 0, TMath::Pi());
     dphill->setBins(20);
-    RooRealVar* mt  = new RooRealVar("mt","transverse higgs mass", lowMt, highMt);
-    mt->setBins(20);
-    RooRealVar* mll  = new RooRealVar("mll","dilepton mass [GeV]", 12, 80.);
-    mll->setBins(17);
+    RooRealVar* mt  = new RooRealVar("mt","transverse higgs mass", 50, 130);
+    mt->setBins(10);
+    RooRealVar* mll  = new RooRealVar("mll","dilepton mass [GeV]", 10, 90.);
+    mll->setBins(10);
     
     RooArgSet* obs;
 

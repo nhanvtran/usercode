@@ -2,7 +2,7 @@
 
 void runsignfiancesingle(int higgsMass, double intLumi, int nToys, int var, const spinType spin, const unsigned int seed);
 
-void runsignificancexwwcuts(const Site site, const unsigned int seedOffset, const unsigned int nToys, const spinType spin) {
+void runsignificancexwwcuts(const Site site, const unsigned int seedOffset, const unsigned int nToys, const spinType spin, double intLumi) {
 
   //
   // load libraries
@@ -35,7 +35,6 @@ void runsignificancexwwcuts(const Site site, const unsigned int seedOffset, cons
   gSystem->Load("libMathCore.so");
 
   int higgsMass=125;
-  double intLumi=10.0;
   const unsigned int seed = 4126 + seedOffset;
 
 
@@ -53,12 +52,9 @@ void runsignificancexwwcuts(const Site site, const unsigned int seedOffset, cons
   
   double sigRate;
   double bkgRate;
-  double lowMt(0.);
-  double highMt = higgsMass;
-  
   if(higgsMass==125){
-    sigRate = 25.;
-    bkgRate = 250.;
+    sigRate = 13.4;
+    bkgRate = 162.;
   }else{
     cout << "HMMMM.... I don't know that mass point...BYE!" << endl;
     return;
@@ -66,10 +62,10 @@ void runsignificancexwwcuts(const Site site, const unsigned int seedOffset, cons
   
   RooRealVar* dphill = new RooRealVar("dphill","#Delta#phi(leptons) [radian]", 0, TMath::Pi());
   dphill->setBins(20);
-  RooRealVar* mt  = new RooRealVar("mt","transverse higgs mass", lowMt, highMt);
-  mt->setBins(20);
-  RooRealVar* mll  = new RooRealVar("mll","dilepton mass [GeV]", 12, 80.);
-  mll->setBins(17);
+  RooRealVar* mt  = new RooRealVar("mt","transverse higgs mass", 50, 130);
+  mt->setBins(10);
+  RooRealVar* mll  = new RooRealVar("mll","dilepton mass [GeV]", 10, 90.);
+  mll->setBins(10);
   
   TString varName = getVarName(var);
   

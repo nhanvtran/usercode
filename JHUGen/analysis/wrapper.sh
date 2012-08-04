@@ -4,12 +4,13 @@
 # configuration
 #
 
-if [ ! $# -eq 5 ]; then
+if [ ! $# -eq 6 ]; then
     echo "USAGE: ./wrapper.sh SITE SEED NTOYS TESTTYPE 
 	SITE  - UCSD=0, FNAL=1
         SEED  - the random seed
         NTOYS - the number of toys
         TESTTYPE - the TestType (see enums.h)
+	LUMI - the luminosity in fb integer
 	ANA - the anaysis, either hypsep or sig	"
     exit 1
 fi
@@ -18,7 +19,8 @@ SITE=$1
 SEED=$2
 NTOYS=$3
 TESTTYPE=$4
-ANA=$5
+LUMI=$5
+ANA=$6
 
 #
 # set up environment
@@ -59,14 +61,14 @@ cd tmp/
 tar -xvf input.tar
 
 if [ "${ANA}" == "hypsep" ]; then
-    echo "[wrapper] running root -b -q runSigSepWW.C\(${SITE},${SEED},${NTOYS},${TESTTYPE}\)"
-    root -b -q runSigSepWW.C\(${SITE},${SEED},${NTOYS},${TESTTYPE}\)
+    echo "[wrapper] running root -b -q runSigSepWW.C\(${SITE},${SEED},${NTOYS},${TESTTYPE},${LUMI}\)"
+    root -b -q runSigSepWW.C\(${SITE},${SEED},${NTOYS},${TESTTYPE},${LUMI}\)
 fi
 
 
 if [ "${ANA}" == "sig" ]; then
-    echo "[wrapper] running root -b -q runsignificancexwwcuts.C\(${SITE},${SEED},${NTOYS},${TESTTYPE}\)"
-    root -b -q runsignificancexwwcuts.C\(${SITE},${SEED},${NTOYS},${TESTTYPE}\)
+    echo "[wrapper] running root -b -q runsignificancexwwcuts.C\(${SITE},${SEED},${NTOYS},${TESTTYPE},${LUMI}\)"
+    root -b -q runsignificancexwwcuts.C\(${SITE},${SEED},${NTOYS},${TESTTYPE},${LUMI}\)
 fi
 
 
