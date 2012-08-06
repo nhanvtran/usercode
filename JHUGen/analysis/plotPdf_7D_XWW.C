@@ -13,10 +13,14 @@
 using namespace RooFit ;
 
 void plotPdf_7D_XWW(double mH = 125, bool draw=true) {
-    
+
     gROOT->ProcessLine(".L ~/tdrstyle.C");
     setTDRStyle();
-    gStyle->SetPadLeftMargin(0.16);
+    gStyle->SetPadLeftMargin(0.06);
+    gStyle->SetPadBottomMargin(0.15);
+    gStyle->SetTitleXOffset(1.1);
+    TGaxis::SetMaxDigits(3);
+    gROOT->ForceStyle();
     
     // Declaration of the PDFs to use
     gROOT->ProcessLine(".L  PDFs/RooSpinTwo_7D.cxx+");
@@ -37,12 +41,19 @@ void plotPdf_7D_XWW(double mH = 125, bool draw=true) {
     // Observables (7D)
     // 
     RooRealVar* wplusmass = new RooRealVar("wplusmass","m(W+)",mV,1e-09,120);
+    wplusmass->setBins(50);
     RooRealVar* wminusmass = new RooRealVar("wminusmass","m(W-)",mV,1e-09,120);
-    RooRealVar* hs = new RooRealVar("costhetastar","hs",-1,1);
-    RooRealVar* h1 = new RooRealVar("costheta1","h1",-1,1);
-    RooRealVar* h2 = new RooRealVar("costheta2","h2",-1,1);
-    RooRealVar* Phi = new RooRealVar("phi","Phi",-TMath::Pi(),TMath::Pi());
-    RooRealVar* Phi1 = new RooRealVar("phistar1","Phi1",-TMath::Pi(),TMath::Pi());
+    wminusmass->setBins(50);
+    RooRealVar* hs = new RooRealVar("costhetastar","cos#theta*",-1,1);
+    hs->setBins(20);
+    RooRealVar* Phi1 = new RooRealVar("phistar1","#Phi_{1}",-TMath::Pi(),TMath::Pi());
+    Phi1->setBins(20);
+    RooRealVar* h1 = new RooRealVar("costheta1","cos#theta_{1}",-1,1);
+    h1->setBins(20);
+    RooRealVar* h2 = new RooRealVar("costheta2","cos#theta_{2}",-1,1);
+    h2->setBins(20);
+    RooRealVar* Phi = new RooRealVar("phi","#Phi",-TMath::Pi(),TMath::Pi());
+    Phi->setBins(20);
     
     //
     // coupling constants for 2m+
@@ -208,7 +219,15 @@ void plotPdf_7D_XWW(double mH = 125, bool draw=true) {
     // P L O T   . . .  
     // (All parameters fixed, no fitting, just looking at the shape of the PDFs w.r.t. the data)
     if ( draw ) {
-      
+
+      bool drawmplus = true;
+      bool drawhminus = true;
+      bool drawhplus = true;
+      bool drawpaper = false;
+      double rescale = 1.0;
+      if ( drawpaper ) 
+	rescale = .001;
+
       TH1F* dum0 = new TH1F("dum0","dum0",1,0,1); dum0->SetLineColor(kRed); dum0->SetMarkerColor(kBlack); dum0->SetLineWidth(3);
       TH1F* dum1 = new TH1F("dum1","dum1",1,0,1); dum1->SetLineColor(kBlue); dum1->SetMarkerColor(kBlack); dum1->SetMarkerStyle(24), dum1->SetLineWidth(3);  
       TH1F* dum2 = new TH1F("dum2","dum2",1,0,1); dum2->SetLineColor(kGreen); dum2->SetMarkerColor(kBlack); dum2->SetMarkerStyle(21), dum2->SetLineWidth(3); // 2L+
@@ -216,119 +235,318 @@ void plotPdf_7D_XWW(double mH = 125, bool draw=true) {
       TLegend * box3 = new TLegend(0.1,0.1,0.9,0.92);
       box3->SetFillColor(0);
       box3->SetBorderSize(0);
-      box3->AddEntry(dum0,Form("X(%.0f)#rightarrow WW JP = 2m+", mH),"lp");
-      box3->AddEntry(dum1,Form("X(%.0f)#rightarrow WW JP = 2h-", mH),"lp");
-      box3->AddEntry(dum2,Form("X(%.0f)#rightarrow WW JP = 2h+,", mH),"lp");
-      
-      bool drawmplus = false;
-      bool drawhminus = false;
-      bool drawhplus = true;
 
+      if ( drawmplus ) 
+	box3->AddEntry(dum0,Form("X(%.0f)#rightarrow WW JP = 2m+", mH),"lp");
+      if ( drawhminus )
+	box3->AddEntry(dum1,Form("X(%.0f)#rightarrow WW JP = 2h-", mH),"lp");
+      if ( drawhplus ) 
+	box3->AddEntry(dum2,Form("X(%.0f)#rightarrow WW JP = 2h+,", mH),"lp");
+  
+      
+      // 
+      //  h1
+      // 
+      RooPlot* h1frame =  h1->frame(20);
+      h1frame->GetXaxis()->CenterTitle();
+      h1frame->GetYaxis()->CenterTitle();
+      h1frame->GetYaxis()->SetTitle(" ");
+      
+      double ymax_h1;
+      TH1F *h1_mplus = new TH1F("h1_mplus", "h1_mplus", 20, -1, 1);
+      tin->Project("h1_mplus", "costheta1");
+      ymax_h1 = h1_mplus->GetMaximum();
+      
+      TH1F *h1_hminus = new TH1F("h1_hminus", "h1_hminus", 20, -1, 1);
+      tinMinus->Project("h1_hminus", "costheta1");
+      ymax_h1 = h1_hminus->GetMaximum() > ymax_h1 ? h1_hminus->GetMaximum() : ymax_h1;
+      
+      TH1F *h1_hplus = new TH1F("h1_hplus", "h1_hplus", 20, -1, 1);
+      tinHPlus->Project("h1_hplus", "costheta1");
+      ymax_h1 = h1_hplus->GetMaximum() > ymax_h1 ? h1_hplus->GetMaximum() : ymax_h1;
+      
+      if ( drawmplus ) {
+	data.plotOn(h1frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+	myPDF->plotOn(h1frame, LineColor(kRed),LineWidth(2), Normalization(rescale));
+      }
+      if ( drawhminus ) {
+	dataMinus.plotOn(h1frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+	myPDFMinus->plotOn(h1frame, LineColor(kBlue),LineWidth(2), Normalization(rescale));
+      }
+      if ( drawhplus ) {
+	dataHPlus.plotOn(h1frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+	myPDFHPlus->plotOn(h1frame, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
+      }
+      if ( rescale != 1. )
+	h1frame->GetYaxis()->SetRangeUser(0, ymax_h1  * rescale * 1.3);
+      
+      
+      // 
+      //  h2
+      // 
+      
+      RooPlot* h2frame =  h2->frame(20);
+      h2frame->GetXaxis()->CenterTitle();
+      h2frame->GetYaxis()->CenterTitle();
+      h2frame->GetYaxis()->SetTitle(" ");
+      
+      double ymax_h2;
+      TH1F *h2_mplus = new TH1F("h2_mplus", "h2_mplus", 20, -1, 1);
+      tin->Project("h2_mplus", "costheta2");
+      ymax_h2 = h2_mplus->GetMaximum();
+      
+      TH1F *h2_hminus = new TH1F("h2_hminus", "h2_hminus", 20, -1, 1);
+      tinMinus->Project("h2_hminus", "costheta2");
+      ymax_h2 = h2_hminus->GetMaximum() > ymax_h2 ? h2_hminus->GetMaximum() : ymax_h2;
+      
+      TH1F *h2_hplus = new TH1F("h2_hplus", "h2_hplus", 20, -1, 1);
+      tinHPlus->Project("h2_hplus", "costheta2");
+      ymax_h2 = h2_hplus->GetMaximum() > ymax_h2 ? h2_hplus->GetMaximum() : ymax_h2;
+      
+      
+      if ( drawmplus ) {
+	data.plotOn(h2frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+	myPDF->plotOn(h2frame, LineColor(kRed),LineWidth(2), Normalization(rescale));
+      }
+      if ( drawhminus ) {
+	dataMinus.plotOn(h2frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+	myPDFMinus->plotOn(h2frame, LineColor(kBlue),LineWidth(2), Normalization(rescale));
+      }
+      if ( drawhplus ) {
+	dataHPlus.plotOn(h2frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+	myPDFHPlus->plotOn(h1frame, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
+      }
+      if ( rescale != 1. ) 
+	h2frame->GetYaxis()->SetRangeUser(0, ymax_h2  * rescale * 1.3);
+      
+      //
+      // Phi
+      // 
+      RooPlot* Phiframe =  Phi->frame(20);
+      
+      Phiframe->GetXaxis()->CenterTitle();
+      Phiframe->GetYaxis()->CenterTitle();
+      Phiframe->GetYaxis()->SetTitle(" ");
+      
+      double ymax_Phi;
+      TH1F *Phi_mplus = new TH1F("Phi_mplus", "Phi_mplus", 20,  -TMath::Pi(), TMath::Pi());
+      tin->Project("Phi_mplus", "phi");
+      ymax_Phi = Phi_mplus->GetMaximum();
+      
+      TH1F *Phi_hminus = new TH1F("Phi_hminus", "Phi_hminus", 20,  -TMath::Pi(), TMath::Pi());
+      tinMinus->Project("Phi_hminus", "phi");
+      ymax_Phi = Phi_hminus->GetMaximum() > ymax_Phi ? Phi_hminus->GetMaximum() : ymax_Phi;
+      
+      TH1F *Phi_hplus = new TH1F("Phi_hplus", "Phi_hplus", 20,  -TMath::Pi(), TMath::Pi());
+      tinHPlus->Project("Phi_hplus", "phi");
+      ymax_Phi = Phi_hplus->GetMaximum() > ymax_Phi ? Phi_hplus->GetMaximum() : ymax_Phi;
+      
+      if ( drawmplus ) {
+	data.plotOn(Phiframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+	myPDF->plotOn(Phiframe, LineColor(kRed),LineWidth(2), Normalization(rescale));
+      }
+      if ( drawhminus ) {
+	dataMinus.plotOn(Phiframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+	myPDFMinus->plotOn(Phiframe, LineColor(kBlue),LineWidth(2), Normalization(rescale));
+      }
+      if ( drawhplus ) {
+	dataHPlus.plotOn(Phiframe, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+	myPDFHPlus->plotOn(Phiframe, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
+      }
+      if ( rescale != 1. ) 
+	Phiframe->GetYaxis()->SetRangeUser(0, ymax_Phi  * rescale * 1.3);
+      
+      // 
+      //  hs 
+      // 
+      RooPlot* hsframe =  hs->frame(20);
+      
+      hsframe->GetXaxis()->CenterTitle();
+      hsframe->GetYaxis()->CenterTitle();
+      hsframe->GetYaxis()->SetTitle(" ");
+      
+      double ymax_hs;
+      TH1F *hs_mplus = new TH1F("hs_mplus", "hs_mplus", 20, -1, 1);
+      tin->Project("hs_mplus", "costhetastar");
+      ymax_hs = hs_mplus->GetMaximum();
+      
+      TH1F *hs_hminus = new TH1F("hs_hminus", "hs_hminus", 20, -1, 1);
+      tinMinus->Project("hs_hminus", "costhetastar");
+      ymax_hs = hs_hminus->GetMaximum() > ymax_hs ? hs_hminus->GetMaximum() : ymax_hs;
+      
+      TH1F *hs_hplus = new TH1F("hs_hplus", "hs_hplus", 20, -1, 1);
+      tinHPlus->Project("hs_hplus", "costhetastar");
+      ymax_hs = hs_hplus->GetMaximum() > ymax_hs ? hs_hplus->GetMaximum() : ymax_hs;
+      
+      if ( drawmplus ) {
+	data.plotOn(hsframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+	myPDF->plotOn(hsframe, LineColor(kRed),LineWidth(2), Normalization(rescale));
+      }
+      if ( drawhminus ) {
+	dataMinus.plotOn(hsframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+	myPDFMinus->plotOn(hsframe, LineColor(kBlue),LineWidth(2), Normalization(rescale));
+      }
+      if ( drawhplus ) {
+	dataHPlus.plotOn(hsframe, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+	myPDFHPlus->plotOn(hsframe, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
+      }
+      if ( rescale != 1. )
+	hsframe->GetYaxis()->SetRangeUser(0, ymax_hs  * rescale * 1.3);
+      
+      
+      //
+      // Phi1
+      // 
+      RooPlot* Phi1frame =  Phi1->frame(20);
+      
+      Phi1frame->GetXaxis()->CenterTitle();
+      Phi1frame->GetYaxis()->CenterTitle();
+      Phi1frame->GetYaxis()->SetTitle(" ");
+      
+      double ymax_Phi1;
+      TH1F *Phi1_mplus = new TH1F("Phi1_mplus", "Phi1_mplus", 20, -TMath::Pi(), TMath::Pi());
+      tin->Project("Phi1_mplus", "phistar1");
+      ymax_Phi1 = Phi1_mplus->GetMaximum();
+      
+      TH1F *Phi1_hminus = new TH1F("Phi1_hminus", "Phi1_hminus", 20, -TMath::Pi(), TMath::Pi());
+      tinMinus->Project("Phi1_hminus", "phistar1");
+      ymax_Phi1 = Phi1_hminus->GetMaximum() > ymax_Phi1 ? Phi1_hminus->GetMaximum() : ymax_Phi1;
+      
+      TH1F *Phi1_hplus = new TH1F("Phi1_hplus", "Phi1_hplus", 20, -TMath::Pi(), TMath::Pi());
+      tinHPlus->Project("Phi1_hplus", "phistar1");
+      ymax_Phi1 = Phi1_hplus->GetMaximum() > ymax_Phi1 ? Phi1_hplus->GetMaximum() : ymax_Phi1;
+      
+      if ( drawmplus ) {
+	data.plotOn(Phi1frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+	myPDF->plotOn(Phi1frame, LineColor(kRed),LineWidth(2), Normalization(rescale));
+      }
+      if ( drawhminus ) {
+	dataMinus.plotOn(Phi1frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+	myPDFMinus->plotOn(Phi1frame, LineColor(kBlue),LineWidth(2), Normalization(rescale));
+      }
+      if ( drawhplus ) {
+	dataHPlus.plotOn(Phi1frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+	myPDFHPlus->plotOn(Phi1frame, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
+      }
+      if ( rescale != 1. ) 
+	Phi1frame->GetYaxis()->SetRangeUser(0, ymax_Phi1  * rescale * 1.3);
+      
+      
+      
       if ( offshell ) {
-	RooPlot* wplusmassframe =  wplusmass->frame(55);
-	if ( drawmplus ) {
-	  data.plotOn(wplusmassframe, LineColor(kBlack));
-	  myPDF->plotOn(wplusmassframe, LineColor(kRed));
-	}
-	if ( drawhminus ) {
-	  dataMinus.plotOn(wplusmassframe, LineColor(kBlack), MarkerStyle(24));
-	  myPDFMinus->plotOn(wplusmassframe, LineColor(kBlue));
-	}
-	if ( drawhplus ) {
-	  dataHPlus.plotOn(wplusmassframe, LineColor(kBlack), MarkerStyle(21));
-	  myPDFHPlus->plotOn(wplusmassframe, LineColor(kGreen));
-	}
+	RooPlot* w1frame =  wplusmass->frame(50);
+	w1frame->GetXaxis()->CenterTitle();
+	w1frame->GetYaxis()->CenterTitle();
+	w1frame->GetYaxis()->SetTitle(" ");
 	
-	RooPlot* wminusmassframe =  wminusmass->frame(55);
+	double ymax_w1;
+	TH1F *w1_mplus = new TH1F("w1_mplus", "w1_mplus", 50, 1e-09, 120);
+	tin->Project("w1_mplus", "wplusmass");
+	ymax_w1 = w1_mplus->GetMaximum();
+	
+	TH1F *w1_hminus = new TH1F("w1_hminus", "w1_hminus", 50, 1e-09, 120);
+	tinMinus->Project("w1_hminus", "wplusmass");
+	ymax_w1 = w1_hminus->GetMaximum() > ymax_w1 ? w1_hminus->GetMaximum() : ymax_w1;
+	
+	TH1F *w1_hplus = new TH1F("w1_hplus", "w1_hplus", 50, 1e-09, 120);
+	tinHPlus->Project("w1_hplus", "wplusmass");
+	ymax_w1 = w1_hplus->GetMaximum() > ymax_w1 ? w1_hplus->GetMaximum() : ymax_w1;
+	
 	if ( drawmplus ) {
-	  data.plotOn(wminusmassframe, LineColor(kBlack));
-	  myPDF->plotOn(wminusmassframe, LineColor(kRed));
-	} 
+	  data.plotOn(w1frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+	  myPDF->plotOn(w1frame, LineColor(kRed),LineWidth(2), Normalization(rescale));
+	}
 	if ( drawhminus ) {
-	  dataMinus.plotOn(wminusmassframe, LineColor(kBlack), MarkerStyle(24));
-	  myPDFMinus->plotOn(wminusmassframe, LineColor(kBlue));
+	  dataMinus.plotOn(w1frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+	  myPDFMinus->plotOn(w1frame, LineColor(kBlue),LineWidth(2), Normalization(rescale));
 	}
 	if ( drawhplus ) {
-	  dataHPlus.plotOn(wminusmassframe, LineColor(kBlack), MarkerStyle(21));
-	  myPDFHPlus->plotOn(wminusmassframe, LineColor(kGreen));
+	  dataHPlus.plotOn(w1frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+	  myPDFHPlus->plotOn(w1frame, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
 	}
+	if ( rescale != 1. ) 
+	  w1frame->GetYaxis()->SetRangeUser(0, ymax_w1  * rescale * 1.5);
+	
+	// 
+	//  wminus
+	// 
+	RooPlot* w2frame =  wminusmass->frame(50);
+	
+	w2frame->GetXaxis()->CenterTitle();
+	w2frame->GetYaxis()->CenterTitle();
+	w2frame->GetYaxis()->SetTitle(" ");
+	
+	double ymax_w2;
+	TH1F *w2_mplus = new TH1F("w2_mplus", "w2_mplus", 50, 1e-09, 120);
+	tin->Project("w2_mplus", "wminusmass");
+	ymax_w2 = w2_mplus->GetMaximum();
+	
+	TH1F *w2_hminus = new TH1F("w2_hminus", "w2_hminus", 50, 1e-09, 120);
+	tinMinus->Project("w2_hminus", "wminusmass");
+	ymax_w2 = w2_hminus->GetMaximum() > ymax_w2 ? w2_hminus->GetMaximum() : ymax_w2;
+	
+	TH1F *w2_hplus = new TH1F("w2_hplus", "w2_hplus", 50, 1e-09, 120);
+	tinHPlus->Project("w2_hplus", "wminusmass");
+	ymax_w2 = w2_hplus->GetMaximum() > ymax_w2 ? w2_hplus->GetMaximum() : ymax_w2;
+	
+	if ( drawmplus ) {
+	  data.plotOn(w2frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+	  myPDF->plotOn(w2frame, LineColor(kRed),LineWidth(2), Normalization(rescale));
+	}
+	if ( drawhminus ) {
+	  dataMinus.plotOn(w2frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+	  myPDFMinus->plotOn(w2frame, LineColor(kBlue),LineWidth(2), Normalization(rescale));
+	}
+	if ( drawhplus ) {
+	  dataHPlus.plotOn(w2frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+	  myPDFHPlus->plotOn(w2frame, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
+	}
+	if ( rescale != 1. ) 
+	  w2frame->GetYaxis()->SetRangeUser(0, ymax_w2  * rescale * 1.5);
+      }
+    }
+    if ( drawpaper ) {
+      TCanvas* can =new TCanvas("can","can",600,600);
+      
+      if ( offshell ) {
+	w1frame->GetXaxis()->SetTitle("m_{l#nu} [GeV]");
+	w1frame->Draw();
+	can->Print(Form("paperplots/wplusmass_%.0fGeV_spin2_3in1_ww.eps", mH));
+	can->SaveAs(Form("paperplots/wplusmass_%.0fGeV_spin2_3in1_ww.C", mH));
       }
       
-      RooPlot* h1frame =  h1->frame(55);
-      if ( drawmplus ) {
-	data.plotOn(h1frame, LineColor(kBlack));
-	myPDF->plotOn(h1frame, LineColor(kRed));
-      }
-      if ( drawhminus ) {
-      dataMinus.plotOn(h1frame, LineColor(kBlack), MarkerStyle(24));
-      myPDFMinus->plotOn(h1frame, LineColor(kBlue));
-      } 
-      if ( drawhplus ) {
-	dataHPlus.plotOn(h1frame, LineColor(kBlack), MarkerStyle(21));
-	myPDFHPlus->plotOn(h1frame, LineColor(kGreen));
-      }
-      RooPlot* h2frame =  h2->frame(55);
-      if ( drawmplus ) {
-	data.plotOn(h2frame, LineColor(kBlack));
-	myPDF->plotOn(h2frame, LineColor(kRed));
-      }
-      if ( drawhminus ) {
-	dataMinus.plotOn(h2frame, LineColor(kBlack), MarkerStyle(24));
-	myPDFMinus->plotOn(h2frame, LineColor(kBlue));
-      }
-      if ( drawhplus ) {
-	dataHPlus.plotOn(h2frame, LineColor(kBlack), MarkerStyle(21));
-	myPDFHPlus->plotOn(h2frame, LineColor(kGreen));
-      }
-      RooPlot* hsframe =  hs->frame(55);
-      if ( drawmplus ) {
-	data.plotOn(hsframe, LineColor(kBlack));
-	myPDF->plotOn(hsframe, LineColor(kRed));
-      }
-      if ( drawhminus ) {
-	dataMinus.plotOn(hsframe, LineColor(kBlack), MarkerStyle(24));
-	myPDFMinus->plotOn(hsframe, LineColor(kBlue));
-      }
-      if ( drawhplus ) {
-	dataHPlus.plotOn(hsframe, LineColor(kBlack), MarkerStyle(21));
-	myPDFHPlus->plotOn(hsframe, LineColor(kGreen));
-      }
-      RooPlot* Phiframe =  Phi->frame(55);
-      if ( drawmplus ) {
-	data.plotOn(Phiframe, LineColor(kBlack));
-	myPDF->plotOn(Phiframe, LineColor(kRed));
-      }
-      if ( drawhminus ) {
-	dataMinus.plotOn(Phiframe, LineColor(kBlack), MarkerStyle(24));
-	myPDFMinus->plotOn(Phiframe, LineColor(kBlue));
-      }
-      if ( drawhplus ) {
-	dataHPlus.plotOn(Phiframe, LineColor(kBlack), MarkerStyle(21));
-	myPDFHPlus->plotOn(Phiframe, LineColor(kGreen));
-      }
-      RooPlot* Phi1frame =  Phi1->frame(55);
-      if ( drawmplus ) {
-	data.plotOn(Phi1frame, LineColor(kBlack));
-	myPDF->plotOn(Phi1frame, LineColor(kRed));
-      }
-      if ( drawhminus ) {
-	dataMinus.plotOn(Phi1frame, LineColor(kBlack), MarkerStyle(24));
-	myPDFMinus->plotOn(Phi1frame, LineColor(kBlue));
-      }
-      if ( drawhplus ) {
-	dataHPlus.plotOn(Phi1frame, LineColor(kBlack), MarkerStyle(21));
-	myPDFHPlus->plotOn(Phi1frame, LineColor(kGreen));
-      }
+      can->Clear();
+      hsframe->Draw();
+      can->Print(Form("paperplots/costhetastar_%.0fGeV_spin2_3in1_ww.eps", mH));      
+      can->SaveAs(Form("paperplots/costhetastar_%.0fGeV_spin2_3in1_ww.C", mH));      
+      
+      can->Clear();
+      Phi1frame->Draw();
+      can->Print(Form("paperplots/phistar1_%.0fGeV_spin2_3in1_ww.eps", mH));      
+      can->SaveAs(Form("paperplots/phistar1_%.0fGeV_spin2_3in1_ww.C", mH));      
 
+      can->Clear();
+      h1frame->GetXaxis()->SetTitle("cos#theta_{1} or cos#theta_{2}");
+      h1frame->Draw();
+      can->Print(Form("paperplots/costheta1_%.0fGeV_spin2_3in1_ww.eps", mH));
+      can->SaveAs(Form("paperplots/costheta1_%.0fGeV_spin2_3in1_ww.C", mH));
+
+      can->Clear();
+      Phiframe->Draw();
+      can->Print(Form("paperplots/phi_%.0fGeV_spin2_3in1_ww.eps", mH));      
+      can->SaveAs(Form("paperplots/phi_%.0fGeV_spin2_3in1_ww.C", mH));      
+
+      }      else {
+      
       TCanvas* czz = new TCanvas( "czz", "czz", 1000, 600 );
       czz->Divide(4,2);
       
       if ( offshell ) {
 	czz->cd(1);
-	wplusmassframe->Draw();
+	w1frame->Draw();
 	
 	czz->cd(2);
-	wminusmassframe->Draw();
+	w2frame->Draw();
       }
       
       czz->cd(3);
