@@ -24,20 +24,27 @@
 #include "TNtuple.h"
 #include "enums.h"
 
-double intLumi = 10.;
+// 
+// gloabl variables
+// 
+double intLumi = 20.;
+bool drawpaper = true;
+
 
 void drawsingle(int test, int var, int toy);
 int getMedianBin(TH1F& *h);
 void drawhypsep() {
   
   drawsingle(zeroplusVSzerominus,MLLMT, pure);
-  drawsingle(zeroplusVStwoplus, MLLMT, pure);
   drawsingle(zeroplusVSzerohplus, MLLMT, pure);
+  
   drawsingle(zeroplusVSoneplus, MLLMT, pure);
   drawsingle(zeroplusVSoneminus, MLLMT, pure);
-  drawsingle(zeroplusVStwohminus, MLLMT, pure);
+
+  drawsingle(zeroplusVStwoplus, MLLMT, pure);
   drawsingle(zeroplusVStwohplus, MLLMT, pure);
-    
+  drawsingle(zeroplusVStwohminus, MLLMT, pure);
+
   // not used 
   // drawsingle(zeroplusVSzerominus, DPHIMT, pure);
   // drawsingle(zeroplusVStwoplus, DPHIMT, pure);
@@ -54,10 +61,15 @@ void drawsingle(int test, int var, int toy)
 
   gROOT->ProcessLine(".L ~/tdrstyle.C");
   gROOT->ProcessLine("setTDRStyle();");
-  gROOT->ForceStyle();
-  
+
+  gStyle->SetPadRightMargin(0.05);
+  gStyle->SetPadLeftMargin(0.14);
+  gStyle->SetPadBottomMargin(0.15);
+  gStyle->SetTitleXOffset(1.1);                                                                                   
+  gStyle->SetTitleYOffset(1.05);                                                                                   
   TGaxis *gaxis = new TGaxis();
   gaxis->SetMaxDigits(3);
+  gROOT->ForceStyle();
 
 
   TString testName = getTestName(test);
@@ -72,29 +84,12 @@ void drawsingle(int test, int var, int toy)
 
   
   int nbins = 5000;
-  double xmin = -10.;
-  double xmax = 10.;
+  double xmin = -20.;
+  double xmax = 20.;
 
   switch (test) {
-    
-  case zeroplusVSzerominus:
-    xmin = -10.;
-    xmax = 10.;
-    break;
-
-  case zeroplusVSzerohplus:
-  case zeroplusVStwohplus:
-  case zeroplusVSoneplus:
-    xmin = -20.;
-    xmax = 20.;
-    break;
-
   case zeroplusVSoneminus:
   case zeroplusVStwohminus:
-    xmin = -30.;
-    xmax = 30.;
-    break;
-    
   case zeroplusVStwoplus:
     xmin = -40.;
     xmax = 40.;
@@ -203,15 +198,19 @@ void drawsingle(int test, int var, int toy)
   // set line color marker color etc
   S_H0->SetLineColor(kBlue);
   S_H0->SetMarkerColor(kBlue);
+  S_H0->SetXTitle("-2ln(L_{1}/L_{2})");
+  S_H0->SetYTitle("experiments");
+  S_H0->GetXaxis()->CenterTitle();
+  S_H0->GetYaxis()->CenterTitle();
+
   S_H1->SetLineColor(kRed);
   S_H1->SetMarkerColor(kRed);
-  S_H0->SetXTitle("-2ln(L_{1}/L_{2})");
   S_H1->SetXTitle("-2ln(L_{1}/L_{2})");
-  S_H0->SetYTitle("experiments");
   S_H1->SetYTitle("experiments");
+  S_H1->GetXaxis()->CenterTitle();
+  S_H1->GetYaxis()->CenterTitle();
 
-
-  TLegend *leg = new TLegend(0.65, 0.7, 0.8, 0.9);
+  TLegend *leg = new TLegend(0.68, 0.7, 0.8, 0.9);
   leg->SetFillColor(0);
   leg->SetTextSize(0.05);
   leg->SetTextFont(42);
@@ -242,18 +241,18 @@ void drawsingle(int test, int var, int toy)
     break;
   }
 
-  TLatex* tex_sepH = new TLatex(0.25, 0.85, Form("S  %.1f #sigma", sepH));
+  TLatex* tex_sepH = new TLatex(0.2, 0.85, Form("S = %.1f #sigma", sepH));
   tex_sepH->SetTextFont(42);
   tex_sepH->SetTextSize(.05);
   tex_sepH->SetNDC(1);
   
-  TLatex* tex_sepH0vsH1 = new TLatex(0.25, 0.80, Form("S_{1}  %.1f #sigma", sepH0vsH1));
+  TLatex* tex_sepH0vsH1 = new TLatex(0.2, 0.80, Form("S_{1} =  %.1f #sigma", sepH0vsH1));
   tex_sepH0vsH1->SetTextFont(42);
   tex_sepH0vsH1->SetTextSize(.05);
   tex_sepH0vsH1->SetNDC(1);
 
 
-  TLatex* tex_sepH1vsH0 = new TLatex(0.25, 0.75, Form("S_{2} %.1f #sigma", sepH1vsH0));
+  TLatex* tex_sepH1vsH0 = new TLatex(0.2, 0.75, Form("S_{2} = %.1f #sigma", sepH1vsH0));
   tex_sepH1vsH0->SetTextFont(42);
   tex_sepH1vsH0->SetTextSize(.05);
   tex_sepH1vsH0->SetNDC(1);
@@ -261,7 +260,7 @@ void drawsingle(int test, int var, int toy)
 
 
 
-  TCanvas *c1 = new TCanvas("c1", "c1", 800, 600);
+  TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
   if ( nbins > 100 ) {
     S_H0->Rebin(int(nbins/100));
     S_H1->Rebin(int(nbins/100));
@@ -278,11 +277,17 @@ void drawsingle(int test, int var, int toy)
   S_H1->Draw("samee");
   leg->Draw("same");
   tex_sepH->Draw("same");
-  tex_sepH0vsH1->Draw("same");
-  tex_sepH1vsH0->Draw("same");
+  if ( ! drawpaper ) {
+    tex_sepH0vsH1->Draw("same");
+    tex_sepH1vsH0->Draw("same");
+  }
   c1->SaveAs(Form("plots/epsfiles/hypsep_%s_%s_%s_%.0ffb.eps", testName.Data(), toyName.Data(), varName.Data(), intLumi));
   c1->SaveAs(Form("plots/pngfiles/hypsep_%s_%s_%s_%.0ffb.png", testName.Data(), toyName.Data(), varName.Data(), intLumi));
-  
+  if ( drawpaper ) {
+    c1->SaveAs(Form("paperplots/hypsep_%s_%s_%s_%.0ffb.eps", testName.Data(), toyName.Data(), varName.Data(), intLumi));
+    c1->SaveAs(Form("paperplots/hypsep_%s_%s_%s_%.0ffb.png", testName.Data(), toyName.Data(), varName.Data(), intLumi));
+    c1->SaveAs(Form("paperplots/hypsep_%s_%s_%s_%.0ffb.C", testName.Data(), toyName.Data(), varName.Data(), intLumi));
+  }
 
 
   c1->Clear();
