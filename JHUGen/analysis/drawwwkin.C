@@ -21,32 +21,48 @@
 
 
 void drawsingle( int spin, TString varName, TString varTitle, int nbins, float xmin, float xmax);
-void  drawsingle2d(int hypType); 
+void drawsingleforpaper(TString varName, TString varTitle, int nbins, float xmin, float xmax);
+void drawsingle2d(int hypType); 
 void drawwwkin() {
 
-  drawsingle2d(zeroplus);
-  drawsingle2d(twoplus);
-  drawsingle2d(ww);
-  // spin = 3 is for WW 
-  for (int spin = 0; spin < 4; spin ++ ) {
-    drawsingle(spin, "mt", "m_{T} [GeV]", 10, 50, 130);
-    drawsingle(spin, "mll", "m_{ll} [GeV]", 10, 10, 90.);
+  bool drawpaper = true;
+
+  // arbitary rescale to make the maximum ~ 1.
+  drawsingle2d(zeroplus, 0.0006);
+  drawsingle2d(twoplus, 0.0009);
+  drawsingle2d(ww, 0.0009);
+  
+  if ( drawpaper ) {
+    drawsingleforpaper("mt", "m_{T} [GeV]", 10, 50, 130);
+    drawsingleforpaper("mll", "m_{ll} [GeV]", 10, 10, 90);
+
   }
+
+  if ( ! drawpaper ) {
+    // spin = 3 is for WW 
+    for (int spin = 0; spin < 4; spin ++ ) {
+      drawsingle(spin, "mt", "m_{T} [GeV]", 10, 50, 130);
+      drawsingle(spin, "mll", "m_{ll} [GeV]", 10, 10, 90.);
+    }
+  }
+
+  
 }
 
-void drawsingle2d(int hypType) {
+void drawsingle2d(int hypType, double rescale) {
   gROOT->ProcessLine(".L ~/tdrstyle.C");
   gROOT->ProcessLine("setTDRStyle();");
   gStyle->SetPadRightMargin(0.15);
   gStyle->SetPadBottomMargin(0.15);
   gStyle->SetTitleXOffset(1.1);                                                                                   
   TGaxis::SetMaxDigits(3);
+  gStyle->SetNdivisions(505, "Z");                                               
   gROOT->ForceStyle();
 
 
   TString datadir = "datafiles/125/";
     
-  TH2F *h2 = new TH2F("h2","h2", 10, 10, 90, 10, 50, 130);
+  TH2F *h2 = new TH2F("h2","h2", 10, 50, 130, 10, 10, 90);
   TString inputName = getInputName(hypType);
   TString fileName; 
   if ( hypType != ww )
@@ -57,12 +73,14 @@ void drawsingle2d(int hypType) {
   TFile *f = TFile::Open(fileName, "READ");
   TTree *tree = (TTree*)f->Get("angles");
   gROOT->cd();
-  tree->Project("h2", "mt:mll");
+  tree->Project("h2", "mll:mt");
   f->Close();
   
+  h2->Scale(rescale);
+
   TCanvas *c1 = new TCanvas();
-  h2->SetXTitle("m_{ll} [GeV]");
-  h2->SetYTitle("m_{T} [GeV]");
+  h2->SetXTitle("m_{T} [GeV]");
+  h2->SetYTitle("m_{ll} [GeV]");
   h2->GetXaxis()->CenterTitle();
   h2->GetYaxis()->CenterTitle();
   h2->Draw("colz");
@@ -277,6 +295,110 @@ void drawsingle( int spin, TString varName, TString varTitle, int nbins, float x
   delete h2;
   delete h3;
   delete h4;
+  delete c1;
+  
+}
+
+void drawsingleforpaper(TString varName, TString varTitle, int nbins, float xmin, float xmax)
+{
+  gROOT->ProcessLine(".L ~/tdrstyle.C");
+  gROOT->ProcessLine("setTDRStyle();");
+  gStyle->SetPadRightMargin(0.05);
+  gStyle->SetPadLeftMargin(0.16);
+  gStyle->SetPadBottomMargin(0.14);
+  gStyle->SetTitleXOffset(1.0);                                                                                   
+  gStyle->SetTitleYOffset(1.4);                                                                                   
+  TGaxis::SetMaxDigits(3);
+  gROOT->ForceStyle();  
+
+  TString datadir = "datafiles/125/";
+  
+  
+  TH1F *h1 = new TH1F("h1", "h1", nbins, xmin, xmax);
+  h1->Sumw2();
+  TH1F *h2 = new TH1F("h2", "h2", nbins, xmin, xmax);
+  h2->Sumw2();
+  TH1F *h3 = new TH1F("h3", "h3", nbins, xmin, xmax);
+  h3->Sumw2();
+  
+  
+  TString fileName1 = Form("%s/SMHiggsWW_125_JHU.root", datadir.Data());
+  TFile *f1 = TFile::Open(fileName1, "READ");
+  TTree *tree1 = (TTree*)f1->Get("angles");
+  gROOT->cd();
+  tree1->Project("h1", varName);
+  f1->Close();
+  
+  TString fileName2 = Form("%s/TWW_2hminus_125_JHU.root", datadir.Data());
+  TFile *file2 = TFile::Open(fileName2, "READ");
+  TTree *tree2 = (TTree*)file2->Get("angles");
+  gROOT->cd();
+  tree2->Project("h2", varName);
+  file2->Close();
+  
+  TString fileName3 = Form("%s/WW_madgraph_8TeV.root", datadir.Data());
+  TFile *file3 = TFile::Open(fileName3, "READ");
+  TTree *tree3 = (TTree*)file3->Get("angles");
+  gROOT->cd();
+  tree3->Project("h3", varName);
+  file3->Close();
+  
+  //
+  // Plot
+  // 
+
+  // 0m+
+  h1->SetLineColor(kRed);
+  h1->SetMarkerColor(kRed);
+  h1->SetLineWidth(2);
+  h1->SetMarkerStyle(4);
+  h1->SetMarkerSize(1.5);
+  h1->Scale(1./h1->Integral(0, 1000));
+  
+  // 2m+
+  h2->SetLineColor(kBlue);
+  h2->SetMarkerColor(kBlue);
+  h2->SetLineWidth(2);
+  h2->SetMarkerStyle(27);
+  h2->SetMarkerSize(1.5);
+  h2->Scale(1./h2->Integral(0, 1000));
+  
+  // WW
+  h3->SetLineColor(kBlack);
+  h3->SetMarkerColor(kBlack);
+  h3->SetLineWidth(2);
+  h3->SetMarkerStyle(20);
+  h3->SetMarkerSize(1.5);
+  h3->Scale(1./h3->Integral(0, 1000));
+  
+  float yMax;
+
+  yMax = h1->GetMaximum();
+  yMax = yMax > h2->GetMaximum() ? yMax : h2->GetMaximum();
+  yMax = yMax > h3->GetMaximum() ? yMax : h3->GetMaximum();
+  
+  
+  TCanvas *c1 = new TCanvas();
+  h1->SetXTitle(varTitle);
+  h1->SetYTitle("normalized entries");
+  h1->GetXaxis()->CenterTitle();  
+  h1->GetYaxis()->CenterTitle();
+  h1->SetMaximum(yMax*1.2);
+  h1->SetMinimum(0);
+  
+  h1->Draw("h");
+  h2->Draw("sameh");
+  h3->Draw("sameh");
+    
+  TString plotName = Form("%s_XWW", varName.Data());
+  
+  c1->SaveAs(Form("paperplots/%s.eps", plotName.Data()));
+  c1->SaveAs(Form("paperplots/%s.png", plotName.Data()));
+  c1->SaveAs(Form("paperplots/%s.C", plotName.Data()));
+
+  delete h1;
+  delete h2;
+  delete h3;
   delete c1;
   
 }
