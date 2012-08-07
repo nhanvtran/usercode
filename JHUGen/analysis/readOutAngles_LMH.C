@@ -15,7 +15,7 @@ using namespace std;
 
 void calculateAngles(TLorentzVector p4H, TLorentzVector p4Z1, TLorentzVector p4M11, TLorentzVector p4M12, TLorentzVector p4Z2, TLorentzVector p4M21, TLorentzVector p4M22, double& costheta1, double& costheta2, double& phi, double& costhetastar, double& phistar1, double& phistar2, double& phistar12, double& phi1, double& phi2);
 
-void readOutAngles_LMH(std::string filename){
+void readOutAngles_LMH(std::string filename, bool debug=false){
 	
 	ifstream fin;
     std::string filenameT = filename + ".txt";
@@ -97,41 +97,51 @@ void readOutAngles_LMH(std::string filename){
 			 l2_plus = new TLorentzVector(pup[4][0], pup[4][1], pup[4][2], pup[4][3]);
 			 l2_minus = new TLorentzVector(pup[5][0], pup[5][1], pup[5][2], pup[5][3]);
 			 */
-			
+            
+          if (debug) std::cout << "----" << std::endl;
 			if (mothup[0][0] == mothup[1][0]){
 				l1_minus = new TLorentzVector(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
 				l1_plus = new TLorentzVector(pup[1][0], pup[1][1], pup[1][2], pup[1][3]);
-				if (idup[2] < 0){
+                if (debug) std::cout << "l1minus: " << idup[0] << ", l1plus: " << idup[1] << std::endl;
+				if (idup[2] > 0){
 					l2_minus = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);
 					l2_plus = new TLorentzVector(pup[3][0], pup[3][1], pup[3][2], pup[3][3]);		
+                    if (debug) std::cout << "l2minus: " << idup[2] << ", l2plus: " << idup[3] << std::endl;
 				}
 				else {
 					l2_plus = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);
 					l2_minus = new TLorentzVector(pup[3][0], pup[3][1], pup[3][2], pup[3][3]);						
+                    if (debug) std::cout << "l2minus: " << idup[3] << ", l2plus: " << idup[2] << std::endl;
 				}
 			}
 			else if (mothup[0][0] == mothup[2][0]){
 				l1_minus = new TLorentzVector(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
 				l1_plus = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);
-				if (idup[1] < 0){
+                std::cout << "l1minus: " << idup[0] << ", l1plus: " << idup[2] << std::endl;
+				if (idup[1] > 0){
 					l2_minus = new TLorentzVector(pup[1][0], pup[1][1], pup[1][2], pup[1][3]);
 					l2_plus = new TLorentzVector(pup[3][0], pup[3][1], pup[3][2], pup[3][3]);		
+                    if (debug) std::cout << "l2minus: " << idup[1] << ", l2plus: " << idup[3] << std::endl;
 				}
 				else {
 					l2_plus = new TLorentzVector(pup[1][0], pup[1][1], pup[1][2], pup[1][3]);
-					l2_minus = new TLorentzVector(pup[3][0], pup[3][1], pup[3][2], pup[3][3]);			
+					l2_minus = new TLorentzVector(pup[3][0], pup[3][1], pup[3][2], pup[3][3]);	
+                    if (debug) std::cout << "l2minus: " << idup[3] << ", l2plus: " << idup[1] << std::endl;                    
 				}
 			}
 			else if (mothup[0][0] == mothup[3][0]){
 				l1_minus = new TLorentzVector(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
 				l1_plus = new TLorentzVector(pup[3][0], pup[3][1], pup[3][2], pup[3][3]);
-				if (idup[1] < 0){
+              if (debug) std::cout << "l1minus: " << idup[0] << ", l1plus: " << idup[3] << std::endl;                
+				if (idup[1] > 0){
 					l2_minus = new TLorentzVector(pup[1][0], pup[1][1], pup[1][2], pup[1][3]);
-					l2_plus = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);		
+					l2_plus = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);	
+                    if (debug) std::cout << "l2minus: " << idup[1] << ", l2plus: " << idup[2] << std::endl;
 				}
 				else {
 					l2_plus = new TLorentzVector(pup[1][0], pup[1][1], pup[1][2], pup[1][3]);
-					l2_minus = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);		
+					l2_minus = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);	
+                    if (debug) std::cout << "l2minus: " << idup[2] << ", l2plus: " << idup[1] << std::endl;                    
 				}				
 			}
 			
