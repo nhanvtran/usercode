@@ -34,7 +34,9 @@ bool drawpaper = true;
 void drawsingle(int test, int var, int toy);
 int getMedianBin(TH1F& *h);
 void drawhypsep() {
-  
+
+  drawsingle(zeroplusVStwoplus, MLLMT, pure);
+
   drawsingle(zeroplusVSzerominus,MLLMT, pure);
   drawsingle(zeroplusVSzerohplus, MLLMT, pure);
   
@@ -45,28 +47,18 @@ void drawhypsep() {
   drawsingle(zeroplusVStwohplus, MLLMT, pure);
   drawsingle(zeroplusVStwohminus, MLLMT, pure);
 
-  // not used 
-  // drawsingle(zeroplusVSzerominus, DPHIMT, pure);
-  // drawsingle(zeroplusVStwoplus, DPHIMT, pure);
-  // drawsingle(zeroplusVSzerominus, MLL, pure);
-  //  drawsingle(zeroplusVSzerominus, DPHI, pure);
-  
-  // drawsingle(zeroplusVStwoplus, DPHI, pure);
-  // drawsingle(zeroplusVStwoplus, MLL, pure);
-
 }
 
 void drawsingle(int test, int var, int toy)
 {
-
   gROOT->ProcessLine(".L ~/tdrstyle.C");
   gROOT->ProcessLine("setTDRStyle();");
 
   gStyle->SetPadRightMargin(0.05);
-  gStyle->SetPadLeftMargin(0.14);
+  gStyle->SetPadLeftMargin(0.13);
   gStyle->SetPadBottomMargin(0.15);
   gStyle->SetTitleXOffset(1.1);                                                                                   
-  gStyle->SetTitleYOffset(1.05);                                                                                   
+  gStyle->SetTitleYOffset(1.1);
   TGaxis *gaxis = new TGaxis();
   gaxis->SetMaxDigits(3);
   gROOT->ForceStyle();
@@ -83,7 +75,7 @@ void drawsingle(int test, int var, int toy)
   assert(hypTuple);
 
   
-  int nbins = 5000;
+  int nbins = 200;
   double xmin = -20.;
   double xmax = 20.;
 
@@ -91,8 +83,8 @@ void drawsingle(int test, int var, int toy)
   case zeroplusVSoneminus:
   case zeroplusVStwohminus:
   case zeroplusVStwoplus:
-    xmin = -40.;
-    xmax = 40.;
+    xmin = -30.;
+    xmax = 30.;
     break;
   default:
     break;
@@ -194,17 +186,19 @@ void drawsingle(int test, int var, int toy)
   //
   // Plotting stuff
   // 
-  
   // set line color marker color etc
-  S_H0->SetLineColor(kBlue);
-  S_H0->SetMarkerColor(kBlue);
+  // set line color marker color etc
+  S_H0->SetLineColor(kRed);
+  S_H0->SetMarkerColor(kRed);
+  S_H0->SetMarkerStyle(8);
   S_H0->SetXTitle("-2ln(L_{1}/L_{2})");
   S_H0->SetYTitle("experiments");
   S_H0->GetXaxis()->CenterTitle();
   S_H0->GetYaxis()->CenterTitle();
 
-  S_H1->SetLineColor(kRed);
-  S_H1->SetMarkerColor(kRed);
+  S_H1->SetMarkerStyle(24);
+  S_H1->SetLineColor(kBlue);
+  S_H1->SetMarkerColor(kBlue);
   S_H1->SetXTitle("-2ln(L_{1}/L_{2})");
   S_H1->SetYTitle("experiments");
   S_H1->GetXaxis()->CenterTitle();
@@ -251,33 +245,88 @@ void drawsingle(int test, int var, int toy)
   tex_sepH0vsH1->SetTextSize(.05);
   tex_sepH0vsH1->SetNDC(1);
 
-
   TLatex* tex_sepH1vsH0 = new TLatex(0.2, 0.75, Form("S_{2} = %.1f #sigma", sepH1vsH0));
   tex_sepH1vsH0->SetTextFont(42);
   tex_sepH1vsH0->SetTextSize(.05);
   tex_sepH1vsH0->SetNDC(1);
 
-
-
-
-  TCanvas *c1 = new TCanvas("c1", "c1", 600, 600);
-  if ( nbins > 100 ) {
-    S_H0->Rebin(int(nbins/100));
-    S_H1->Rebin(int(nbins/100));
+  /*
+  if ( nbins > 200 ) {
+    S_H0->Rebin(int(nbins/200));
+    S_H1->Rebin(int(nbins/200));
   }
-  S_H0->SetMarkerColor(kBlue);
+  */
+  
   float yMax_S = S_H0->GetMaximum();
   yMax_S = yMax_S > S_H1->GetMaximum() ? yMax_S : S_H1->GetMaximum();
-  S_H0->SetMarkerStyle(24);
-  S_H0->SetMaximum(yMax_S * 1.2);
+  S_H0->SetMaximum(yMax_S * 1.1);
   
-  S_H0->Fit("gaus");
-  S_H1->Fit("gaus");
+  //added by sara
+  double xline= S_H0->GetBinCenter(nbin_eq)+ S_H0->GetBinWidth(1)/2.;
+  double yline= S_H0->GetMaximum();
+  TLine *line = new TLine(xline,yline,xline,0);
+  double xline0=  S_H0->GetBinCenter(bin_median_H0 )+ S_H0->GetBinWidth(1)/2.;
+  line->SetLineWidth(2);
+  TLine *line0 = new TLine(xline0,yline,xline0,0);
+  line0->SetLineStyle(2);
+  line0->SetLineWidth(2);
+  double xline1=  S_H1->GetBinCenter(bin_median_H1) - S_H1->GetBinWidth(1)/2.;
+  TLine *line1 = new TLine(xline1,yline,xline1,0);
+  line1->SetLineStyle(2);
+  line1->SetLineWidth(2);
+
+    TH1F *S_H1_tail = new TH1F("S_H1_tail", "S_H1_tail", nbin_eq, xmin, S_H1->GetBinCenter(nbin_eq)+S_H1->GetBinWidth(nbin_eq)/2.);
+  for (int i=0;i<=nbin_eq;i++){
+    S_H1_tail->SetBinContent(i,S_H1->GetBinContent(i));
+  }
+  
+  S_H1_tail->SetFillColor(kBlue);
+  S_H1_tail->SetLineColor(kWhite);
+  S_H1_tail->SetFillStyle(3244);
+
+  double xmaxH1=S_H1->GetBinCenter(bin_median_H0)+S_H1->GetBinWidth(bin_median_H0)/2.;
+  TH1F *S_H1_tailSmall = new TH1F("S_H1_tailSmall", "S_H1_tailSmall", (int)((xmaxH1-xmin)/S_H1->GetBinWidth(1)), xmin, xmaxH1);
+  for (int i=0;i<=(bin_median_H0);i++){
+      S_H1_tailSmall->SetBinContent(i,S_H1->GetBinContent(i));
+  }
+  S_H1_tailSmall->SetFillColor(kBlue);
+  S_H1_tailSmall->SetLineColor(kBlue);
+
+  TH1F *S_H0_tail = new TH1F("S_H0_tail", "S_H0_tail", nbin_eq, S_H0->GetBinCenter(nbin_eq)+S_H0->GetBinWidth(nbin_eq)/2.,xmax);
+  for (int i=1;i<=nbin_eq;i++){
+    if(i+nbin_eq<(nbins+1))
+      S_H0_tail->SetBinContent(i,S_H0->GetBinContent(i+nbin_eq));
+  }
+  S_H0_tail->SetFillColor(kRed);
+  S_H0_tail->SetLineColor(kWhite);
+  S_H0_tail->SetFillStyle(3244);
+
+  double xminH0=S_H0->GetBinCenter(bin_median_H1)-S_H0->GetBinWidth(bin_median_H1)/2.,
+    TH1F *S_H0_tailSmall = new TH1F("S_H0_tailSmall", "S_H0_tailSmall", (int)((xmax-xminH0)/S_H0->GetBinWidth(1)),xminH0, xmax);
+  for (int i=0;i<=bin_median_H1;i++){
+    S_H0_tailSmall->SetBinContent(i,S_H0->GetBinContent(i+bin_median_H1-1));
+  }
+  S_H0_tailSmall->SetFillColor(kRed);
+  S_H0_tailSmall->SetLineColor(kRed);
+
+
+  TCanvas *c1 = new TCanvas("c1", "c1", 800, 800);
   S_H0->Draw("e");
+  S_H1_tail->Draw("same");
+  S_H0_tail->Draw("same");
+  S_H1_tailSmall->Draw("same");
+  S_H0_tailSmall->Draw("same");
+  S_H0->Draw("samee");
   S_H1->Draw("samee");
-  leg->Draw("same");
-  tex_sepH->Draw("same");
+  line->Draw("same");
+  line0->Draw("same");
+  line1->Draw("same");
+  
   if ( ! drawpaper ) {
+    S_H0->Fit("gaus");
+    S_H1->Fit("gaus");
+    leg->Draw("same");
+    tex_sepH->Draw("same");
     tex_sepH0vsH1->Draw("same");
     tex_sepH1vsH0->Draw("same");
   }
@@ -355,3 +404,5 @@ int getMedianBin(TH1F& *h) {
   
   return bin_median;
 }
+
+
