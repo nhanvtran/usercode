@@ -53,8 +53,8 @@ void runsignificancexwwcuts(const Site site, const unsigned int seedOffset, cons
   double sigRate;
   double bkgRate;
   if(higgsMass==125){
-    sigRate = 13.4;
-    bkgRate = 162.;
+    sigRate = 13.0;
+    bkgRate = 155.;
   }else{
     cout << "HMMMM.... I don't know that mass point...BYE!" << endl;
     return;
@@ -62,7 +62,7 @@ void runsignificancexwwcuts(const Site site, const unsigned int seedOffset, cons
   
   RooRealVar* dphill = new RooRealVar("dphill","#Delta#phi(leptons) [radian]", 0, TMath::Pi());
   dphill->setBins(20);
-  RooRealVar* mt  = new RooRealVar("mt","transverse higgs mass", 50, 130);
+  RooRealVar* mt  = new RooRealVar("mt","transverse higgs mass", 60, 130);
   mt->setBins(10);
   RooRealVar* mll  = new RooRealVar("mll","dilepton mass [GeV]", 10, 90.);
   mll->setBins(10);
