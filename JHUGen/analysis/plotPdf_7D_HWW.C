@@ -13,11 +13,8 @@ using namespace RooFit ;
 
 void plotPdf_7D_HWW(float mH = 125) {
   
-    gROOT->ProcessLine(".L ~/tdrstyle.C");
+    gROOT->ProcessLine(".L tdrstyle.C");
     setTDRStyle();
-    gStyle->SetPadLeftMargin(0.06);
-    gStyle->SetPadBottomMargin(0.15);
-    gStyle->SetTitleXOffset(1.1);
     TGaxis::SetMaxDigits(3);
     gROOT->ForceStyle();
     
@@ -91,8 +88,9 @@ void plotPdf_7D_HWW(float mH = 125) {
     TTree* tin = (TTree*) fin->Get("angles");
     
     // for weighted events
-    if ( offshell ) 
+    if ( offshell ) {
       RooDataSet data("data","data",tin,RooArgSet(*m1,*m2,*h1,*h2,*hs,*Phi,*Phi1));
+    }
     else 
       RooDataSet data("data","data",tin,RooArgSet(*h1,*h2,*hs,*Phi,*Phi1));
     
@@ -171,7 +169,7 @@ void plotPdf_7D_HWW(float mH = 125) {
     bool drawsm = true;
     bool drawhminus = true;
     bool drawhplus = true;
-    bool drawpaper = false;
+    bool drawpaper = true;
     double rescale = 1.;
     if ( drawpaper ) rescale = .001;
 
@@ -212,15 +210,15 @@ void plotPdf_7D_HWW(float mH = 125) {
     ymax_h1 = h1_hplus->GetMaximum() > ymax_h1 ? h1_hplus->GetMaximum() : ymax_h1;
     
     if ( drawsm ) {
-      data.plotOn(h1frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+      data.plotOn(h1frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDF->plotOn(h1frame, LineColor(kRed),LineWidth(2), Normalization(rescale));
     }
     if ( drawhminus ) {
-      data2.plotOn(h1frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+      data2.plotOn(h1frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDFA->plotOn(h1frame, LineColor(kBlue),LineWidth(2), Normalization(rescale));
     }
     if ( drawhplus ) {
-      datahp.plotOn(h1frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+      datahp.plotOn(h1frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDFHP->plotOn(h1frame, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
     }
     if ( rescale != 1.) 
@@ -251,15 +249,15 @@ void plotPdf_7D_HWW(float mH = 125) {
 
 
     if ( drawsm ) {
-      data.plotOn(h2frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+      data.plotOn(h2frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDF->plotOn(h2frame, LineColor(kRed),LineWidth(2), Normalization(rescale));
     }
     if ( drawhminus ) {
-      data2.plotOn(h2frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+      data2.plotOn(h2frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDFA->plotOn(h2frame, LineColor(kBlue),LineWidth(2), Normalization(rescale));
     }
     if ( drawhplus ) {
-      datahp.plotOn(h2frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+      datahp.plotOn(h2frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDFHP->plotOn(h1frame, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
     }
     if ( rescale != 1. ) 
@@ -288,15 +286,15 @@ void plotPdf_7D_HWW(float mH = 125) {
     ymax_Phi = Phi_hplus->GetMaximum() > ymax_Phi ? Phi_hplus->GetMaximum() : ymax_Phi;
     
     if ( drawsm ) {
-      data.plotOn(Phiframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+      data.plotOn(Phiframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDF->plotOn(Phiframe, LineColor(kRed),LineWidth(2), Normalization(rescale));
     }
     if ( drawhminus ) {
-      data2.plotOn(Phiframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+      data2.plotOn(Phiframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDFA->plotOn(Phiframe, LineColor(kBlue),LineWidth(2), Normalization(rescale));
     }
     if ( drawhplus ) {
-      datahp.plotOn(Phiframe, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+      datahp.plotOn(Phiframe, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDFHP->plotOn(Phiframe, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
     }
     if ( rescale != 1. )
@@ -325,15 +323,15 @@ void plotPdf_7D_HWW(float mH = 125) {
     ymax_hs = hs_hplus->GetMaximum() > ymax_hs ? hs_hplus->GetMaximum() : ymax_hs;
     
     if ( drawsm ) {
-      data.plotOn(hsframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+      data.plotOn(hsframe, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDF->plotOn(hsframe, LineColor(kRed),LineWidth(2), Normalization(rescale));
     }
     if ( drawhminus ) {
-      data2.plotOn(hsframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+      data2.plotOn(hsframe, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDFA->plotOn(hsframe, LineColor(kBlue),LineWidth(2), Normalization(rescale));
     }
     if ( drawhplus ) {
-      datahp.plotOn(hsframe, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+      datahp.plotOn(hsframe, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDFHP->plotOn(hsframe, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
     }
     if ( rescale != 1. )
@@ -363,15 +361,15 @@ void plotPdf_7D_HWW(float mH = 125) {
     ymax_Phi1 = Phi1_hplus->GetMaximum() > ymax_Phi1 ? Phi1_hplus->GetMaximum() : ymax_Phi1;
     
     if ( drawsm ) {
-      data.plotOn(Phi1frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+      data.plotOn(Phi1frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDF->plotOn(Phi1frame, LineColor(kRed),LineWidth(2), Normalization(rescale));
     }
     if ( drawhminus ) {
-      data2.plotOn(Phi1frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+      data2.plotOn(Phi1frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDFA->plotOn(Phi1frame, LineColor(kBlue),LineWidth(2), Normalization(rescale));
     }
     if ( drawhplus ) {
-      datahp.plotOn(Phi1frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+      datahp.plotOn(Phi1frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
       myPDFHP->plotOn(Phi1frame, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
     }
     if ( rescale != 1. )
@@ -399,15 +397,15 @@ void plotPdf_7D_HWW(float mH = 125) {
       ymax_w1 = w1_hplus->GetMaximum() > ymax_w1 ? w1_hplus->GetMaximum() : ymax_w1;
       
       if ( drawsm ) {
-	data.plotOn(w1frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+	data.plotOn(w1frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
 	myPDF->plotOn(w1frame, LineColor(kRed),LineWidth(2), Normalization(rescale));
       }
       if ( drawhminus ) {
-	data2.plotOn(w1frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+	data2.plotOn(w1frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
 	myPDFA->plotOn(w1frame, LineColor(kBlue),LineWidth(2), Normalization(rescale));
       }
       if ( drawhplus ) {
-	datahp.plotOn(w1frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+	datahp.plotOn(w1frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
 	myPDFHP->plotOn(w1frame, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
       }
       if ( rescale != 1. ) 
@@ -436,15 +434,15 @@ void plotPdf_7D_HWW(float mH = 125) {
       ymax_w2 = w2_hplus->GetMaximum() > ymax_w2 ? w2_hplus->GetMaximum() : ymax_w2;
       
       if ( drawsm ) {
-	data.plotOn(w2frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale));
+	data.plotOn(w2frame, MarkerColor(kRed),MarkerStyle(4),MarkerSize(1.5),LineWidth(0),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
 	myPDF->plotOn(w2frame, LineColor(kRed),LineWidth(2), Normalization(rescale));
       }
       if ( drawhminus ) {
-	data2.plotOn(w2frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale));
+	data2.plotOn(w2frame, MarkerColor(kBlue),MarkerStyle(27),MarkerSize(1.9),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
 	myPDFA->plotOn(w2frame, LineColor(kBlue),LineWidth(2), Normalization(rescale));
       }
       if ( drawhplus ) {
-	datahp.plotOn(w2frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale));
+	datahp.plotOn(w2frame, MarkerColor(kGreen+3),MarkerStyle(25),MarkerSize(1.5),XErrorSize(0), Rescale(rescale), DataError(RooAbsData::None));
 	myPDFHP->plotOn(w2frame, LineColor(kGreen+3),LineWidth(2), Normalization(rescale));
       }
       if ( rescale != 1. ) 
