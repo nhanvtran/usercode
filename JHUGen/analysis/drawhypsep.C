@@ -37,6 +37,7 @@ void drawhypsep() {
 
   drawsingle(zeroplusVStwoplus, MLLMT, pure);
 
+  /*
   drawsingle(zeroplusVSzerominus,MLLMT, pure);
   drawsingle(zeroplusVSzerohplus, MLLMT, pure);
   
@@ -46,21 +47,16 @@ void drawhypsep() {
   drawsingle(zeroplusVStwoplus, MLLMT, pure);
   drawsingle(zeroplusVStwohplus, MLLMT, pure);
   drawsingle(zeroplusVStwohminus, MLLMT, pure);
-
+  */
 }
 
 void drawsingle(int test, int var, int toy)
 {
-  gROOT->ProcessLine(".L ~/tdrstyle.C");
+  gROOT->ProcessLine(".L tdrstyle.C");
   gROOT->ProcessLine("setTDRStyle();");
-
-  gStyle->SetPadRightMargin(0.05);
-  gStyle->SetPadLeftMargin(0.13);
-  gStyle->SetPadBottomMargin(0.15);
-  gStyle->SetTitleXOffset(1.1);                                                                                   
-  gStyle->SetTitleYOffset(1.1);
   TGaxis *gaxis = new TGaxis();
   gaxis->SetMaxDigits(3);
+  gStyle->SetTitleXOffset(1.0);
   gROOT->ForceStyle();
 
 
