@@ -27,8 +27,8 @@
 // 
 // gloabl variables
 // 
-double intLumi = 20.;
-bool drawpaper = true;
+double intLumi = 23.;
+bool drawpaper = true;i
 
 
 void drawsingle(int test, int var, int toy);
@@ -36,8 +36,8 @@ int getMedianBin(TH1F& *h);
 void drawhypsep() {
 
   drawsingle(zeroplusVStwoplus, MLLMT, pure);
-
   /*
+
   drawsingle(zeroplusVSzerominus,MLLMT, pure);
   drawsingle(zeroplusVSzerohplus, MLLMT, pure);
   
@@ -71,7 +71,9 @@ void drawsingle(int test, int var, int toy)
   assert(hypTuple);
 
   
-  int nbins = 200;
+  int nbins = 5000;
+  if ( drawpaper ) 
+    nbins = 100;
   double xmin = -20.;
   double xmax = 20.;
 
@@ -319,8 +321,8 @@ void drawsingle(int test, int var, int toy)
   line1->Draw("same");
   
   if ( ! drawpaper ) {
-    S_H0->Fit("gaus");
-    S_H1->Fit("gaus");
+    // S_H0->Fit("gaus");
+    // S_H1->Fit("gaus");
     leg->Draw("same");
     tex_sepH->Draw("same");
     tex_sepH0vsH1->Draw("same");
