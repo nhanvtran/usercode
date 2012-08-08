@@ -290,5 +290,6 @@ void plotFig2WW(float mH = 125) {
     Phiframe->Draw();
     c1->SaveAs(Form("paperplots/phi_%.0fGeV_WW.eps", mH));
     c1->SaveAs(Form("paperplots/phi_%.0fGeV_WW.png", mH));
+    c1->SaveAs(Form("paperplots/phi_%.0fGeV_WW.C", mH));
 
 }
