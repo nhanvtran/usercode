@@ -166,6 +166,12 @@ void readOutAngles_LMH(std::string filename, bool debug=false){
 			
 			//std::cout << "l1m: " << l1_minus.E() << std::endl;
 			
+			if ( debug ) {
+			  std::cout << Form("l1_minus (px, py, pz, E): (%.3f, %.3f, %.3f, %.3f) \n", l1_minus.Px(), l1_minus.Py(), l1_minus.Pz(), l1_minus.E());
+			  std::cout << Form("l1_plus (px, py, pz, E): (%.3f, %.3f, %.3f, %.3f) \n", l1_plus.Px(), l1_plus.Py(), l1_plus.Pz(), l1_plus.E());
+			  std::cout << Form("l2_minus (px, py, pz, E): (%.3f, %.3f, %.3f, %.3f) \n", l2_minus.Px(), l2_minus.Py(), l2_minus.Pz(), l2_minus.E());
+			  std::cout << Form("l2_plus (px, py, pz, E): (%.3f, %.3f, %.3f, %.3f) \n", l2_plus.Px(), l2_plus.Py(), l2_plus.Pz(), l2_plus.E());
+			}
 			TLorentzVector Z1 = l1_minus + l1_plus;
 			TLorentzVector Z2 = l2_minus + l2_plus;
 			TLorentzVector Graviton = Z1 + Z2;
