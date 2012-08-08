@@ -21,7 +21,7 @@ void readOutAngles_LMH(std::string filename, bool debug=false){
     std::string filenameT = filename + ".txt";
     std::cout << "Processing " << filenameT << std::endl;
 	fin.open(filenameT.c_str());
-	int maxEvents = 1000000;
+	int maxEvents = 100000;
 	
     char oname[192];
     sprintf(oname,"%s.root",filename.c_str());
@@ -98,10 +98,16 @@ void readOutAngles_LMH(std::string filename, bool debug=false){
 			 l2_minus = new TLorentzVector(pup[5][0], pup[5][1], pup[5][2], pup[5][3]);
 			 */
             
-          if (debug) std::cout << "----" << std::endl;
+            if (debug) std::cout << "----" << std::endl;
 			if (mothup[0][0] == mothup[1][0]){
-				l1_minus = new TLorentzVector(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
-				l1_plus = new TLorentzVector(pup[1][0], pup[1][1], pup[1][2], pup[1][3]);
+                if (idup[0] > 0){
+                    l1_minus = new TLorentzVector(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
+                    l1_plus = new TLorentzVector(pup[1][0], pup[1][1], pup[1][2], pup[1][3]);
+                }
+                else{
+                    l1_plus = new TLorentzVector(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
+                    l1_minus = new TLorentzVector(pup[1][0], pup[1][1], pup[1][2], pup[1][3]);                    
+                }
                 if (debug) std::cout << "l1minus: " << idup[0] << ", l1plus: " << idup[1] << std::endl;
 				if (idup[2] > 0){
 					l2_minus = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);
@@ -115,8 +121,14 @@ void readOutAngles_LMH(std::string filename, bool debug=false){
 				}
 			}
 			else if (mothup[0][0] == mothup[2][0]){
-				l1_minus = new TLorentzVector(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
-				l1_plus = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);
+                if (idup[0] > 0){
+                    l1_minus = new TLorentzVector(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
+                    l1_plus = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);
+                }
+                else{
+                    l1_plus = new TLorentzVector(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
+                    l1_minus = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);                    
+                }
                 std::cout << "l1minus: " << idup[0] << ", l1plus: " << idup[2] << std::endl;
 				if (idup[1] > 0){
 					l2_minus = new TLorentzVector(pup[1][0], pup[1][1], pup[1][2], pup[1][3]);
@@ -130,9 +142,15 @@ void readOutAngles_LMH(std::string filename, bool debug=false){
 				}
 			}
 			else if (mothup[0][0] == mothup[3][0]){
-				l1_minus = new TLorentzVector(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
-				l1_plus = new TLorentzVector(pup[3][0], pup[3][1], pup[3][2], pup[3][3]);
-              if (debug) std::cout << "l1minus: " << idup[0] << ", l1plus: " << idup[3] << std::endl;                
+				if (idup[0] > 0){				
+                    l1_minus = new TLorentzVector(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
+                    l1_plus = new TLorentzVector(pup[3][0], pup[3][1], pup[3][2], pup[3][3]);
+                }
+                else{
+                    l1_plus = new TLorentzVector(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
+                    l1_minus = new TLorentzVector(pup[3][0], pup[3][1], pup[3][2], pup[3][3]);
+                }
+                if (debug) std::cout << "l1minus: " << idup[0] << ", l1plus: " << idup[3] << std::endl;                
 				if (idup[1] > 0){
 					l2_minus = new TLorentzVector(pup[1][0], pup[1][1], pup[1][2], pup[1][3]);
 					l2_plus = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);	
@@ -148,9 +166,9 @@ void readOutAngles_LMH(std::string filename, bool debug=false){
 			
 			//std::cout << "l1m: " << l1_minus.E() << std::endl;
 			
-			TLorentzVector Z1 = l1_minus+l1_plus;
-			TLorentzVector Z2 = l2_minus+l2_plus;
-			TLorentzVector Graviton = Z1+Z2;
+			TLorentzVector Z1 = l1_minus + l1_plus;
+			TLorentzVector Z2 = l2_minus + l2_plus;
+			TLorentzVector Graviton = Z1 + Z2;
 			
 			const double PDGZmass = 91.2;
 			TLorentzVector pZ1; TLorentzVector pl1_m; TLorentzVector pl1_p;
@@ -192,6 +210,8 @@ void readOutAngles_LMH(std::string filename, bool debug=false){
 			m_l2plus_pT = pl2_p.Pt();
 			
 			tree->Fill();
+
+
 		}
 		
 		// counter
