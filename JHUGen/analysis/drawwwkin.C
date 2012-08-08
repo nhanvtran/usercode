@@ -37,6 +37,7 @@ void drawwwkin() {
   if ( drawpaper ) {
     drawsingleforpaper("mt", "m_{T} [GeV]", 10, 50, 130);
     drawsingleforpaper("mll", "m_{ll} [GeV]", 10, 10, 90);
+    drawsingleforpaper("dphill", "#Delta#phi_{ll}", 20, 0, TMath::Pi());
 
   }
 
@@ -99,7 +100,7 @@ void drawsingle2d(int hypType) {
 }
 void drawsingle( int spin, TString varName, TString varTitle, int nbins, float xmin, float xmax)
 {
-  gROOT->ProcessLine(".L ~/tdrstyle.C");
+  gROOT->ProcessLine(".L tdrstyle.C");
   gROOT->ProcessLine("setTDRStyle();");
   gStyle->SetPadRightMargin(0.05);
   gStyle->SetPadLeftMargin(0.16);
@@ -167,7 +168,8 @@ void drawsingle( int spin, TString varName, TString varTitle, int nbins, float x
 
   if ( spin == 3 ) {
     TString fileName4;
-    fileName4  = Form("%s/WW_madgraph_8TeV.root", datadir.Data());
+    // fileName4  = Form("%s/WW_madgraph_8TeV.root", datadir.Data());
+    fileName4  = Form("%s/WW_madgraph_8TeV_0j.root", datadir.Data());
     TFile *file4 = TFile::Open(fileName4, "READ");
     TTree *tree4 = (TTree*)file4->Get("angles");
     gROOT->cd();
@@ -304,14 +306,10 @@ void drawsingle( int spin, TString varName, TString varTitle, int nbins, float x
 
 void drawsingleforpaper(TString varName, TString varTitle, int nbins, float xmin, float xmax)
 {
-  gROOT->ProcessLine(".L ~/tdrstyle.C");
+  gROOT->ProcessLine(".L tdrstyle.C");
   gROOT->ProcessLine("setTDRStyle();");
-  gStyle->SetPadRightMargin(0.05);
-  gStyle->SetPadLeftMargin(0.16);
-  gStyle->SetPadBottomMargin(0.14);
-  gStyle->SetTitleXOffset(1.0);                                                                                   
-  gStyle->SetTitleYOffset(1.4);                                                                                   
   TGaxis::SetMaxDigits(3);
+  gStyle->SetNdivisions(505, "XY");
   gROOT->ForceStyle();  
 
   TString datadir = "datafiles/125/";
@@ -341,7 +339,8 @@ void drawsingleforpaper(TString varName, TString varTitle, int nbins, float xmin
   tree2->Project("h2", varName);
   file2->Close();
   
-  TString fileName3 = Form("%s/WW_madgraph_8TeV.root", datadir.Data());
+  // TString fileName3 = Form("%s/WW_madgraph_8TeV.root", datadir.Data());
+  TString fileName3 = Form("%s/WW_madgraph_8TeV_0j.root", datadir.Data());
   TFile *file3 = TFile::Open(fileName3, "READ");
   TTree *tree3 = (TTree*)file3->Get("angles");
   gROOT->cd();
@@ -375,7 +374,7 @@ void drawsingleforpaper(TString varName, TString varTitle, int nbins, float xmin
   h2->SetLineColor(kBlue);
   h2->SetMarkerColor(kBlue);
   h2->SetLineWidth(2);
-  h2->SetMarkerStyle(27);
+  h2->SetMarkerStyle(32);
   h2->SetMarkerSize(1.5);
   h2->Scale(1./h2->Integral(0, 1000));
   
@@ -406,9 +405,12 @@ void drawsingleforpaper(TString varName, TString varTitle, int nbins, float xmin
   // h1->SetYTitle("normalized entries");
   h1->GetXaxis()->CenterTitle();  
   h1->GetYaxis()->CenterTitle();
-  h1->SetMaximum(yMax*1.2);
+  h1->SetMaximum(yMax*1.3);
   h1->SetMinimum(0);
-  
+
+  h2->SetMinimum(0);
+  h3->SetMinimum(0);
+  h4->SetMinimum(0);
   
   TCanvas *c1 = new TCanvas();
   h1->Draw("h");
@@ -443,6 +445,7 @@ void drawsingleforpaper(TString varName, TString varTitle, int nbins, float xmin
   delete h1;
   delete h2;
   delete h3;
+  delete h4;
   delete c1;
   
 }

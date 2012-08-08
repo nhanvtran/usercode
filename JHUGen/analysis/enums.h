@@ -27,6 +27,7 @@ enum spinType{
   twoplus = 5,
   twohplus = 6,
   twohminus = 7,
+  ww = 8,
 };
 
 
@@ -156,6 +157,8 @@ TString getInputName(int spin) {
     return "TWW_2hplus";
   if ( spin == twohminus )
     return "TWW_2hminus";
+  if ( spin == ww )
+    return "WW_madgraph_8TeV_0j";
   return "unKnown";
 }
 
