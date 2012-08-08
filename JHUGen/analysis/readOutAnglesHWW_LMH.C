@@ -16,7 +16,7 @@ using namespace std;
 
 void calculateAngles(TLorentzVector p4H, TLorentzVector p4Z1, TLorentzVector p4M11, TLorentzVector p4M12, TLorentzVector p4Z2, TLorentzVector p4M21, TLorentzVector p4M22, double& costheta1, double& costheta2, double& phi, double& costhetastar, double& phistar1, double& phistar2, double& phistar12, double& phi1, double& phi2, bool verbose);
 
-void readOutAnglesHWW_LMH(std::string filename){
+void readOutAnglesHWW_LMH(std::string filename, bool debug = false){
 	
   ifstream fin;
   std::string filenameT = filename + ".txt";
@@ -126,14 +126,13 @@ void readOutAnglesHWW_LMH(std::string filename){
 	  nubar = new TLorentzVector(pup[2][0], pup[2][1], pup[2][2], pup[2][3]);		
 	}				
       }
-      
-      /*
+
+      if ( debug ) {
 	std::cout << Form("nu (px, py, pz, E): (%.3f, %.3f, %.3f, %.3f) \n", nu.Px(), nu.Py(), nu.Pz(), nu.E());
 	std::cout << Form("lplus (px, py, pz, E): (%.3f, %.3f, %.3f, %.3f) \n", lplus.Px(), lplus.Py(), lplus.Pz(), lplus.E());
 	std::cout << Form("lminus (px, py, pz, E): (%.3f, %.3f, %.3f, %.3f) \n", lminus.Px(), lminus.Py(), lminus.Pz(), lminus.E());
 	std::cout << Form("nubar (px, py, pz, E): (%.3f, %.3f, %.3f, %.3f) \n", nubar.Px(), nubar.Py(), nubar.Pz(), nubar.E());
-      */
-      
+      }      
       
       TLorentzVector Wplus = nu+lplus;
       TLorentzVector Wminus = nubar+lminus;
