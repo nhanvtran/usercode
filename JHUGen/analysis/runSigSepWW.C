@@ -129,7 +129,7 @@ void runSigSepWWSingle(int higgsMass, double intLumi, int nToys,  const TestType
 
     // read background
     TChain *bkgTree = new TChain("angles");
-    bkgTree->Add(Form("%s/%i/WW_madgraph_8TeV.root",dataLocation,higgsMass));
+    bkgTree->Add(Form("%s/%i/WW_madgraph_8TeV_0j.root",dataLocation,higgsMass));
     RooDataSet *bkgData = new RooDataSet("bkgData","bkgData",bkgTree,*obs);
     RooDataHist *bkgHist = bkgData->binnedClone(0);
     RooHistPdf* bkgPdf = new RooHistPdf("bkgPdf", "bkgPdf", *obs, *bkgHist);
