@@ -28,9 +28,11 @@ void drawwwkin() {
   bool drawpaper = true;
 
   // arbitary rescale to make the maximum ~ 1.
-  drawsingle2d(zeroplus, 0.0006);
-  drawsingle2d(twoplus, 0.0009);
-  drawsingle2d(ww, 0.0009);
+  drawsingle2d(zeroplus);
+  drawsingle2d(twoplus);
+  drawsingle2d(twohplus);
+  drawsingle2d(ww);
+
   
   if ( drawpaper ) {
     drawsingleforpaper("mt", "m_{T} [GeV]", 10, 50, 130);
@@ -49,7 +51,7 @@ void drawwwkin() {
   
 }
 
-void drawsingle2d(int hypType, double rescale) {
+void drawsingle2d(int hypType) {
   gROOT->ProcessLine(".L ~/tdrstyle.C");
   gROOT->ProcessLine("setTDRStyle();");
   gStyle->SetPadRightMargin(0.15);
@@ -76,7 +78,8 @@ void drawsingle2d(int hypType, double rescale) {
   tree->Project("h2", "mll:mt");
   f->Close();
   
-  h2->Scale(rescale);
+  h2->Scale(1./h2->GetMaximum());
+  
 
   TCanvas *c1 = new TCanvas();
   h2->SetXTitle("m_{T} [GeV]");
@@ -259,14 +262,14 @@ void drawsingle( int spin, TString varName, TString varTitle, int nbins, float x
   
   TCanvas *c1 = new TCanvas();
   h1->SetXTitle(varTitle);
-  h1->SetYTitle("normalized entries");
+  // h1->SetYTitle("normalized entries");
   h1->GetXaxis()->CenterTitle();  
   h1->GetYaxis()->CenterTitle();
   h1->SetMaximum(yMax*1.2);
   h1->SetMinimum(0);
 
   h4->SetXTitle(varTitle);
-  h4->SetYTitle("normalized entries");
+  // h4->SetYTitle("normalized entries");
   h4->SetMaximum(yMax*1.2);
   h4->SetMinimum(0);
   h4->GetXaxis()->CenterTitle();  
@@ -320,6 +323,8 @@ void drawsingleforpaper(TString varName, TString varTitle, int nbins, float xmin
   h2->Sumw2();
   TH1F *h3 = new TH1F("h3", "h3", nbins, xmin, xmax);
   h3->Sumw2();
+  TH1F *h4 = new TH1F("h4", "h4", nbins, xmin, xmax);
+  h4->Sumw2();
   
   
   TString fileName1 = Form("%s/SMHiggsWW_125_JHU.root", datadir.Data());
@@ -343,17 +348,28 @@ void drawsingleforpaper(TString varName, TString varTitle, int nbins, float xmin
   tree3->Project("h3", varName);
   file3->Close();
   
+  TString fileName4 = Form("%s/TWW_2hplus_125_JHU.root", datadir.Data());
+  TFile *file4 = TFile::Open(fileName4, "READ");
+  TTree *tree4 = (TTree*)file4->Get("angles");
+  gROOT->cd();
+  tree4->Project("h4", varName);
+  file4->Close();
+  
+
+
   //
   // Plot
   // 
 
   // 0m+
-  h1->SetLineColor(kRed);
-  h1->SetMarkerColor(kRed);
+  h1->SetLineColor(2);
+  h1->SetMarkerColor(2);
   h1->SetLineWidth(2);
   h1->SetMarkerStyle(4);
   h1->SetMarkerSize(1.5);
   h1->Scale(1./h1->Integral(0, 1000));
+  h1->SetLineStyle(1);
+
   
   // 2m+
   h2->SetLineColor(kBlue);
@@ -370,31 +386,59 @@ void drawsingleforpaper(TString varName, TString varTitle, int nbins, float xmin
   h3->SetMarkerStyle(20);
   h3->SetMarkerSize(1.5);
   h3->Scale(1./h3->Integral(0, 1000));
+
+  // 2h+
+  h4->SetLineColor(kGreen+3);
+  h4->SetMarkerColor(kGreen+3);
+  h4->SetLineWidth(2);
+  h4->SetMarkerStyle(27);
+  h4->SetMarkerSize(1.5);
+  h4->Scale(1./h4->Integral(0, 1000));
   
   float yMax;
 
   yMax = h1->GetMaximum();
   yMax = yMax > h2->GetMaximum() ? yMax : h2->GetMaximum();
   yMax = yMax > h3->GetMaximum() ? yMax : h3->GetMaximum();
-  
-  
-  TCanvas *c1 = new TCanvas();
+
+
   h1->SetXTitle(varTitle);
-  h1->SetYTitle("normalized entries");
+  // h1->SetYTitle("normalized entries");
   h1->GetXaxis()->CenterTitle();  
   h1->GetYaxis()->CenterTitle();
   h1->SetMaximum(yMax*1.2);
   h1->SetMinimum(0);
   
+  
+  TCanvas *c1 = new TCanvas();
   h1->Draw("h");
   h2->Draw("sameh");
   h3->Draw("sameh");
-    
+  
   TString plotName = Form("%s_XWW", varName.Data());
   
   c1->SaveAs(Form("paperplots/%s.eps", plotName.Data()));
   c1->SaveAs(Form("paperplots/%s.png", plotName.Data()));
   c1->SaveAs(Form("paperplots/%s.C", plotName.Data()));
+
+  c1->Clear();
+  
+  yMax = yMax > h4->GetMaximum() ? yMax : h4->GetMaximum();
+
+  h1->SetXTitle(varTitle);
+  // h1->SetYTitle("normalized entries");
+  h1->GetXaxis()->CenterTitle();  
+  h1->GetYaxis()->CenterTitle();
+  h1->SetMaximum(yMax*1.2);
+  h1->SetMinimum(0);
+  h1->Draw("h");
+  h2->Draw("sameh");
+  h3->Draw("sameh");
+  h4->Draw("sameh");
+  c1->SaveAs(Form("paperplots/%s_with2hplus.eps", plotName.Data()));
+  c1->SaveAs(Form("paperplots/%s_with2hplus.png", plotName.Data()));
+  c1->SaveAs(Form("paperplots/%s_with2hplus.C", plotName.Data()));
+  
 
   delete h1;
   delete h2;
