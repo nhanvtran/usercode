@@ -30,11 +30,20 @@ void   drawsignificance ()
 {
   
   double higgsMass = 125.;
-  double intLumi = 10.;
+  double intLumi = 23;
 
-  // drawsingle(higgsMass, intLumi, twoplus, MLLMT, pure);
   drawsingle(higgsMass, intLumi, zeroplus, MLLMT, pure);
-  // drawsingle(higgsMass, intLumi, zerominus, MLLMT, pure);
+  drawsingle(higgsMass, intLumi, zerominus, MLLMT, pure);
+  drawsingle(higgsMass, intLumi, zerohplus, MLLMT, pure);
+
+  drawsingle(higgsMass, intLumi, oneplus, MLLMT, pure);
+  drawsingle(higgsMass, intLumi, oneminus, MLLMT, pure);
+
+  drawsingle(higgsMass, intLumi, twoplus, MLLMT, pure);
+  drawsingle(higgsMass, intLumi, twohplus, MLLMT, pure);
+  drawsingle(higgsMass, intLumi, twohminus, MLLMT, pure);
+
+
 }
 
 void drawsingle(double higgsMass, double intLumi, int spin, int var, int toy)
@@ -55,9 +64,10 @@ void drawsingle(double higgsMass, double intLumi, int spin, int var, int toy)
   TNtuple *signifTuple = (TNtuple*) file->Get("signifTuple");
   assert(signifTuple);
   
-  int nbins = 40;
+  int nbins = 100;
   double xmin = 0.;
   double xmax = 10.;
+  
   
   TH1F *sig = new TH1F("sig", "sig", nbins, xmin, xmax);
   signifTuple->Project("sig", "sig");
