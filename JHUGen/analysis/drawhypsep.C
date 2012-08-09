@@ -28,29 +28,30 @@
 // gloabl variables
 // 
 double intLumi = 23.;
-bool drawpaper = true;i
 
 
-void drawsingle(int test, int var, int toy);
+void drawsingle(int test, int var, int toy, bool drawpaper);
 int getMedianBin(TH1F& *h);
 void drawhypsep() {
 
-  drawsingle(zeroplusVStwoplus, MLLMT, pure);
-  /*
+  // for paper
+  drawsingle(zeroplusVStwoplus, MLLMT, pure, true);
 
-  drawsingle(zeroplusVSzerominus,MLLMT, pure);
-  drawsingle(zeroplusVSzerohplus, MLLMT, pure);
+  // for reading the significances
+  drawsingle(zeroplusVStwoplus, MLLMT, pure, false);
+  drawsingle(zeroplusVSzerominus,MLLMT, pure, false);
+  drawsingle(zeroplusVSzerohplus, MLLMT, pure, false);
   
-  drawsingle(zeroplusVSoneplus, MLLMT, pure);
-  drawsingle(zeroplusVSoneminus, MLLMT, pure);
+  drawsingle(zeroplusVSoneplus, MLLMT, pure, false);
+  drawsingle(zeroplusVSoneminus, MLLMT, pure, false);
 
-  drawsingle(zeroplusVStwoplus, MLLMT, pure);
-  drawsingle(zeroplusVStwohplus, MLLMT, pure);
-  drawsingle(zeroplusVStwohminus, MLLMT, pure);
-  */
+  drawsingle(zeroplusVStwoplus, MLLMT, pure, false);
+  drawsingle(zeroplusVStwohplus, MLLMT, pure, false);
+  drawsingle(zeroplusVStwohminus, MLLMT, pure, false);
+
 }
 
-void drawsingle(int test, int var, int toy)
+void drawsingle(int test, int var, int toy, bool drawpaper)
 {
   gROOT->ProcessLine(".L tdrstyle.C");
   gROOT->ProcessLine("setTDRStyle();");
@@ -181,10 +182,10 @@ void drawsingle(int test, int var, int toy)
   double frac_H1_beyondH0Median = S_H1->Integral(1, bin_median_H0) / norm1;
   double sepH1vsH0 = ROOT::Math::normal_quantile_c(frac_H1_beyondH0Median, 1.0);
   std::cout << "frac of H1 histogram beyond the H0 median " << frac_H1_beyondH0Median << ", correspond to " << sepH1vsH0 << " sigma\n";
+
   //
   // Plotting stuff
   // 
-  // set line color marker color etc
   // set line color marker color etc
   S_H0->SetLineColor(kRed);
   S_H0->SetMarkerColor(kRed);
@@ -328,12 +329,14 @@ void drawsingle(int test, int var, int toy)
     tex_sepH0vsH1->Draw("same");
     tex_sepH1vsH0->Draw("same");
   }
-  c1->SaveAs(Form("plots/epsfiles/hypsep_%s_%s_%s_%.0ffb.eps", testName.Data(), toyName.Data(), varName.Data(), intLumi));
-  c1->SaveAs(Form("plots/pngfiles/hypsep_%s_%s_%s_%.0ffb.png", testName.Data(), toyName.Data(), varName.Data(), intLumi));
+
   if ( drawpaper ) {
     c1->SaveAs(Form("paperplots/hypsep_%s_%s_%s_%.0ffb.eps", testName.Data(), toyName.Data(), varName.Data(), intLumi));
     c1->SaveAs(Form("paperplots/hypsep_%s_%s_%s_%.0ffb.png", testName.Data(), toyName.Data(), varName.Data(), intLumi));
     c1->SaveAs(Form("paperplots/hypsep_%s_%s_%s_%.0ffb.C", testName.Data(), toyName.Data(), varName.Data(), intLumi));
+  } else {
+    c1->SaveAs(Form("plots/epsfiles/hypsep_%s_%s_%s_%.0ffb.eps", testName.Data(), toyName.Data(), varName.Data(), intLumi));
+    c1->SaveAs(Form("plots/pngfiles/hypsep_%s_%s_%s_%.0ffb.png", testName.Data(), toyName.Data(), varName.Data(), intLumi));
   }
 
 
