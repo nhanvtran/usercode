@@ -41,7 +41,13 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1
 !        print *, "LHE_IDUP(i) ",LHE_IDUP(i)
     enddo
 
-    NUP=9
+! NUP changes for gamma gamma final state
+    if (LHE_IDUP(4).eq.22) then
+        NUP=5
+    else 
+        NUP=9
+    endif
+    
     IDPRUP=100
     XWGTUP=1.
     SCALUP=1000.
