@@ -15,7 +15,7 @@ contains
  use ifport
 #endif
  implicit none
- real(8) :: EvalWeighted,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
+ real(8) :: EvalWeighted,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
  real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac,PDFFac1,PDFFac2
  real(8) :: pdf(-6:6,1:2)
  integer :: NBin(1:11),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
@@ -23,7 +23,7 @@ contains
  real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4)
  real(8) :: EZ,  EZ1, EZ2, pz, xmax, xx1, xx2
  real(8) :: pz12, MomExt_f(1:4,1:4), MomDK_f(1:4,1:4)
- real(8) :: MZ1,MZ2,EZ_max,dr, MG, yz1,yz2
+ real(8) :: MZ1,MZ2,ML1,ML2,ML3,ML4,EZ_max,dr, MG, yz1,yz2
  real(8) :: offzchannel
  logical :: applyPSCut
  include 'csmaxvalue.f'
@@ -59,7 +59,7 @@ contains
             MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
             sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * ( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
 
-            EZ_max = EHat - MZ1*0.99
+            EZ_max = EHat - MZ1*0.99d0
             dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
             MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
@@ -120,13 +120,25 @@ contains
       return
     endif
 
-
     call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
     call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
     if( DecayMode1.ne.7 ) then ! don't decay the photon
-        call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
-        call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
+        ML1 = getMass(MY_IDUP(7))
+        ML2 = getMass(MY_IDUP(6))
+        ML3 = getMass(MY_IDUP(9))
+        ML4 = getMass(MY_IDUP(8))
+        if( (MZ1.lt.ML1+ML2) .or. (MZ2.lt.ML3+ML4) ) then
+            EvalWeighted = 0d0
+            return
+        endif
+        call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,ML1,ML2,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
+        call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,ML3,ML4,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
         PSWgt = PSWgt * PSWgt2*PSWgt3
+
+        if( includeInterference.eqv..true.) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MZ2=(p2+p3)^2 and MZ2=(p1+p4)^2
+            if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
+            PSWgt = PSWgt * 2d0
+        endif
     else
         MomDK(1:4,1) = MomExt(1:4,3)
         MomDK(1:4,2) = 0d0
@@ -136,7 +148,9 @@ contains
 
 
     if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
+        if( (includeInterference.eqv..true.) .and. (yrnd(13).gt.0.5d0) ) call swapmom( momdk(1:4,1),momdk(1:4,3) )! swap momenta for MC truth mZ1,mZ2 reconstruction
         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
+        if( (includeInterference.eqv..true.) .and. (yrnd(13).gt.0.5d0) ) call swapmom( momdk(1:4,1),momdk(1:4,3) )! swap back
     else
         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
         call Kinematics(4,MomExt_f,MomDK_f,applyPSCut,NBin)
@@ -183,7 +197,6 @@ contains
          call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
          call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
       elseif(Process.eq.2) then
-!          call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
          call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
          call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
       endif
@@ -237,7 +250,7 @@ use ifport
 #endif
 implicit none
 real(8) :: RES(-5:5,-5:5)
-real(8) :: EvalUnWeighted,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
+real(8) :: EvalUnWeighted,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
 real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
 real(8) :: pdf(-6:6,1:2)
 integer :: NBin(1:11),NHisto,i
@@ -245,7 +258,7 @@ real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
 real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomExt_f(1:4,1:4),MomDK_f(1:4,1:4)
 logical :: applyPSCut,genEvt
 real(8) :: CS_max, channel_ratio
-real(8) :: oneovervolume, bound(1:11), sumtot,yz1,yz2,EZ_max,dr,MZ1,MZ2
+real(8) :: oneovervolume, bound(1:11), sumtot,yz1,yz2,EZ_max,dr,MZ1,MZ2,ML1,ML2,ML3,ML4
 integer :: parton(-5:5,-5:5), i1, ifound, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9)
 real(8)::ntRnd,ZMass(1:2)
 real(8) :: offzchannel
@@ -287,7 +300,7 @@ include 'csmaxvalue.f'
             MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
             sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * ( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
 
-            EZ_max = EHat - MZ1*0.99
+            EZ_max = EHat - MZ1*0.99d0
             dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
             MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
@@ -356,9 +369,23 @@ include 'csmaxvalue.f'
    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
    if( DecayMode1.ne.7 ) then ! don't decay the photon
-      call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
-      call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
+      ML1 = getMass(MY_IDUP(7))
+      ML2 = getMass(MY_IDUP(6))
+      ML3 = getMass(MY_IDUP(9))
+      ML4 = getMass(MY_IDUP(8))
+      if( (MZ1.lt.ML1+ML2) .or. (MZ2.lt.ML3+ML4) ) then
+          EvalUnWeighted = 0d0
+          RejeCounter = RejeCounter + 1
+          return
+      endif
+      call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,ML1,ML2,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
+      call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,ML3,ML4,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
       PSWgt = PSWgt * PSWgt2*PSWgt3
+
+      if( includeInterference.eqv..true. ) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MZ2=(p2+p3)^2 and MZ2=(p1+p4)^2
+          if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
+          PSWgt = PSWgt * 2d0
+      endif
     else
         MomDK(1:4,1) = MomExt(1:4,3)
         MomDK(1:4,2) = 0d0
@@ -368,7 +395,9 @@ include 'csmaxvalue.f'
 
 
     if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
+        if( (includeInterference.eqv..true.) .and. (yrnd(13).gt.0.5d0) ) call swapmom( momdk(1:4,1),momdk(1:4,3) )! swap momenta for MC truth mZ1,mZ2 reconstruction
         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
+        if( (includeInterference.eqv..true.) .and. (yrnd(13).gt.0.5d0) ) call swapmom( momdk(1:4,1),momdk(1:4,3) )! swap back
     else
         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
         call Kinematics(4,MomExt_f,MomDK_f,applyPSCut,NBin)
@@ -380,6 +409,8 @@ include 'csmaxvalue.f'
 
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
+
+
 
 IF( GENEVT ) THEN
     sumtot = csmax(0,0)+csmax(-5,5)+csmax(-4,4)+csmax(-3,3)+csmax(-2,2)+csmax(-1,1)  &
@@ -421,7 +452,7 @@ IF( GENEVT ) THEN
       elseif(Process.eq.2) then
             call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
       endif
-      LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2 * PDFFac
+      LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
 
    else
 
@@ -432,6 +463,7 @@ IF( GENEVT ) THEN
          call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
          call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
       endif
+
 
       if (ifound.eq.2) then
           PDFFac = pdf(Bot_,2)*pdf(ABot_,1)
@@ -535,7 +567,7 @@ IF( GENEVT ) THEN
       endif
 
 
-ELSE! GENEVT
+ELSE! NOT GENEVT
 
 
    if (PChannel.eq.0.or.PChannel.eq.2) then
@@ -546,6 +578,7 @@ ELSE! GENEVT
          call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
       endif
       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
+
 
       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
@@ -604,10 +637,10 @@ ELSE! GENEVT
          elseif(i1.eq.4) then
           PDFFac = pdf(Chm_,1)*pdf(AChm_,2)
           EvalUnWeighted = LO_Res_Unpol1 * PreFac *PDFFac
-          elseif(i1.eq.5) then
+         elseif(i1.eq.5) then
           PDFFac = pdf(Bot_,1)*pdf(ABot_,2)
           EvalUnWeighted = LO_Res_Unpol1 * PreFac *PDFFac
-          endif
+         endif
 
           RES(i1,-i1) = EvalUnWeighted
           if (EvalUnWeighted.gt.csmax(i1,-i1)) csmax(i1,-i1) = EvalUnWeighted
@@ -642,7 +675,7 @@ use ifport
 #endif
 implicit none
 real(8) :: RES(-5:5,-5:5)
-real(8) :: EvalUnWeighted_BETA,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt
+real(8) :: EvalUnWeighted_BETA,LO_Res_Unpol,yRnd(1:22),VgsWgt
 real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
 real(8) :: pdf(-6:6,1:2)
 integer :: NBin(1:11),NHisto,i,XBin(1:4)
@@ -650,7 +683,7 @@ real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
 real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomExt_f(1:4,1:4),MomDK_f(1:4,1:4)
 logical :: applyPSCut,genEvt
 real(8) :: CS_max, channel_ratio
-real(8) :: oneovervolume, bound(1:11), sumtot,yz1,yz2,EZ_max,dr,MZ1,MZ2
+real(8) :: oneovervolume, bound(1:11), sumtot,yz1,yz2,EZ_max,dr,MZ1,MZ2,ML1,ML2,ML3,ML4
 integer :: parton(-5:5,-5:5), i1, ifound, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9)
 real(8)::ntRnd,ZMass(1:2)
 real(8) :: offzchannel
@@ -775,8 +808,17 @@ include 'csmaxvalue.f'
    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
    if( DecayMode1.ne.7 ) then ! don't decay the photon
-      call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
-      call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
+      ML1 = getMass(MY_IDUP(7))
+      ML2 = getMass(MY_IDUP(6))
+      ML3 = getMass(MY_IDUP(9))
+      ML4 = getMass(MY_IDUP(8))
+      if( (MZ1.lt.ML1+ML2) .or. (MZ2.lt.ML3+ML4) ) then
+          EvalUnWeighted_BETA = 0d0
+          RejeCounter = RejeCounter + 1
+          return
+      endif
+      call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,ML1,ML2,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
+      call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,ML3,ML4,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
       PSWgt = PSWgt * PSWgt2*PSWgt3
     else
         MomDK(1:4,1) = MomExt(1:4,3)

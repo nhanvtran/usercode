@@ -8,7 +8,7 @@ use ifport
 #endif
 implicit none
 real(8) :: VG_Result,VG_Error
-logical,parameter :: useBetaVersion=.false.! this should be set to .false.
+logical,parameter :: useBetaVersion=.true.! this should be set to .false.
 
 
 
@@ -21,7 +21,7 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call InitVegas()
    call OpenFiles()
    call InitOutput()
-   print *, "Running"
+   print *, " Running"
    if( .not. useBetaVersion ) then
        call StartVegas(VG_Result,VG_Error)
    else
@@ -29,9 +29,9 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    endif
    call cpu_time(time_end)
    call WriteHisto(VG_Result,VG_Error,time_end-time_start)
-   write(*,*)  "event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+   write(*,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
    call CloseFiles()
-   print *, "Done"
+   print *, " Done"
 
 END PROGRAM
 
@@ -44,15 +44,15 @@ use ModParameters
 use ModKinematics
 implicit none
 character :: arg*(31)
-integer :: NumArgs,NArg,OffShell_XVV,iunwgt
+integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg
 
    Collider=1
    VegasIt1=-1
    PDFSet=1      ! 1: CTEQ6L1   2: MRSW with best fit, 2xx: MSTW with eigenvector set xx=01..40
    VegasNc1=-1
    PChannel=2
-   DecayMode1=0
-   DecayMode2=0
+   DecayMode1=0  ! Z/W+
+   DecayMode2=0  ! Z/W-
    Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
    Unweighted =.true.
    OffShell_XVV=000! 000: X,V1,V2 on-shell; 010: X,V2 on-shell, V1 off-shell; and so on
@@ -75,30 +75,41 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt
 #endif
 
 
+   CountArg = 0
    do NArg=1,NumArgs
     call GetArg(NArg,arg)
     if( arg(1:4).eq."help" .or. arg(1:4).eq."Help" .or. arg(1:4).eq."HELP") then
         call PrintCommandLineArgs()
     elseif( arg(1:9).eq."Collider=" ) then
         read(arg(10:10),*) Collider
+        CountArg = CountArg + 1
     elseif( arg(1:7).eq."PDFSet=" ) then
         read(arg(8:10),*) PDFSet
+        CountArg = CountArg + 1
     elseif( arg(1:9).eq."VegasNc1=" ) then
         read(arg(10:17),*) VegasNc1
+        CountArg = CountArg + 1
     elseif( arg(1:9).eq."PChannel=" ) then
         read(arg(10:11),*) PChannel
+        CountArg = CountArg + 1
     elseif( arg(1:9).eq."DataFile=" ) then
         read(arg(10:31),*) DataFile
+        CountArg = CountArg + 1
     elseif( arg(1:8).eq."Process=" ) then
         read(arg(9:10),*) Process
+        CountArg = CountArg + 1
     elseif( arg(1:11).eq."DecayMode1=" ) then
         read(arg(12:13),*) DecayMode1
+        CountArg = CountArg + 1
     elseif( arg(1:11).eq."DecayMode2=" ) then
         read(arg(12:13),*) DecayMode2
+        CountArg = CountArg + 1
     elseif( arg(1:7) .eq."OffXVV=" ) then
         read(arg(8:10),*) OffShell_XVV
+        CountArg = CountArg + 1
     elseif( arg(1:11) .eq."Unweighted=" ) then
         read(arg(12:12),*) iunwgt
+        CountArg = CountArg + 1
         if( iunwgt.eq.0 ) then
             Unweighted = .false.
         else
@@ -106,6 +117,11 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt
         endif
     endif
    enddo
+   
+   if( CountArg.ne.NumArgs ) then
+        print *, "unknown command line argument"
+        stop
+   endif
 
     if (Process.eq.0) PChannel = 0   !only gluons
     if (Process.eq.1) PChannel = 1   !only quarks
@@ -258,6 +274,7 @@ include "vegas_common.f"
       NDim = NDim + 6    ! PS integration
       NDim = NDim + 2    ! shat integration
       NDim = NDim + 1    ! offzchannel
+      if( includeInterference ) NDim = NDim + 1    ! for interference
       if( OffShellV1 .or. OffShellV2 ) then
           NDim = NDim + 2    ! integration over Z's invariant mass
       else
@@ -329,7 +346,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     endif
 
 
-    print *, "finding maximal weight"
+    print *, " finding maximal weight"
     do i=1,ncall
         call random_number(yRnd)
         if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
@@ -433,13 +450,23 @@ integer :: i, i1, PChannel_aux, PChannel_aux1,n1,n2,n3,n4
 include 'csmaxvalue.f'
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
-if( VegasNc1.eq.-1 ) VegasNc1 = VegasNc1_default
+if( VegasNc1.eq.-1 ) VegasNc1 = 5000
 
 
 
    warmup = .false.
-   itmx = 5  !VegasIt1   ! overwrite this for development phase
-   ncall= 2000000  !VegasNc1
+   itmx = 3  !VegasIt1        ! overwrite this for development phase
+   ncall= 500000 !VegasNc1   ! overwrite this for development phase
+
+   if( (Process.eq.2 .and. PChannel.ne.0) .or. (Process.eq.1) ) then
+        print *, " ERROR:"
+        print *, " You are running the beta version for generating events."
+        print *, " This version does not yet support qqb initial states."
+        print *, " Please set  useBetaVersion=.false.  in main.F90."
+        print *, ""
+        stop
+   endif
+
 
    PChannel_aux = PChannel
 
@@ -452,7 +479,7 @@ if (unweighted.eqv..false.) then  !----------------------- weighted events
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
 
-    print *, "scanning the integrand"
+    print *, " scanning the integrand"
 
     call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
 
@@ -464,7 +491,7 @@ do n2=1,NPart-1
 !do n3=1,NPart-1
 !do n4=1,NPart-1
      if( PartitionMax(n1,n2).eq.-1d99 ) then
-          print *, "unfilled partition: ",n1,n2
+          print *, " unfilled partition: ",n1,n2
          PartitionMax(n1,n2) = globalMax
      endif
 !      if( PartitionMax(n1,n2,n3,n4).eq.-1d99 ) then
@@ -479,12 +506,12 @@ enddo
 !pause
    call ClearHisto()
 
-   print *, "generating events"
+   print *, " generating events"
    call cpu_time(time_start)
-   do while( AccepCounter.lt.50000 )! generate a fixed number of 50000 events
+   do while( AccepCounter.lt.VegasNc1 )! generate a fixed number of VegasNc1 events
 !   do i=1,ncall
          call random_number(yRnd)
-!print *, "generated event no.",AccepCounter
+! print *, "generated event no.",AccepCounter
          dum = EvalUnWeighted_BETA(yRnd)
    enddo
    call cpu_time(time_end)
@@ -521,12 +548,12 @@ logical :: dirresult
 
    print *, ""
    if( unweighted ) then
-      print *, "LHE file:       "//trim(DataFile)//'.lhe'
+      print *, " LHE file:       "//trim(DataFile)//'.lhe'
       open(unit=14,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')        ! LHE event file
-      print *, "histogram file: "//trim(DataFile)//'.dat'
+      print *, " histogram file: "//trim(DataFile)//'.dat'
       open(unit=15,file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')        ! histogram file
    else
-      print *, "histogram file: "//trim(DataFile)//'.dat'
+      print *, " histogram file: "//trim(DataFile)//'.dat'
       open(unit=15,file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')        ! histogram file
    endif
 
@@ -580,59 +607,77 @@ implicit none
 integer :: AllocStatus,NHisto
 
          it_sav = 1
-          NumHistograms = 8
+          NumHistograms = 11
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
 
-          Histo(1)%Info   = "pT_LepP"
+          Histo(1)%Info   = "pT(LepP)"
           Histo(1)%NBins  = 40
           Histo(1)%BinSize= 50d0*GeV
           Histo(1)%LowVal = 0d0
           Histo(1)%SetScale= 1d0/GeV
 
-          Histo(2)%Info   = "pT_LepM"
+          Histo(2)%Info   = "pT(LepM)"
           Histo(2)%NBins  = 40
           Histo(2)%BinSize= 50d0*GeV
           Histo(2)%LowVal = 0d0
           Histo(2)%SetScale= 1d0/GeV
 
-          Histo(3)%Info   = "cos(Psi_LepPZ)"    ! angle between lepton momentum in the rest frame of its own Z(call it Z1) and
-          Histo(3)%NBins  = 40                  ! the direction of the other Z (call it Z2) in the rest frame of Z1
-          Histo(3)%BinSize= 0.05d0
-          Histo(3)%LowVal =-1d0
+          Histo(3)%Info   = "y(LepP)"
+          Histo(3)%NBins  = 32
+          Histo(3)%BinSize= 0.125
+          Histo(3)%LowVal =-2d0
           Histo(3)%SetScale= 1d0
 
-          Histo(4)%Info   = "Psi_LepPlanes"  ! angle between lepton planes
-          Histo(4)%NBins  = 40
-          Histo(4)%BinSize= 0.078539d0
-          Histo(4)%LowVal =0d0
+          Histo(4)%Info   = "y(LepM)"
+          Histo(4)%NBins  = 32
+          Histo(4)%BinSize= 0.125
+          Histo(4)%LowVal =-2d0
           Histo(4)%SetScale= 1d0
 
-          Histo(5)%Info   = "cos(ThetaZ)"   ! scattering angle of Z in graviton rest frame
+          Histo(5)%Info   = "cos(theta*)"   ! scattering angle of Z in resonance rest frame
           Histo(5)%NBins  = 200
           Histo(5)%BinSize= 0.01d0
           Histo(5)%LowVal =-1d0
           Histo(5)%SetScale= 1d0
 
-          Histo(6)%Info   = "MV1 invariant mass"
-          Histo(6)%NBins  = 200
-          Histo(6)%BinSize= 0.5d0*GeV
-          Histo(6)%LowVal = 10d0*GeV
-          Histo(6)%SetScale= 1d0/GeV
+          Histo(6)%Info   = "Phi1"  ! angle between plane of beam-scatterin axis and the lepton plane of Z1 in the resonance rest frame
+          Histo(6)%NBins  = 40
+          Histo(6)%BinSize= 0.078539d0 *2d0
+          Histo(6)%LowVal =-3.14159d0
+          Histo(6)%SetScale= 1d0
 
-          Histo(7)%Info   = "MV2 invariant mass"
-          Histo(7)%NBins  = 200
-          Histo(7)%BinSize= 0.5d0*GeV
-          Histo(7)%LowVal = 10d0*GeV
-          Histo(7)%SetScale= 1d0/GeV
+          Histo(7)%Info   = "cos(theta1)"    ! angle between lepton momentum in the rest frame of its own Z(call it Z1) and
+          Histo(7)%NBins  = 40                  ! the direction of the other Z (call it Z2) in the rest frame of Z1
+          Histo(7)%BinSize= 0.05d0
+          Histo(7)%LowVal =-1d0
+          Histo(7)%SetScale= 1d0
 
-          Histo(8)%Info   = "MG resonance invariant mass"
-          Histo(8)%NBins  = 200
-          Histo(8)%BinSize= 10d0*GeV
-          Histo(8)%LowVal = 0d0*GeV
-          Histo(8)%SetScale= 1d0/GeV
+          Histo(8)%Info   = "Phi"  ! angle between lepton planes in resonance rest frame
+          Histo(8)%NBins  = 40
+          Histo(8)%BinSize= 0.078539d0*2d0
+          Histo(8)%LowVal = -3.14159d0
+          Histo(8)%SetScale= 1d0
+
+          Histo(9)%Info   = "MV1 invariant mass"
+          Histo(9)%NBins  = 200
+          Histo(9)%BinSize= 0.5d0*GeV
+          Histo(9)%LowVal = 00d0*GeV
+          Histo(9)%SetScale= 1d0/GeV
+
+          Histo(10)%Info   = "MV2 invariant mass"
+          Histo(10)%NBins  = 200
+          Histo(10)%BinSize= 0.5d0*GeV
+          Histo(10)%LowVal = 00d0*GeV
+          Histo(10)%SetScale= 1d0/GeV
+
+          Histo(11)%Info   = "MG resonance invariant mass"
+          Histo(11)%NBins  = 200
+          Histo(11)%BinSize= 10d0*GeV
+          Histo(11)%LowVal = 0d0*GeV
+          Histo(11)%SetScale= 1d0/GeV
 
 
   do NHisto=1,NumHistograms
@@ -721,8 +766,8 @@ implicit none
         write(*,"(2X,A)") "Command line arguments:"
         write(*,"(4X,A)") "Collider:   1=LHC, 2=Tevatron"
         write(*,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance"
-        write(*,"(4X,A)") "DecayMode1: decay mode for vector boson 1"
-        write(*,"(4X,A)") "DecayMode2: decay mode for vector boson 2"
+        write(*,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
+        write(*,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
         write(*,"(4X,A)") "              0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu"
         write(*,"(4X,A)") "              4=W->lnu, 5=W->2q, 6=W->taunu"
         write(*,"(4X,A)") "              7=gamma"
@@ -742,18 +787,20 @@ END SUBROUTINE
 
 SUBROUTINE PrintLogo()
 implicit none
-    write(*,*) " "
-    write(*,*) " ******************************************************************************"
-    write(*,*) " *                               JHU Generator                                *"
-    write(*,*) " ******************************************************************************"
-    write(*,*) " *                                                                            *"
-    write(*,*) " *    Spin determination of single-produced resonances at hadron colliders    *"
-    write(*,*) " *                                                                            *"
-    write(*,*) " *          Y.Gao, A.Gritsan, Z.Guo, K.Melnikov, M.Schulze, N.Tran            *"
-    write(*,*) " *          Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph]            *"
-    write(*,*) " *                                                                            *"
-    write(*,*) " ******************************************************************************"
-    write(*,*) " "
+    write(*,"(A90)") " "
+    write(*,"(A90)") " ***************************************************************************************"
+    write(*,"(A90)") " *                               JHU Generator                                         *"
+    write(*,"(A90)") " ***************************************************************************************"
+    write(*,"(A90)") " *                                                                                     *"
+    write(*,"(A90)") " *   Spin and parity determination of single-produced resonances at hadron colliders   *"
+    write(*,"(A90)") " *                                                                                     *"
+    write(*,"(A90)") " *                      S. Bolognesi, Y. Gao, A. Gritsan, Z. Guo,                      *"
+    write(*,"(A90)") " *                    K. Melnikov, M. Schulze, N. Tran, A. Whitbeck                    *"
+    write(*,"(A90)") " *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph]               *"
+    write(*,"(A90)") " *                              arXiv:1208.4018 [hep-ph]                               *"
+    write(*,"(A90)") " *                                                                                     *"
+    write(*,"(A90)") " ***************************************************************************************"
+    write(*,"(A90)") " "
 return
 END SUBROUTINE
 
