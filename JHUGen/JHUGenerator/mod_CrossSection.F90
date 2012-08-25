@@ -452,7 +452,7 @@ IF( GENEVT ) THEN
       elseif(Process.eq.2) then
             call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
       endif
-      LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
+      LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2 * PDFFac
 
    else
 
