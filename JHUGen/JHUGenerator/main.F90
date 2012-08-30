@@ -30,6 +30,7 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call cpu_time(time_end)
    call WriteHisto(VG_Result,VG_Error,time_end-time_start)
    write(*,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+   call FinalizeOutput()
    call CloseFiles()
    print *, " Done"
 
@@ -259,6 +260,23 @@ implicit none
     endif
   
 END SUBROUTINE
+
+
+
+
+SUBROUTINE FinalizeOutput
+use ModParameters
+implicit none
+
+    if( unweighted ) then 
+        write(14 ,'(A)') '</LesHouchesEvents>'
+    endif
+  
+END SUBROUTINE
+
+
+
+
 
 
 SUBROUTINE InitProcess()
