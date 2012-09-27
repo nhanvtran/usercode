@@ -38,33 +38,31 @@ class sampleWrapperClass:
         
         self.IsData_ = isData;
         self.FileName_ = file;
-        self.File_ = ROOT.TFile(file);
-        self.InputTree_ = self.File_.Get("WJet");
         
-        self.NTree_ = self.InputTree_.GetEntries();
         self.SampleWeight_ = lumi/sampleEffLumi;
         
         self.JetPrefix_ = "GroomedJet_CA8";
         self.Label_ = label;
         self.OFileName_ = "trainingtrees/ofile_"+label+".root";
-
-        self.OFileNameTTbar_ = "trainingtrees/ofile_"+label+"_ttbar.root";
-                
-        # define training tree
-#        self.initTrainingTree();
+            
+    def createTrainingTree(self):
         
+        print self.FileName_
+        self.File_ = ROOT.TFile(self.FileName_);
+        self.InputTree_ = self.File_.Get("WJet");
+        self.NTree_ = self.InputTree_.GetEntries();
+        
+        print "Turning off branches...", self.FileName_
+
         # turn off unnecessary branches
         self.turnOffBranches();
-        
-#        self.createTrainingTree();
-    
-    def createTrainingTree(self):
         
         print "Initializing sample: ", self.FileName_
         print "Nentries = ", self.NTree_
         
         # fill histograms
         self.createBRDTree();
+        self.File_.Close();
 
 #    def createTTbarTree(self):
 #        
@@ -107,6 +105,7 @@ class sampleWrapperClass:
         
         # n bjets
         nbjets_ = array( 'f', [ 0. ] );
+        njets_ = array( 'f', [ 0. ] );        
         jet_pt1frac_ = array( 'f', [ 0. ] );
         jet_pt2frac_ = array( 'f', [ 0. ] );
         jet_sjdr_ = array( 'f', [ 0. ] );       
@@ -116,6 +115,10 @@ class sampleWrapperClass:
         jet_planarlow06_ = array( 'f', [0.] );
         jet_planarlow07_ = array( 'f', [0.] );
         
+        deltaR_lca8jet_ = array( 'f', [0.] );
+        deltaphi_METca8jet_ = array( 'f', [0.] );
+        deltaphi_Vca8jet_ = array( 'f', [0.] );
+    
         otree.Branch("v_pt", v_pt_ , "v_pt/F");
         otree.Branch("jet_pt_pr", jet_pt_pr_ , "jet_pt_pr/F");
         otree.Branch("jet_mass_pr", jet_mass_pr_ , "jet_mass_pr/F");
@@ -137,6 +140,7 @@ class sampleWrapperClass:
         otree.Branch("jet_rcore7", jet_rcore7_ , "jet_rcore7/F");
 
         otree.Branch("nbjets", nbjets_ , "nbjets/F");
+        otree.Branch("njets", njets_ , "njets/F");
         otree.Branch("jet_pt1frac", jet_pt1frac_ , "jet_pt1frac/F");
         otree.Branch("jet_pt2frac", jet_pt2frac_ , "jet_pt2frac/F");
         otree.Branch("jet_sjdr", jet_sjdr_ , "jet_sjdr/F");
@@ -145,6 +149,10 @@ class sampleWrapperClass:
         otree.Branch("jet_planarflow05", jet_planarlow05_, "jet_planarflow05/F");
         otree.Branch("jet_planarflow06", jet_planarlow06_, "jet_planarflow06/F");
         otree.Branch("jet_planarflow07", jet_planarlow07_, "jet_planarflow07/F");
+        
+        otree.Branch("deltaR_lca8jet", deltaR_lca8jet_, "deltaR_lca8jet/F");
+        otree.Branch("deltaphi_METca8jet", deltaphi_METca8jet_, "deltaphi_METca8jet/F");
+        otree.Branch("deltaphi_Vca8jet", deltaphi_Vca8jet_, "deltaphi_Vca8jet/F");
         
         prefix = self.JetPrefix_;
         
@@ -167,11 +175,13 @@ class sampleWrapperClass:
                 puwt = getattr( self.InputTree_, "puwt" ); 
                 totSampleWeight = 1.;
                 if self.IsData_: totSampleWeight = wSampleWeight;
-                else: totSampleWeight = wSampleWeight*effwt;
+                else: totSampleWeight = wSampleWeight*effwt*puwt;
+                
+#                print puwt;
                 
                 ###################################
                 # make training tree
-                v_pt_[0] = getattr( self.InputTree_, "W_muon_pt" );
+                v_pt_[0] = getattr( self.InputTree_, "W_pt" );
                 jet_mass_pr_[0] = getattr( self.InputTree_, prefix + "_mass_pr" )[0];
                 jet_pt_pr_[0] = getattr( self.InputTree_, prefix + "_pt_pr" )[0];
                 
@@ -201,13 +211,18 @@ class sampleWrapperClass:
                 jet_planarlow05_[0] = getattr( self.InputTree_, prefix + "_planarflow05");
                 jet_planarlow06_[0] = getattr( self.InputTree_, prefix + "_planarflow06");
                 jet_planarlow07_[0] = getattr( self.InputTree_, prefix + "_planarflow07");
-
+                
                 nbjets_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets" );
+                njets_[0] = getattr( self.InputTree_, "GroomedJet_numberjets" );
                 pt1FracVal = max( getattr( self.InputTree_, prefix + "_prsubjet1ptoverjetpt" ), getattr( self.InputTree_, prefix + "_prsubjet2ptoverjetpt" ) );
                 pt2FracVal = min( getattr( self.InputTree_, prefix + "_prsubjet1ptoverjetpt" ), getattr( self.InputTree_, prefix + "_prsubjet2ptoverjetpt" ) );
                 jet_pt1frac_[0] = pt1FracVal;
                 jet_pt2frac_[0] = pt2FracVal;
-                jet_sjdr_[0] = getattr( self.InputTree_, prefix + "_prsubjet1subjet2_deltaR" );                        
+                jet_sjdr_[0] = getattr( self.InputTree_, prefix + "_prsubjet1subjet2_deltaR" );       
+                
+                deltaR_lca8jet_[0] = getattr( self.InputTree_, prefix + "_deltaR_lca8jet" );       
+                deltaphi_METca8jet_[0] = getattr( self.InputTree_, prefix + "_deltaphi_METca8jet" );       
+                deltaphi_Vca8jet_[0] = getattr( self.InputTree_, prefix + "_deltaphi_Vca8jet" );       
                 
                 otree.Fill();
                 ###################################
@@ -253,6 +268,7 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus(prefix + "_rcores",1);
         self.InputTree_.SetBranchStatus(prefix + "_jetconstituents",1);
 
+        self.InputTree_.SetBranchStatus("GroomedJet_numberjets",1);
         self.InputTree_.SetBranchStatus("GroomedJet_numberbjets",1);
         self.InputTree_.SetBranchStatus(prefix + "_prsubjet1ptoverjetpt",1);
         self.InputTree_.SetBranchStatus(prefix + "_prsubjet2ptoverjetpt",1);
@@ -262,6 +278,9 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus(prefix + "_planarflow06",1);
         self.InputTree_.SetBranchStatus(prefix + "_planarflow07",1);
 
+        self.InputTree_.SetBranchStatus(prefix + "_deltaR_lca8jet",1);
+        self.InputTree_.SetBranchStatus(prefix + "_deltaphi_METca8jet",1);
+        self.InputTree_.SetBranchStatus(prefix + "_deltaphi_Vca8jet",1);
 
 
 

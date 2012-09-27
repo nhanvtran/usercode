@@ -107,8 +107,8 @@ class plotterClass:
         self.hvarsNBins[self.hvars[5]] = 25; self.hvarsMin[self.hvars[5]] = -2.5; self.hvarsMax[self.hvars[5]] = 2.5; self.hvarsXName[self.hvars[5]] = "lepton eta"; self.hvarsLeg[self.hvars[5]] = "right";
         self.hvars.append("mvaMET"); 
         self.hvarsNBins[self.hvars[6]] = 50; self.hvarsMin[self.hvars[6]] = 0.; self.hvarsMax[self.hvars[6]] = 500; self.hvarsXName[self.hvars[6]] = "mvaMET"; self.hvarsLeg[self.hvars[6]] = "right";
-        self.hvars.append("mvaMET"); 
-        self.hvarsNBins[self.hvars[7]] = 50; self.hvarsMin[self.hvars[7]] = 0.; self.hvarsMax[self.hvars[7]] = 500; self.hvarsXName[self.hvars[7]] = "mvaMET"; self.hvarsLeg[self.hvars[7]] = "right";          
+        self.hvars.append("njets"); 
+        self.hvarsNBins[self.hvars[7]] = 5; self.hvarsMin[self.hvars[7]] = 0.; self.hvarsMax[self.hvars[7]] = 5; self.hvarsXName[self.hvars[7]] = "n extra jets"; self.hvarsLeg[self.hvars[7]] = "right";          
         self.hvars.append("nPV"); 
         self.hvarsNBins[self.hvars[8]] = 50; self.hvarsMin[self.hvars[8]] = 0.; self.hvarsMax[self.hvars[8]] = 50; self.hvarsXName[self.hvars[8]] = "n PV"; self.hvarsLeg[self.hvars[8]] = "right";   
         self.hvars.append("jet_grsens_ft"); 
@@ -145,6 +145,12 @@ class plotterClass:
         self.hvarsNBins[self.hvars[24]] = 30; self.hvarsMin[self.hvars[24]] = 0.; self.hvarsMax[self.hvars[24]] = 1.; self.hvarsXName[self.hvars[24]] = "pt2/pt"; self.hvarsLeg[self.hvars[24]] = "right";           
         self.hvars.append("jet_sjdr"); 
         self.hvarsNBins[self.hvars[25]] = 30; self.hvarsMin[self.hvars[25]] = 0.; self.hvarsMax[self.hvars[25]] = 0.8; self.hvarsXName[self.hvars[25]] = "DR subjets"; self.hvarsLeg[self.hvars[25]] = "center";            
+        self.hvars.append("deltaR_lca8jet"); 
+        self.hvarsNBins[self.hvars[26]] = 30; self.hvarsMin[self.hvars[26]] = 0.; self.hvarsMax[self.hvars[26]] = 3.0; self.hvarsXName[self.hvars[26]] = "DR l,j"; self.hvarsLeg[self.hvars[26]] = "left";            
+        self.hvars.append("deltaphi_METca8jet"); 
+        self.hvarsNBins[self.hvars[27]] = 30; self.hvarsMin[self.hvars[27]] = 0.; self.hvarsMax[self.hvars[27]] = 3.15; self.hvarsXName[self.hvars[27]] = "DPhi MET,j"; self.hvarsLeg[self.hvars[27]] = "left";            
+        self.hvars.append("deltaphi_Vca8jet"); 
+        self.hvarsNBins[self.hvars[28]] = 30; self.hvarsMin[self.hvars[28]] = 0.; self.hvarsMax[self.hvars[28]] = 3.15; self.hvarsXName[self.hvars[28]] = "DPhi V,j"; self.hvarsLeg[self.hvars[28]] = "left";            
             
         self.cBTagMax = 10;
         self.cBTagMin = 0;
@@ -154,6 +160,7 @@ class plotterClass:
         self.cDRsubjets = 0.0;
         self.cPtMin = 0.0;
         self.cPtMax = 1000.0;
+        self.cNJetsMax = 10.;    
 
     ## ------------------------
     ## ------------------------
@@ -167,6 +174,7 @@ class plotterClass:
         self.cDRsubjets = 0.0;
         self.cPtMin = 0.0;
         self.cPtMax = 1000.0;
+        self.cNJetsMax = 10.;
 
     ## ------------------------
     ## ------------------------
@@ -178,6 +186,7 @@ class plotterClass:
             self.cBTagMax = 10;
             self.cBTagMin = 1;
             self.cDRsubjets = 0.3;
+            self.cPtMin = 220.0;
             normalizeSignalToBkg = True;   
         elif tag == "signalregion":
             self.cBTagMax = 1;
@@ -185,7 +194,8 @@ class plotterClass:
             self.cMassMin = 60;    
             self.cMassMax = 100;    
             self.cDRsubjets = 0.;
-            self.cPtMin = 200.0;            
+            self.cPtMin = 220.0;            
+            self.cNJetsMax = 1;                        
             normalizeSignalToBkg = True;   
             plotData = False;
         else: 
@@ -205,6 +215,7 @@ class plotterClass:
         if tag == "ttbar": 
             self.SetDefaultCuts();
             self.cDRsubjets = 0.3;
+            self.cPtMin = 220.0;
 
         sigHistos = self.makeHistograms( self.sigMCfile_, self.sigMClabel_ );
 
@@ -239,7 +250,7 @@ class plotterClass:
             
             tree.GetEntry(i);
             
-            if tree.nbjets >= self.cBTagMin and tree.nbjets < self.cBTagMax and tree.jet_mass_pr > self.cMassMin and tree.jet_mass_pr < self.cMassMax and tree.jet_pt1frac < self.cPt1Frac and tree.jet_sjdr > self.cDRsubjets and tree.jet_pt_pr > self.cPtMin and tree.jet_pt_pr < self.cPtMax:
+            if tree.nbjets >= self.cBTagMin and tree.nbjets < self.cBTagMax and tree.jet_mass_pr > self.cMassMin and tree.jet_mass_pr < self.cMassMax and tree.jet_pt1frac < self.cPt1Frac and tree.jet_sjdr > self.cDRsubjets and tree.jet_pt_pr > self.cPtMin and tree.jet_pt_pr < self.cPtMax and tree.njets <         self.cNJetsMax:
                 for j in range(len(self.hvars)):
                     histograms[j].Fill( getattr( tree, self.hvars[j] ), getattr( tree,"totalEventWeight" ) );
 

@@ -60,7 +60,7 @@ if __name__ == '__main__':
     sigSCF = 200.;
     ggH600SampleXS = 8.55627E1*sigSCF;
     ggH600Sample_EffLumi = 197170/ggH600SampleXS;
-    ggH600Sample = sampleWrapperClass("ggH600","/eos/uscms/store/user/smpjs/weizou/HCP2012/RDtreesPUCMSSW532/RD_mu_HWWMH600_CMSSW532_private.root",ggH600Sample_EffLumi,LUMI,notData);
+    ggH600Sample = sampleWrapperClass("ggH600","/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/RD_mu_HWWMH600_CMSSW532_private.root",ggH600Sample_EffLumi,LUMI,notData);
 
     boostedWXS = 1.3*228.9E3;
     WJetsSample_EffLumi = 8955318/boostedWXS;
@@ -76,13 +76,11 @@ if __name__ == '__main__':
     ZZSample_EffLumi = 9702850/5.196E3;
     ZZSample = sampleWrapperClass("ZZ","/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/RD_mu_ZZ_CMSSW532.root",ZZSample_EffLumi,LUMI,notData);
 
-    mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
-    myPlotter = plotterClass( ggH600Sample, mcbackgrounds, singlemu600Sample );
-
     if options.createTrainingTrees:
         
         # ---------------------------------------------------
         # create training tree
+        ggH600Sample.createTrainingTree();        
         singlemu600Sample.createTrainingTree();
         ggH600Sample.createTrainingTree();
         WJetsSample.createTrainingTree();
@@ -91,6 +89,9 @@ if __name__ == '__main__':
         WZSample.createTrainingTree();
         ZZSample.createTrainingTree();
 
+    mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
+    myPlotter = plotterClass( ggH600Sample, mcbackgrounds, singlemu600Sample );    
+    
     if options.makeControlPlots:
                 
         # ---------------------------------------------------
@@ -121,44 +122,45 @@ if __name__ == '__main__':
 
     # Trainings
     # --------- #1 -----------
-    listOfTrainingVariables1 = ["jet_pt1frac","jet_pt2frac","jet_massdrop_pr"];
-    WWTraining1 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables1, "noCores" );
+    listOfTrainingVariables1 = ["jet_massdrop_pr","jet_qjetvol","jet_tau2tau1"];
+    WWTraining1 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables1, "simple" );
     # --------- #2 -----------
-    listOfTrainingVariables2 = ["jet_grsens_tr","jet_grsens_ft","jet_massdrop_pr","jet_qjetvol","jet_tau2tau1","jet_pt1frac","jet_sjdr","jet_jetconstituents","jet_rcore4","jet_rcore5","jet_rcore6","jet_rcore7"];
-    WWTraining2 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables2, "cores" );
-    # --------- #3 -----------
-    listOfTrainingVariables3 = ["jet_grsens_tr","jet_grsens_ft","jet_massdrop_pr","jet_qjetvol","jet_tau2tau1","jet_planarflow05","jet_planarflow07","jet_pt1frac","jet_sjdr"];
-    WWTraining3 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables3, "planflow" );
-    # --------- #4 -----------
-    listOfTrainingVariables4 = ["jet_grsens_tr","jet_grsens_ft","jet_massdrop_pr","jet_qjetvol","jet_tau2tau1","jet_rcore5","jet_rcore7","jet_pt1frac","jet_pt2frac","jet_sjdr","jet_planarflow05","jet_jetconstituents"];
-    WWTraining4 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables4, "optimal" );
+#    listOfTrainingVariables2 = ["jet_grsens_tr","jet_grsens_ft","jet_massdrop_pr","jet_qjetvol","jet_tau2tau1","jet_rcore4","jet_rcore7","jet_planarflow04","jet_planarflow07"];
+#    WWTraining2 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables2, "no subjets" );
+    listOfTrainingVariables2 = ["jet_grsens_tr","jet_grsens_ft","jet_massdrop_pr","jet_qjetvol","jet_tau2tau1","jet_sjdr","jet_rcore4","jet_rcore7","jet_planarflow04","jet_planarflow07"];
+    WWTraining2 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables2, "optimal" );
+#    # --------- #3 -----------
+#    listOfTrainingVariables3 = ["jet_grsens_tr","jet_grsens_ft","jet_massdrop_pr","jet_qjetvol","jet_tau2tau1","jet_rcore7","jet_planarflow07"];
+#    WWTraining3 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables3, "optimal2" );
+#    # --------- #4 -----------
+#    listOfTrainingVariables4 = ["jet_grsens_tr","jet_grsens_ft","jet_massdrop_pr","jet_qjetvol","jet_tau2tau1","jet_pt1frac","jet_sjdr","jet_jetconstituents","jet_rcore4","jet_rcore5","jet_rcore6","jet_rcore7","jet_planarflow04","jet_planarflow05","jet_planarflow06","jet_planarflow07"];
+#    WWTraining4 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables4, "all" );
 
     if options.doTraining:        
         
         WWTraining1.doTraining( 200, 275 );
         WWTraining1.doTraining( 275, 500 );
-
-        WWTraining1.plotTrainingResults( 200, 275 );
-        WWTraining1.plotTrainingResults( 275, 500 );
-
         
         WWTraining2.doTraining( 200, 275 );
         WWTraining2.doTraining( 275, 500 );
         
+#        WWTraining3.doTraining( 200, 275 );
+#        WWTraining3.doTraining( 275, 500 );
+#
+#        WWTraining4.doTraining( 200, 275 );
+#        WWTraining4.doTraining( 275, 500 );
+        
+        WWTraining1.plotTrainingResults( 200, 275 );
+        WWTraining1.plotTrainingResults( 275, 500 );
+
         WWTraining2.plotTrainingResults( 200, 275 );
         WWTraining2.plotTrainingResults( 275, 500 );
-        
-        WWTraining3.doTraining( 200, 275 );
-        WWTraining3.doTraining( 275, 500 );
-        
-        WWTraining3.plotTrainingResults( 200, 275 );
-        WWTraining3.plotTrainingResults( 275, 500 );
-
-        WWTraining4.doTraining( 200, 275 );
-        WWTraining4.doTraining( 275, 500 );
-
-        WWTraining4.plotTrainingResults( 200, 275 );
-        WWTraining4.plotTrainingResults( 275, 500 );
+                
+#        WWTraining3.plotTrainingResults( 200, 275 );
+#        WWTraining3.plotTrainingResults( 275, 500 );
+#
+#        WWTraining4.plotTrainingResults( 200, 275 );
+#        WWTraining4.plotTrainingResults( 275, 500 );
 
     if options.makeFinalTree:
 
@@ -171,9 +173,13 @@ if __name__ == '__main__':
         # give it samples
         rocs1 = WWTraining1.makeFinalPlotsInternal( 200, 275 );
         rocs2 = WWTraining2.makeFinalPlotsInternal( 200, 275 );
-        rocs3 = WWTraining3.makeFinalPlotsInternal( 200, 275 );
-        rocs4 = WWTraining4.makeFinalPlotsInternal( 200, 275 );
-        rocs4ex = WWTraining4.makeFinalPlots( 200, 275, 0. );
+#        rocs3 = WWTraining3.makeFinalPlotsInternal( 200, 275 );
+#        rocs4 = WWTraining4.makeFinalPlotsInternal( 200, 275 );
+
+#        rocs1ex = WWTraining1.makeFinalPlots( 200, 275, 0. );
+        rocs2ex = WWTraining2.makeFinalPlots( 200, 275, 0. );
+#        rocs3ex = WWTraining3.makeFinalPlots( 200, 275, 0. );        
+#        rocs4ex = WWTraining4.makeFinalPlots( 200, 275, 0. );
         
         canBdtRoc = ROOT.TCanvas("canBdtRoc","canBdtRoc",800,800);    
         canBdtRoc.cd();
@@ -181,17 +187,28 @@ if __name__ == '__main__':
         hrl.GetXaxis().SetTitle("#epsilon_{sig}");
         hrl.GetYaxis().SetTitle("1 - #epsilon_{bkg}");
         canBdtRoc.SetGrid();
-#        rocs1[0].Draw();
+        rocs1[0].Draw();
         rocs1[1].SetLineColor(ROOT.kRed);
         rocs1[1].Draw();
-#        rocs2[0].SetLineColor(ROOT.kBlue);
-#        rocs2[0].Draw();
+        rocs2[0].SetLineColor(ROOT.kBlue);
+        rocs2[0].Draw();
 #        rocs3[0].SetLineColor(ROOT.kMagenta);
 #        rocs3[0].Draw();
-        rocs4[0].SetLineColor(ROOT.kCyan+2);
-        rocs4[0].Draw();
-        rocs4ex[0].SetLineColor(ROOT.kRed+2);
-        rocs4ex[0].Draw();
+#        rocs4[0].SetLineColor(ROOT.kGreen+2);
+#        rocs4[0].Draw();
+
+#        rocs1[2].SetLineWidth(2);
+#        rocs1[2].SetLineColor(ROOT.kBlack);
+#        rocs1[2].Draw();
+#        rocs2[2].SetLineWidth(2);
+#        rocs2[2].SetLineColor(ROOT.kBlue);
+#        rocs2[2].Draw();
+#        rocs3[2].SetLineWidth(2);
+#        rocs3[2].SetLineColor(ROOT.kMagenta);
+#        rocs3[2].Draw();
+#        rocs4[2].SetLineWidth(2);
+#        rocs4[2].SetLineColor(ROOT.kGreen+2);
+#        rocs4[2].Draw();
         
 #        rocs4[2].SetLineColor(ROOT.kCyan+2);
 #        rocs4[2].SetLineStyle(2);
@@ -200,21 +217,21 @@ if __name__ == '__main__':
         leg = ROOT.TLegend(0.25,0.2,0.55,0.5)
         leg.SetFillColor(0)
         leg.SetBorderSize(0)                
-#        leg.AddEntry( rocs1[0], "noCores", 'l' );
+        leg.AddEntry( rocs1[0], "simple", 'l' );
         leg.AddEntry( rocs1[1], "mass drop only", 'l' ); 
-#        leg.AddEntry( rocs2[0], "cores", 'l' );
-#        leg.AddEntry( rocs3[0], "planflow", 'l' ); 
-        leg.AddEntry( rocs4[0], "optimal", 'l' );         
-        leg.AddEntry( rocs4ex[0], "optimal ex", 'l' );         
+        leg.AddEntry( rocs2[0], "optimal", 'l' );
+#        leg.AddEntry( rocs3[0], "optimal2", 'l' ); 
+#        leg.AddEntry( rocs4[0], "all", 'l' );         
+#        leg.AddEntry( rocs4ex[0], "all ex", 'l' );         
         leg.Draw();
         
-        canBdtRoc.SaveAs("finalPlot/testROC_compex.eps");
-        canBdtRoc.SaveAs("finalPlot/testROC_compex.png");
+        canBdtRoc.SaveAs("finalPlot/testROC_compall.eps");
+        canBdtRoc.SaveAs("finalPlot/testROC_compall.png");
 
-        hs = rocs4ex[2];
+        hs = rocs2ex[2];
         hs.SetLineColor(4);        
         hs.Scale(1./hs.Integral());                
-        hb = rocs4ex[3];
+        hb = rocs2ex[3];
         hb.SetLineColor(2);        
         hb.Scale(1./hb.Integral());                
         canMassPrBdtCut = ROOT.TCanvas("canMassPrBdtCut","canMassPrBdtCut",800,800);    

@@ -157,7 +157,8 @@ class trainingClass:
         print "PrepareTrainingAndTestTree ... "
         factory.PrepareTrainingAndTestTree( mycutSig, mycutBkg,"nTrain_Signal=0:nTrain_Background=0:SplitMode=Random:NormMode=NumEvents:!V" )
         print "BookMethod ... "
-        factory.BookMethod( ROOT.TMVA.Types.kBDT, "BDT","!H:!V:NTrees=850:nEventsMin=150:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning" )
+#        factory.BookMethod( ROOT.TMVA.Types.kBDT, "BDT","!H:!V:NTrees=850:nEventsMin=150:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning" )
+        factory.BookMethod( ROOT.TMVA.Types.kBDT, "BDT","!H:!V:NTrees=1000:nEventsMin=40:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=20:PruneMethod=CostComplexity:PruneStrength=4" )
         
         # Train MVAs
         print "TrainAllMethods ... "        
@@ -244,7 +245,7 @@ class trainingClass:
             bdtv = reader.EvaluateMVA("BDT");
             if bdtv > bdtcut: h_mass_pr_sig.Fill( getattr( self.SigTree_, "jet_mass_pr" ) );
 
-            print "mass = ", getattr( self.SigTree_, "jet_mass_pr" ), " and discriminant = ", bdtv
+#            print "mass = ", getattr( self.SigTree_, "jet_mass_pr" ), " and discriminant = ", bdtv
 
             if getattr(self.SigTree_,"jet_pt_pr") > pTlo and getattr(self.SigTree_,"jet_pt_pr") < pThi and getattr(self.SigTree_,"jet_mass_pr") > 60. and getattr(self.SigTree_,"jet_mass_pr") < 100:
                 
@@ -280,21 +281,21 @@ class trainingClass:
         hdiscr_bkg = ROOT.TH1F("hdiscr_bkg","hdiscr_bkg",100,min(discrVal_bkg),max(discrVal_bkg));
         for i in range(len(discrVal_bkg)): hdiscr_bkg.Fill( discrVal_bkg[i] );
 
-        can1 = ROOT.TCanvas("can1","can1",800,800);
-        can1.cd();
+        can1ex = ROOT.TCanvas("can1ex","can1ex",800,800);
+        can1ex.cd();
         hmd_sig.Draw("hist");
         hmd_bkg.SetLineColor(2);
         hmd_bkg.Draw("histsames");
-        can1.SaveAs("finalPlot/testmd_"+self.Label_+".eps");
-        can1.SaveAs("finalPlot/testmd_"+self.Label_+".png");
+        can1ex.SaveAs("finalPlot/extestmd_"+self.Label_+".eps");
+        can1ex.SaveAs("finalPlot/extestmd_"+self.Label_+".png");
 
-        can2 = ROOT.TCanvas("can2","can2",800,800);
-        can2.cd();
+        can2ex = ROOT.TCanvas("can2ex","can2ex",800,800);
+        can2ex.cd();
         hdiscr_sig.Draw("hist");
         hdiscr_bkg.SetLineColor(2);
         hdiscr_bkg.Draw("histsames");
-        can2.SaveAs("finalPlot/testdiscr_"+self.Label_+".eps");
-        can2.SaveAs("finalPlot/testdiscr_"+self.Label_+".png");
+        can2ex.SaveAs("finalPlot/extestdiscr_"+self.Label_+".eps");
+        can2ex.SaveAs("finalPlot/extestdiscr_"+self.Label_+".png");
 
         tgs = [];
         tgs.append( ComputeROCFromList(discrVal_sig,discrVal_bkg, True) );
@@ -312,9 +313,11 @@ class trainingClass:
 
         internalTreeName = ROOT.TFile(self.OutputFileName_);
         internalTree = internalTreeName.Get("TestTree");
+        internalTrainTree = internalTreeName.Get("TrainTree");
         
         mdVal_sig = []; mdVal_bkg = [];
         discrVal_sig = []; discrVal_bkg = [];
+        discrVal_sig_train = []; discrVal_bkg_train = [];        
         ## ---------------
         for i in range(internalTree.GetEntries()): 
             
@@ -334,18 +337,44 @@ class trainingClass:
                 
                 mdVal_bkg.append( getattr( internalTree, "jet_massdrop_pr") );
                 discrVal_bkg.append( getattr( internalTree, "BDT") );
+        ## ---------------
+        for i in range(internalTrainTree.GetEntries()): 
+            
+            internalTrainTree.GetEntry(i);
+            
+            if getattr(internalTrainTree,"jet_pt_pr") > pTlo and getattr(internalTrainTree,"jet_pt_pr") < pThi and getattr(internalTrainTree,"jet_mass_pr") > 60. and getattr(internalTrainTree,"jet_mass_pr") < 100 and internalTrainTree.classID == 0:
+                
+                mdVal_sig.append( getattr( internalTrainTree, "jet_massdrop_pr") );
+                discrVal_sig_train.append( getattr( internalTrainTree, "BDT") );
+        
+        ## ---------------
+        for i in range(internalTrainTree.GetEntries()): 
+            
+            internalTrainTree.GetEntry(i);
+            
+            if getattr(internalTrainTree,"jet_pt_pr") > pTlo and getattr(internalTrainTree,"jet_pt_pr") < pThi and getattr(internalTrainTree,"jet_mass_pr") > 60. and getattr(internalTrainTree,"jet_mass_pr") < 100 and internalTrainTree.classID == 1:
+                
+                mdVal_bkg.append( getattr( internalTrainTree, "jet_massdrop_pr") );
+                discrVal_bkg_train.append( getattr( internalTrainTree, "BDT") );
 
+            
                     
-        hmd_sig = ROOT.TH1F("hmd_sig",";mass drop ("+self.Label_+");",100,min(mdVal_sig),max(mdVal_sig));
+        hmd_sig = ROOT.TH1F("hmd_sig",";mass drop ("+self.Label_+");",30,min(mdVal_sig),max(mdVal_sig));
         for i in range(len(mdVal_sig)): hmd_sig.Fill( mdVal_sig[i] );
-        hmd_bkg = ROOT.TH1F("hmd_bkg",";mass drop ("+self.Label_+");",100,min(mdVal_bkg),max(mdVal_bkg)); 
+        hmd_bkg = ROOT.TH1F("hmd_bkg",";mass drop ("+self.Label_+");",30,min(mdVal_bkg),max(mdVal_bkg)); 
         for i in range(len(mdVal_bkg)): hmd_bkg.Fill( mdVal_bkg[i] );
         
-        hdiscr_sig = ROOT.TH1F("hdiscr_sig",";BDT discr ("+self.Label_+");",100,min(discrVal_sig),max(discrVal_sig));
+        hdiscr_sig = ROOT.TH1F("hdiscr_sig",";BDT discr ("+self.Label_+");",30,min(discrVal_sig),max(discrVal_sig));
         for i in range(len(discrVal_sig)): hdiscr_sig.Fill( discrVal_sig[i] );
-        hdiscr_bkg = ROOT.TH1F("hdiscr_bkg",";BDT discr ("+self.Label_+");",100,min(discrVal_bkg),max(discrVal_bkg));
+        hdiscr_bkg = ROOT.TH1F("hdiscr_bkg",";BDT discr ("+self.Label_+");",30,min(discrVal_bkg),max(discrVal_bkg));
         for i in range(len(discrVal_bkg)): hdiscr_bkg.Fill( discrVal_bkg[i] );
-        
+
+        hdiscr_sig_train = ROOT.TH1F("hdiscr_sig_train",";BDT discr ("+self.Label_+");",30,min(discrVal_sig_train),max(discrVal_sig_train));
+        for i in range(len(discrVal_sig_train)): hdiscr_sig_train.Fill( discrVal_sig_train[i] );
+        hdiscr_bkg_train = ROOT.TH1F("hdiscr_bkg_train",";BDT discr ("+self.Label_+");",30,min(discrVal_bkg_train),max(discrVal_bkg_train));
+        for i in range(len(discrVal_bkg_train)): hdiscr_bkg_train.Fill( discrVal_bkg_train[i] );
+                    
+                    
         can1 = ROOT.TCanvas("can1"+self.Label_,"can1"+self.Label_,800,800);
         can1.cd();
         hmd_sig.Draw("hist");
@@ -359,6 +388,14 @@ class trainingClass:
         hdiscr_sig.Draw("hist");
         hdiscr_bkg.SetLineColor(2);
         hdiscr_bkg.Draw("histsames");
+                    
+        hdiscr_sig_train.SetLineStyle(2);
+        hdiscr_sig_train.Draw("histsames");
+                    
+        hdiscr_bkg_train.SetLineColor(2);
+        hdiscr_bkg_train.SetLineStyle(2);
+                    
+        hdiscr_bkg_train.Draw("histsames");
         can2.SaveAs("finalPlot/testdiscr_"+self.Label_+".eps");
         can2.SaveAs("finalPlot/testdiscr_"+self.Label_+".png");
         
@@ -367,5 +404,6 @@ class trainingClass:
 #        tgs.append( ComputeROC(hmd_sig,hmd_bkg, False) );
         tgs.append( ComputeROCFromList(discrVal_sig,discrVal_bkg, True) );
         tgs.append( ComputeROCFromList(mdVal_sig,mdVal_bkg, False) );
+        tgs.append( ComputeROCFromList(discrVal_sig_train,discrVal_bkg_train, True) );
 
         return tgs;
