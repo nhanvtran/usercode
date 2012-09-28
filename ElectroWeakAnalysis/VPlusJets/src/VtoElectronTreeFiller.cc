@@ -33,11 +33,15 @@
 
 
 
-ewk::VtoElectronTreeFiller::VtoElectronTreeFiller(std::string vType, std::string leptonType, TTree* tree, 
+ewk::VtoElectronTreeFiller::VtoElectronTreeFiller(const char *name, TTree* tree, 
                                                   const edm::ParameterSet iConfig)
 {
     
     // ********** Vector boson ********** //
+    if(  iConfig.existsAs<edm::InputTag>("srcVectorBoson") )
+        mInputBoson = iConfig.getParameter<edm::InputTag>("srcVectorBoson"); 
+    else std::cout << "***Error:" << name << 
+        " Collection not specified !" << std::endl;
     if(  iConfig.existsAs<edm::InputTag>("srcMet") )
 		mInputMet = iConfig.getParameter<edm::InputTag>("srcMet");
     if(  iConfig.existsAs<edm::InputTag>("srcElectrons") )
@@ -46,441 +50,17 @@ ewk::VtoElectronTreeFiller::VtoElectronTreeFiller(std::string vType, std::string
 		mInputBeamSpot  = iConfig.getParameter<edm::InputTag>("srcBeamSpot");
 	if( iConfig.existsAs<bool>("runningOverAOD"))
 		runoverAOD = iConfig.getParameter<bool>("runningOverAOD");
-
-    
-    if (vType == "W") mInputBoson = iConfig.getParameter<edm::InputTag>("srcVectorBosonWe");
-    if (vType == "Z") mInputBoson = iConfig.getParameter<edm::InputTag>("srcVectorBosonZe");
-    
     tree_     = tree;
-    name_     = vType;
-    if (leptonType == "muon") name_ += "mu";
-    if (leptonType == "electron") name_ += "el";
-    Vtype_    = vType; 
-    LeptonType_ = leptonType;
+    name_     = name;
+    Vtype_    = iConfig.getParameter<std::string>("VBosonType"); 
+    LeptonType_ = iConfig.getParameter<std::string>("LeptonType");
     
     if( !(tree==0) && LeptonType_=="electron") SetBranches();
 }
 
 
-void ewk::VtoElectronTreeFiller::fill(const edm::Event& iEvent, int vecBosonIndex)
-{
-    // protection
-    if( (tree_==0) || !(LeptonType_=="electron") )  return;
-    
-    // first initialize to the default values
-    init();
-    
-    edm::Handle<reco::CandidateView> boson;
-    iEvent.getByLabel( mInputBoson, boson);
-    if( boson->size()<1 ) return; // Nothing to fill
-    
-    
-    //  edm::Handle<reco::PFMETCollection> pfmet;
-    // iEvent.getByLabel("pfMet", pfmet);
-    
-    edm::Handle<edm::View<reco::MET> > pfmet;
-    iEvent.getByLabel(mInputMet, pfmet);
-    
-    
-    nTightElectron = 0;
-    nLooseElectron = 0;
-    
-    // Loop over electrons for loose/tight counting
-    // edm::Handle<reco::GsfElectronCollection> electrons;
-    // iEvent.getByLabel("gsfElectrons", electrons);
-    edm::Handle<edm::View<reco::GsfElectron> > electrons;
-    iEvent.getByLabel(mInputElectrons, electrons);
-    for(edm::View<reco::GsfElectron>::const_iterator 
-        elec = electrons->begin(); elec != electrons->end();++elec) {
-        if( isTightElectron( iEvent, *elec) ) nTightElectron++;
-        if( isLooseElectron( iEvent, *elec) ) nLooseElectron++;
-    }
-    
-    
-    const reco::Candidate *Vboson = &((*boson)[vecBosonIndex]); 
-    if( Vboson == 0) return;
-    
-    ////////// Vector boson quantities //////////////
-    V_mass = Vboson->mass();
-    V_mt = sqrt(2.0*Vboson->daughter(0)->pt()*Vboson->daughter(1)->pt()*
-                (1.0-cos(Vboson->daughter(0)->phi()-Vboson->daughter(1)->phi())));
-    V_Eta = Vboson->eta();   
-    V_Phi = Vboson->phi();
-    V_Vx = Vboson->vx();
-    V_Vy = Vboson->vy();
-    V_Vz = Vboson->vz();
-    V_Y  = Vboson->rapidity();
-    V_px = Vboson->px();
-    V_py = Vboson->py();
-    V_pz = Vboson->pz();
-    V_E  = Vboson->energy();
-    V_Pt = Vboson->pt();
-    V_Et = Vboson->et();
-    
-    // now iterate over the daughters  
-    if(Vboson->numberOfDaughters()<2 ) {
-        throw cms::Exception( "***Error: V boson has < 2 daughters !\n");
-        return;  // if no electron found, then return
-    } 
-   
-    //std::cout << "number of daugters " << Vboson->numberOfDaughters() <<std::endl;
-    // get the two daughters
-    reco::CandidateBaseRef m0 = Vboson->daughter(0)->masterClone();
-    reco::CandidateBaseRef m1 = Vboson->daughter(1)->masterClone();
-    //std::cout << "ptr m1 is nonnull " << m1.isNonnull() <<std::endl ;
-    
-    const reco::GsfElectron* e1=NULL;
-    const reco::GsfElectron* e2=NULL;
-    const std::type_info & type0 = typeid(*m0);
-    const std::type_info & type1 = typeid(*m1);
-    
-
-    if( type0 == typeid(pat::Electron) ){
-        //std::cout << " boson daughter - pat el " << std::endl;
-        
-        //std::cout << "ptr is nonnull " << m0.isNonnull() <<std::endl ;
-        //std::cout << "charge from Ptr = " << m0->charge() << std::endl;
-        e1 = dynamic_cast<const pat::Electron *>(&*m0) ;
-        //std::cout << "charge from el 1 = " << e1->charge() << std::endl;
-        //std::cout << "pt from el 1 = " << e1->pt() << std::endl;
-    }
-    
-    if( type1 == typeid(pat::Electron) ){
-        //std::cout << " boson daughter - pat el 2" << std::endl;
-        
-        //std::cout << "ptr is nonnull " << m1.isNonnull() <<std::endl ;
-        //std::cout << "charge from Ptr = " << m1->charge() << std::endl;
-        e2 = dynamic_cast<const pat::Electron *>(&*m1) ;
-        //std::cout << "charge from el 2 = " << e2->charge() << std::endl;
-    }
-
-    
-    if(0==e1 && 0==e2) {
-        throw cms::Exception("***Error: couldn't" 
-                             " do dynamic cast of vector boson daughters !\n");
-        return;  // if no electron found, then return
-    } 
-    
-    
-    const reco::GsfElectron* ele1=NULL;
-    const reco::GsfElectron* ele2=NULL;
-    
-    
-    // if Z--> e+e- then ele1 = e+, ele2 = e-
-    if(Vtype_=="Z") {
-        if(e1->charge() > 0) {  ele1 = e1;   ele2 = e2; }
-        else { ele1 = e2;  ele2 = e1; }
-    }
-    // if W--> enu then ele1 = e, ele2 = NULL 
-    if(Vtype_=="W") {
-        if( abs(e1->charge())==1 ) ele1  = e1;
-        else if( abs(e2->charge())==1 ) ele1  = e2;
-        
-        // estimate Pz of neutrino
-        TLorentzVector p4MET((*pfmet)[0].px(), (*pfmet)[0].py(), (*pfmet)[0].pz(), (*pfmet)[0].energy());
-        TLorentzVector p4lepton(ele1->px(), ele1->py(), ele1->pz(), ele1->energy());
-        METzCalculator metz;
-        metz.SetMET(p4MET);
-        metz.SetLepton(p4lepton);
-        if (LeptonType_=="electron") metz.SetLeptonType("electron");
-        V_pzNu1 = metz.Calculate();
-        V_pzNu2 = metz.getOther();
-    }
-    
-    
-    ////////// electron #1 quantities //////////////
-    if( !(ele1 == NULL) ) {
-        e1Charge           = ele1-> charge(); 
-        e1Vx               = ele1->vx();
-        e1Vy               = ele1->vy();
-        e1Vz               = ele1->vz();
-        e1Y                = ele1->rapidity();
-        e1Theta            = ele1->theta();
-        e1Eta              = ele1->eta();    
-        e1Phi              = ele1->phi();
-        e1E                = ele1->energy();
-        e1px               = ele1->px();
-        e1py               = ele1->py();
-        e1pz               = ele1->pz();
-        e1Pt               = ele1->pt();
-        e1Et               = ele1->et();
-        
-        /// isolation 
-        e1_trackiso       = e1->dr03TkSumPt();
-        e1_ecaliso        = e1->dr03EcalRecHitSumEt();
-        e1_hcaliso        = e1->dr03HcalTowerSumEt();
-
-        // leave empty for now, add as necessary
-        ///*
-        e1Classification  = ele1->classification();
-        e1_numberOfBrems  = ele1->numberOfBrems();      
-        e1_BremFraction   = ele1->fbrem();
-        e1_DeltaEtaIn     = ele1->deltaEtaSuperClusterTrackAtVtx();
-        e1_DeltaPhiIn     = ele1->deltaPhiSuperClusterTrackAtVtx();
-        e1_DeltaPhiOut    = ele1->deltaPhiSeedClusterTrackAtCalo();
-        e1_DeltaEtaOut    = ele1->deltaEtaSeedClusterTrackAtCalo();
-        
-        
-        //Track Momentum information
-        e1_Trackmom_calo  = sqrt(ele1->trackMomentumAtCalo().perp2());
-        e1_Trackmom_vtx   = sqrt(ele1->trackMomentumAtVtx().perp2());
-        //get Hcal energy over Ecal Energy
-        e1_HoverE = ele1->hadronicOverEm();	  
-        e1_EoverPout      = ele1->eSeedClusterOverPout();
-        e1_EoverPin       = ele1->eSuperClusterOverP();
-        //get SuperCluster (sc) infos
-        reco::SuperClusterRef SCp = ele1->superCluster();
-        e1_sc_x          = SCp->x();
-        e1_sc_y          = SCp->y();
-        e1_sc_z          = SCp->z();
-        e1_sc_Theta      = SCp->position().Theta();
-        e1_sc_Eta        = SCp->eta();    
-        e1_sc_Phi        = SCp->phi();
-        e1_sc_E          = SCp->energy();
-        e1_sc_px         = e1E * sin(e1Theta) * cos(e1Phi);
-        e1_sc_py         = e1E * sin(e1Theta) * sin(e1Phi);
-        e1_sc_pz         = e1E * cos(e1Theta);
-        e1_sc_Pt         = e1E / cosh(e1Eta);
-        e1_sc_Et         = e1Pt;	  
-        e1_SigmaEtaEta   = ele1->sigmaEtaEta();
-        e1_SigmaIetaIeta = ele1->sigmaIetaIeta();
-        e1_missingHits   = ele1->gsfTrack()->trackerExpectedHitsInner().numberOfHits();
-        e1_dist          = ele1->convDist();
-        e1_dcot          = ele1->convDcot();
-        e1_convradius    = ele1->convRadius();
-        
-        //std::cout << "Iso vars: " << e1_trackiso << ", " << e1_ecaliso << ", " << e1_hcaliso << std::endl;
-        //std::cout << "e1_missingHits: " << e1_missingHits << ", e1_dist: " << e1_dist << ", e1_dcot: " << e1_dcot << std::endl;
-        //std::cout << "e1_DeltaPhiIn: " << e1_DeltaPhiIn << ", e1_DeltaEtaIn: " << e1_DeltaEtaIn << ", e1_HoverE: " << e1_HoverE << ", e1_SigmaIetaIeta: " << e1_SigmaIetaIeta << std::endl;
-        
-        
-        if( ele1->isEB() ) {
-            ise1WP95      = (e1_missingHits<=1) && (e1_trackiso/e1Et<0.15) && (e1_ecaliso/e1Et<2.0) 
-            && (e1_hcaliso/e1Et<0.12) && (e1_SigmaIetaIeta<0.01) && (fabs(e1_DeltaPhiIn)<0.8) 
-            && (fabs(e1_DeltaEtaIn)<0.007) && (e1_HoverE<0.15);
-            ise1WP80      = (e1_missingHits==0) && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02) 
-            && (e1_trackiso/e1Et<0.09) && (e1_ecaliso/e1Et<0.07) 
-            && (e1_hcaliso/e1Et<0.1) && (e1_SigmaIetaIeta<0.01) && (fabs(e1_DeltaPhiIn)<0.06) 
-            && (fabs(e1_DeltaEtaIn)<0.004) && (e1_HoverE<0.04);
-            ise1WP70      = (e1_missingHits==0) && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02) 
-            && (e1_trackiso/e1Et<0.05) && (e1_ecaliso/e1Et<0.06) 
-            && (e1_hcaliso/e1Et<0.03) && (e1_SigmaIetaIeta<0.01) && (fabs(e1_DeltaPhiIn)<0.03) 
-            && (fabs(e1_DeltaEtaIn)<0.004) && (e1_HoverE<0.025);
-            
-            ise1WP70Good      = (e1_missingHits==0) && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02) 
-            && (e1_trackiso/e1Et<0.09) && (e1_ecaliso/e1Et<0.07) 
-            && (e1_hcaliso/e1Et<0.1) && (e1_SigmaIetaIeta<0.01) && (fabs(e1_DeltaPhiIn)<0.03) 
-            && (fabs(e1_DeltaEtaIn)<0.004) && (e1_HoverE<0.04);
-        }
-        if( ele1->isEE() ) {
-            ise1WP95      = (e1_missingHits<=1) && (e1_trackiso/e1Et<0.08) && (e1_ecaliso/e1Et<0.06) 
-            && (e1_hcaliso/e1Et<0.05) && (e1_SigmaIetaIeta<0.03) && (fabs(e1_DeltaPhiIn)<0.7) 
-            && (fabs(e1_DeltaEtaIn)<0.01) && (e1_HoverE<0.07);
-            ise1WP80      = (e1_missingHits==0)  && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02)  
-            && (e1_trackiso/e1Et<0.08) && (e1_ecaliso/e1Et<0.06) 
-            && (e1_hcaliso/e1Et<0.05) && (e1_SigmaIetaIeta<0.03) && (fabs(e1_DeltaPhiIn)<0.7) 
-            && (fabs(e1_DeltaEtaIn)<0.01) && (e1_HoverE<0.07);
-            ise1WP70      = (e1_missingHits==0)  && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02)  
-            && (e1_trackiso/e1Et<0.025) && (e1_ecaliso/e1Et<0.025) 
-            && (e1_hcaliso/e1Et<0.02) && (e1_SigmaIetaIeta<0.03) && (fabs(e1_DeltaPhiIn)<0.02) 
-            && (fabs(e1_DeltaEtaIn)<0.005) && (e1_HoverE<0.025);
-            
-            ise1WP70Good      = (e1_missingHits==0)  && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02)  
-            && (e1_trackiso/e1Et<0.08) && (e1_ecaliso/e1Et<0.06) 
-            && (e1_hcaliso/e1Et<0.05) && (e1_SigmaIetaIeta<0.03) && (fabs(e1_DeltaPhiIn)<0.02) 
-            && (fabs(e1_DeltaEtaIn)<0.005) && (e1_HoverE<0.07);
-        }
-        
-        // IP relative to beam spot  & dz relative to vertex
-        edm::Handle<reco::BeamSpot > beamSpot;
-        if(runoverAOD){
-            iEvent.getByLabel(mInputBeamSpot, beamSpot);
-            e1_d0bsp = e1->gsfTrack()->dxy( beamSpot->position() ) ;
-            e1_dz000 = e1->vertex().z();
-        }
-        // PF Isolation 
-        e1_pfiso_chargedHadronIso = e1->pfIsolationVariables().chargedHadronIso;
-        e1_pfiso_photonIso        = e1->pfIsolationVariables().photonIso;
-        e1_pfiso_neutralHadronIso = e1->pfIsolationVariables().neutralHadronIso;
-    }
-    
-    ////////// electron #2 quantities //////////////
-    if( !(ele2 == NULL) ) {
-        e2Charge          = ele2->charge();
-        e2Vx              = ele2->vx();
-        e2Vy              = ele2->vy();
-        e2Vz              = ele2->vz();
-        e2Y               = ele2->rapidity();
-        e2Theta           = ele2->theta();
-        e2Eta             = ele2->eta();    
-        e2Phi             = ele2->phi();
-        e2E               = ele2->energy();
-        e2px              = ele2->px();
-        e2py              = ele2->py();
-        e2pz              = ele2->pz();
-        e2Pt              = ele2->pt();
-        e2Et              = ele2->et();	  
-        
-        /// isolation 
-        e2_trackiso       = ele2->dr03TkSumPt();
-        e2_ecaliso        = ele2->dr03EcalRecHitSumEt();
-        e2_hcaliso        = ele2->dr03HcalTowerSumEt();
-        e2Classification  = ele2->classification();
-        e2_EoverPout = ele2->eSeedClusterOverPout();
-        e2_EoverPin  = ele2->eSuperClusterOverP();
-        e2_numberOfBrems  = ele2->numberOfBrems();
-        e2_BremFraction   = ele2->fbrem();
-        e2_DeltaEtaIn     = ele2->deltaEtaSuperClusterTrackAtVtx();
-        e2_DeltaPhiIn     = ele2->deltaPhiSuperClusterTrackAtVtx();
-        e2_DeltaPhiOut    = ele2->deltaPhiSeedClusterTrackAtCalo();
-        e2_DeltaEtaOut    = ele2->deltaEtaSeedClusterTrackAtCalo();
-        //Track Momentum information
-        e2_Trackmom_calo  = sqrt(ele2->trackMomentumAtCalo().perp2());
-        e2_Trackmom_vtx   = sqrt(ele2->trackMomentumAtVtx().perp2());   
-        //get Hcal energy over Ecal Energy
-        e2_HoverE = ele2->hadronicOverEm();	  
-        //get SuperCluster (sc) infos
-        reco::SuperClusterRef SCm = ele2->superCluster();
-        e2_sc_x          = SCm->x();
-        e2_sc_y          = SCm->y();
-        e2_sc_z          = SCm->z();
-        e2_sc_Theta      = SCm->position().Theta();
-        e2_sc_Eta        = SCm->eta();    
-        e2_sc_Phi        = SCm->phi();
-        e2_sc_E          = SCm->energy();
-        e2_sc_px         = e2E * sin(e2Theta) * cos(e2Phi);
-        e2_sc_py         = e2E * sin(e2Theta) * sin(e2Phi);
-        e2_sc_pz         = e2E * cos(e2Theta);
-        e2_sc_Pt         = e2E / cosh(e2Eta);
-        e2_sc_Et         = e2Pt;	 
-        e2_SigmaEtaEta   = ele2->sigmaEtaEta();
-        e2_SigmaIetaIeta = ele2->sigmaIetaIeta();
-        e2_missingHits   = ele2->gsfTrack()->trackerExpectedHitsInner().numberOfHits();
-        e2_dist          = ele2->convDist();
-        e2_dcot          = ele2->convDcot();
-        e2_convradius    = ele2->convRadius();
-        if( ele2->isEB() ) {
-            ise2WP95      = (e2_missingHits<=1) && (e2_trackiso/e2Et<0.15) && (e2_ecaliso/e2Et<2.0) 
-            && (e2_hcaliso/e2Et<0.12) && (e2_SigmaIetaIeta<0.01) && (fabs(e2_DeltaPhiIn)<0.8) 
-            && (fabs(e2_DeltaEtaIn)<0.007) && (e2_HoverE<0.15);
-            ise2WP80      = (e2_missingHits==0) && (fabs(e2_dist)>0.02 || fabs(e2_dcot)>0.02) 
-            && (e2_trackiso/e2Et<0.09) && (e2_ecaliso/e2Et<0.07) 
-            && (e2_hcaliso/e2Et<0.1) && (e2_SigmaIetaIeta<0.01) && (fabs(e2_DeltaPhiIn)<0.06) 
-            && (fabs(e2_DeltaEtaIn)<0.004) && (e2_HoverE<0.04);
-            ise2WP70      = (e2_missingHits==0) && (fabs(e2_dist)>0.02 || fabs(e2_dcot)>0.02) 
-            && (e2_trackiso/e2Et<0.05) && (e2_ecaliso/e2Et<0.06) 
-            && (e2_hcaliso/e2Et<0.03) && (e2_SigmaIetaIeta<0.01) && (fabs(e2_DeltaPhiIn)<0.03) 
-            && (fabs(e2_DeltaEtaIn)<0.004) && (e2_HoverE<0.025);
-            
-            ise2WP70Good      = (e1_missingHits==0) && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02) 
-            && (e1_trackiso/e1Et<0.09) && (e1_ecaliso/e1Et<0.07) 
-            && (e1_hcaliso/e1Et<0.1) && (e1_SigmaIetaIeta<0.01) && (fabs(e1_DeltaPhiIn)<0.03) 
-            && (fabs(e1_DeltaEtaIn)<0.004) && (e1_HoverE<0.04);
-        }
-        if( ele2->isEE() ) {
-            ise2WP95      = (e2_missingHits<=1) && (e2_trackiso/e2Et<0.08) && (e2_ecaliso/e2Et<0.06) 
-            && (e2_hcaliso/e2Et<0.05) && (e2_SigmaIetaIeta<0.03) && (fabs(e2_DeltaPhiIn)<0.7) 
-            && (fabs(e2_DeltaEtaIn)<0.01) && (e2_HoverE<0.07);
-            ise2WP80      = (e2_missingHits==0)  && (fabs(e2_dist)>0.02 || fabs(e2_dcot)>0.02)  
-            && (e2_trackiso/e2Et<0.08) && (e2_ecaliso/e2Et<0.06) 
-            && (e2_hcaliso/e2Et<0.05) && (e2_SigmaIetaIeta<0.03) && (fabs(e2_DeltaPhiIn)<0.7) 
-            && (fabs(e2_DeltaEtaIn)<0.01) && (e2_HoverE<0.07);
-            ise2WP70      = (e2_missingHits==0)  && (fabs(e2_dist)>0.02 || fabs(e2_dcot)>0.02)  
-            && (e2_trackiso/e2Et<0.025) && (e2_ecaliso/e2Et<0.025) 
-            && (e2_hcaliso/e2Et<0.02) && (e2_SigmaIetaIeta<0.03) && (fabs(e2_DeltaPhiIn)<0.02) 
-            && (fabs(e2_DeltaEtaIn)<0.005) && (e2_HoverE<0.025);
-            
-            ise2WP70Good      = (e1_missingHits==0)  && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02)  
-            && (e1_trackiso/e1Et<0.08) && (e1_ecaliso/e1Et<0.06) 
-            && (e1_hcaliso/e1Et<0.05) && (e1_SigmaIetaIeta<0.03) && (fabs(e1_DeltaPhiIn)<0.02) 
-            && (fabs(e1_DeltaEtaIn)<0.005) && (e1_HoverE<0.07);
-        }
-    } 
-    
-}
 
 
-
-
-
-// WP80: but only track iso, and cut on impact parameter |d0|
-bool ewk::VtoElectronTreeFiller::isTightElectron(const edm::Event& iEvent, const reco::GsfElectron& ele) 
-{
-    float pt = ele.pt();
-    float eta = fabs(ele.superCluster()->eta());  
-    
-    if( pt<20.0 )  return false;
-    if( eta > 1.4442 && eta < 1.5660) return false;
-    if ( eta > 2.5 ) return false;
-    
-    
-    int missingHits   = ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits();
-    float dist          = fabs(ele.convDist());
-    float dcot          = fabs(ele.convDcot());
-    
-    if( !(missingHits==0) )  return false;
-    if( dist<0.02 && dcot<0.02) return false;
-    
-    
-    float trackiso      = ele.dr03TkSumPt()/pt;
-    float sigmaIetaIeta = ele.sigmaIetaIeta();
-    float deltaEta      = ele.deltaEtaSuperClusterTrackAtVtx();
-    float deltaPhi      = ele.deltaPhiSuperClusterTrackAtVtx();
-    float HoverE        = ele.hadronicOverEm();	  
-    bool isEB = ele.isEB();
-    bool isEE = ele.isEE();
-    
-    
-    bool isWP80Id    = (trackiso<0.1) && 
-    ((isEB && sigmaIetaIeta<0.01 && deltaPhi<0.06 && deltaEta<0.004 && HoverE<0.04) || 
-     (isEE && sigmaIetaIeta<0.03 && deltaPhi<0.03 && deltaEta<0.007 && HoverE<0.025)); 
-    
-    
-    //////////// Beam spot //////////////
-    edm::Handle<reco::BeamSpot> beamSpot;
-    double dz =0.0;
-	if(runoverAOD){
-		iEvent.getByLabel(mInputBeamSpot, beamSpot);
-		dz = fabs( ele.gsfTrack()->dxy( beamSpot->position() ) );
-        
-	}
-    if( !(isWP80Id && dz<0.02) )  return false;
-    
-    return true;
-}
-
-
-
-
-
-// WP95: but only track iso
-bool ewk::VtoElectronTreeFiller::isLooseElectron(const edm::Event& iEvent, const reco::GsfElectron& ele) 
-{
-    float pt = ele.pt();
-    float eta = fabs(ele.superCluster()->eta());  
-    
-    if( pt<20.0 )  return false;
-    if( eta > 1.4442 && eta < 1.5660) return false;
-    if ( eta > 2.5 ) return false;
-    
-    
-    float trackiso      = ele.dr03TkSumPt()/pt;
-    float sigmaIetaIeta = ele.sigmaIetaIeta();
-    float deltaEta      = ele.deltaEtaSuperClusterTrackAtVtx();
-    float deltaPhi      = ele.deltaPhiSuperClusterTrackAtVtx();
-    float HoverE        = ele.hadronicOverEm();	  
-    bool isEB = ele.isEB();
-    bool isEE = ele.isEE();
-    
-    
-    bool isWP95Id    = (trackiso<0.2) && 
-    ((isEB && sigmaIetaIeta<0.01 && deltaPhi<0.8 && deltaEta<0.007 && HoverE<0.15) || 
-     (isEE && sigmaIetaIeta<0.03 && deltaPhi<0.7 && deltaEta<0.010 && HoverE<0.07)); 
-    
-    if( !(isWP95Id) )  return false;
-    
-    return true;
-}
 
 void ewk::VtoElectronTreeFiller::SetBranches()
 {
@@ -528,8 +108,6 @@ void ewk::VtoElectronTreeFiller::SetBranches()
     SetBranch( &e1_hcaliso,       lept1+"_hcaliso" );
     SetBranch( &e1_ecaliso,       lept1+"_ecaliso" );
     SetBranch( &e1Classification, lept1+"_classification" );
-    // drop for now, add as necessary
-    /*
     SetBranch( &e1_sc_x,          lept1+"_sc_x" );
     SetBranch( &e1_sc_y,          lept1+"_sc_y" );
     SetBranch( &e1_sc_z,          lept1+"_sc_z" );
@@ -560,18 +138,15 @@ void ewk::VtoElectronTreeFiller::SetBranches()
     SetBranch( &e1_dist,          lept1+"_dist" );
     SetBranch( &e1_dcot,          lept1+"_dcot" );
     SetBranch( &e1_convradius,    lept1+"_convradius" );
-     SetBranch( &e1_d0bsp,         lept1+"_d0bsp" );
-     SetBranch( &e1_dz000,         lept1+"_dz000" );
-     
-     SetBranch( &e1_pfiso_chargedHadronIso,         lept1+"_pfiso_chargedHadronIso" );
-     SetBranch( &e1_pfiso_photonIso,                lept1+"_pfiso_photonIso" );
-     SetBranch( &e1_pfiso_neutralHadronIso,         lept1+"_pfiso_neutralHadronIso" );
-     //*/     
     SetBranch( &ise1WP95,         lept1+"_isWP95" );
     SetBranch( &ise1WP80,         lept1+"_isWP80" );
     SetBranch( &ise1WP70,         lept1+"_isWP70" );
-    SetBranch( &ise1WP70Good,         lept1+"_isWP70Good" );
-
+    SetBranch( &e1_d0bsp,         lept1+"_d0bsp" );
+    SetBranch( &e1_dz000,         lept1+"_dz000" );
+    
+    SetBranch( &e1_pfiso_chargedHadronIso,         lept1+"_pfiso_chargedHadronIso" );
+    SetBranch( &e1_pfiso_photonIso,                lept1+"_pfiso_photonIso" );
+    SetBranch( &e1_pfiso_neutralHadronIso,         lept1+"_pfiso_neutralHadronIso" );
     
     
     ////////////////////////////////////////////////////////
@@ -593,7 +168,6 @@ void ewk::VtoElectronTreeFiller::SetBranches()
         SetBranch( &e2_trackiso,      lept2+"_trackiso" );
         SetBranch( &e2_hcaliso,       lept2+"_hcaliso" );
         SetBranch( &e2_ecaliso,       lept2+"_ecaliso");
-        /*
         SetBranch( &e2Classification, lept2+"_classification" );
         SetBranch( &e2_sc_x,          lept2+"_sc_x" );
         SetBranch( &e2_sc_y,          lept2+"_sc_y" );
@@ -625,15 +199,17 @@ void ewk::VtoElectronTreeFiller::SetBranches()
         SetBranch( &e2_dist,          lept2+"_dist" );
         SetBranch( &e2_dcot,          lept2+"_dcot" );
         SetBranch( &e2_convradius,    lept2+"_convradius" );
-         //*/
         SetBranch( &ise2WP95,         lept2+"_isWP95" );
         SetBranch( &ise2WP80,         lept2+"_isWP80" );
         SetBranch( &ise2WP70,         lept2+"_isWP70" );
-        SetBranch( &ise2WP70Good,         lept2+"_isWP70Good" );
-        
     }	  
 }
 /////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 
 void ewk::VtoElectronTreeFiller::init()   
 {
@@ -660,11 +236,9 @@ void ewk::VtoElectronTreeFiller::init()
     ise1WP95          = false;
     ise1WP80          = false;
     ise1WP70          = false;
-    ise1WP70Good          = false;
     ise2WP95          = false;
     ise2WP80          = false;
     ise2WP70          = false;
-    ise2WP70Good          = false;    
     
     e1Classification   = -1; 
     e1Charge           = -10;
@@ -775,6 +349,399 @@ void ewk::VtoElectronTreeFiller::init()
     
     // initialization done
 }
+
+void ewk::VtoElectronTreeFiller::fill(const edm::Event& iEvent, int vecBosonIndex)
+{
+    // protection
+    if( (tree_==0) || !(LeptonType_=="electron") )  return;
+    
+    // first initialize to the default values
+    init();
+    
+    edm::Handle<reco::CandidateView> boson;
+    iEvent.getByLabel( mInputBoson, boson);
+    if( boson->size()<1 ) return; // Nothing to fill
+    
+    
+    //  edm::Handle<reco::PFMETCollection> pfmet;
+    // iEvent.getByLabel("pfMet", pfmet);
+    
+    edm::Handle<edm::View<reco::MET> > pfmet;
+    iEvent.getByLabel(mInputMet, pfmet);
+    
+    
+    nTightElectron = 0;
+    nLooseElectron = 0;
+    
+    // Loop over electrons for loose/tight counting
+    // edm::Handle<reco::GsfElectronCollection> electrons;
+    // iEvent.getByLabel("gsfElectrons", electrons);
+    edm::Handle<edm::View<reco::GsfElectron> > electrons;
+    iEvent.getByLabel(mInputElectrons, electrons);
+    for(edm::View<reco::GsfElectron>::const_iterator 
+        elec = electrons->begin(); elec != electrons->end();++elec) {
+        if( isTightElectron( iEvent, *elec) ) nTightElectron++;
+        if( isLooseElectron( iEvent, *elec) ) nLooseElectron++;
+    }
+    
+    
+    const reco::Candidate *Vboson = &((*boson)[vecBosonIndex]); 
+    if( Vboson == 0) return;
+    
+    ////////// Vector boson quantities //////////////
+    V_mass = Vboson->mass();
+    V_mt = sqrt(2.0*Vboson->daughter(0)->pt()*Vboson->daughter(1)->pt()*
+                (1.0-cos(Vboson->daughter(0)->phi()-Vboson->daughter(1)->phi())));
+    V_Eta = Vboson->eta();   
+    V_Phi = Vboson->phi();
+    V_Vx = Vboson->vx();
+    V_Vy = Vboson->vy();
+    V_Vz = Vboson->vz();
+    V_Y  = Vboson->rapidity();
+    V_px = Vboson->px();
+    V_py = Vboson->py();
+    V_pz = Vboson->pz();
+    V_E  = Vboson->energy();
+    V_Pt = Vboson->pt();
+    V_Et = Vboson->et();
+    
+    // now iterate over the daughters  
+    if(Vboson->numberOfDaughters()<2 ) {
+        throw cms::Exception( "***Error: V boson has < 2 daughters !\n");
+        return;  // if no electron found, then return
+    } 
+   
+    std::cout << "number of daugters " << Vboson->numberOfDaughters() <<std::endl;
+    // get the two daughters
+    reco::CandidateBaseRef m0 = Vboson->daughter(0)->masterClone();
+    reco::CandidateBaseRef m1 = Vboson->daughter(1)->masterClone();
+    std::cout << "ptr m1 is nonnull " << m1.isNonnull() <<std::endl ;
+    
+    const reco::GsfElectron* e1=NULL;
+    const reco::GsfElectron* e2=NULL;
+    const std::type_info & type0 = typeid(*m0);
+    const std::type_info & type1 = typeid(*m1);
+    
+
+    if( type0 == typeid(pat::Electron) ){
+        std::cout << " boson daughter - pat el " << std::endl;
+        
+        std::cout << "ptr is nonnull " << m0.isNonnull() <<std::endl ;
+        std::cout << "charge from Ptr = " << m0->charge() << std::endl;
+        e1 = dynamic_cast<const pat::Electron *>(&*m0) ;
+        std::cout << "charge from el 1 = " << e1->charge() << std::endl;
+        std::cout << "pt from el 1 = " << e1->pt() << std::endl;
+    }
+    
+    if( type1 == typeid(pat::Electron) ){
+        std::cout << " boson daughter - pat el 2" << std::endl;
+        
+        std::cout << "ptr is nonnull " << m1.isNonnull() <<std::endl ;
+        std::cout << "charge from Ptr = " << m1->charge() << std::endl;
+        e2 = dynamic_cast<const pat::Electron *>(&*m1) ;
+        std::cout << "charge from el 2 = " << e2->charge() << std::endl;
+    }
+
+    
+    if(0==e1 && 0==e2) {
+        throw cms::Exception("***Error: couldn't" 
+                             " do dynamic cast of vector boson daughters !\n");
+        return;  // if no electron found, then return
+    } 
+    
+    
+    const reco::GsfElectron* ele1=NULL;
+    const reco::GsfElectron* ele2=NULL;
+    
+    
+    // if Z--> e+e- then ele1 = e+, ele2 = e-
+    if(Vtype_=="Z") {
+        if(e1->charge() > 0) {  ele1 = e1;   ele2 = e2; }
+        else { ele1 = e2;  ele2 = e1; }
+    }
+    // if W--> enu then ele1 = e, ele2 = NULL 
+    if(Vtype_=="W") {
+        if( abs(e1->charge())==1 ) ele1  = e1;
+        else if( abs(e2->charge())==1 ) ele1  = e2;
+        
+        // estimate Pz of neutrino
+        TLorentzVector p4MET((*pfmet)[0].px(), (*pfmet)[0].py(), (*pfmet)[0].pz(), (*pfmet)[0].energy());
+        TLorentzVector p4lepton(ele1->px(), ele1->py(), ele1->pz(), ele1->energy());
+        METzCalculator metz;
+        metz.SetMET(p4MET);
+        metz.SetLepton(p4lepton);
+        if (LeptonType_=="electron") metz.SetLeptonType("electron");
+        V_pzNu1 = metz.Calculate();
+        V_pzNu2 = metz.getOther();
+    }
+    
+    
+    ////////// electron #1 quantities //////////////
+    if( !(ele1 == NULL) ) {
+        e1Charge           = ele1-> charge(); 
+        e1Vx               = ele1->vx();
+        e1Vy               = ele1->vy();
+        e1Vz               = ele1->vz();
+        e1Y                = ele1->rapidity();
+        e1Theta            = ele1->theta();
+        e1Eta              = ele1->eta();    
+        e1Phi              = ele1->phi();
+        e1E                = ele1->energy();
+        e1px               = ele1->px();
+        e1py               = ele1->py();
+        e1pz               = ele1->pz();
+        e1Pt               = ele1->pt();
+        e1Et               = ele1->et();
+        
+        /// isolation 
+        e1_trackiso       = ele1->dr03TkSumPt();
+        e1_ecaliso        = ele1->dr03EcalRecHitSumEt();
+        e1_hcaliso        = ele1->dr03HcalTowerSumEt();
+        e1Classification  = ele1->classification();
+        e1_numberOfBrems  = ele1->numberOfBrems();      
+        e1_BremFraction   = ele1->fbrem();
+        e1_DeltaEtaIn     = ele1->deltaEtaSuperClusterTrackAtVtx();
+        e1_DeltaPhiIn     = ele1->deltaPhiSuperClusterTrackAtVtx();
+        e1_DeltaPhiOut    = ele1->deltaPhiSeedClusterTrackAtCalo();
+        e1_DeltaEtaOut    = ele1->deltaEtaSeedClusterTrackAtCalo();
+        
+        
+        //Track Momentum information
+        e1_Trackmom_calo  = sqrt(ele1->trackMomentumAtCalo().perp2());
+        e1_Trackmom_vtx   = sqrt(ele1->trackMomentumAtVtx().perp2());
+        //get Hcal energy over Ecal Energy
+        e1_HoverE = ele1->hadronicOverEm();	  
+        e1_EoverPout      = ele1->eSeedClusterOverPout();
+        e1_EoverPin       = ele1->eSuperClusterOverP();
+        //get SuperCluster (sc) infos
+        reco::SuperClusterRef SCp = ele1->superCluster();
+        e1_sc_x          = SCp->x();
+        e1_sc_y          = SCp->y();
+        e1_sc_z          = SCp->z();
+        e1_sc_Theta      = SCp->position().Theta();
+        e1_sc_Eta        = SCp->eta();    
+        e1_sc_Phi        = SCp->phi();
+        e1_sc_E          = SCp->energy();
+        e1_sc_px         = e1E * sin(e1Theta) * cos(e1Phi);
+        e1_sc_py         = e1E * sin(e1Theta) * sin(e1Phi);
+        e1_sc_pz         = e1E * cos(e1Theta);
+        e1_sc_Pt         = e1E / cosh(e1Eta);
+        e1_sc_Et         = e1Pt;	  
+        e1_SigmaEtaEta   = ele1->sigmaEtaEta();
+        e1_SigmaIetaIeta = ele1->sigmaIetaIeta();
+        e1_missingHits   = ele1->gsfTrack()->trackerExpectedHitsInner().numberOfHits();
+        e1_dist          = ele1->convDist();
+        e1_dcot          = ele1->convDcot();
+        e1_convradius    = ele1->convRadius();
+        
+        if( ele1->isEB() ) {
+            ise1WP95      = (e1_missingHits<=1) && (e1_trackiso/e1Et<0.15) && (e1_ecaliso/e1Et<2.0) 
+            && (e1_hcaliso/e1Et<0.12) && (e1_SigmaIetaIeta<0.01) && (fabs(e1_DeltaPhiIn)<0.8) 
+            && (fabs(e1_DeltaEtaIn)<0.007) && (e1_HoverE<0.15);
+            ise1WP80      = (e1_missingHits==0) && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02) 
+            && (e1_trackiso/e1Et<0.09) && (e1_ecaliso/e1Et<0.07) 
+            && (e1_hcaliso/e1Et<0.1) && (e1_SigmaIetaIeta<0.01) && (fabs(e1_DeltaPhiIn)<0.06) 
+            && (fabs(e1_DeltaEtaIn)<0.004) && (e1_HoverE<0.04);
+            ise1WP70      = (e1_missingHits==0) && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02) 
+            && (e1_trackiso/e1Et<0.05) && (e1_ecaliso/e1Et<0.06) 
+            && (e1_hcaliso/e1Et<0.03) && (e1_SigmaIetaIeta<0.01) && (fabs(e1_DeltaPhiIn)<0.03) 
+            && (fabs(e1_DeltaEtaIn)<0.004) && (e1_HoverE<0.025);
+        }
+        if( ele1->isEE() ) {
+            ise1WP95      = (e1_missingHits<=1) && (e1_trackiso/e1Et<0.08) && (e1_ecaliso/e1Et<0.06) 
+            && (e1_hcaliso/e1Et<0.05) && (e1_SigmaIetaIeta<0.03) && (fabs(e1_DeltaPhiIn)<0.7) 
+            && (fabs(e1_DeltaEtaIn)<0.01) && (e1_HoverE<0.07);
+            ise1WP80      = (e1_missingHits==0)  && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02)  
+            && (e1_trackiso/e1Et<0.08) && (e1_ecaliso/e1Et<0.06) 
+            && (e1_hcaliso/e1Et<0.05) && (e1_SigmaIetaIeta<0.03) && (fabs(e1_DeltaPhiIn)<0.7) 
+            && (fabs(e1_DeltaEtaIn)<0.01) && (e1_HoverE<0.07);
+            ise1WP70      = (e1_missingHits==0)  && (fabs(e1_dist)>0.02 || fabs(e1_dcot)>0.02)  
+            && (e1_trackiso/e1Et<0.025) && (e1_ecaliso/e1Et<0.025) 
+            && (e1_hcaliso/e1Et<0.02) && (e1_SigmaIetaIeta<0.03) && (fabs(e1_DeltaPhiIn)<0.02) 
+            && (fabs(e1_DeltaEtaIn)<0.005) && (e1_HoverE<0.025);
+        }
+        
+        // IP relative to beam spot  & dz relative to vertex
+        edm::Handle<reco::BeamSpot > beamSpot;
+        if(runoverAOD){
+            iEvent.getByLabel(mInputBeamSpot, beamSpot);
+            e1_d0bsp = e1->gsfTrack()->dxy( beamSpot->position() ) ;
+            e1_dz000 = e1->vertex().z();
+        }
+        // PF Isolation 
+        e1_pfiso_chargedHadronIso = e1->pfIsolationVariables().chargedHadronIso;
+        e1_pfiso_photonIso        = e1->pfIsolationVariables().photonIso;
+        e1_pfiso_neutralHadronIso = e1->pfIsolationVariables().neutralHadronIso;
+    }
+    
+    ////////// electron #2 quantities //////////////
+    if( !(ele2 == NULL) ) {
+        e2Charge          = ele2->charge();
+        e2Vx              = ele2->vx();
+        e2Vy              = ele2->vy();
+        e2Vz              = ele2->vz();
+        e2Y               = ele2->rapidity();
+        e2Theta           = ele2->theta();
+        e2Eta             = ele2->eta();    
+        e2Phi             = ele2->phi();
+        e2E               = ele2->energy();
+        e2px              = ele2->px();
+        e2py              = ele2->py();
+        e2pz              = ele2->pz();
+        e2Pt              = ele2->pt();
+        e2Et              = ele2->et();	  
+        
+        /// isolation 
+        e2_trackiso       = ele2->dr03TkSumPt();
+        e2_ecaliso        = ele2->dr03EcalRecHitSumEt();
+        e2_hcaliso        = ele2->dr03HcalTowerSumEt();
+        e2Classification  = ele2->classification();
+        e2_EoverPout = ele2->eSeedClusterOverPout();
+        e2_EoverPin  = ele2->eSuperClusterOverP();
+        e2_numberOfBrems  = ele2->numberOfBrems();
+        e2_BremFraction   = ele2->fbrem();
+        e2_DeltaEtaIn     = ele2->deltaEtaSuperClusterTrackAtVtx();
+        e2_DeltaPhiIn     = ele2->deltaPhiSuperClusterTrackAtVtx();
+        e2_DeltaPhiOut    = ele2->deltaPhiSeedClusterTrackAtCalo();
+        e2_DeltaEtaOut    = ele2->deltaEtaSeedClusterTrackAtCalo();
+        //Track Momentum information
+        e2_Trackmom_calo  = sqrt(ele2->trackMomentumAtCalo().perp2());
+        e2_Trackmom_vtx   = sqrt(ele2->trackMomentumAtVtx().perp2());   
+        //get Hcal energy over Ecal Energy
+        e2_HoverE = ele2->hadronicOverEm();	  
+        //get SuperCluster (sc) infos
+        reco::SuperClusterRef SCm = ele2->superCluster();
+        e2_sc_x          = SCm->x();
+        e2_sc_y          = SCm->y();
+        e2_sc_z          = SCm->z();
+        e2_sc_Theta      = SCm->position().Theta();
+        e2_sc_Eta        = SCm->eta();    
+        e2_sc_Phi        = SCm->phi();
+        e2_sc_E          = SCm->energy();
+        e2_sc_px         = e2E * sin(e2Theta) * cos(e2Phi);
+        e2_sc_py         = e2E * sin(e2Theta) * sin(e2Phi);
+        e2_sc_pz         = e2E * cos(e2Theta);
+        e2_sc_Pt         = e2E / cosh(e2Eta);
+        e2_sc_Et         = e2Pt;	 
+        e2_SigmaEtaEta   = ele2->sigmaEtaEta();
+        e2_SigmaIetaIeta = ele2->sigmaIetaIeta();
+        e2_missingHits   = ele2->gsfTrack()->trackerExpectedHitsInner().numberOfHits();
+        e2_dist          = ele2->convDist();
+        e2_dcot          = ele2->convDcot();
+        e2_convradius    = ele2->convRadius();
+        if( ele2->isEB() ) {
+            ise2WP95      = (e2_missingHits<=1) && (e2_trackiso/e2Et<0.15) && (e2_ecaliso/e2Et<2.0) 
+            && (e2_hcaliso/e2Et<0.12) && (e2_SigmaIetaIeta<0.01) && (fabs(e2_DeltaPhiIn)<0.8) 
+            && (fabs(e2_DeltaEtaIn)<0.007) && (e2_HoverE<0.15);
+            ise2WP80      = (e2_missingHits==0) && (fabs(e2_dist)>0.02 || fabs(e2_dcot)>0.02) 
+            && (e2_trackiso/e2Et<0.09) && (e2_ecaliso/e2Et<0.07) 
+            && (e2_hcaliso/e2Et<0.1) && (e2_SigmaIetaIeta<0.01) && (fabs(e2_DeltaPhiIn)<0.06) 
+            && (fabs(e2_DeltaEtaIn)<0.004) && (e2_HoverE<0.04);
+            ise2WP70      = (e2_missingHits==0) && (fabs(e2_dist)>0.02 || fabs(e2_dcot)>0.02) 
+            && (e2_trackiso/e2Et<0.05) && (e2_ecaliso/e2Et<0.06) 
+            && (e2_hcaliso/e2Et<0.03) && (e2_SigmaIetaIeta<0.01) && (fabs(e2_DeltaPhiIn)<0.03) 
+            && (fabs(e2_DeltaEtaIn)<0.004) && (e2_HoverE<0.025);
+        }
+        if( ele2->isEE() ) {
+            ise2WP95      = (e2_missingHits<=1) && (e2_trackiso/e2Et<0.08) && (e2_ecaliso/e2Et<0.06) 
+            && (e2_hcaliso/e2Et<0.05) && (e2_SigmaIetaIeta<0.03) && (fabs(e2_DeltaPhiIn)<0.7) 
+            && (fabs(e2_DeltaEtaIn)<0.01) && (e2_HoverE<0.07);
+            ise2WP80      = (e2_missingHits==0)  && (fabs(e2_dist)>0.02 || fabs(e2_dcot)>0.02)  
+            && (e2_trackiso/e2Et<0.08) && (e2_ecaliso/e2Et<0.06) 
+            && (e2_hcaliso/e2Et<0.05) && (e2_SigmaIetaIeta<0.03) && (fabs(e2_DeltaPhiIn)<0.7) 
+            && (fabs(e2_DeltaEtaIn)<0.01) && (e2_HoverE<0.07);
+            ise2WP70      = (e2_missingHits==0)  && (fabs(e2_dist)>0.02 || fabs(e2_dcot)>0.02)  
+            && (e2_trackiso/e2Et<0.025) && (e2_ecaliso/e2Et<0.025) 
+            && (e2_hcaliso/e2Et<0.02) && (e2_SigmaIetaIeta<0.03) && (fabs(e2_DeltaPhiIn)<0.02) 
+            && (fabs(e2_DeltaEtaIn)<0.005) && (e2_HoverE<0.025);
+        }
+    } 
+    
+}
+
+
+
+
+
+// WP80: but only track iso, and cut on impact parameter |d0|
+bool ewk::VtoElectronTreeFiller::isTightElectron(const edm::Event& iEvent, const reco::GsfElectron& ele) 
+{
+    float pt = ele.pt();
+    float eta = fabs(ele.superCluster()->eta());  
+    
+    if( pt<20.0 )  return false;
+    if( eta > 1.4442 && eta < 1.5660) return false;
+    if ( eta > 2.5 ) return false;
+    
+    
+    int missingHits   = ele.gsfTrack()->trackerExpectedHitsInner().numberOfHits();
+    float dist          = fabs(ele.convDist());
+    float dcot          = fabs(ele.convDcot());
+    
+    if( !(missingHits==0) )  return false;
+    if( dist<0.02 && dcot<0.02) return false;
+    
+    
+    float trackiso      = ele.dr03TkSumPt()/pt;
+    float sigmaIetaIeta = ele.sigmaIetaIeta();
+    float deltaEta      = ele.deltaEtaSuperClusterTrackAtVtx();
+    float deltaPhi      = ele.deltaPhiSuperClusterTrackAtVtx();
+    float HoverE        = ele.hadronicOverEm();	  
+    bool isEB = ele.isEB();
+    bool isEE = ele.isEE();
+    
+    
+    bool isWP80Id    = (trackiso<0.1) && 
+    ((isEB && sigmaIetaIeta<0.01 && deltaPhi<0.06 && deltaEta<0.004 && HoverE<0.04) || 
+     (isEE && sigmaIetaIeta<0.03 && deltaPhi<0.03 && deltaEta<0.007 && HoverE<0.025)); 
+    
+    
+    //////////// Beam spot //////////////
+    edm::Handle<reco::BeamSpot> beamSpot;
+    double dz =0.0;
+	if(runoverAOD){
+		iEvent.getByLabel(mInputBeamSpot, beamSpot);
+		dz = fabs( ele.gsfTrack()->dxy( beamSpot->position() ) );
+        
+	}
+    if( !(isWP80Id && dz<0.02) )  return false;
+    
+    return true;
+}
+
+
+
+
+
+// WP95: but only track iso
+bool ewk::VtoElectronTreeFiller::isLooseElectron(const edm::Event& iEvent, const reco::GsfElectron& ele) 
+{
+    float pt = ele.pt();
+    float eta = fabs(ele.superCluster()->eta());  
+    
+    if( pt<20.0 )  return false;
+    if( eta > 1.4442 && eta < 1.5660) return false;
+    if ( eta > 2.5 ) return false;
+    
+    
+    float trackiso      = ele.dr03TkSumPt()/pt;
+    float sigmaIetaIeta = ele.sigmaIetaIeta();
+    float deltaEta      = ele.deltaEtaSuperClusterTrackAtVtx();
+    float deltaPhi      = ele.deltaPhiSuperClusterTrackAtVtx();
+    float HoverE        = ele.hadronicOverEm();	  
+    bool isEB = ele.isEB();
+    bool isEE = ele.isEE();
+    
+    
+    bool isWP95Id    = (trackiso<0.2) && 
+    ((isEB && sigmaIetaIeta<0.01 && deltaPhi<0.8 && deltaEta<0.007 && HoverE<0.15) || 
+     (isEE && sigmaIetaIeta<0.03 && deltaPhi<0.7 && deltaEta<0.010 && HoverE<0.07)); 
+    
+    if( !(isWP95Id) )  return false;
+    
+    return true;
+}
+
 
 
 

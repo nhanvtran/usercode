@@ -92,17 +92,11 @@ process.source = cms.Source("PoolSource",
 ##-------- Electron events of interest --------
 process.HLTEle =cms.EDFilter("HLTHighLevel",
      TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-     HLTPaths = cms.vstring('HLT_Photon15_Cleaned_L1R', 'HLT_Ele15_*', 'HLT_Ele17_*', 'HLT_Ele22_*', 'HLT_Ele25_*','HLT_Ele27_*', 'HLT_Ele32_*','HLT_Mu9','HLT_Mu11','HLT_Mu13','HLT_Mu15_v*','HLT_Mu17_v*','HLT_Mu24_v*','HLT_Mu30_v*','HLT_IsoMu17_v*','HLT_IsoMu24_v*','HLT_IsoMu30_v*','HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*','HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*'),
+     HLTPaths = cms.vstring("HLT_Photon15_Cleaned_L1R", "HLT_Ele15_*", "HLT_Ele17_*", "HLT_Ele22_*", "HLT_Ele25_*","HLT_Ele27_*", "HLT_Ele32_*"),
      eventSetupPathsKey = cms.string(''),
      andOr = cms.bool(True), #----- True = OR, False = AND between the HLTPaths
      throw = cms.bool(False) # throw exception on unknown path names
  )
-
-
-##-------- Muon events of interest --------
-#process.HLTMu =cms.EDFilter("HLTHighLevel",
-#TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-#HLTPaths = cms.vstring('HLT_Mu9','HLT_Mu11','HLT_Mu13','HLT_Mu15_v*','HLT_Mu17_v*','HLT_Mu24_v*','HLT_Mu30_v*','HLT_IsoMu17_v*','HLT_IsoMu24_v*','HLT_IsoMu30_v*','HLT_DoubleMu*'),
 
 
 ##process.tightElectrons("selectedPatElectronsPFlow");
@@ -116,7 +110,7 @@ process.VplusJetSubstructure = cms.EDAnalyzer("VplusJetSubstructureAnalysis",
                                               VBosonType     = cms.string('W'),
                                               LeptonType     = cms.string('electron'),    
 
-                                              PatJetCollections = cms.vstring('goodPatJetsPFlow','goodPatJetsCA8PrunedPF','goodPatJetsCA8PF','goodPatJetsCA12FilteredPF','goodPatJetsCA12MassDropFilteredPF'),    
+                                              PatJetCollections = cms.vstring('goodPatJetsPFlow','goodPatJetsCA8PrunedPF','goodPatJetsCA8PF'),    
                                               LiteJetCollections = cms.vstring('ak5TrimmedLite','ak5FilteredLite','ak5PrunedLite','ak7Lite','ak7TrimmedLite','ak7FilteredLite','ak7PrunedLite','ak8Lite','ak8TrimmedLite','ak8FilteredLite','ak8PrunedLite'),    
                                               #GenJetCollections = cms.vstring('ak5GenJetsNoNu','ak7GenJetsNoNu','ak8GenJetsNoNu','ca8GenJetsNoNu'),    
                                               GenJetCollections = cms.vstring(),    
@@ -124,8 +118,8 @@ process.VplusJetSubstructure = cms.EDAnalyzer("VplusJetSubstructureAnalysis",
                                               srcElectrons  = cms.InputTag("selectedPatElectronsPFlow"), # matches VBoson src
                                               srcMet = cms.InputTag("patMETsPFlow"),
 
-                                              srcJetsforRho = cms.string("kt6PFJets"),
-                                              srcJetsforRho_lepIso = cms.string("kt6PFJets"),
+                                              srcJetsforRho = cms.string("kt6PFJetsPFlow"),
+                                              srcJetsforRho_lepIso = cms.string("kt6PFJetsPFlow"),
                                               srcPrimaryVertex = cms.InputTag("goodOfflinePrimaryVertices"),                               
                                               
                                               runningOverMC = cms.bool(isMC),			
@@ -155,8 +149,7 @@ process.myseq = cms.Sequence(
     )
 
 if isMC:
-    process.myseq.remove ( process.HLTEle )
-
+    process.myseq.remove ( process.HLTEle)
 
 
 ##---- if do not want to require >= 2 jets then disable that filter ---

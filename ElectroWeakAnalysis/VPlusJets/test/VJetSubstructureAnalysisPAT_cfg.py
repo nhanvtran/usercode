@@ -80,8 +80,8 @@ process.source = cms.Source("PoolSource",
 ##### test data samples                                                                            
 #    '/store/user/lpctlbsm/samvel/SingleElectron/tlbsm_v9_Summer11-PU_S4_START42_V11-v1_2011_10_12_21_06_34/f8e845a0332c56398831da6c30999af1/ttbsm_42x_data_428_1_upi.root'
 ## #v10
-                                                              #'/store/user/smpjs/ntran/SingleElectron/ttbsm_v10_SingleElectron_Run2011A-PromptReco-v4/2900f36c5423fd804f580f1efac6dc75/ttbsm_42x_data_157_1_enm.root',
-                                                              '/store/user/smpjs/ntran/WW_TuneZ2_7TeV_pythia6_tauola/ttbsm_v10_WW_TuneZ2_7TeV_pythia6_tauola/a326ba49a16ab761c492392538b61378/ttbsm_42x_mc_116_1_wLv.root'
+'/store/user/smpjs/ntran/SingleElectron/ttbsm_v10_SingleElectron_Run2011A-PromptReco-v4/2900f36c5423fd804f580f1efac6dc75/ttbsm_42x_data_157_1_enm.root',
+                                                              #'/store/user/ntran/ntran/WW_TuneZ2_7TeV_pythia6_tauola/ttbsm_v10_v2_WW_TuneZ2_7TeV_pythia6_tauola/9b28f3f8b392373f53b6169b6cb537b0/ttbsm_42x_mc_10_1_ZKo.root'
                                                               #'file:ttbsm_42x_mc.root'
                                                               ) 
                             )
@@ -110,17 +110,16 @@ process.VplusJetSubstructure = cms.EDAnalyzer("VplusJetSubstructureAnalysis",
                                               VBosonType     = cms.string('W'),
                                               LeptonType     = cms.string('electron'),    
 
-                                              PatJetCollections = cms.vstring('goodPatJetsPFlow','goodPatJetsCA8PrunedPF','goodPatJetsCA8PF','goodPatJetsCA12FilteredPF','goodPatJetsCA12MassDropFilteredPF'),    
+                                              PatJetCollections = cms.vstring('goodPatJetsPFlow','goodPatJetsCA8PrunedPF','goodPatJetsCA8PF'),    
                                               LiteJetCollections = cms.vstring('ak5TrimmedLite','ak5FilteredLite','ak5PrunedLite','ak7Lite','ak7TrimmedLite','ak7FilteredLite','ak7PrunedLite','ak8Lite','ak8TrimmedLite','ak8FilteredLite','ak8PrunedLite'),    
                                               GenJetCollections = cms.vstring('ak5GenJetsNoNu','ak7GenJetsNoNu','ak8GenJetsNoNu','ca8GenJetsNoNu'),    
                                               
                                               srcElectrons  = cms.InputTag("selectedPatElectronsPFlow"), # matches VBoson src
                                               srcMet = cms.InputTag("patMETsPFlow"),
 
-                                              srcJetsforRho = cms.string("kt6PFJets"),
-                                              srcJetsforRho_lepIso = cms.string("kt6PFJets"),
+                                              srcJetsforRho = cms.string("kt6PFJetsPFlow"),
+                                              srcJetsforRho_lepIso = cms.string("kt6PFJetsPFlow"),
                                               srcPrimaryVertex = cms.InputTag("goodOfflinePrimaryVertices"),                               
-                                              srcBeamSpot  = cms.InputTag("offlineBeamSpot"),
                                               
                                               runningOverMC = cms.bool(isMC),			
                                               runningOverAOD = cms.bool(False)	

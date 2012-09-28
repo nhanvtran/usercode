@@ -77,7 +77,7 @@ PSGenObj = $(ObjectDir)/genps.o \
 
 graviton: $(PSGenObj) $(VegasObj) $(PDFObj) $(MainObj)
 	@echo " linking"
-	@echo " executable file is "$(Exec) "compiled with "$(Comp)
+	@echo " executabel file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
 	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(VegasObj) $(PDFObj)
 
