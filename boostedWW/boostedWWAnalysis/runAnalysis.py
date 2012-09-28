@@ -6,10 +6,13 @@ import array
 
 from ROOT import gROOT, gStyle, gSystem, TLatex
 import subprocess
+from subprocess import Popen
 
 from sampleWrapperClass import *
 from trainingClass import *
-from helperUtils import *
+from BoostedWSamples import * 
+
+#from helperUtils import *
 
 ############################################################
 ############################################
@@ -53,10 +56,32 @@ if __name__ == '__main__':
     # define samples, this creates some trees in the "trainingtrees" directory
     isData = True;
     notData = False;
-    LUMI = 9.9;
+    LUMI = 9.9
+    sourcefiledirectory = "/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/"
+    treename = "WJet"
+    lumifile = "MCScaleFactors.txt"
+
+    boostedWSamples = Samples()
+    boostedWSamples.SetFilePath(sourcefiledirectory)
+    boostedWSamples.SetTreeName(treename)
+    boostedWSamples.SetFileNames()
+    boostedWSamples.SetLumi(LUMI)
     
-    singlemu600Sample = sampleWrapperClass("singleMu","/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/RD_WmunuJets_DataAll_GoldenJSON_9p9invfb.root",LUMI,LUMI, isData);
+    singlemu600Sample = sampleWrapperClass("data",boostedWSamples.GetFileNames()["data"],LUMI,LUMI,boostedWSamples.GetTreeName(),isData)
     
+    #sigSCF = 200.;
+    #ggH600SampleXS = 8.55627E1*sigSCF;
+    #ggH600Sample_EffLumi = 197170/ggH600SampleXS;
+    ggH600Sample = sampleWrapperClass("ggH600",boostedWSamples.GetFileNames()["ggH600"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH600")),LUMI,boostedWSamples.GetTreeName(),notData)
+
+    #boostedWXS = 1.3*228.9E3;
+    #WJetsSample_EffLumi = 8955318/boostedWXS;
+    WJetsSample = sampleWrapperClass("WJets",boostedWSamples.GetFileNames()["WJets"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets")),LUMI,boostedWSamples.GetTreeName(),notData)
+    
+<<<<<<< runAnalysis.py
+    #TTbarSample_EffLumi = 6893735/225197.;
+    TTbarSample = sampleWrapperClass("TTbar",boostedWSamples.GetFileNames()["TTbar"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar")),LUMI,boostedWSamples.GetTreeName(),notData);
+=======
     sigSCF = 200.;
     ggH600SampleXS = 8.55627E1*sigSCF;
     ggH600Sample_EffLumi = 197170/ggH600SampleXS;
@@ -75,7 +100,21 @@ if __name__ == '__main__':
     WZSample = sampleWrapperClass("WZ","/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/RD_mu_WZ_CMSSW532.root",WZSample_EffLumi,LUMI,notData);
     ZZSample_EffLumi = 9702850/5.196E3;
     ZZSample = sampleWrapperClass("ZZ","/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/RD_mu_ZZ_CMSSW532.root",ZZSample_EffLumi,LUMI,notData);
+>>>>>>> 1.2
 
+<<<<<<< runAnalysis.py
+    #WWSample_EffLumi = 9450414/33.61E3;
+    WWSample = sampleWrapperClass("WW",boostedWSamples.GetFileNames()["WW"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WW")),LUMI,boostedWSamples.GetTreeName(),notData);
+   # WZSample_EffLumi = 10000267/12.63E3;
+    WZSample = sampleWrapperClass("WZ",boostedWSamples.GetFileNames()["WZ"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WZ")),LUMI,boostedWSamples.GetTreeName(),notData);
+    #ZZSample_EffLumi = 9702850/5.196E3;
+    ZZSample = sampleWrapperClass("ZZ",boostedWSamples.GetFileNames()["ZZ"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZZ")),LUMI,boostedWSamples.GetTreeName(),notData);
+
+    #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
+    #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, singlemu600Sample );
+
+=======
+>>>>>>> 1.2
     if options.createTrainingTrees:
         
         # ---------------------------------------------------
@@ -97,22 +136,50 @@ if __name__ == '__main__':
         # ---------------------------------------------------
         # make control plots based on the same cuts as the training trees
         if not os.path.isdir("controlPlots"): os.system("mkdir controlPlots");
-        myPlotter.makeControlPlots("controlPlots","nocuts");
+        #myPlotter.makeControlPlots("controlPlots","nocuts");
+        print "Please Check the Cuts used on the BoostedWControlPlots.py is reasonable"
+        Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50"
+        print "Cuts we apply: " + Cuts
+        if options.noX:
+           p = subprocess.Popen(["python","BoostedWControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+           if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
+        else:
+           p = subprocess.Popen(["python","BoostedWControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+           if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
     
     if options.makeTTBarControlPlots:        
         
         # ---------------------------------------------------
         # make control plots based on the same cuts as the training trees
         if not os.path.isdir("controlPlots_ttbar"): os.system("mkdir controlPlots_ttbar");
-        myPlotter.makeControlPlots("controlPlots_ttbar","ttbar");
+        #myPlotter.makeControlPlots("controlPlots_ttbar","ttbar");
+        print "Please Check the Cuts used on the BoostedWTopControlPlots.py is reasonable"
+        Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets >= 1"
+        print "Cuts we apply: " + Cuts
+        print "We don't put the cuts on the signal and try to compare the W jet performance with TTbar and Data!!!!"
+        print "Make Sure the numberbjets cut is the last cut in the cut sequence"
+        if options.noX:
+           p = subprocess.Popen(["python","BoostedWTopControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+           if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
+        else:
+           p = subprocess.Popen(["python","BoostedWTopControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+           if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
 
     if options.makeSignalRegionControlPlots:        
         
         # ---------------------------------------------------
         # make control plots based on the same cuts as the training trees
         if not os.path.isdir("controlPlots_signalregion"): os.system("mkdir controlPlots_signalregion");
-        myPlotter.makeControlPlots("controlPlots_signalregion","signalregion");
-
+        #myPlotter.makeControlPlots("controlPlots_signalregion","signalregion");
+        print "Please Check the Cuts used on the BoostedWWWControlPlots.py is reasonable"
+        Cuts = ""
+        print "Cuts we apply: " + Cuts
+        if options.noX:
+           p = subprocess.Popen(["python","BoostedWWWControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+           if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
+        else:
+           p = subprocess.Popen(["python","BoostedWWWControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+           if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
 
     # ---------------------------------------------------
     # do the training

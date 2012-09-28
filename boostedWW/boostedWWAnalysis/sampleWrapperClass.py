@@ -33,11 +33,13 @@ def getListMean(list):
 class sampleWrapperClass:
 
     ### ------------------------------------------------
-    def __init__(self, label, file, sampleEffLumi, lumi, isData):
+    def __init__(self, label, file, sampleEffLumi, lumi, treename, isData):
 
         
         self.IsData_ = isData;
         self.FileName_ = file;
+        self.File_ = ROOT.TFile(file);
+        self.InputTree_ = self.File_.Get(treename);
         
         self.SampleWeight_ = lumi/sampleEffLumi;
         
