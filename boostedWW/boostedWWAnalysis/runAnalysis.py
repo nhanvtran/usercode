@@ -78,31 +78,9 @@ if __name__ == '__main__':
     #WJetsSample_EffLumi = 8955318/boostedWXS;
     WJetsSample = sampleWrapperClass("WJets",boostedWSamples.GetFileNames()["WJets"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets")),LUMI,boostedWSamples.GetTreeName(),notData)
     
-<<<<<<< runAnalysis.py
     #TTbarSample_EffLumi = 6893735/225197.;
     TTbarSample = sampleWrapperClass("TTbar",boostedWSamples.GetFileNames()["TTbar"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar")),LUMI,boostedWSamples.GetTreeName(),notData);
-=======
-    sigSCF = 200.;
-    ggH600SampleXS = 8.55627E1*sigSCF;
-    ggH600Sample_EffLumi = 197170/ggH600SampleXS;
-    ggH600Sample = sampleWrapperClass("ggH600","/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/RD_mu_HWWMH600_CMSSW532_private.root",ggH600Sample_EffLumi,LUMI,notData);
 
-    boostedWXS = 1.3*228.9E3;
-    WJetsSample_EffLumi = 8955318/boostedWXS;
-    WJetsSample = sampleWrapperClass("WJets","/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/RD_mu_WpJPt100_CMSSW532.root",WJetsSample_EffLumi,LUMI,notData);
-    
-    TTbarSample_EffLumi = 6893735/225197.;
-    TTbarSample = sampleWrapperClass("TTbar","/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/RD_mu_TTbar_CMSSW532.root",TTbarSample_EffLumi,LUMI,notData);
-
-    WWSample_EffLumi = 9450414/33.61E3;
-    WWSample = sampleWrapperClass("WW","/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/RD_mu_WW_CMSSW532.root",WWSample_EffLumi,LUMI,notData);
-    WZSample_EffLumi = 10000267/12.63E3;
-    WZSample = sampleWrapperClass("WZ","/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/RD_mu_WZ_CMSSW532.root",WZSample_EffLumi,LUMI,notData);
-    ZZSample_EffLumi = 9702850/5.196E3;
-    ZZSample = sampleWrapperClass("ZZ","/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/RD_mu_ZZ_CMSSW532.root",ZZSample_EffLumi,LUMI,notData);
->>>>>>> 1.2
-
-<<<<<<< runAnalysis.py
     #WWSample_EffLumi = 9450414/33.61E3;
     WWSample = sampleWrapperClass("WW",boostedWSamples.GetFileNames()["WW"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WW")),LUMI,boostedWSamples.GetTreeName(),notData);
    # WZSample_EffLumi = 10000267/12.63E3;
@@ -113,8 +91,6 @@ if __name__ == '__main__':
     #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
     #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, singlemu600Sample );
 
-=======
->>>>>>> 1.2
     if options.createTrainingTrees:
         
         # ---------------------------------------------------
@@ -128,8 +104,8 @@ if __name__ == '__main__':
         WZSample.createTrainingTree();
         ZZSample.createTrainingTree();
 
-    mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
-    myPlotter = plotterClass( ggH600Sample, mcbackgrounds, singlemu600Sample );    
+    #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
+    #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, singlemu600Sample );    
     
     if options.makeControlPlots:
                 
