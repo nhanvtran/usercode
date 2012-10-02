@@ -182,7 +182,7 @@ plot13.DrawTHStack("GroomedJet_CA8_qjetmassvolatility",0,"CA8 QJet Mass Volatili
 
 plot14 = ProducePlot()
 plot14.SetBinMinMax(20,0.5,1)
-plot14.SetCutWeightName(cut + "(GroomedJet_CA8_prsubjet1ptoverjetpt > GroomedJet_CA8_prsubjet2ptoverjetpt)","effwt*puwt")
+plot14.SetCutWeightName( "(GroomedJet_CA8_prsubjet1ptoverjetpt > GroomedJet_CA8_prsubjet2ptoverjetpt) &&" + cut,"effwt*puwt")
 plot14.SetFilePath(filedirectory)
 plot14.SetLumiTree(LUMI,Treename)
 plot14.SetPlotDir(plotdirectort)
@@ -191,7 +191,7 @@ plot14.DrawTHStack("GroomedJet_CA8_prsubjet1ptoverjetpt",0,"CA8 Pruned SubJet1 P
 
 plot15 = ProducePlot()
 plot15.SetBinMinMax(20,0,0.5)
-plot15.SetCutWeightName(cut + "(GroomedJet_CA8_prsubjet1ptoverjetpt > GroomedJet_CA8_prsubjet2ptoverjetpt)","effwt*puwt")
+plot15.SetCutWeightName( "(GroomedJet_CA8_prsubjet1ptoverjetpt > GroomedJet_CA8_prsubjet2ptoverjetpt) &&" + cut ,"effwt*puwt")
 plot15.SetFilePath(filedirectory)
 plot15.SetLumiTree(LUMI,Treename)
 plot15.SetPlotDir(plotdirectort)
