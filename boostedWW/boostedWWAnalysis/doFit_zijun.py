@@ -181,8 +181,8 @@ def fit_general(in_file_name, in_model_name,cutOnMassDrop):
 
 if __name__ == '__main__':
 
-    cutOnMassDrop = True;
-    #cutOnMassDrop = False;
+    #cutOnMassDrop = True;
+    cutOnMassDrop = False;
     
     fit_general("ofile_WJets.root","ErfExp",cutOnMassDrop);
     fit_general("ofile_WW.root","ErfExpGaus",cutOnMassDrop);
