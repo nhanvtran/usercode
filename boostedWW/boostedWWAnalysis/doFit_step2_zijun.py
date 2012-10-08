@@ -360,9 +360,10 @@ def fit_ClosureTest():
     model=ROOT.RooAddPdf("model","model",ROOT.RooArgList(model_WJets,model_WW,model_TTB));
 
     parameters_list=[rrv_c_ErfExp_WJets,rrv_offset_ErfExp_WJets,rrv_width_ErfExp_WJets,rrv_number_WJets];
-
+    rrv_mass.setRange("sb_lo",rrv_mass.getMin(),60); rrv_mass.setRange("sb_hi",100,rrv_mass.getMax());
     #rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) ,ROOT.RooFit.SumW2Error(ROOT.kTRUE) );
-    rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) ,ROOT.RooFit.SumW2Error(ROOT.kTRUE), ROOT.RooFit.Range(60,100) );
+    #rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) ,ROOT.RooFit.SumW2Error(ROOT.kTRUE), ROOT.RooFit.Range(60,100) );
+    rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) , ROOT.RooFit.Range("sb_lo,sb_hi") ,ROOT.RooFit.SumW2Error(ROOT.kTRUE) );
 
     mplot = rrv_mass.frame(ROOT.RooFit.Title("Closure test: WJets+TTBar+WW"));
     rdataset.plotOn( mplot ,ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2) );
