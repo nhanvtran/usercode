@@ -8,6 +8,9 @@ from ROOT import gROOT, gStyle, gSystem, TLatex
 import subprocess
 from subprocess import Popen
 
+from ROOT import *
+import ROOT
+
 from sampleWrapperClass import *
 from trainingClass import *
 from BoostedWSamples import * 
@@ -15,6 +18,9 @@ from BoostedWSamples import *
 gROOT.ProcessLine('.L tdrstyle.C')
 ROOT.setTDRStyle()
 
+#ROOT.gSystem.AddIncludePath("-I$ROOFITSYS/include")
+#ROOT.gSystem.Load("${ROOTSYS}/lib/libFFTW.so");
+#ROOT.gSystem.Load("${ROOTSYS}/lib/libfftw3.so");
 ROOT.gSystem.Load("PDFs/RooErfExpPdf_cxx.so")
 
 ############################################################
@@ -143,6 +149,8 @@ def fit_general(in_file_name, label, in_model_name,cutOnMassDrop):
         parameters_list=[rrv_mean_CB,rrv_sigma_CB,rrv_alpha_CB,rrv_n_CB,rrv_number];
 
     if in_model_name == "CBBW": # FFT: BreitWigner*CBShape
+        
+        print "in here..."
         rrv_mean_CB=ROOT.RooRealVar("rrv_mean_CB"+label,"rrv_mean_CB"+label,83.5,80,87);
         rrv_sigma_CB=ROOT.RooRealVar("rrv_sigma_CB"+label,"rrv_sigma_CB"+label,6,2,10);
         rrv_alpha_CB=ROOT.RooRealVar("rrv_alpha_CB"+label,"rrv_alpha_CB"+label,-2,-4,-1);
@@ -151,12 +159,14 @@ def fit_general(in_file_name, label, in_model_name,cutOnMassDrop):
         rrv_width_BW=ROOT.RooRealVar("rrv_width_BW"+label,"rrv_width_BW"+label,10,5,20);
         rrv_number = ROOT.RooRealVar("rrv_number"+label,"rrv_number"+label,1800,1,100000);
 
+        print "in here 2..."
         cbshape = ROOT.RooCBShape("cbshape"+label,"cbshape"+label, rrv_mass,rrv_mean_CB,rrv_sigma_CB,rrv_alpha_CB,rrv_n_CB);
         bw = ROOT.RooBreitWigner("bw"+label,"bw"+label, rrv_mass,rrv_mean_BW,rrv_width_BW);
         #model = ROOT.RooExtendPdf("model"+label,"model"+label, cbshape, rrv_number );
         cbbw = ROOT.RooFFTConvPdf("cbbw"+label,"cbbw"+label, rrv_mass, cbshape, bw);
         model = ROOT.RooExtendPdf("model"+label,"model"+label, cbbw, rrv_number );
         parameters_list=[rrv_mean_CB,rrv_sigma_CB,rrv_alpha_CB,rrv_n_CB,rrv_mean_BW,rrv_width_BW,rrv_number];
+        print "in here 3..."
 
     if in_model_name == "LDGaus": # FFT: Landau*Gaus
         rrv_mean_landau=ROOT.RooRealVar("rrv_mean_landau"+label,"rrv_mean_landau"+label,83.5,80,87);
@@ -184,10 +194,13 @@ def fit_general(in_file_name, label, in_model_name,cutOnMassDrop):
 
 
     # fit to a Model
-    #rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) );
-    rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) ,ROOT.RooFit.SumW2Error(ROOT.kTRUE) );
+    print "in here 4..."
+#    model.fitTo( rdataset,ROOT.RooFit.SumW2Error(ROOT.kTRUE) );
+#    rfresult = model.fitTo( rdataset );
+    rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) ,ROOT.RooFit.SumW2Error(ROOT.kTRUE), ROOT.RooFit.Extended(ROOT.kTRUE) );
     #rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) ,ROOT.RooFit.SumW2Error(ROOT.kTRUE),ROOT.RooFit.Range(30,100) );
     
+    print "in here 5..."
     mplot = rrv_mass.frame(ROOT.RooFit.Title(in_file_name+" fitted by "+in_model_name));
     rdataset.plotOn( mplot ,ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2) );
     model.plotOn( mplot, ROOT.RooFit.VisualizeError(rfresult,1),ROOT.RooFit.FillColor(ROOT.kOrange) );
@@ -264,159 +277,161 @@ def fit_general(in_file_name, label, in_model_name,cutOnMassDrop):
 
     return [rfresult,parameters_list,rdataset];
 
-######## ++++++++++++++
-def fit_ClosureTest():
-    #cutOnMassDrop = True;
-    cutOnMassDrop = False;
-    rlt_TTB=fit_general("ofile_TTbar.root","_TTB","CBBW",cutOnMassDrop);
-    rlt_WW=fit_general("ofile_WW.root","_WW","Voig",cutOnMassDrop);
-    rlt_WJets=fit_general("ofile_WJets.root","_WJets","ErfExp",cutOnMassDrop);
-
-    parameters_list_WJets=rlt_WJets[1];
-    parameters_list_TTB=rlt_TTB[1];
-    parameters_list_WW=rlt_WW[1];
-
-    fileIn_name=[ROOT.TString("trainingtrees/ofile_WJets.root"),ROOT.TString("trainingtrees/ofile_WW.root"),ROOT.TString("trainingtrees/ofile_TTbar.root")];
-
-    listOfTrainingVariables1 = ["jet_massdrop_pr","jet_qjetvol","jet_tau2tau1"];
-    bdtSimple = tmvaApplicator( listOfTrainingVariables1, "weights/Wtagger_200to275_simple_BDT.weights.xml");
-
-    rrv_mass = ROOT.RooRealVar("rrv_mass","rrv_mass",30.,140.) 
-    rrv_weight = ROOT.RooRealVar("rrv_weight","rrv_weight",0. ,1.) 
-    rdataset = ROOT.RooDataSet("rdataset","rdataset",ROOT.RooArgSet(rrv_mass,rrv_weight),ROOT.RooFit.WeightVar(rrv_weight) ); 
-
-    #prepare the dataset: WJets+TTB+WW
-    for j in range(3):
-        fileIn = ROOT.TFile(fileIn_name[j].Data());
-        treeIn = fileIn.Get("otree");
-        # make cuts (including mass drop) # create a RooDataSet
-        print "N entries: ", treeIn.GetEntries()
-        for i in range(treeIn.GetEntries()):
-            if i % 10000 == 0: print "i: ",i
-            treeIn.GetEntry(i);
-            discriminantCut = False; 
-                
-            if cutOnMassDrop and treeIn.jet_massdrop_pr < 0.25: discriminantCut = True;
-            elif not cutOnMassDrop:
-                listOfVarVals = [];
-                for kk in range(len(listOfTrainingVariables1)):
-                    listOfVarVals.append( getattr( treeIn, listOfTrainingVariables1[kk] ) );
-                BDTval = bdtSimple.eval( listOfVarVals );
-                #print BDTval;
-                if BDTval > 0.0: discriminantCut = True;
-            else: discriminantCut = False;
-            
-            #if treeIn.jet_pt_pr > 200. and discriminantCut and treeIn.jet_mass_pr > 60 and treeIn.jet_mass_pr<100:
-            if treeIn.jet_pt_pr > 200. and discriminantCut and treeIn.jet_mass_pr > 30 and treeIn.jet_mass_pr<140:
-                rrv_mass.setVal( treeIn.jet_mass_pr );
-                rdataset.add( ROOT.RooArgSet( rrv_mass ), treeIn.totalEventWeight );
-    print "N_rdataset: ", rdataset.numEntries();
-
-    #prepare the model
-    #WJets shape
-    rrv_c_ErfExp_WJets      = parameters_list_WJets[0];
-    rrv_offset_ErfExp_WJets = parameters_list_WJets[1];
-    rrv_width_ErfExp_WJets  = parameters_list_WJets[2];
-    rrv_number_WJets        = parameters_list_WJets[3];
-    erfExp_WJets = ROOT.RooErfExpPdf("erfExp_WJets","erfExp_WJets",rrv_mass,rrv_c_ErfExp_WJets,rrv_offset_ErfExp_WJets,rrv_width_ErfExp_WJets);
-    model_WJets=ROOT.RooExtendPdf("model_WJets","model_WJets",erfExp_WJets,rrv_number_WJets);
-    #rrv_c_ErfExp_WJets.setConstant(1);
-    #rrv_offset_ErfExp_WJets.setConstant(1);
-    #rrv_width_ErfExp_WJets.setConstant(1);
-    #rrv_number_WJets.setConstant(1);
-
-    #WW shape
-    rrv_mean_voig_WW  = parameters_list_WW[0];
-    rrv_width_voig_WW = parameters_list_WW[1];
-    rrv_sigma_voig_WW = parameters_list_WW[2];
-    rrv_number_WW     = parameters_list_WW[3];
-    voig_WW = ROOT.RooVoigtian("voig_WW","voig_WW", rrv_mass,rrv_mean_voig_WW,rrv_width_voig_WW,rrv_sigma_voig_WW);
-    model_WW=ROOT.RooExtendPdf("model_WW","model_WW",voig_WW,rrv_number_WW);
-    rrv_mean_voig_WW.setConstant(1);
-    rrv_width_voig_WW.setConstant(1);
-    rrv_sigma_voig_WW.setConstant(1);
-    rrv_number_WW.setConstant(1);
-
-    #TTB shape
-    rrv_mean_CB_TTB  = parameters_list_TTB[0];
-    rrv_sigma_CB_TTB = parameters_list_TTB[1];
-    rrv_alpha_CB_TTB = parameters_list_TTB[2];
-    rrv_n_CB_TTB     = parameters_list_TTB[3];
-    rrv_mean_BW_TTB  = parameters_list_TTB[4];
-    rrv_width_BW_TTB = parameters_list_TTB[5];
-    rrv_number_TTB   = parameters_list_TTB[6];
-    cbshape_TTB = ROOT.RooCBShape("cbshape_TTB","cbshape_TTB", rrv_mass,rrv_mean_CB_TTB,rrv_sigma_CB_TTB,rrv_alpha_CB_TTB,rrv_n_CB_TTB);
-    bw_TTB = ROOT.RooBreitWigner("bw_TTB","bw_TTB", rrv_mass,rrv_mean_BW_TTB,rrv_width_BW_TTB);
-    cbbw_TTB = ROOT.RooFFTConvPdf("cbbw_TTB","cbbw_TTB", rrv_mass, cbshape_TTB, bw_TTB);
-    model_TTB=ROOT.RooExtendPdf("model_TTB","model_TTB",cbbw_TTB,rrv_number_TTB);
-    rrv_mean_CB_TTB.setConstant(1);
-    rrv_sigma_CB_TTB.setConstant(1);
-    rrv_alpha_CB_TTB.setConstant(1);
-    rrv_n_CB_TTB.setConstant(1);
-    rrv_mean_BW_TTB.setConstant(1);
-    rrv_width_BW_TTB.setConstant(1);
-    rrv_number_TTB.setConstant(1);
-
-    model=ROOT.RooAddPdf("model","model",ROOT.RooArgList(model_WJets,model_WW,model_TTB));
-
-    parameters_list=[rrv_c_ErfExp_WJets,rrv_offset_ErfExp_WJets,rrv_width_ErfExp_WJets,rrv_number_WJets];
-    rrv_mass.setRange("sb_lo",rrv_mass.getMin(),60); rrv_mass.setRange("sb_hi",100,rrv_mass.getMax());
-    #rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) ,ROOT.RooFit.SumW2Error(ROOT.kTRUE) );
-    #rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) ,ROOT.RooFit.SumW2Error(ROOT.kTRUE), ROOT.RooFit.Range(60,100) );
-    rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) , ROOT.RooFit.Range("sb_lo,sb_hi") ,ROOT.RooFit.SumW2Error(ROOT.kTRUE) );
-
-    mplot = rrv_mass.frame(ROOT.RooFit.Title("Closure test: WJets+TTBar+WW"));
-    rdataset.plotOn( mplot ,ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2) );
-    model.plotOn(mplot, ROOT.RooFit.VisualizeError(rfresult,1),ROOT.RooFit.FillColor(ROOT.kOrange) );
-    rdataset.plotOn( mplot ,ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2) );
-    model.plotOn(mplot );
-    model.plotOn(mplot, ROOT.RooFit.Components("model_WJets"), ROOT.RooFit.LineStyle(ROOT.RooFit.kDashed));
-    model.plotOn(mplot, ROOT.RooFit.Components("model_WW"),ROOT.RooFit.LineStyle(ROOT.RooFit.kDashed),ROOT.RooFit.LineColor(ROOT.kRed));
-    model.plotOn(mplot, ROOT.RooFit.Components("model_TTB"),ROOT.RooFit.LineStyle(ROOT.RooFit.kDashed),ROOT.RooFit.LineColor(6));
-    model.plotOn( mplot );
-
-    #pull
-    hpull=mplot.pullHist();
-    mplot_pull = rrv_mass.frame(ROOT.RooFit.Title("Pull Distribution"));
-    mplot_pull.addPlotable(hpull,"P");
-    mplot_pull.SetTitle("PULL");
-    mplot_pull.GetYaxis().SetRangeUser(-5,5);
-
-    cMassFit = ROOT.TCanvas("cMassFit","cMassFit",1000,800);
-    pad1=ROOT.TPad("pad1","pad1",0.,0. ,0.8,0.2);
-    pad2=ROOT.TPad("pad2","pad2",0.,0.2,0.8,1. );
-    pad3=ROOT.TPad("pad3","pad3",0.8,0.,1,1);
-    pad1.Draw();
-    pad2.Draw();
-    pad3.Draw();
-
-    pad2.cd();
-    mplot.Draw();
-    pad1.cd();
-    mplot_pull.Draw();
-
-    pad3.cd();
-    latex=ROOT.TLatex();
-    latex.SetTextSize(0.1);
-    #parameters_list.sort();
-    for i in range(len(parameters_list)):
-        latex.DrawLatex(0,0.9-i*0.08,"%s"%(parameters_list[i].GetName()) );
-        latex.DrawLatex(0,0.9-i*0.08-0.04," %4.3e +/- %2.1e"%(parameters_list[i].getVal(),parameters_list[i].getError()) );
-
-    if cutOnMassDrop : rlt_file=ROOT.TString("testNhan/mdcut/closure_test.png");
-    else : rlt_file=ROOT.TString("testNhan/BDTcut/closure_test.png");
-    cMassFit.SaveAs(rlt_file.Data());
-    rlt_file.ReplaceAll(".png",".eps"); 
-    cMassFit.SaveAs(rlt_file.Data());
-    
-
-    rfresult.Print();
+######### ++++++++++++++
+#def fit_ClosureTest():
+#    #cutOnMassDrop = True;
+#    cutOnMassDrop = False;
+#    rlt_TTB=fit_general("ofile_TTbar.root","_TTB","CBBW",cutOnMassDrop);
+#    rlt_WW=fit_general("ofile_WW.root","_WW","Voig",cutOnMassDrop);
+#    rlt_WJets=fit_general("ofile_WJets.root","_WJets","ErfExp",cutOnMassDrop);
+#
+#    parameters_list_WJets=rlt_WJets[1];
+#    parameters_list_TTB=rlt_TTB[1];
+#    parameters_list_WW=rlt_WW[1];
+#
+#    fileIn_name=[ROOT.TString("trainingtrees/ofile_WJets.root"),ROOT.TString("trainingtrees/ofile_WW.root"),ROOT.TString("trainingtrees/ofile_TTbar.root")];
+#
+#    listOfTrainingVariables1 = ["jet_massdrop_pr","jet_qjetvol","jet_tau2tau1"];
+#    bdtSimple = tmvaApplicator( listOfTrainingVariables1, "weights/Wtagger_200to275_simple_BDT.weights.xml");
+#
+#    rrv_mass = ROOT.RooRealVar("rrv_mass","rrv_mass",30.,140.) 
+#    rrv_weight = ROOT.RooRealVar("rrv_weight","rrv_weight",0. ,1.) 
+#    rdataset = ROOT.RooDataSet("rdataset","rdataset",ROOT.RooArgSet(rrv_mass,rrv_weight),ROOT.RooFit.WeightVar(rrv_weight) ); 
+#
+#    #prepare the dataset: WJets+TTB+WW
+#    for j in range(3):
+#        fileIn = ROOT.TFile(fileIn_name[j].Data());
+#        treeIn = fileIn.Get("otree");
+#        # make cuts (including mass drop) # create a RooDataSet
+#        print "N entries: ", treeIn.GetEntries()
+#        for i in range(treeIn.GetEntries()):
+#            if i % 10000 == 0: print "i: ",i
+#            treeIn.GetEntry(i);
+#            discriminantCut = False; 
+#                
+#            if cutOnMassDrop and treeIn.jet_massdrop_pr < 0.25: discriminantCut = True;
+#            elif not cutOnMassDrop:
+#                listOfVarVals = [];
+#                for kk in range(len(listOfTrainingVariables1)):
+#                    listOfVarVals.append( getattr( treeIn, listOfTrainingVariables1[kk] ) );
+#                BDTval = bdtSimple.eval( listOfVarVals );
+#                #print BDTval;
+#                if BDTval > 0.0: discriminantCut = True;
+#            else: discriminantCut = False;
+#            
+#            #if treeIn.jet_pt_pr > 200. and discriminantCut and treeIn.jet_mass_pr > 60 and treeIn.jet_mass_pr<100:
+#            if treeIn.jet_pt_pr > 200. and discriminantCut and treeIn.jet_mass_pr > 30 and treeIn.jet_mass_pr<140:
+#                rrv_mass.setVal( treeIn.jet_mass_pr );
+#                rdataset.add( ROOT.RooArgSet( rrv_mass ), treeIn.totalEventWeight );
+#    print "N_rdataset: ", rdataset.numEntries();
+#
+#    #prepare the model
+#    #WJets shape
+#    rrv_c_ErfExp_WJets      = parameters_list_WJets[0];
+#    rrv_offset_ErfExp_WJets = parameters_list_WJets[1];
+#    rrv_width_ErfExp_WJets  = parameters_list_WJets[2];
+#    rrv_number_WJets        = parameters_list_WJets[3];
+#    erfExp_WJets = ROOT.RooErfExpPdf("erfExp_WJets","erfExp_WJets",rrv_mass,rrv_c_ErfExp_WJets,rrv_offset_ErfExp_WJets,rrv_width_ErfExp_WJets);
+#    model_WJets=ROOT.RooExtendPdf("model_WJets","model_WJets",erfExp_WJets,rrv_number_WJets);
+#    #rrv_c_ErfExp_WJets.setConstant(1);
+#    #rrv_offset_ErfExp_WJets.setConstant(1);
+#    #rrv_width_ErfExp_WJets.setConstant(1);
+#    #rrv_number_WJets.setConstant(1);
+#
+#    #WW shape
+#    rrv_mean_voig_WW  = parameters_list_WW[0];
+#    rrv_width_voig_WW = parameters_list_WW[1];
+#    rrv_sigma_voig_WW = parameters_list_WW[2];
+#    rrv_number_WW     = parameters_list_WW[3];
+#    voig_WW = ROOT.RooVoigtian("voig_WW","voig_WW", rrv_mass,rrv_mean_voig_WW,rrv_width_voig_WW,rrv_sigma_voig_WW);
+#    model_WW=ROOT.RooExtendPdf("model_WW","model_WW",voig_WW,rrv_number_WW);
+#    rrv_mean_voig_WW.setConstant(1);
+#    rrv_width_voig_WW.setConstant(1);
+#    rrv_sigma_voig_WW.setConstant(1);
+#    rrv_number_WW.setConstant(1);
+#
+#    #TTB shape
+#    rrv_mean_CB_TTB  = parameters_list_TTB[0];
+#    rrv_sigma_CB_TTB = parameters_list_TTB[1];
+#    rrv_alpha_CB_TTB = parameters_list_TTB[2];
+#    rrv_n_CB_TTB     = parameters_list_TTB[3];
+#    rrv_mean_BW_TTB  = parameters_list_TTB[4];
+#    rrv_width_BW_TTB = parameters_list_TTB[5];
+#    rrv_number_TTB   = parameters_list_TTB[6];
+#    cbshape_TTB = ROOT.RooCBShape("cbshape_TTB","cbshape_TTB", rrv_mass,rrv_mean_CB_TTB,rrv_sigma_CB_TTB,rrv_alpha_CB_TTB,rrv_n_CB_TTB);
+#    bw_TTB = ROOT.RooBreitWigner("bw_TTB","bw_TTB", rrv_mass,rrv_mean_BW_TTB,rrv_width_BW_TTB);
+#    cbbw_TTB = ROOT.RooFFTConvPdf("cbbw_TTB","cbbw_TTB", rrv_mass, cbshape_TTB, bw_TTB);
+#    model_TTB=ROOT.RooExtendPdf("model_TTB","model_TTB",cbbw_TTB,rrv_number_TTB);
+#    rrv_mean_CB_TTB.setConstant(1);
+#    rrv_sigma_CB_TTB.setConstant(1);
+#    rrv_alpha_CB_TTB.setConstant(1);
+#    rrv_n_CB_TTB.setConstant(1);
+#    rrv_mean_BW_TTB.setConstant(1);
+#    rrv_width_BW_TTB.setConstant(1);
+#    rrv_number_TTB.setConstant(1);
+#
+#    model=ROOT.RooAddPdf("model","model",ROOT.RooArgList(model_WJets,model_WW,model_TTB));
+#
+#    parameters_list=[rrv_c_ErfExp_WJets,rrv_offset_ErfExp_WJets,rrv_width_ErfExp_WJets,rrv_number_WJets];
+#    rrv_mass.setRange("sb_lo",rrv_mass.getMin(),60); rrv_mass.setRange("sb_hi",100,rrv_mass.getMax());
+#    #rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) ,ROOT.RooFit.SumW2Error(ROOT.kTRUE) );
+#    #rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) ,ROOT.RooFit.SumW2Error(ROOT.kTRUE), ROOT.RooFit.Range(60,100) );
+#    rfresult = model.fitTo( rdataset, ROOT.RooFit.Save(1) , ROOT.RooFit.Range("sb_lo,sb_hi") ,ROOT.RooFit.SumW2Error(ROOT.kTRUE) );
+#
+#    mplot = rrv_mass.frame(ROOT.RooFit.Title("Closure test: WJets+TTBar+WW"));
+#    rdataset.plotOn( mplot ,ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2) );
+#    model.plotOn(mplot, ROOT.RooFit.VisualizeError(rfresult,1),ROOT.RooFit.FillColor(ROOT.kOrange) );
+#    rdataset.plotOn( mplot ,ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2) );
+#    model.plotOn(mplot );
+#    model.plotOn(mplot, ROOT.RooFit.Components("model_WJets"), ROOT.RooFit.LineStyle(ROOT.RooFit.kDashed));
+#    model.plotOn(mplot, ROOT.RooFit.Components("model_WW"),ROOT.RooFit.LineStyle(ROOT.RooFit.kDashed),ROOT.RooFit.LineColor(ROOT.kRed));
+#    model.plotOn(mplot, ROOT.RooFit.Components("model_TTB"),ROOT.RooFit.LineStyle(ROOT.RooFit.kDashed),ROOT.RooFit.LineColor(6));
+#    model.plotOn( mplot );
+#
+#    #pull
+#    hpull=mplot.pullHist();
+#    mplot_pull = rrv_mass.frame(ROOT.RooFit.Title("Pull Distribution"));
+#    mplot_pull.addPlotable(hpull,"P");
+#    mplot_pull.SetTitle("PULL");
+#    mplot_pull.GetYaxis().SetRangeUser(-5,5);
+#
+#    cMassFit = ROOT.TCanvas("cMassFit","cMassFit",1000,800);
+#    pad1=ROOT.TPad("pad1","pad1",0.,0. ,0.8,0.2);
+#    pad2=ROOT.TPad("pad2","pad2",0.,0.2,0.8,1. );
+#    pad3=ROOT.TPad("pad3","pad3",0.8,0.,1,1);
+#    pad1.Draw();
+#    pad2.Draw();
+#    pad3.Draw();
+#
+#    pad2.cd();
+#    mplot.Draw();
+#    pad1.cd();
+#    mplot_pull.Draw();
+#
+#    pad3.cd();
+#    latex=ROOT.TLatex();
+#    latex.SetTextSize(0.1);
+#    #parameters_list.sort();
+#    for i in range(len(parameters_list)):
+#        latex.DrawLatex(0,0.9-i*0.08,"%s"%(parameters_list[i].GetName()) );
+#        latex.DrawLatex(0,0.9-i*0.08-0.04," %4.3e +/- %2.1e"%(parameters_list[i].getVal(),parameters_list[i].getError()) );
+#
+#    if cutOnMassDrop : rlt_file=ROOT.TString("testNhan/mdcut/closure_test.png");
+#    else : rlt_file=ROOT.TString("testNhan/BDTcut/closure_test.png");
+#    cMassFit.SaveAs(rlt_file.Data());
+#    rlt_file.ReplaceAll(".png",".eps"); 
+#    cMassFit.SaveAs(rlt_file.Data());
+#    
+#
+#    rfresult.Print();
  ######## ++++++++++++++
 
 def fit_AllSamples():
+    
+    print "fitting all samples..."
     #cutOnMassDrop = True;
     cutOnMassDrop = False;
-    rlt_TTB=fit_general("ofile_TTbar.root","_TTB","CBBW",cutOnMassDrop);
+    rlt_TTB=fit_general("ofile_TTbar.root","_TTB","CBBW",cutOnMassDrop);    
     rlt_WW=fit_general("ofile_WW.root","_WW","Voig",cutOnMassDrop);
     rlt_WJets=fit_general("ofile_WJets.root","_WJets","ErfExp",cutOnMassDrop);
     print "________________________________________________________________________"
@@ -425,5 +440,7 @@ def fit_AllSamples():
     rlt_TTB[0].Print();
 
 if __name__ == '__main__':
-    #fit_AllSamples();
-    fit_ClosureTest();
+    
+    print "doFit_setp2_zijun.py..."
+    fit_AllSamples();
+    #fit_ClosureTest();
