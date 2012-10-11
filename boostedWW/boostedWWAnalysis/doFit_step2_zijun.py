@@ -16,9 +16,9 @@ gROOT.ProcessLine('.L tdrstyle.C')
 ROOT.setTDRStyle()
 
 ROOT.gSystem.Load("PDFs/RooErfExpPdf_cxx.so")
-ROOT.gSystem.Load("PDFs/RooErfExp_Gaus_Pdf_cxx.so")
-ROOT.gSystem.Load("PDFs/RooErfExp_2Gaus_Pdf_cxx.so")
-ROOT.gSystem.Load("PDFs/RooErfExp_Voig_Gaus_Pdf_cxx.so")
+#ROOT.gSystem.Load("PDFs/RooErfExp_Gaus_Pdf_cxx.so")
+#ROOT.gSystem.Load("PDFs/RooErfExp_2Gaus_Pdf_cxx.so")
+#ROOT.gSystem.Load("PDFs/RooErfExp_Voig_Gaus_Pdf_cxx.so")
 
 ############################################################
 ############################################
