@@ -305,6 +305,9 @@ def fit_general(in_file_name, label, in_model_name,cutOnMassDrop):
         latex.DrawLatex(0,0.9-i*0.08-0.04," %4.3e +/- %2.1e"%(parameters_list[i].getVal(),parameters_list[i].getError()) );
         #print "%s:  %s +/- %s"%(parameters_list[i].GetName(),parameters_list[i].getVal(),parameters_list[i].getError()) ;
 
+    if not os.path.isdir("testNhan/mdcut"): os.system("mkdir -p  testNhan/mdcut");
+    if not os.path.isdir("testNhan/BDTcut"): os.system("mkdir -p  testNhan/BDTcut");
+
     if cutOnMassDrop : rlt_file=ROOT.TString("testNhan/mdcut/"+in_file_name);
     else : rlt_file=ROOT.TString("testNhan/BDTcut/"+in_file_name);
     rlt_file.ReplaceAll(".root","_"+in_model_name+"_rlt_weight.png");
@@ -512,6 +515,10 @@ def fit_ClosureTest():
     for i in range(len(parameters_list)):
         latex.DrawLatex(0,0.9-i*0.08,"%s"%(parameters_list[i].GetName()) );
         latex.DrawLatex(0,0.9-i*0.08-0.04," %4.3e +/- %2.1e"%(parameters_list[i].getVal(),parameters_list[i].getError()) );
+
+
+    if not os.path.isdir("testNhan/mdcut"): os.system("mkdir -p  testNhan/mdcut");
+    if not os.path.isdir("testNhan/BDTcut"): os.system("mkdir -p  testNhan/BDTcut");
 
     if cutOnMassDrop : rlt_file=ROOT.TString("testNhan/mdcut/closure_test.png");
     else : rlt_file=ROOT.TString("testNhan/BDTcut/closure_test.png");
