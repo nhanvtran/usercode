@@ -83,6 +83,7 @@ class sampleWrapperClass:
 
         otree = ROOT.TTree("otree","otree");        
         
+        mass_lvj_ = array( 'f', [ 0. ] );
         v_pt_ = array( 'f', [ 0. ] );
         jet_mass_pr_ = array( 'f', [ 0. ] );
         jet_pt_pr_ = array( 'f', [ 0. ] );
@@ -121,6 +122,7 @@ class sampleWrapperClass:
         deltaphi_METca8jet_ = array( 'f', [0.] );
         deltaphi_Vca8jet_ = array( 'f', [0.] );
     
+        otree.Branch("mass_lvj", mass_lvj_ , "mass_lvj/F");
         otree.Branch("v_pt", v_pt_ , "v_pt/F");
         otree.Branch("jet_pt_pr", jet_pt_pr_ , "jet_pt_pr/F");
         otree.Branch("jet_mass_pr", jet_mass_pr_ , "jet_mass_pr/F");
@@ -183,6 +185,7 @@ class sampleWrapperClass:
                 
                 ###################################
                 # make training tree
+                mass_lvj_[0] = getattr( self.InputTree_, "boostedW_lvj_m" );
                 v_pt_[0] = getattr( self.InputTree_, "W_pt" );
                 jet_mass_pr_[0] = getattr( self.InputTree_, prefix + "_mass_pr" )[0];
                 jet_pt_pr_[0] = getattr( self.InputTree_, prefix + "_pt_pr" )[0];
@@ -258,6 +261,7 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus("W_muon_eta",1);
         self.InputTree_.SetBranchStatus("event_metMVA_met",1);
         self.InputTree_.SetBranchStatus("event_nPV",1);
+        self.InputTree_.SetBranchStatus("boostedW_lvj_m",1);
         self.InputTree_.SetBranchStatus("W_pt",1);
         self.InputTree_.SetBranchStatus(prefix + "_pt_pr",1);
         self.InputTree_.SetBranchStatus(prefix + "_massdrop_pr",1);
