@@ -205,6 +205,7 @@ public:
   std::vector<SimpleJet> filterJets; //???
   std::vector<HardJet> hardJets;
   std::vector<RawJet> rawJets;
+  std::vector<RawJet> rawJetsGen;    
     
   
   METInfo calomet;
