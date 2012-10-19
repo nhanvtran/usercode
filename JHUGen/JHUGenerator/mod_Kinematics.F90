@@ -64,6 +64,12 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1
     ISTUP(8) = 1
     ISTUP(9) = 1
 
+    if (LHE_IDUP(4).eq.22) then
+        ISTUP(4) = 1
+        ISTUP(5) = 1
+    endif
+
+
     MOTHUP(1,1) = 0
     MOTHUP(2,1) = 0
     MOTHUP(1,2) = 0

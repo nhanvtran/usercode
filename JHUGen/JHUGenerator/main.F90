@@ -524,6 +524,19 @@ enddo
 !pause
    call ClearHisto()
 
+    if (seed_random) then
+#if compiler==1
+        call random_seed()
+#elif compiler==2
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=clock)
+        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)
+#endif
+    endif
+
    print *, " generating events"
    call cpu_time(time_start)
    do while( AccepCounter.lt.VegasNc1 )! generate a fixed number of VegasNc1 events
