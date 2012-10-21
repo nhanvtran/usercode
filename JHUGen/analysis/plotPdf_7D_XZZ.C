@@ -12,14 +12,14 @@
 #include "TROOT.h"
 using namespace RooFit ;
 
-void plotPdf_7D_XZZ(double mH = 125, bool draw=true) {
+void plotPdf_7D_XZZ(double mH = 250, bool draw=true) {
     
     gROOT->ProcessLine(".L ~/tdrstyle.C");
     setTDRStyle();
     gStyle->SetPadLeftMargin(0.16);
     
     // Declaration of the PDFs to use
-    gROOT->ProcessLine(".L  PDFs/RooSpinTwoXZsZs.cxx+");
+    gROOT->ProcessLine(".L  PDFs/RooSpinTwo_7D.cxx+");
 
     // W/Z mass and decay width constants
     double mV = 91.1876;
@@ -48,8 +48,7 @@ void plotPdf_7D_XZZ(double mH = 125, bool draw=true) {
     // See equation 5,6,7 in PRD 91, 075022
     //
     double s = (mH*mH-2*mV*mV)/2.;
-    double c1 = 2*(1+mV*mV/s); // definition as in paper
-    c1 = c1 * 2.; // to be consistent with the generator
+    double c1 = 2*(1+mV*mV/s); // 2m+ model
     std::cout << "c1Value = " << c1 << "\n";
     RooRealVar* c1Val = new RooRealVar("c1Val", "c1Val", c1);
     // RooRealVar* c1Val = new RooRealVar("c1Val", "c1Val", 2.0);
@@ -85,14 +84,14 @@ void plotPdf_7D_XZZ(double mH = 125, bool draw=true) {
     
       
     // PDF definition SM Higgs (JP = 2+)
-    RooSpinTwoXZsZs *myPDF;
+    RooSpinTwo_7D *myPDF;
     if ( offshell )
-      myPDF = new RooSpinTwoXZsZs("myPDF","myPDF", *mX, *z1mass, *z2mass, *hs, *h1,*h2, *Phi, *Phi1, 
+      myPDF = new RooSpinTwo_7D("myPDF","myPDF", *mX, *z1mass, *z2mass, *hs, *h1,*h2, *Phi, *Phi1, 
 				  *c1Val, *c2Val, *c3Val, *c4Val, *c5Val, *c6Val, *c7Val, 
 				  *useGTerm, *g1Val, *g2Val, *g3Val, *g4Val, *g5Val, *g6Val, *g7Val, *g8Val, *g9Val, *g10Val,
 				  *fz1Val, *fz2Val, *R1Val, *R2Val, *mZ, *gamZ);
     else 
-      myPDF = new RooSpinTwoXZsZs("myPDF","myPDF", *mX, *mZ, *mZ, *hs, *h1,*h2, *Phi, *Phi1, 
+      myPDF = new RooSpinTwo_7D("myPDF","myPDF", *mX, *mZ, *mZ, *hs, *h1,*h2, *Phi, *Phi1, 
 				  *c1Val, *c2Val, *c3Val, *c4Val, *c5Val, *c6Val, *c7Val, 
 				  *useGTerm, *g1Val, *g2Val, *g3Val, *g4Val, *g5Val, *g6Val, *g7Val, *g8Val, *g9Val, *g10Val,
 				  *fz1Val, *fz2Val, *R1Val, *R2Val, *mZ, *gamZ);
@@ -100,9 +99,7 @@ void plotPdf_7D_XZZ(double mH = 125, bool draw=true) {
     // dataset for (JP = 2+)
     TString fileName;
     if ( useGTerm->getVal() > 0.) {
-      fileName = Form("7T_125G_4l_wResolution.root",mH); // Ian's file
-      // fileName = Form("TZZ_%.0f_JHU_YY.root", mH);
-      // fileName = Form("TZZ_%.0f_JHU_FromG1.root", mH);
+      fileName = Form("TZZ_%.0f_JHU.root", mH);
     }
     else {
       fileName = Form("TZZ_%.0f_JHU_GenFromC.root", mH);
@@ -187,10 +184,8 @@ void plotPdf_7D_XZZ(double mH = 125, bool draw=true) {
       Phiframe->Draw();
       
       if ( useGTerm->getVal() > 0.) {
-	czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromG_FileFromIan.eps", mH));
-	czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromG_FileFromIan.png", mH));
-	// czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromG1.eps", mH));
-	// czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromG1.png", mH));
+	czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D.eps", mH));
+	czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D.png", mH));
       } else {
 	czz->SaveAs(Form("epsfiles/angles_TZZ%.0f_JHU_7D_GenFromC.eps", mH));
 	czz->SaveAs(Form("pngfiles/angles_TZZ%.0f_JHU_7D_GenFromC.png", mH));
