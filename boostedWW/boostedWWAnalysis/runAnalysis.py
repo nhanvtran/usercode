@@ -56,8 +56,10 @@ if __name__ == '__main__':
     # define samples, this creates some trees in the "trainingtrees" directory
     isData = True;
     notData = False;
-    LUMI = 9.9
-    sourcefiledirectory = "/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/"
+    #LUMI = 9.9
+    LUMI = 11.541
+    #sourcefiledirectory = "/eos/uscms/store/user/lnujj/HCP2012/ReducedTrees/"
+    sourcefiledirectory = "/eos/uscms/store/user/lnujj/HCP2012METfix/ReducedTrees/"
     treename = "WJet"
     lumifile = "MCScaleFactors.txt"
 
@@ -73,13 +75,28 @@ if __name__ == '__main__':
     #ggH600SampleXS = 8.55627E1*sigSCF;
     #ggH600Sample_EffLumi = 197170/ggH600SampleXS;
     ggH600Sample = sampleWrapperClass("ggH600",boostedWSamples.GetFileNames()["ggH600"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH600")),LUMI,boostedWSamples.GetTreeName(),notData)
+    ggH700Sample = sampleWrapperClass("ggH700",boostedWSamples.GetFileNames()["ggH700"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH700")),LUMI,boostedWSamples.GetTreeName(),notData)
+    ggH800Sample = sampleWrapperClass("ggH800",boostedWSamples.GetFileNames()["ggH800"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH800")),LUMI,boostedWSamples.GetTreeName(),notData)
+    ggH900Sample = sampleWrapperClass("ggH900",boostedWSamples.GetFileNames()["ggH900"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH900")),LUMI,boostedWSamples.GetTreeName(),notData)
+    ggH1000Sample = sampleWrapperClass("ggH1000",boostedWSamples.GetFileNames()["ggH1000"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH1000")),LUMI,boostedWSamples.GetTreeName(),notData)
 
     #boostedWXS = 1.3*228.9E3;
     #WJetsSample_EffLumi = 8955318/boostedWXS;
     WJetsSample = sampleWrapperClass("WJets",boostedWSamples.GetFileNames()["WJets"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets")),LUMI,boostedWSamples.GetTreeName(),notData)
     
+    #ZJetsSample_EffLumi = 
+    ZJetsSample = sampleWrapperClass("ZJets",boostedWSamples.GetFileNames()["ZJets"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZJets")),LUMI,boostedWSamples.GetTreeName(),notData)
+    
     #TTbarSample_EffLumi = 6893735/225197.;
     TTbarSample = sampleWrapperClass("TTbar",boostedWSamples.GetFileNames()["TTbar"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar")),LUMI,boostedWSamples.GetTreeName(),notData);
+
+    #STop_Sample_EffLumi
+    STopT_TSample     = sampleWrapperClass("tch"     ,boostedWSamples.GetFileNames()["tch"]     ,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tch"))     ,LUMI,boostedWSamples.GetTreeName(),notData);
+    STopTW_TSample    = sampleWrapperClass("tWch"    ,boostedWSamples.GetFileNames()["tWch"]    ,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tWch"))    ,LUMI,boostedWSamples.GetTreeName(),notData);
+    STopS_TSample     = sampleWrapperClass("sch"     ,boostedWSamples.GetFileNames()["sch"]     ,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"sch"))     ,LUMI,boostedWSamples.GetTreeName(),notData);
+    STopT_TbarSample  = sampleWrapperClass("tch_bar" ,boostedWSamples.GetFileNames()["tch_bar"] ,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tch_bar")) ,LUMI,boostedWSamples.GetTreeName(),notData);
+    STopTW_TbarSample = sampleWrapperClass("tWch_bar",boostedWSamples.GetFileNames()["tWch_bar"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tWch_bar")),LUMI,boostedWSamples.GetTreeName(),notData);
+    STopS_TbarSample = sampleWrapperClass("sch_bar" ,boostedWSamples.GetFileNames()["sch_bar"] ,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"sch_bar")) ,LUMI,boostedWSamples.GetTreeName(),notData);
 
     #WWSample_EffLumi = 9450414/33.61E3;
     WWSample = sampleWrapperClass("WW",boostedWSamples.GetFileNames()["WW"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WW")),LUMI,boostedWSamples.GetTreeName(),notData);
@@ -95,14 +112,26 @@ if __name__ == '__main__':
         
         # ---------------------------------------------------
         # create training tree
-        ggH600Sample.createTrainingTree();        
+        #ggH600Sample.createTrainingTree();        
         singlemu600Sample.createTrainingTree();
         ggH600Sample.createTrainingTree();
+        ggH700Sample.createTrainingTree();
+        ggH800Sample.createTrainingTree();
+        ggH900Sample.createTrainingTree();
+        ggH1000Sample.createTrainingTree();
+
         WJetsSample.createTrainingTree();
         TTbarSample.createTrainingTree();
         WWSample.createTrainingTree();
         WZSample.createTrainingTree();
         ZZSample.createTrainingTree();
+        ZJetsSample.createTrainingTree();
+        STopT_TSample.createTrainingTree();
+        STopTW_TSample.createTrainingTree();
+        STopS_TSample.createTrainingTree();
+        STopT_TbarSample.createTrainingTree();
+        STopTW_TbarSample.createTrainingTree();
+        STopS_TbarSample.createTrainingTree();
 
     #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
     #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, singlemu600Sample );    
@@ -161,6 +190,10 @@ if __name__ == '__main__':
     # do the training
     # get the training tree names
     signalTrainingTreeName = ggH600Sample.getTrainingTreeName();
+    #signalTrainingTreeName = ggH700Sample.getTrainingTreeName();
+    #signalTrainingTreeName = ggH800Sample.getTrainingTreeName();
+    #signalTrainingTreeName = ggH900Sample.getTrainingTreeName();
+    #signalTrainingTreeName = ggH1000Sample.getTrainingTreeName();
     backgroundTrainingTreeNames = WJetsSample.getTrainingTreeName();
 
     # Trainings
