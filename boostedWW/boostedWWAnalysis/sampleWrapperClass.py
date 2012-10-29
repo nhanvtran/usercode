@@ -93,6 +93,11 @@ class sampleWrapperClass:
         mvaMET_ = array( 'f', [ 0. ] );                
         nPV_ = array( 'f', [ 0. ] );                        
         totalEventWeight_ = array( 'f', [ 0. ] );                                
+        interference_Weight_H600_ = array( 'f', [ 0. ] );                                
+        interference_Weight_H700_ = array( 'f', [ 0. ] );                                
+        interference_Weight_H800_ = array( 'f', [ 0. ] );                                
+        interference_Weight_H900_ = array( 'f', [ 0. ] );                                
+        interference_Weight_H1000_ = array( 'f', [ 0. ] );                                
         
         jet_grsens_ft_ = array( 'f', [ 0. ] );
         jet_grsens_tr_ = array( 'f', [ 0. ] );
@@ -131,6 +136,11 @@ class sampleWrapperClass:
         otree.Branch("mvaMET", mvaMET_ , "mvaMET/F");
         otree.Branch("nPV", nPV_ , "nPV/F");
         otree.Branch("totalEventWeight", totalEventWeight_ , "totalEventWeight/F");
+        otree.Branch("interference_Weight_H600", interference_Weight_H600_ , "interference_Weight_H600/F");
+        otree.Branch("interference_Weight_H700", interference_Weight_H700_ , "interference_Weight_H700/F");
+        otree.Branch("interference_Weight_H800", interference_Weight_H800_ , "interference_Weight_H800/F");
+        otree.Branch("interference_Weight_H900", interference_Weight_H900_ , "interference_Weight_H900/F");
+        otree.Branch("interference_Weight_H1000", interference_Weight_H1000_ , "interference_Weight_H1000/F");
 
         otree.Branch("jet_grsens_ft", jet_grsens_ft_ , "jet_grsens_ft/F");
         otree.Branch("jet_grsens_tr", jet_grsens_tr_ , "jet_grsens_tr/F");
@@ -180,8 +190,34 @@ class sampleWrapperClass:
                 totSampleWeight = 1.;
                 if self.IsData_: totSampleWeight = wSampleWeight;
                 else: totSampleWeight = wSampleWeight*effwt*puwt;
-                
-#                print puwt;
+                #print puwt;
+
+                #interference weight
+                complexpolewtggH600    = getattr(self.InputTree_,"complexpolewtggH600"); 
+                interferencewtggH600   = getattr(self.InputTree_,"interferencewtggH600");
+                avecomplexpolewtggH600 = getattr(self.InputTree_,"avecomplexpolewtggH600"); 
+                infe_Weight_H600 = complexpolewtggH600*interferencewtggH600/avecomplexpolewtggH600;
+
+                complexpolewtggH700    = getattr(self.InputTree_,"complexpolewtggH700"); 
+                interferencewtggH700   = getattr(self.InputTree_,"interferencewtggH700");
+                avecomplexpolewtggH700 = getattr(self.InputTree_,"avecomplexpolewtggH700"); 
+                infe_Weight_H700 = complexpolewtggH700*interferencewtggH700/avecomplexpolewtggH700;
+
+                complexpolewtggH800    = getattr(self.InputTree_,"complexpolewtggH800"); 
+                interferencewtggH800   = getattr(self.InputTree_,"interferencewtggH800");
+                avecomplexpolewtggH800 = getattr(self.InputTree_,"avecomplexpolewtggH800"); 
+                infe_Weight_H800 = complexpolewtggH800*interferencewtggH800/avecomplexpolewtggH800;
+
+                complexpolewtggH900    = getattr(self.InputTree_,"complexpolewtggH900"); 
+                interferencewtggH900   = getattr(self.InputTree_,"interferencewtggH900");
+                avecomplexpolewtggH900 = getattr(self.InputTree_,"avecomplexpolewtggH900"); 
+                infe_Weight_H900 = complexpolewtggH900*interferencewtggH900/avecomplexpolewtggH900;
+
+                complexpolewtggH1000    = getattr(self.InputTree_,"complexpolewtggH1000"); 
+                interferencewtggH1000   = getattr(self.InputTree_,"interferencewtggH1000");
+                avecomplexpolewtggH1000 = getattr(self.InputTree_,"avecomplexpolewtggH1000"); 
+                infe_Weight_H1000 = complexpolewtggH1000*interferencewtggH1000/avecomplexpolewtggH1000;
+
                 
                 ###################################
                 # make training tree
@@ -195,6 +231,11 @@ class sampleWrapperClass:
                 mvaMET_[0] = getattr( self.InputTree_, "event_metMVA_met" );
                 nPV_[0] = getattr( self.InputTree_, "event_nPV" );
                 totalEventWeight_[0] = totSampleWeight;
+                interference_Weight_H600_[0] = infe_Weight_H600;
+                interference_Weight_H700_[0] = infe_Weight_H700;
+                interference_Weight_H800_[0] = infe_Weight_H800;
+                interference_Weight_H900_[0] = infe_Weight_H900;
+                interference_Weight_H1000_[0] = infe_Weight_H1000;
 
                 jet_grsens_ft_[0] = getattr( self.InputTree_, prefix + "_mass_ft" )[0] / getattr( self.InputTree_, prefix + "_mass" )[0];
                 jet_grsens_tr_[0] = getattr( self.InputTree_, prefix + "_mass_tr" )[0] / getattr( self.InputTree_, prefix + "_mass" )[0];
@@ -287,6 +328,22 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus(prefix + "_deltaR_lca8jet",1);
         self.InputTree_.SetBranchStatus(prefix + "_deltaphi_METca8jet",1);
         self.InputTree_.SetBranchStatus(prefix + "_deltaphi_Vca8jet",1);
+
+        self.InputTree_.SetBranchStatus("avecomplexpolewtggH600",1)
+        self.InputTree_.SetBranchStatus("avecomplexpolewtggH700",1)
+        self.InputTree_.SetBranchStatus("avecomplexpolewtggH800",1)
+        self.InputTree_.SetBranchStatus("avecomplexpolewtggH900",1)
+        self.InputTree_.SetBranchStatus("avecomplexpolewtggH1000",1)
+        self.InputTree_.SetBranchStatus("complexpolewtggH600",1)
+        self.InputTree_.SetBranchStatus("complexpolewtggH700",1)
+        self.InputTree_.SetBranchStatus("complexpolewtggH800",1)
+        self.InputTree_.SetBranchStatus("complexpolewtggH900",1)
+        self.InputTree_.SetBranchStatus("complexpolewtggH1000",1)
+        self.InputTree_.SetBranchStatus("interferencewtggH600",1)
+        self.InputTree_.SetBranchStatus("interferencewtggH700",1)
+        self.InputTree_.SetBranchStatus("interferencewtggH800",1)
+        self.InputTree_.SetBranchStatus("interferencewtggH900",1)
+        self.InputTree_.SetBranchStatus("interferencewtggH1000",1)
 
 
 
