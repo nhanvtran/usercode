@@ -17,29 +17,28 @@ Testprogram: mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o
 	$(fcomp) -o testF testprogram.F90 -lm mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o
 	@echo " "
 	@echo " compiling and linking testprogram.c with gcc"
-	$(ccomp) -o testC testprogram.c   -lm -lgfortran  mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o
+	$(ccomp) -o testC testprogram.c   -lm  -lgfortran  mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o
 	@echo " "
 
-	
 
 
 
 mod_Higgs_MatEl.o: mod_Higgs_MatEl.F90 includeVars.F90
 	@echo " "
 	@echo " compiling mod_Higgs_MatEl.F90 includeVars.F90 with "$(Comp)
-	$(fcomp) -c mod_Higgs_MatEl.F90  -lm
+	$(fcomp) -c mod_Higgs_MatEl.F90  
 
 
 mod_Zprime_MatEl.o: mod_Zprime_MatEl.F90 includeVars.F90
 	@echo " "
 	@echo " compiling mod_Zprime_MatEl.F90 includeVars.F90 with "$(Comp)
-	$(fcomp) -c mod_Zprime_MatEl.F90  -lm
+	$(fcomp) -c mod_Zprime_MatEl.F90  
 
 
 mod_Graviton_MatEl.o: mod_Graviton_MatEl.F90 includeVars.F90
 	@echo " "
 	@echo " compiling mod_Graviton_MatEl.F90 includeVars.F90 with "$(Comp)
-	$(fcomp) -c mod_Graviton_MatEl.F90  -lm
+	$(fcomp) -c mod_Graviton_MatEl.F90  
 
 
 clean:

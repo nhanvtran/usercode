@@ -92,25 +92,25 @@ int main(void){
   P[5][3]=-0.1672134945045036;
   
 
- __modhiggs_MOD_evalamp_gg_h_vv(P, &MReso,  &GaReso, Hggcoupl, Hvvcoupl, MYIDUP, &MatElSq);
+ __modhiggs__evalamp_gg_h_vv(P, &MReso,  &GaReso, Hggcoupl, Hvvcoupl, MYIDUP, &MatElSq);
  printf("\n ");
  printf("Matr.el. squared (spin-0): %20.17e \n ",MatElSq);
  printf("result should be (spin-0): %20.17e \n ",0.0045682366425370);
  printf("ratio: %20.17e \n ",MatElSq/0.0045682366425370);
 
- __modzprime_MOD_evalamp_qqb_zprime_vv(P, &MReso,  &GaReso, Zqqcoupl, Zvvcoupl, MYIDUP, &MatElSq);
+ __modzprime__evalamp_qqb_zprime_vv(P, &MReso,  &GaReso, Zqqcoupl, Zvvcoupl, MYIDUP, &MatElSq);
  printf("\n ");
  printf("Matr.el. squared (spin-1): %20.17e \n ",MatElSq);
  printf("result should be (spin-1): %20.17e \n ",0.0020357978978982);
  printf("ratio: %20.17e \n ",MatElSq/0.0020357978978982);
 
-  __modgraviton_MOD_evalamp_gg_g_vv(P, &MReso,  &GaReso, Gggcoupl, Gvvcoupl, MYIDUP, &MatElSq);
+  __modgraviton__evalamp_gg_g_vv(P, &MReso,  &GaReso, Gggcoupl, Gvvcoupl, MYIDUP, &MatElSq);
  printf("\n ");
  printf("Matr.el. squared (gg spin-2): %20.17e \n ",MatElSq);
  printf("result should be (gg spin-2): %20.17e \n ",0.0307096869320374);
  printf("ratio: %20.17e \n ",MatElSq/0.0307096869320374);
 
-  __modgraviton_MOD_evalamp_qqb_g_vv(P, &MReso,  &GaReso, Gqqcoupl, Gvvcoupl, MYIDUP, &MatElSq);
+  __modgraviton__evalamp_qqb_g_vv(P, &MReso,  &GaReso, Gqqcoupl, Gvvcoupl, MYIDUP, &MatElSq);
  printf("\n ");
  printf("Matr.el. squared (qq spin-2): %20.17e \n ",MatElSq);
  printf("result should be (qq spin-2): %20.17e \n ",0.0004838377647021);
