@@ -8,7 +8,7 @@ use ifport
 #endif
 implicit none
 real(8) :: VG_Result,VG_Error
-logical,parameter :: useBetaVersion=.true.! this should be set to .false.
+logical,parameter :: useBetaVersion=.false.! this should be set to .false.
 
 
 
