@@ -20,6 +20,7 @@ type(Histogram),allocatable :: Histo(:)
 contains
 
 
+
 SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP)
 use ModParameters
 implicit none
@@ -44,10 +45,10 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1
 ! NUP changes for gamma gamma final state
     if (LHE_IDUP(4).eq.22) then
         NUP=5
-    else 
+    else
         NUP=9
     endif
-    
+
     IDPRUP=100
     XWGTUP=1.
     SCALUP=1000.
@@ -125,26 +126,56 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1
         tmp = Z1FV(1)*Z1FV(1)-Z1FV(2)*Z1FV(2)-Z1FV(3)*Z1FV(3)-Z1FV(4)*Z1FV(4)
         if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
 	V1Mass = dSQRT(dabs(tmp))
+        if( V1Mass.lt.1d-5 ) then
+           V1Mass=0d0
+        endif
 
         tmp = Z2FV(1)*Z2FV(1)-Z2FV(2)*Z2FV(2)-Z2FV(3)*Z2FV(3)-Z2FV(4)*Z2FV(4)
         if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
 	V2Mass = dSQRT(dabs(tmp))
+        if( V2Mass.lt.1d-5 ) then
+            V2Mass=0d0
+        endif
 
         tmp = MomDummy(1,3)*MomDummy(1,3)-MomDummy(2,3)*MomDummy(2,3)-MomDummy(3,3)*MomDummy(3,3)-MomDummy(4,3)*MomDummy(4,3)
         if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	L11Mass = dSQRT(dABS(tmp))
+	L12Mass = dSQRT(dABS(tmp))
+        if( L12Mass.lt.1d-5 ) then
+            L12Mass=0d0
+        endif
+        if( tmp.lt.0d0 ) then
+            MomDummy(1,3) = MomDummy(1,3) + 1d-7
+        endif
 
         tmp = MomDummy(1,4)*MomDummy(1,4)-MomDummy(2,4)*MomDummy(2,4)-MomDummy(3,4)*MomDummy(3,4)-MomDummy(4,4)*MomDummy(4,4)
         if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	L12Mass = dSQRT(dABS(tmp))
+	L11Mass = dSQRT(dABS(tmp))
+        if( L11Mass.lt.1d-5 ) then
+            L11Mass=0d0
+        endif
+        if( tmp.lt.0d0 ) then
+            MomDummy(1,4) = MomDummy(1,4) + 1d-7
+        endif
 
         tmp = MomDummy(1,5)*MomDummy(1,5)-MomDummy(2,5)*MomDummy(2,5)-MomDummy(3,5)*MomDummy(3,5)-MomDummy(4,5)*MomDummy(4,5)
         if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	L21Mass = dSQRT(dABS(tmp))
+	L22Mass = dSQRT(dABS(tmp))
+        if( L22Mass.lt.1d-5 ) then
+            L22Mass=0d0
+        endif
+        if( tmp.lt.0d0 ) then
+            MomDummy(1,5) = MomDummy(1,5) + 1d-7
+        endif
 
         tmp = MomDummy(1,6)*MomDummy(1,6)-MomDummy(2,6)*MomDummy(2,6)-MomDummy(3,6)*MomDummy(3,6)-MomDummy(4,6)*MomDummy(4,6)
         if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	L22Mass = dSQRT(dABS(tmp))
+	L21Mass = dSQRT(dABS(tmp))
+        if( L21Mass.lt.1d-5 ) then
+            L21Mass=0d0
+        endif
+        if( tmp.lt.0d0 ) then
+            MomDummy(1,6) = MomDummy(1,6) + 1d-7
+        endif
 
 
     write(14,"(A)") "<event>"
@@ -205,7 +236,6 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1
 ! pause
 
 END SUBROUTINE
-
 
 
 SUBROUTINE EvalPhasespace_VDecay(VMom,MV,ML1,ML2,xRndPS,MomDK,PSWgt)
