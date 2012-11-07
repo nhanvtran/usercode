@@ -8,7 +8,7 @@ use ifport
 #endif
 implicit none
 real(8) :: VG_Result,VG_Error
-logical,parameter :: useBetaVersion=.false.! this should be set to .false.
+logical,parameter :: useBetaVersion=.true.! this should be set to .false.
 
 
 
@@ -400,7 +400,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         adj_par = VG(0,0)/(VG(-5,5)+VG(-4,4)+VG(-3,3)+VG(-2,2)+VG(-1,1)  &
                 + VG(1,-1)+VG(2,-2)+VG(3,-3)+VG(4,-4)+VG(5,-5))*channels_ratio_fix/(one-channels_ratio_fix)
     else
-        adj_par = one
+        adj_par = 100000
     endif
 
 !--- rescale the gluon induced channel
