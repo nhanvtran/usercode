@@ -93,6 +93,8 @@ class sampleWrapperClass:
         mvaMET_ = array( 'f', [ 0. ] );                
         nPV_ = array( 'f', [ 0. ] );                        
         totalEventWeight_ = array( 'f', [ 0. ] );                                
+        eff_and_pu_Weight_ = array( 'f', [ 0. ] );                                
+        wSampleWeight_ = array( 'f', [ 0. ] ); #wSampleWeight*effwt*puwt                               
         interference_Weight_H600_ = array( 'f', [ 0. ] );                                
         interference_Weight_H700_ = array( 'f', [ 0. ] );                                
         interference_Weight_H800_ = array( 'f', [ 0. ] );                                
@@ -136,6 +138,8 @@ class sampleWrapperClass:
         otree.Branch("mvaMET", mvaMET_ , "mvaMET/F");
         otree.Branch("nPV", nPV_ , "nPV/F");
         otree.Branch("totalEventWeight", totalEventWeight_ , "totalEventWeight/F");
+        otree.Branch("eff_and_pu_Weight", eff_and_pu_Weight_ , "eff_and_pu_Weight/F");
+        otree.Branch("wSampleWeight", wSampleWeight_ , "wSampleWeight/F");
         otree.Branch("interference_Weight_H600", interference_Weight_H600_ , "interference_Weight_H600/F");
         otree.Branch("interference_Weight_H700", interference_Weight_H700_ , "interference_Weight_H700/F");
         otree.Branch("interference_Weight_H800", interference_Weight_H800_ , "interference_Weight_H800/F");
@@ -230,7 +234,9 @@ class sampleWrapperClass:
                 l_eta_[0] = getattr( self.InputTree_, "W_muon_eta" );
                 mvaMET_[0] = getattr( self.InputTree_, "event_metMVA_met" );
                 nPV_[0] = getattr( self.InputTree_, "event_nPV" );
-                totalEventWeight_[0] = totSampleWeight;
+                totalEventWeight_[0]  = totSampleWeight;
+                eff_and_pu_Weight_[0] = effwt*puwt;
+                wSampleWeight_[0]     = wSampleWeight;
                 interference_Weight_H600_[0] = infe_Weight_H600;
                 interference_Weight_H700_[0] = infe_Weight_H700;
                 interference_Weight_H800_[0] = infe_Weight_H800;
