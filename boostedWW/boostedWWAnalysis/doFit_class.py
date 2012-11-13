@@ -4,7 +4,7 @@ import glob
 import math
 import array
 
-from ROOT import gROOT, gStyle, gSystem, TLatex, TString, TF1,TFile,TLine, TLegend, TH1D,TH2D, TCanvas, TPad, RooFit, RooArgSet, RooArgList, RooArgSet, RooAbsData, RooAddPdf, RooWorkspace, RooExtendPdf,RooCBShape, RooLandau, RooFFTConvPdf, RooGaussian, RooBifurGauss, RooDataSet, RooBreitWigner, RooVoigtian, RooRealVar,RooFormulaVar, RooDataHist, RooHistPdf, RooGenericPdf, RooKeysPdf, RooHistPdf, RooEffProd, TIter, kTRUE, kFALSE, kGray, kRed, kDashed, kGreen,kAzure, kOrange, kBlack,kBlue,kYellow,kCyan, Form
+from ROOT import gROOT, gStyle, gSystem, TLatex, TString, TF1,TFile,TLine, TLegend, TH1D,TH2D, TCanvas, TPad, RooFit, RooArgSet, RooArgList, RooArgSet, RooAbsData, RooAbsPdf, RooAddPdf, RooWorkspace, RooExtendPdf,RooCBShape, RooLandau, RooFFTConvPdf, RooGaussian, RooBifurGauss, RooDataSet, RooBreitWigner, RooVoigtian, RooRealVar,RooFormulaVar, RooDataHist, RooHistPdf, RooGenericPdf, RooKeysPdf, RooHistPdf, RooEffProd, TIter, kTRUE, kFALSE, kGray, kRed, kDashed, kGreen,kAzure, kOrange, kBlack,kBlue,kYellow,kCyan, Form
 import subprocess
 from subprocess import Popen
 
@@ -35,6 +35,9 @@ parser.add_option('-b', action='store_true', dest='noX', default=False,
 class doFit_wj_and_wlvj:
     def __init__(self, in_cutOnMassDrop, in_higgs_sample="ggH600", in_mlvj_signal_region_min=500, in_mlvj_signal_region_max=700, in_mj_min=30, in_mj_max=140, in_mlvj_min=300., in_mlvj_max=1400.):
         print "Begin to fit"
+
+        RooAbsPdf.defaultIntegratorConfig().setEpsRel(1e-9) ;
+        RooAbsPdf.defaultIntegratorConfig().setEpsAbs(1e-9) ;
 
         self.cutOnMassDrop_=in_cutOnMassDrop;
 
@@ -103,8 +106,8 @@ class doFit_wj_and_wlvj:
         self.file_out=open(self.file_rlt_txt,"a+");
 
         #higgs XS scale
-        self.higgs_xs_scale=50.;
-        #self.higgs_xs_scale=1.;
+        #self.higgs_xs_scale=50.;
+        self.higgs_xs_scale=0.1;
 
         #color palet
         self.color_palet={
@@ -690,8 +693,8 @@ class doFit_wj_and_wlvj:
         
         mplot = rrv_mass_j.frame(RooFit.Title(in_file_name+" fitted by "+in_model_name));
         rdataset_mj.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) , RooFit.VLines());
-        #model.plotOn( mplot, RooFit.VisualizeError(rfresult,1),RooFit.FillColor(kOrange) , RooFit.VLines());
-        model.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines());
+        model.plotOn( mplot, RooFit.VisualizeError(rfresult,1),RooFit.FillColor(kOrange) , RooFit.VLines());
+        #model.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines());
         rdataset_mj.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) , RooFit.VLines());
         model.plotOn( mplot , RooFit.VLines());
         model.plotOn( mplot, RooFit.Components("erfExp"+label), RooFit.LineStyle(kDashed),RooFit.LineColor(kGreen) , RooFit.VLines());
@@ -724,7 +727,7 @@ class doFit_wj_and_wlvj:
             
         rrv_mass_j = self.workspace4fit_.var("rrv_mass_j") 
         rrv_mass_lvj = self.workspace4fit_.var("rrv_mass_lvj") 
-        rrv_weight = RooRealVar("rrv_weight","rrv_weight",0. ,1.) 
+        rrv_weight = RooRealVar("rrv_weight","rrv_weight",0. ,10000000.) 
         #dataset of m_j
         rdataset_mj = RooDataSet("rdataset"+label+"_mj","rdataset"+label+"_mj",RooArgSet(rrv_mass_j,rrv_weight),RooFit.WeightVar(rrv_weight) );
         #dataset of m_lvj
@@ -828,7 +831,7 @@ class doFit_wj_and_wlvj:
             
         rrv_mass_j = self.workspace4fit_.var("rrv_mass_j") 
         rrv_mass_lvj = self.workspace4fit_.var("rrv_mass_lvj") 
-        rrv_weight = RooRealVar("rrv_weight","rrv_weight",0. ,1.) 
+        rrv_weight = RooRealVar("rrv_weight","rrv_weight",0. ,1000000.) 
         #dataset of m_j
         rdataset_mj = RooDataSet("rdataset"+label+"_mj","rdataset"+label+"_mj",RooArgSet(rrv_mass_j,rrv_weight),RooFit.WeightVar(rrv_weight) );
         #dataset of m_lvj
@@ -868,7 +871,7 @@ class doFit_wj_and_wlvj:
                 if label=="_ggH700": tmp_event_weight=tmp_event_weight/self.higgs_xs_scale*tmp_interference_weight_H700
                 if label=="_ggH800": tmp_event_weight=tmp_event_weight/self.higgs_xs_scale*tmp_interference_weight_H800
                 if label=="_ggH900": tmp_event_weight=tmp_event_weight/self.higgs_xs_scale*tmp_interference_weight_H900
-                if label=="_ggH1000": tmp_event_weight=tmp_event_weight/self.higgs_xs_scale*tmp_interference_weight_H1000
+                if label=="_ggH1000":tmp_event_weight=tmp_event_weight/self.higgs_xs_scale*tmp_interference_weight_H1000
                 rrv_mass_lvj.setVal( treeIn.mass_lvj );
                 if treeIn.jet_mass_pr >= self.mj_sideband_lo_min and treeIn.jet_mass_pr < self.mj_sideband_lo_max:
                     rdataset_sb_lo.add( RooArgSet( rrv_mass_lvj ), tmp_event_weight );
@@ -972,8 +975,8 @@ class doFit_wj_and_wlvj:
         
         mplot = rrv_mass_lvj.frame(RooFit.Title("M_{lvj_"+in_range+"} fitted by "+in_model_name));
         rdataset.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) , RooFit.VLines());
-        #model.plotOn( mplot, RooFit.VisualizeError(rfresult,1),RooFit.FillColor(kOrange) , RooFit.VLines());
-        model.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines());
+        model.plotOn( mplot, RooFit.VisualizeError(rfresult,1),RooFit.FillColor(kOrange) , RooFit.VLines());
+        #model.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines());
         rdataset.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) , RooFit.VLines());
         model.plotOn( mplot , RooFit.VLines());
         #pull
@@ -1048,7 +1051,8 @@ class doFit_wj_and_wlvj:
         
         mplot = rrv_mass_j.frame(RooFit.Title("Closure test: WJets+TTbar+STop+VV"));
         rdataset_data_mj.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) , RooFit.VLines());
-        model_data.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange),RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()), RooFit.VLines());
+        model_data.plotOn(mplot,RooFit.VisualizeError(rfresult,1),RooFit.FillColor(kOrange),RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()), RooFit.VLines());
+        #model_data.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange),RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()), RooFit.VLines());
         rdataset_data_mj.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) , RooFit.VLines());
         model_data.plotOn(mplot , RooFit.VLines());
         #DrawOption("LF"), FillStyle(1001), FillColor(DibosonColor)
@@ -1119,7 +1123,8 @@ class doFit_wj_and_wlvj:
         
         mplot = rrv_mass_lvj.frame(RooFit.Title("Closure test: WJets+TTbar+STop+VV"));
         rdataset_data_signal_region_mlvj.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) , RooFit.VLines());
-        model_data.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines());
+        model_data.plotOn(mplot,RooFit.VisualizeError(rfresult,1),RooFit.FillColor(kOrange), RooFit.VLines());
+        #model_data.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines());
         rdataset_data_signal_region_mlvj.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) , RooFit.VLines());
         #model_ggH.plotOn( mplot, RooFit.LineColor(kBlack) , RooFit.VLines());
         model_data.plotOn(mplot , RooFit.VLines());
@@ -1192,7 +1197,8 @@ class doFit_wj_and_wlvj:
         model_WJets.plotOn(mplot,RooFit.Normalization(scale_WJets),RooFit.Name("WJets") , RooFit.AddTo("other_backgrounds_invisible"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(self.color_palet["WJets"]), RooFit.VLines())
         #model_other_backgrounds.plotOn(mplot,RooFit.Normalization(scale_other_backgrounds),RooFit.Name("other_backgrounds"), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["Other_Backgrounds"]), RooFit.LineColor(self.color_palet["Other_Backgrounds"]) , RooFit.VLines())
         model_other_backgrounds.plotOn(mplot,RooFit.Normalization(scale_other_backgrounds),RooFit.Name("VV+TTbar+STop"), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["Other_Backgrounds"]), RooFit.LineColor(self.color_palet["Other_Backgrounds"]) , RooFit.VLines())
-        model_data.plotOn(mplot,RooFit.Name("Uncertainty"),RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(self.color_palet["Error"]),RooFit.FillStyle(3013),RooFit.LineColor(self.color_palet["Error"])), RooFit.VLines();
+        model_data.plotOn(mplot,RooFit.Name("Uncertainty"),RooFit.VisualizeError(rfresult,1),RooFit.FillColor(self.color_palet["Error"]),RooFit.FillStyle(3013),RooFit.LineColor(self.color_palet["Error"])), RooFit.VLines();
+        #model_data.plotOn(mplot,RooFit.Name("Uncertainty"),RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(self.color_palet["Error"]),RooFit.FillStyle(3013),RooFit.LineColor(self.color_palet["Error"])), RooFit.VLines();
         model_WJets.plotOn(mplot,RooFit.Normalization(scale_WJets),RooFit.Name("WJets_invisible") , RooFit.AddTo("other_backgrounds_invisible"),RooFit.Invisible(), RooFit.VLines())
         rdataset_data_mlvj.plotOn( mplot ,RooFit.Name("data"),RooFit.DataError(RooAbsData.SumW2) , RooFit.VLines());
         leg=self.legend4Plot(mplot,0)
@@ -1336,7 +1342,7 @@ class doFit_wj_and_wlvj:
         datacard_out.write( "\nprocess            0         1        2        3     4" )
         #datacard_out.write( "\nrate               %s        %s       %s       %s     %s "%(self.workspace4fit_.var("rrv_number_%s_signal_region_mlvj"%(self.higgs_sample)).getVal()/50., self.workspace4fit_.var("rrv_number_WJets_signal_region_mlvj").getVal(), self.workspace4fit_.var("rrv_number_TTbar_signal_region_mlvj").getVal(), self.workspace4fit_.var("rrv_number_STop_signal_region_mlvj").getVal(), self.workspace4fit_.var("rrv_number_VV_signal_region_mlvj").getVal()  ) )
         #datacard_out.write( "\nrate               %s        %s       %s       %s     %s "%(self.workspace4fit_.var("rrv_number_%s_signal_region_mlvj"%(self.higgs_sample)).getVal(), self.workspace4fit_.var("rrv_number_WJets_signal_region_mlvj").getVal(), self.workspace4fit_.var("rrv_number_TTbar_signal_region_mlvj").getVal(), self.workspace4fit_.var("rrv_number_STop_signal_region_mlvj").getVal(), self.workspace4fit_.var("rrv_number_VV_signal_region_mlvj").getVal()  ) )
-        datacard_out.write( "\nrate               %s        %s       %s       %s     %s "%(self.workspace4limit_.var("rate_%s_for_unbin"%(self.higgs_sample)).getVal(), self.workspace4limit_.var("rate_WJets_for_unbin").getVal(), self.workspace4limit_.var("rate_TTbar_for_unbin").getVal(), self.workspace4limit_.var("rate_STop_for_unbin").getVal(), self.workspace4limit_.var("rate_VV_for_unbin").getVal()  ) )
+        datacard_out.write( "\nrate               %s        %s       %s       %s     %s "%(self.workspace4limit_.var("rate_%s_for_unbin"%(self.higgs_sample)).getVal()/50*self.higgs_xs_scale, self.workspace4limit_.var("rate_WJets_for_unbin").getVal(), self.workspace4limit_.var("rate_TTbar_for_unbin").getVal(), self.workspace4limit_.var("rate_STop_for_unbin").getVal(), self.workspace4limit_.var("rate_VV_for_unbin").getVal()  ) )
         datacard_out.write( "\n-------------------------------- " )
         datacard_out.write( "\nlumi    lnN        1.044     -        1.044  1.044    1.044" )
         datacard_out.write( "\npdf_gg  lnN        1.099     -        -      -        -" )
@@ -1364,7 +1370,7 @@ class doFit_wj_and_wlvj:
         datacard_out.write( "\nbin                1         1        1      1      1" )
         datacard_out.write( "\nprocess            %s    WJets    TTbar    STop  VV "%(self.higgs_sample) )
         datacard_out.write( "\nprocess            0         1        2      3      4" )
-        datacard_out.write( "\nrate               %s        %s       %s     %s     %s"%(self.workspace4limit_.var("rate_%s_for_counting"%(self.higgs_sample)).getVal(), self.workspace4limit_.var("rate_WJets_for_counting").getVal(), self.workspace4limit_.var("rate_TTbar_for_counting").getVal(), self.workspace4limit_.var("rate_STop_for_counting").getVal(), self.workspace4limit_.var("rate_VV_for_counting").getVal()  ) )
+        datacard_out.write( "\nrate               %s        %s       %s     %s     %s"%(self.workspace4limit_.var("rate_%s_for_counting"%(self.higgs_sample)).getVal()/50*self.higgs_xs_scale, self.workspace4limit_.var("rate_WJets_for_counting").getVal(), self.workspace4limit_.var("rate_TTbar_for_counting").getVal(), self.workspace4limit_.var("rate_STop_for_counting").getVal(), self.workspace4limit_.var("rate_VV_for_counting").getVal()  ) )
         #datacard_out.write( "\nrate               %s        %s       %s     %s     %s"%(self.workspace4fit_.var("rrv_number_fitting_signal_region_%s_mlvj"%(self.higgs_sample)).getVal(), self.workspace4fit_.var("rrv_number_fitting_signal_region_WJets_mlvj").getVal(), self.workspace4fit_.var("rrv_number_fitting_signal_region_TTbar_mlvj").getVal(), self.workspace4fit_.var("rrv_number_fitting_signal_region_STop_mlvj").getVal(), self.workspace4fit_.var("rrv_number_fitting_signal_region_VV_mlvj").getVal()  ) )
         #datacard_out.write( "\nrate               %s        %s       %s     %s     %s"%(self.workspace4fit_.var("rrv_number_fitting_signal_region_%s_mlvj"%(self.higgs_sample)).getVal()/50., self.workspace4fit_.var("rrv_number_fitting_signal_region_WJets_mlvj").getVal(), self.workspace4fit_.var("rrv_number_fitting_signal_region_TTbar_mlvj").getVal(), self.workspace4fit_.var("rrv_number_fitting_signal_region_STop_mlvj").getVal(), self.workspace4fit_.var("rrv_number_fitting_signal_region_VV_mlvj").getVal()  ) )
         datacard_out.write( "\n-------------------------------- " )
@@ -1470,18 +1476,18 @@ class doFit_wj_and_wlvj:
         model_Total_background_MC=RooAddPdf("model_Total_background_MC","model_Total_background_MC",RooArgList(model_pdf_WJets,model_pdf_VV,model_pdf_TTbar,model_pdf_STop),RooArgList(rrv_number_WJets,rrv_number_VV,rrv_number_TTbar,rrv_number_STop));
 
         mplot=rrv_x.frame(RooFit.Title("check"));
-        data_obs.plotOn(mplot ,RooFit.DataError(RooAbsData.SumW2), RooFit.Name("data_invisible"),RooFit.Invisible(), RooFit.VLines());
+        data_obs.plotOn(mplot ,RooFit.DataError(RooAbsData.SumW2), RooFit.Name("data_invisible"),RooFit.Invisible());
 
-        model_pdf_STop.plotOn(mplot,RooFit.Normalization(scale_number_STop),RooFit.Name("STop_invisible"),RooFit.Invisible(), RooFit.VLines())
-        model_pdf_TTbar.plotOn(mplot,RooFit.Normalization(scale_number_TTbar),RooFit.Name("TTbar_invisible"), RooFit.AddTo("STop_invisible"),RooFit.Invisible(), RooFit.VLines())
-        model_pdf_VV.plotOn(mplot,RooFit.Normalization(scale_number_VV),RooFit.Name("VV_invisible"), RooFit.AddTo("TTbar_invisible"),RooFit.Invisible(), RooFit.VLines())
-        model_pdf_WJets.plotOn(mplot,RooFit.Normalization(scale_number_WJets),RooFit.Name("WJets_invisible"), RooFit.AddTo("VV_invisible"),RooFit.Invisible(), RooFit.VLines())
-        model_pdf_WJets.plotOn(mplot,RooFit.Normalization(scale_number_WJets),RooFit.Name("WJets"), RooFit.AddTo("VV_invisible"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(self.color_palet["WJets"]), RooFit.VLines())
-        model_pdf_VV.plotOn(mplot,RooFit.Normalization(scale_number_VV),RooFit.Name("VV"), RooFit.AddTo("TTbar_invisible"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(self.color_palet["VV"]), RooFit.VLines())
-        model_pdf_TTbar.plotOn(mplot,RooFit.Normalization(scale_number_TTbar),RooFit.Name("TTbar"), RooFit.AddTo("STop_invisible"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(self.color_palet["TTbar"]), RooFit.VLines())
-        model_pdf_STop.plotOn(mplot,RooFit.Normalization(scale_number_STop),RooFit.Name("STop"), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(self.color_palet["STop"]), RooFit.VLines())
-        model_pdf_ggH.plotOn(mplot,RooFit.Normalization(scale_number_ggH),RooFit.Name("%s"%(self.higgs_sample)),RooFit.DrawOption("L"), RooFit.LineColor(self.color_palet["Signal"]), RooFit.VLines())
-        data_obs.plotOn(mplot ,RooFit.DataError(RooAbsData.SumW2), RooFit.Name("data"), RooFit.VLines())
+        model_pdf_STop.plotOn(mplot,RooFit.Normalization(scale_number_STop),RooFit.Name("STop_invisible"),RooFit.Invisible(), RooFit.VLines(),RooFit.Precision(1e-8))
+        model_pdf_TTbar.plotOn(mplot,RooFit.Normalization(scale_number_TTbar),RooFit.Name("TTbar_invisible"), RooFit.AddTo("STop_invisible"),RooFit.Invisible(), RooFit.VLines(),RooFit.Precision(1e-8))
+        model_pdf_VV.plotOn(mplot,RooFit.Normalization(scale_number_VV),RooFit.Name("VV_invisible"), RooFit.AddTo("TTbar_invisible"),RooFit.Invisible(), RooFit.VLines(),RooFit.Precision(1e-8))
+        model_pdf_WJets.plotOn(mplot,RooFit.Normalization(scale_number_WJets),RooFit.Name("WJets_invisible"), RooFit.AddTo("VV_invisible"),RooFit.Invisible(), RooFit.VLines(),RooFit.Precision(1e-8))
+        model_pdf_WJets.plotOn(mplot,RooFit.Normalization(scale_number_WJets),RooFit.Name("WJets"), RooFit.AddTo("VV_invisible"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(self.color_palet["WJets"]), RooFit.VLines(),RooFit.Precision(1e-8))
+        model_pdf_VV.plotOn(mplot,RooFit.Normalization(scale_number_VV),RooFit.Name("VV"), RooFit.AddTo("TTbar_invisible"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(self.color_palet["VV"]), RooFit.VLines(),RooFit.Precision(1e-8))
+        model_pdf_TTbar.plotOn(mplot,RooFit.Normalization(scale_number_TTbar),RooFit.Name("TTbar"), RooFit.AddTo("STop_invisible"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(self.color_palet["TTbar"]), RooFit.VLines(),RooFit.Precision(1e-8))
+        model_pdf_STop.plotOn(mplot,RooFit.Normalization(scale_number_STop),RooFit.Name("STop"), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(self.color_palet["STop"]), RooFit.VLines(),RooFit.Precision(1e-8))
+        model_pdf_ggH.plotOn(mplot,RooFit.Normalization(scale_number_ggH),RooFit.Name("%s"%(self.higgs_sample)),RooFit.DrawOption("L"), RooFit.LineColor(self.color_palet["Signal"]), RooFit.VLines(),RooFit.Precision(1e-8))
+        data_obs.plotOn(mplot ,RooFit.DataError(RooAbsData.SumW2), RooFit.Name("data"))
         
         mplot.Print()
         leg=self.legend4Plot(mplot,0)
@@ -1857,11 +1863,11 @@ def test():
     cutOnMassDrop = False;
     boostedW_fitter=doFit_wj_and_wlvj(cutOnMassDrop,"ggH600"); 
     boostedW_fitter.fit_AllSamples_Mlvj()
-    boostedW_fitter.fit_other_backgrounds()
-    #boostedW_fitter=doFit_wj_and_wlvj(cutOnMassDrop,"ggH700"); boostedW_fitter.fit_AllSamples_Mlvj()
-    #boostedW_fitter=doFit_wj_and_wlvj(cutOnMassDrop,"ggH800"); boostedW_fitter.fit_AllSamples_Mlvj()
-    #boostedW_fitter=doFit_wj_and_wlvj(cutOnMassDrop,"ggH900"); boostedW_fitter.fit_AllSamples_Mlvj()
-    #boostedW_fitter=doFit_wj_and_wlvj(cutOnMassDrop,"ggH1000"); boostedW_fitter.fit_AllSamples_Mlvj()
+    #boostedW_fitter.fit_other_backgrounds()
+    boostedW_fitter=doFit_wj_and_wlvj(cutOnMassDrop,"ggH700"); boostedW_fitter.fit_AllSamples_Mlvj()
+    boostedW_fitter=doFit_wj_and_wlvj(cutOnMassDrop,"ggH800"); boostedW_fitter.fit_AllSamples_Mlvj()
+    boostedW_fitter=doFit_wj_and_wlvj(cutOnMassDrop,"ggH900"); boostedW_fitter.fit_AllSamples_Mlvj()
+    boostedW_fitter=doFit_wj_and_wlvj(cutOnMassDrop,"ggH1000"); boostedW_fitter.fit_AllSamples_Mlvj()
 
 def get_alpha():
     cutOnMassDrop = False;
@@ -1887,23 +1893,17 @@ def pre_limit_sb_correction_method(higgs_sample="ggH600", in_mlvj_signal_region_
     boostedW_fitter.analysis_sideband_correction_method(inject_signal)
 
 def pre_limit_All():
-    pre_limit_fitting_method("ggH600",500,700)
+    #pre_limit_fitting_method("ggH600",500,700)
     #pre_limit_fitting_method("ggH700" ,600,850)
     #pre_limit_fitting_method("ggH800" ,650,1000)
     #pre_limit_fitting_method("ggH900" ,750,1100)
     #pre_limit_fitting_method("ggH1000",800,1150)
 
-    #pre_limit_sb_correction_method("ggH600",500,700)
+    pre_limit_sb_correction_method("ggH600",500,700)
     #pre_limit_sb_correction_method("ggH700" ,600,850)
     #pre_limit_sb_correction_method("ggH800" ,650,1000)
     #pre_limit_sb_correction_method("ggH900" ,750,1100)
     #pre_limit_sb_correction_method("ggH1000",800,1150)
-
-    #pre_limit_sb_correction_method("ggH600",500,700, 30,140, 400,1000)
-    #pre_limit_sb_correction_method("ggH700" ,600,850, 30,140, 400,1200)
-    #pre_limit_sb_correction_method("ggH800" ,650,1000, 30,140, 500,1200)
-    #pre_limit_sb_correction_method("ggH900" ,750,1100, 30,140, 500,1400)
-    #pre_limit_sb_correction_method("ggH1000",800,1150, 30,140, 500,1400)
 
 def check_workspace():
     cutOnMassDrop = False;
@@ -1918,6 +1918,6 @@ if __name__ == '__main__':
     #get_alpha()
     #pre_limit_fitting_method()
     #test()
+    #check_workspace()
     #contral_sample()
     pre_limit_All()
-    #check_workspace()
