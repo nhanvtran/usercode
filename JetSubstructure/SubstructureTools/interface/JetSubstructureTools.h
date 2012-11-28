@@ -19,9 +19,9 @@
 #include "fastjet/GhostedAreaSpec.hh"
 
 //#include "VHbbAnalysis/VHbbDataFormats/interface/Nsubjettiness.h"
-#include "VHbbAnalysis/VHbbDataFormats/interface/NjettinessPlugin.hh"
-#include "VHbbAnalysis/VHbbDataFormats/interface/Nsubjettiness.hh"
-#include "VHbbAnalysis/VHbbDataFormats/src/QjetsPlugin.h"
+#include "JetSubstructure/SubstructureTools/interface/NjettinessPlugin.hh"
+#include "JetSubstructure/SubstructureTools/interface/Nsubjettiness.hh"
+#include "JetSubstructure/SubstructureTools/src/QjetsPlugin.h"
 
 #include <iostream>
 
@@ -56,11 +56,18 @@ class JetSubstructureTools {
     
   private: 
     float FindRMS( std::vector< float > qjetmasses ){
-        float totalsquared = 0.;
+        
+        float total = 0.;
         float ctr = 0.;
         for (unsigned int i = 0; i < qjetmasses.size(); i++){
-            totalsquared = totalsquared + qjetmasses[i]*qjetmasses[i];
+            total = total + qjetmasses[i];
             ctr++;
+        }
+        float mean =  total/ctr;
+        
+        float totalsquared = 0.;
+        for (unsigned int i = 0; i < qjetmasses.size(); i++){
+            totalsquared += (qjetmasses[i] - mean)*(qjetmasses[i] - mean) ;
         }
         float RMS = sqrt( totalsquared/ctr );
         return RMS;
@@ -273,6 +280,8 @@ double JetSubstructureTools::getQjetVolatility(int seed){
     float qjetsRMS = FindRMS( qjetmasses );
         // find mean of a vector
     float qjetsMean = FindMean( qjetmasses );
+//    std::cout << "qjetmasses size: " << qjetmasses.size() << std::endl;    
+//    std::cout << "qjetsRMS: " << qjetsRMS << ", qjetsMean: " << qjetsMean << std::endl;    
         // compute QJets volatility
     float qjetsVolatility = qjetsRMS/qjetsMean;
     return qjetsVolatility;
