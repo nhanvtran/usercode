@@ -34,7 +34,7 @@ void DrawLimit_counting(char* model="counting")
     for(Int_t i=0;i<nmass*6;i++){
         masspoint=i/6;
         //cout<<"masspoint="<<masspoint<<endl;
-        tree_limit.GetEntry(i);
+        tree_limit->GetEntry(i);
 
         //cout<<"tmp_quantileExpected="<<tmp_quantileExpected;
         //cout<<"   tmp_limit="<<tmp_limit<<endl;
@@ -70,6 +70,7 @@ void DrawLimit_counting(char* model="counting")
 	likelihd_limit_d->SetLineColor(kBlack);                                                                                                                  
 	likelihd_limit_d->SetLineWidth(2);                                                                                                                       
 	likelihd_limit_d->SetLineStyle(1);
+    likelihd_limit_d->SetMarkerStyle(20);
 
 
 	TGraph *likelihd_limit_c = new TGraph(nmass,Mass,Median);                                                                                                
@@ -116,9 +117,11 @@ void DrawLimit_counting(char* model="counting")
 	//c1->SetGridy(1);
 
 
-    y_max_h2=TMath::Max(P2S[nmass-1]+Median[nmass-1]+1, Observed[nmass-1]+1);
+    Double_t y_max_h2=TMath::Max(P2S[nmass-1]+Median[nmass-1]+1, Observed[nmass-1]+1);
+    cout<<P2S[nmass-1]+Median[nmass-1]+1<<","<<Observed[nmass-1]+1<<endl;
 
-	TH2F *h2=new TH2F("h2","CMS preliminary   #int^{}_{}L dt=11.5fb^{-1}(mu)   #sqrt{s}=8TeV;m_{H} [GeV]; 95% CL limit on #sigma/#sigma_{SM}",100,Mass[0]-30,Mass[nmass-1]+30,20,0, y_max_h2);
+	//TH2F *h2=new TH2F("h2","CMS preliminary   #int^{}_{}L dt=11.5fb^{-1}(mu)   #sqrt{s}=8TeV;m_{H} [GeV]; 95% CL limit on #sigma/#sigma_{SM}",100,Mass[0]-30,Mass[nmass-1]+30,20,0, y_max_h2);
+	TH2F *h2=new TH2F("h2","CMS preliminary   #int^{}_{}L dt=5.3fb^{-1}(mu)   #sqrt{s}=8TeV;m_{H} [GeV]; 95% CL limit on #sigma/#sigma_{SM}",100,Mass[0]-30,Mass[nmass-1]+30,20,0, y_max_h2);
 	h2->Draw();
 
 
@@ -144,7 +147,7 @@ void DrawLimit_counting(char* model="counting")
     }
 
 	//	title->Draw();
-    h2->Draw()
+    //h2->Draw();
 	leg->Draw();
 	c1->Update();
 	//c1->Print(Form("CL_%s_log.eps",model),"eps");
