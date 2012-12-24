@@ -5,6 +5,7 @@ import ROOT
 ROOT.gROOT.ProcessLine(".L ~/tdrstyle.C")
 from ROOT import setTDRStyle
 from ROOT import TTree
+from ROOT import gROOT
 ROOT.setTDRStyle()
 ROOT.gStyle.SetPalette(1)
 ROOT.gStyle.SetOptFit(0)
@@ -77,6 +78,15 @@ class sampleWrapperClass:
     ### ------------------------------------------------
     def createBRDTree(self):
 
+        #weight1_ = "weights/Wtagger_200to275_0to100_tau2tau1qjet_Likelihood.weights.xml"
+        #weight2_ = "weights/Wtagger_275to500_0to100_tau2tau1qjet_Likelihood.weights.xml"
+        #ungroomed_weight1_ = "weights/ungroomed_Wtagger_200to275_0to100_tau2tau1qjet_Likelihood.weights.xml"
+        #ungroomed_weight2_ = "weights/ungroomed_Wtagger_275to500_0to100_tau2tau1qjet_Likelihood.weights.xml"
+        reader1_ = ROOT.TMVA.Reader("!Color:!Silent")
+        reader2_ = ROOT.TMVA.Reader("!Color:!Silent")
+        ungroomed_reader1_ = ROOT.TMVA.Reader("!Color:!Silent")
+        ungroomed_reader2_ = ROOT.TMVA.Reader("!Color:!Silent")
+
         fname = self.OFileName_;
         
         self.OFile_ = ROOT.TFile(fname,"RECREATE");        
@@ -87,6 +97,7 @@ class sampleWrapperClass:
         v_pt_ = array( 'f', [ 0. ] );
         jet_mass_pr_ = array( 'f', [ 0. ] );
         jet_pt_pr_ = array( 'f', [ 0. ] );
+        ungroomed_jet_pt_ = array( 'f', [ 0. ] );
         
         l_pt_ = array( 'f', [ 0. ] );
         l_eta_ = array( 'f', [ 0. ] );        
@@ -128,10 +139,18 @@ class sampleWrapperClass:
         deltaR_lca8jet_ = array( 'f', [0.] );
         deltaphi_METca8jet_ = array( 'f', [0.] );
         deltaphi_Vca8jet_ = array( 'f', [0.] );
+
+        ##TMVA Output
+        #ca8wjettaggerpt200_275_ = array( 'f', [0.] )
+        #ca8wjettaggerpt275_500_ = array( 'f', [0.] )
+
+        #ungroomedwjettaggerpt200_275_ = array( 'f', [0.] )
+        #ungroomedwjettaggerpt275_500_ = array( 'f', [0.] )
     
         otree.Branch("mass_lvj", mass_lvj_ , "mass_lvj/F");
         otree.Branch("v_pt", v_pt_ , "v_pt/F");
         otree.Branch("jet_pt_pr", jet_pt_pr_ , "jet_pt_pr/F");
+        otree.Branch("ungroomed_jet_pt", ungroomed_jet_pt_, "ungroomed_jet_pt/F");
         otree.Branch("jet_mass_pr", jet_mass_pr_ , "jet_mass_pr/F");
         otree.Branch("l_pt", l_pt_ , "l_pt/F");
         otree.Branch("l_eta", l_eta_ , "l_eta/F");
@@ -171,14 +190,76 @@ class sampleWrapperClass:
         otree.Branch("deltaR_lca8jet", deltaR_lca8jet_, "deltaR_lca8jet/F");
         otree.Branch("deltaphi_METca8jet", deltaphi_METca8jet_, "deltaphi_METca8jet/F");
         otree.Branch("deltaphi_Vca8jet", deltaphi_Vca8jet_, "deltaphi_Vca8jet/F");
+
+        #otree.Branch("ca8wjettaggerpt200_275", ca8wjettaggerpt200_275_, "ca8wjettaggerpt200_275/F")
+        #otree.Branch("ca8wjettaggerpt275_500", ca8wjettaggerpt275_500_, "ca8wjettaggerpt275_500/F")
         
+        #otree.Branch("ungroomedwjettaggerpt200_275", ungroomedwjettaggerpt200_275_, "ungroomedwjettaggerpt200_275/F")
+        #otree.Branch("ungroomedwjettaggerpt275_500", ungroomedwjettaggerpt275_500_, "ungroomedwjettaggerpt275_500/F")
+
         prefix = self.JetPrefix_;
         
         NLoop = min(self.NTree_,1e9);
         NLoopWeight = self.NTree_/NLoop;
         
         wSampleWeight = NLoopWeight*self.SampleWeight_;
+
+
+        wjettaggervariables = []
+        wjettaggervariables.append("jet_qjetvol")
+        wjettaggervariables.append("jet_tau2tau1")
+        listOfVarArray1 = []
+        listOfVarArray2 = []
+        for i in range(len(wjettaggervariables)):
+            listOfVarArray1.append( array('f',[0.]) )
+            listOfVarArray2.append( array('f',[0.]) )
+            varString = wjettaggervariables[i] + " := " + wjettaggervariables[i]
+            reader1_.AddVariable(varString, listOfVarArray1[i])
+            reader2_.AddVariable(varString, listOfVarArray2[i])
+            ungroomed_reader1_.AddVariable(varString, listOfVarArray1[i])
+            ungroomed_reader2_.AddVariable(varString, listOfVarArray2[i])
         
+        spec11 = array('f',[0.])
+        spec12 = array('f',[0.])
+        spec13 = array('f',[0.])
+        spec14 = array('f',[0.])
+        spec21 = array('f',[0.])
+        spec22 = array('f',[0.])
+        spec23 = array('f',[0.])
+        spec24 = array('f',[0.])
+         
+        ungroomed_spec11 = array('f',[0.])
+        ungroomed_spec12 = array('f',[0.])
+        ungroomed_spec13 = array('f',[0.])
+        ungroomed_spec14 = array('f',[0.])
+        ungroomed_spec21 = array('f',[0.])
+        ungroomed_spec22 = array('f',[0.])
+        ungroomed_spec23 = array('f',[0.])
+        ungroomed_spec24 = array('f',[0.])
+        reader1_.AddSpectator( "jet_pt_pr", spec11 )
+        reader1_.AddSpectator( "jet_mass_pr", spec12 )
+        reader1_.AddSpectator( "nPV", spec13 )
+        reader1_.AddSpectator( "jet_massdrop_pr", spec14 )
+        reader2_.AddSpectator( "jet_pt_pr", spec21 )
+        reader2_.AddSpectator( "jet_mass_pr", spec22 )
+        reader2_.AddSpectator( "nPV", spec23 )
+        reader2_.AddSpectator( "jet_massdrop_pr", spec24 )
+
+        ungroomed_reader1_.AddSpectator( "ungroomed_jet_pt", ungroomed_spec11 )
+        ungroomed_reader1_.AddSpectator( "jet_mass_pr", ungroomed_spec12 )
+        ungroomed_reader1_.AddSpectator( "nPV", ungroomed_spec13 )
+        ungroomed_reader1_.AddSpectator( "jet_massdrop_pr", ungroomed_spec14 )
+        ungroomed_reader2_.AddSpectator( "ungroomed_jet_pt", ungroomed_spec21 )
+        ungroomed_reader2_.AddSpectator( "jet_mass_pr", ungroomed_spec22 )
+        ungroomed_reader2_.AddSpectator( "nPV", ungroomed_spec23 )
+        ungroomed_reader2_.AddSpectator( "jet_massdrop_pr", ungroomed_spec24 )
+
+        TMVAMethod = "Likelihood" 
+        #reader1_.BookMVA(TMVAMethod,weight1_)
+        #reader2_.BookMVA(TMVAMethod,weight2_)
+        #ungroomed_reader1_.BookMVA(TMVAMethod,ungroomed_weight1_)
+        #ungroomed_reader2_.BookMVA(TMVAMethod,ungroomed_weight2_)
+
         for i in range(NLoop):
             
             if i % 100000 == 0: print "i = ", i
@@ -186,9 +267,9 @@ class sampleWrapperClass:
             self.InputTree_.GetEntry(i);
                         
             # make cuts
-            if getattr( self.InputTree_, "W_pt" ) > 180 and getattr( self.InputTree_, "GroomedJet_CA8_pt_pr" )[0] > 180 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_metMVA_met" ) > 50:
+            #if getattr( self.InputTree_, "W_pt" ) > 180 and getattr( self.InputTree_, "GroomedJet_CA8_pt_pr" )[0] > 180 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_metMVA_met" ) > 50:
+            if getattr( self.InputTree_, "W_pt" ) > 180 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 180 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_metMVA_met" ) > 50:
                             
-                
                 effwt = getattr( self.InputTree_, "effwt" );
                 puwt = getattr( self.InputTree_, "puwt" ); 
                 totSampleWeight = 1.;
@@ -229,12 +310,13 @@ class sampleWrapperClass:
                 v_pt_[0] = getattr( self.InputTree_, "W_pt" );
                 jet_mass_pr_[0] = getattr( self.InputTree_, prefix + "_mass_pr" )[0];
                 jet_pt_pr_[0] = getattr( self.InputTree_, prefix + "_pt_pr" )[0];
+                ungroomed_jet_pt_[0] = getattr( self.InputTree_, prefix+"_pt" )[0];
                 
                 l_pt_[0] = getattr( self.InputTree_, "W_muon_pt" );
                 l_eta_[0] = getattr( self.InputTree_, "W_muon_eta" );
                 mvaMET_[0] = getattr( self.InputTree_, "event_metMVA_met" );
                 nPV_[0] = getattr( self.InputTree_, "event_nPV" );
-                totalEventWeight_[0]  = totSampleWeight;
+                totalEventWeight_[0] = totSampleWeight;
                 eff_and_pu_Weight_[0] = effwt*puwt;
                 wSampleWeight_[0]     = wSampleWeight;
                 interference_Weight_H600_[0] = infe_Weight_H600;
@@ -276,6 +358,34 @@ class sampleWrapperClass:
                 deltaphi_METca8jet_[0] = getattr( self.InputTree_, prefix + "_deltaphi_METca8jet" );       
                 deltaphi_Vca8jet_[0] = getattr( self.InputTree_, prefix + "_deltaphi_Vca8jet" );       
                 
+                listOfVarArray1[0][0] = jet_qjetvol_[0]
+                listOfVarArray1[1][0] = jet_tau2tau1_[0]
+
+                listOfVarArray2[0][0] = jet_qjetvol_[0]
+                listOfVarArray2[1][0] = jet_tau2tau1_[0]
+               
+                #if jet_pt_pr_[0] > 200 and jet_pt_pr_[0] < 275: 
+                #   ca8wjettaggerpt200_275_[0] = reader1_.EvaluateMVA(TMVAMethod)
+                #   ca8wjettaggerpt275_500_[0] = -1;
+
+                #if jet_pt_pr_[0] > 275 and jet_pt_pr_[0] < 500: 
+                #   ca8wjettaggerpt200_275_[0] = -1.;
+                #   ca8wjettaggerpt275_500_[0] = float(reader2_.EvaluateMVA(TMVAMethod))
+
+                #if jet_pt_pr_[0] > 200 and jet_pt_pr_[0] <= 275: 
+                #   ca8wjettaggerpt200_275_[0] = float(reader1_.EvaluateMVA(TMVAMethod))
+                #   ca8wjettaggerpt275_500_[0] = -1;
+                #if jet_pt_pr_[0] > 275 and jet_pt_pr_[0] <= 500: 
+                #   ca8wjettaggerpt200_275_[0] = -1.;
+                #   ca8wjettaggerpt275_500_[0] = float(reader2_.EvaluateMVA(TMVAMethod))
+
+                #if ungroomed_jet_pt_[0] > 200 and ungroomed_jet_pt_[0]<=275:
+                #   ungroomedwjettaggerpt200_275_[0] = float(ungroomed_reader1_.EvaluateMVA(TMVAMethod))
+                #   ungroomedwjettaggerpt275_500_[0] = -1;
+                #if ungroomed_jet_pt_[0] > 275 and ungroomed_jet_pt_[0]<=500:
+                #   ungroomedwjettaggerpt200_275_[0] = -1.;
+                #   ungroomedwjettaggerpt275_500_[0] = float(ungroomed_reader2_.EvaluateMVA(TMVAMethod))
+
                 otree.Fill();
                 ###################################
 
@@ -311,6 +421,7 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus("boostedW_lvj_m",1);
         self.InputTree_.SetBranchStatus("W_pt",1);
         self.InputTree_.SetBranchStatus(prefix + "_pt_pr",1);
+        self.InputTree_.SetBranchStatus(prefix + "_pt",1);
         self.InputTree_.SetBranchStatus(prefix + "_massdrop_pr",1);
         self.InputTree_.SetBranchStatus(prefix + "_mass",1);
         self.InputTree_.SetBranchStatus(prefix + "_mass_pr",1);        
