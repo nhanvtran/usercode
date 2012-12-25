@@ -18,11 +18,11 @@ from TreePlot import *
 
 class ProducePlot:
       
-     def __init__(self):
+     def __init__(self,CHANNEL):#CHANNEL = 'mu', or 'el'
           
           self.thstack = THStack("MC","MC")
 
-          self.samples = Samples()
+          self.samples = Samples(CHANNEL)
           self.drawhistograms = {}
           
           self.tmpplot = TreePlot()
@@ -37,7 +37,7 @@ class ProducePlot:
           self.plotdir_ = ""
           self.setlogy_ = False
 
-          self.channel = "mu"
+          self.channel = CHANNEL
 
           self.multiplicitylabel = {} 
 

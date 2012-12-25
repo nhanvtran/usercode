@@ -8,10 +8,10 @@ from ROOT import gROOT, gStyle, gSystem, TLatex
 import subprocess
 from subprocess import Popen
 
-#from sampleWrapperClass import *
-#from BoostedWSamples import * 
-from sampleWrapperClass_ele import *
-from BoostedWSamples_ele import * 
+from sampleWrapperClass import *
+from BoostedWSamples import * 
+#from sampleWrapperClass_ele import *
+#from BoostedWSamples_ele import * 
 from trainingClass import *
 #from BoostedWSmallTreeSamples import *
 from BoostedWUtils import *
@@ -55,8 +55,8 @@ if __name__ == '__main__':
     
     # ---------------------------------------------------
     # check if directories exists
-    if not os.path.isdir("trainingtrees"): os.system("mkdir trainingtrees");
-    if not os.path.isdir("trainingtrees_ele"): os.system("mkdir trainingtrees_ele");
+    if not os.path.isdir("trainingtrees_mu"): os.system("mkdir trainingtrees_mu");
+    if not os.path.isdir("trainingtrees_el"): os.system("mkdir trainingtrees_el");
     if not os.path.isdir("classifier"): os.system("mkdir classifier");    
 
     # ---------------------------------------------------
@@ -64,10 +64,13 @@ if __name__ == '__main__':
     isData = True;
     notData = False;
     #LUMI = 5.3
-    #LUMI = 14.0
-    LUMI = 13.9
-    #sourcefiledirectory = ""
-    #sourcefiledirectory = "./trainingtrees/"
+    #CHANNEL = 'el' # or 'mu'
+    CHANNEL = 'mu' # or 'mu'
+    if CHANNEL == 'el':
+        LUMI = 13.9
+    elif CHANNEL == 'mu':
+        LUMI = 14.0
+
     sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/"
     treename = ""
     if options.makeControlPlots or options.makeTTBarControlPlots: 
@@ -78,44 +81,44 @@ if __name__ == '__main__':
        treename = "otree"
     lumifile = "MCScaleFactors.txt"
 
-    boostedWSamples = Samples()
+    boostedWSamples = Samples(CHANNEL)
     boostedWSamples.SetFilePath(sourcefiledirectory)
     boostedWSamples.SetTreeName(treename)
     boostedWSamples.SetFileNames()
     boostedWSamples.SetLumi(LUMI)
     
-    singlemu600Sample = sampleWrapperClass("data",boostedWSamples.GetFileNames()["data"],LUMI,LUMI,boostedWSamples.GetTreeName(),isData)
+    singlemu600Sample = sampleWrapperClass("data",boostedWSamples.GetFileNames()["data"],CHANNEL,LUMI,LUMI,boostedWSamples.GetTreeName(),isData)
     
     #sigSCF = 200.;
     #ggH600SampleXS = 8.55627E1*sigSCF;
     #ggH600Sample_EffLumi = 197170/ggH600SampleXS;
-    ggH600Sample = sampleWrapperClass("ggH600",boostedWSamples.GetFileNames()["ggH600"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH600")),LUMI,boostedWSamples.GetTreeName(),notData)
-    ggH700Sample = sampleWrapperClass("ggH700",boostedWSamples.GetFileNames()["ggH700"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH700")),LUMI,boostedWSamples.GetTreeName(),notData)
-    ggH800Sample = sampleWrapperClass("ggH800",boostedWSamples.GetFileNames()["ggH800"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH800")),LUMI,boostedWSamples.GetTreeName(),notData)
-    ggH900Sample = sampleWrapperClass("ggH900",boostedWSamples.GetFileNames()["ggH900"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH900")),LUMI,boostedWSamples.GetTreeName(),notData)
-    ggH1000Sample = sampleWrapperClass("ggH1000",boostedWSamples.GetFileNames()["ggH1000"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH1000")),LUMI,boostedWSamples.GetTreeName(),notData)
+    ggH600Sample = sampleWrapperClass("ggH600",boostedWSamples.GetFileNames()["ggH600"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH600")),LUMI,boostedWSamples.GetTreeName(),notData)
+    ggH700Sample = sampleWrapperClass("ggH700",boostedWSamples.GetFileNames()["ggH700"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH700")),LUMI,boostedWSamples.GetTreeName(),notData)
+    ggH800Sample = sampleWrapperClass("ggH800",boostedWSamples.GetFileNames()["ggH800"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH800")),LUMI,boostedWSamples.GetTreeName(),notData)
+    ggH900Sample = sampleWrapperClass("ggH900",boostedWSamples.GetFileNames()["ggH900"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH900")),LUMI,boostedWSamples.GetTreeName(),notData)
+    ggH1000Sample = sampleWrapperClass("ggH1000",boostedWSamples.GetFileNames()["ggH1000"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH1000")),LUMI,boostedWSamples.GetTreeName(),notData)
 
     #boostedWXS = 1.3*228.9E3;
     #WJetsSample_EffLumi = 8955318/boostedWXS;
-    WJetsSample = sampleWrapperClass("WJets",boostedWSamples.GetFileNames()["WJets"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets")),LUMI,boostedWSamples.GetTreeName(),notData)
-    ZJetsSample = sampleWrapperClass("ZJets",boostedWSamples.GetFileNames()["ZJets"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZJets")),LUMI,boostedWSamples.GetTreeName(),notData)
+    WJetsSample = sampleWrapperClass("WJets",boostedWSamples.GetFileNames()["WJets"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets")),LUMI,boostedWSamples.GetTreeName(),notData)
+    ZJetsSample = sampleWrapperClass("ZJets",boostedWSamples.GetFileNames()["ZJets"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZJets")),LUMI,boostedWSamples.GetTreeName(),notData)
 
     #TTbarSample_EffLumi = 6893735/225197.;
-    TTbarSample = sampleWrapperClass("TTbar",boostedWSamples.GetFileNames()["TTbar"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar")),LUMI,boostedWSamples.GetTreeName(),notData);
+    TTbarSample = sampleWrapperClass("TTbar",boostedWSamples.GetFileNames()["TTbar"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar")),LUMI,boostedWSamples.GetTreeName(),notData);
 
     #WWSample_EffLumi = 9450414/33.61E3;
-    WWSample = sampleWrapperClass("WW",boostedWSamples.GetFileNames()["WW"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WW")),LUMI,boostedWSamples.GetTreeName(),notData);
+    WWSample = sampleWrapperClass("WW",boostedWSamples.GetFileNames()["WW"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WW")),LUMI,boostedWSamples.GetTreeName(),notData);
    # WZSample_EffLumi = 10000267/12.63E3;
-    WZSample = sampleWrapperClass("WZ",boostedWSamples.GetFileNames()["WZ"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WZ")),LUMI,boostedWSamples.GetTreeName(),notData);
+    WZSample = sampleWrapperClass("WZ",boostedWSamples.GetFileNames()["WZ"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WZ")),LUMI,boostedWSamples.GetTreeName(),notData);
     #ZZSample_EffLumi = 9702850/5.196E3;
-    ZZSample = sampleWrapperClass("ZZ",boostedWSamples.GetFileNames()["ZZ"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZZ")),LUMI,boostedWSamples.GetTreeName(),notData);
+    ZZSample = sampleWrapperClass("ZZ",boostedWSamples.GetFileNames()["ZZ"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZZ")),LUMI,boostedWSamples.GetTreeName(),notData);
    
-    tchSample = sampleWrapperClass("tch",boostedWSamples.GetFileNames()["tch"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tch")),LUMI,boostedWSamples.GetTreeName(),notData);
-    tWchSample = sampleWrapperClass("tWch",boostedWSamples.GetFileNames()["tWch"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tWch")),LUMI,boostedWSamples.GetTreeName(),notData);
-    schSample = sampleWrapperClass("sch",boostedWSamples.GetFileNames()["sch"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"sch")),LUMI,boostedWSamples.GetTreeName(),notData);
-    tch_barSample = sampleWrapperClass("tch_bar",boostedWSamples.GetFileNames()["tch_bar"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tch_bar")),LUMI,boostedWSamples.GetTreeName(),notData);
-    tWch_barSample = sampleWrapperClass("tWch_bar",boostedWSamples.GetFileNames()["tWch_bar"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tWch_bar")),LUMI,boostedWSamples.GetTreeName(),notData);
-    sch_barSample = sampleWrapperClass("sch_bar",boostedWSamples.GetFileNames()["sch_bar"],1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"sch_bar")),LUMI,boostedWSamples.GetTreeName(),notData);
+    tchSample = sampleWrapperClass("tch",boostedWSamples.GetFileNames()["tch"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tch")),LUMI,boostedWSamples.GetTreeName(),notData);
+    tWchSample = sampleWrapperClass("tWch",boostedWSamples.GetFileNames()["tWch"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tWch")),LUMI,boostedWSamples.GetTreeName(),notData);
+    schSample = sampleWrapperClass("sch",boostedWSamples.GetFileNames()["sch"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"sch")),LUMI,boostedWSamples.GetTreeName(),notData);
+    tch_barSample = sampleWrapperClass("tch_bar",boostedWSamples.GetFileNames()["tch_bar"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tch_bar")),LUMI,boostedWSamples.GetTreeName(),notData);
+    tWch_barSample = sampleWrapperClass("tWch_bar",boostedWSamples.GetFileNames()["tWch_bar"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tWch_bar")),LUMI,boostedWSamples.GetTreeName(),notData);
+    sch_barSample = sampleWrapperClass("sch_bar",boostedWSamples.GetFileNames()["sch_bar"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"sch_bar")),LUMI,boostedWSamples.GetTreeName(),notData);
 
     #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
     #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, singlemu600Sample );
@@ -155,15 +158,16 @@ if __name__ == '__main__':
         if not os.path.isdir("controlPlots"): os.system("mkdir controlPlots");
         #myPlotter.makeControlPlots("controlPlots","nocuts");
         print "Please Check the Cuts used on the BoostedWControlPlots.py is reasonable"
-        Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50"
+        Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50"
+        #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50"
         #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberjets <= 1"
         #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets == 0"
         print "Cuts we apply: " + Cuts
         if options.noX:
-           p = subprocess.Popen(["python","BoostedWControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+           p = subprocess.Popen(["python","BoostedWControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL])
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
         else:
-           p = subprocess.Popen(["python","BoostedWControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+           p = subprocess.Popen(["python","BoostedWControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL])
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
     
     if options.makeTTBarControlPlots:        
@@ -173,15 +177,16 @@ if __name__ == '__main__':
         if not os.path.isdir("controlPlots_ttbar"): os.system("mkdir controlPlots_ttbar");
         #myPlotter.makeControlPlots("controlPlots_ttbar","ttbar");
         print "Please Check the Cuts used on the BoostedWTopControlPlots.py is reasonable"
-        Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets >= 1"
+        #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets >= 1"
+        Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets >= 1"
         print "Cuts we apply: " + Cuts
         print "We don't put the cuts on the signal and try to compare the W jet performance with TTbar and Data!!!!"
         print "Make Sure the numberbjets cut is the last cut in the cut sequence"
         if options.noX:
-           p = subprocess.Popen(["python","BoostedWTopControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+           p = subprocess.Popen(["python","BoostedWTopControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL ])
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
         else:
-           p = subprocess.Popen(["python","BoostedWTopControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+           p = subprocess.Popen(["python","BoostedWTopControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL ])
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
 
     if options.makeSignalRegionControlPlots:        

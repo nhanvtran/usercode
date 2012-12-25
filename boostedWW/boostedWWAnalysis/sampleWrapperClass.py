@@ -34,7 +34,7 @@ def getListMean(list):
 class sampleWrapperClass:
 
     ### ------------------------------------------------
-    def __init__(self, label, file, sampleEffLumi, lumi, treename, isData):
+    def __init__(self, label, file, channel, sampleEffLumi, lumi, treename, isData):
 
         
         self.IsData_ = isData;
@@ -46,7 +46,8 @@ class sampleWrapperClass:
         
         self.JetPrefix_ = "GroomedJet_CA8";
         self.Label_ = label;
-        self.OFileName_ = "trainingtrees/ofile_"+label+".root";
+        self.Channel_ = channel
+        self.OFileName_ = "trainingtrees_"+channel+"/ofile_"+label+".root";
             
     def createTrainingTree(self):
         
@@ -312,8 +313,13 @@ class sampleWrapperClass:
                 jet_pt_pr_[0] = getattr( self.InputTree_, prefix + "_pt_pr" )[0];
                 ungroomed_jet_pt_[0] = getattr( self.InputTree_, prefix+"_pt" )[0];
                 
-                l_pt_[0] = getattr( self.InputTree_, "W_muon_pt" );
-                l_eta_[0] = getattr( self.InputTree_, "W_muon_eta" );
+                if self.Channel_ == "mu" :
+                    l_pt_[0] = getattr( self.InputTree_, "W_muon_pt" );
+                    l_eta_[0] = getattr( self.InputTree_, "W_muon_eta" );
+                elif self.Channel_ == "el":
+                    l_pt_[0] = getattr( self.InputTree_, "W_electron_pt" );
+                    l_eta_[0] = getattr( self.InputTree_, "W_electron_eta" );
+
                 mvaMET_[0] = getattr( self.InputTree_, "event_metMVA_met" );
                 nPV_[0] = getattr( self.InputTree_, "event_nPV" );
                 totalEventWeight_[0] = totSampleWeight;
@@ -414,8 +420,14 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus("puwt_up",1);
         self.InputTree_.SetBranchStatus("puwt_down",1);
 
-        self.InputTree_.SetBranchStatus("W_muon_pt",1);
-        self.InputTree_.SetBranchStatus("W_muon_eta",1);
+        if self.Channel_ == "mu" :
+            self.InputTree_.SetBranchStatus("W_muon_pt",1);
+            self.InputTree_.SetBranchStatus("W_muon_eta",1);
+        elif self.Channel_ == "el":
+            self.InputTree_.SetBranchStatus("W_electron_pt",1);
+            self.InputTree_.SetBranchStatus("W_electron_eta",1);
+
+
         self.InputTree_.SetBranchStatus("event_metMVA_met",1);
         self.InputTree_.SetBranchStatus("event_nPV",1);
         self.InputTree_.SetBranchStatus("boostedW_lvj_m",1);
