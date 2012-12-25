@@ -171,39 +171,67 @@ if __name__ == '__main__':
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
     
     if options.makeTTBarControlPlots:        
-        
-        # ---------------------------------------------------
-        # make control plots based on the same cuts as the training trees
         if not os.path.isdir("controlPlots_ttbar"): os.system("mkdir controlPlots_ttbar");
-        #myPlotter.makeControlPlots("controlPlots_ttbar","ttbar");
-        print "Please Check the Cuts used on the BoostedWTopControlPlots.py is reasonable"
-        #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets >= 1"
-        Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets >= 1"
+        #myPlotter.makeControlPlots("controlPlots","nocuts");
+        print "Please Check the Cuts used on the BoostedWControlPlots.py is reasonable"
+        Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets >= 1 "
+        #Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50"
         print "Cuts we apply: " + Cuts
         print "We don't put the cuts on the signal and try to compare the W jet performance with TTbar and Data!!!!"
         print "Make Sure the numberbjets cut is the last cut in the cut sequence"
         if options.noX:
-           p = subprocess.Popen(["python","BoostedWTopControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL ])
+           p = subprocess.Popen(["python","BoostedWControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL,"-a","ttbar"])
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
         else:
-           p = subprocess.Popen(["python","BoostedWTopControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL ])
+           p = subprocess.Popen(["python","BoostedWControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL,"-a","ttbar"])
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
 
     if options.makeSignalRegionControlPlots:        
-        
-        # ---------------------------------------------------
-        # make control plots based on the same cuts as the training trees
         if not os.path.isdir("controlPlots_signalregion"): os.system("mkdir controlPlots_signalregion");
-        #myPlotter.makeControlPlots("controlPlots_signalregion","signalregion");
-        print "Please Check the Cuts used on the BoostedWWWControlPlots.py is reasonable"
-        Cuts = ""
+        print "Please Check the Cuts used on the BoostedWControlPlots.py is reasonable"
+        Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 200 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberjets <1 && GroomedJet_CA8_mass_pr[0]>=70 && GroomedJet_CA8_mass_pr[0]<=100"
         print "Cuts we apply: " + Cuts
         if options.noX:
-           p = subprocess.Popen(["python","BoostedWWWControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+           p = subprocess.Popen(["python","BoostedWControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL,"-a","signalregion"])
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
         else:
-           p = subprocess.Popen(["python","BoostedWWWControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+           p = subprocess.Popen(["python","BoostedWControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL,"-a","signalregion"])
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
+     
+    ##if options.makeTTBarControlPlots:        
+    ##    
+    ##    # ---------------------------------------------------
+    ##    # make control plots based on the same cuts as the training trees
+    ##    if not os.path.isdir("controlPlots_ttbar"): os.system("mkdir controlPlots_ttbar");
+    ##    #myPlotter.makeControlPlots("controlPlots_ttbar","ttbar");
+    ##    print "Please Check the Cuts used on the BoostedWTopControlPlots.py is reasonable"
+    ##    #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets >= 1"
+    ##    Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets >= 1"
+    ##    print "Cuts we apply: " + Cuts
+    ##    print "We don't put the cuts on the signal and try to compare the W jet performance with TTbar and Data!!!!"
+    ##    print "Make Sure the numberbjets cut is the last cut in the cut sequence"
+    ##    if options.noX:
+    ##       p = subprocess.Popen(["python","BoostedWTopControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL ])
+    ##       if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
+    ##    else:
+    ##       p = subprocess.Popen(["python","BoostedWTopControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL ])
+    ##       if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
+
+    ##if options.makeSignalRegionControlPlots:        
+    ##    
+    ##    # ---------------------------------------------------
+    ##    # make control plots based on the same cuts as the training trees
+    ##    if not os.path.isdir("controlPlots_signalregion"): os.system("mkdir controlPlots_signalregion");
+    ##    #myPlotter.makeControlPlots("controlPlots_signalregion","signalregion");
+    ##    print "Please Check the Cuts used on the BoostedWWWControlPlots.py is reasonable"
+    ##    Cuts = ""
+    ##    print "Cuts we apply: " + Cuts
+    ##    if options.noX:
+    ##       p = subprocess.Popen(["python","BoostedWWWControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+    ##       if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
+    ##    else:
+    ##       p = subprocess.Popen(["python","BoostedWWWControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts])
+    ##       if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
 
     if options.makeTMVAPlots:
                 
