@@ -34,6 +34,8 @@ parser = OptionParser()
 
 parser.add_option('-b', action='store_true', dest='noX', default=False, help='no X11 windows')
 parser.add_option('--fitwtagger', action='store_true', dest='fitwtagger', default=False, help='fit wtagger jet in ttbar control sample')
+parser.add_option('-s','--single', action='store_true', dest='single', default=True, help='pre-limit in single mode')
+parser.add_option('-m','--multi', action='store_true', dest='multi', default=False, help='pre-limit in multi mode')
 
 (options, args) = parser.parse_args()
 ############################################################
@@ -2974,7 +2976,7 @@ def pre_limit_sb_correction_method4(higgs_sample="ggH600", in_mlvj_signal_region
     boostedW_fitter=doFit_wj_and_wlvj( higgs_sample, in_mlvj_signal_region_min, in_mlvj_signal_region_max, in_mj_min, in_mj_max, in_mlvj_min, in_mlvj_max,fit_model);
     boostedW_fitter.analysis_sideband_correction_method4(inject_signal);
 
-def pre_limit_All():
+def pre_limit_single():
     #pre_limit_fitting_method("ggH600",500,700)
     #pre_limit_fitting_method("ggH700" ,600,850)
     #pre_limit_fitting_method("ggH800" ,650,1000)
@@ -3008,13 +3010,18 @@ def check_workspace():
 
 if __name__ == '__main__':
     if options.fitwtagger:
+        print 'fitwtagger'
         contral_sample("_mu");#_mu for muon sample
         #contral_sample("_el");#_el for el sample
 
-    #pre_limit_All()
+    if options.single and (not options.fitwtagger) and ( not options.multi):
+        print 'single mode'
+        #pre_limit_single()
 
-    #pre_limit_fitting_method(sys.argv[1],int(sys.argv[2]),int(sys.argv[3]))
-    #pre_limit_sb_correction_method(sys.argv[1],int(sys.argv[2]),int(sys.argv[3]))
-    #pre_limit_sb_correction_method2(sys.argv[1],int(sys.argv[2]),int(sys.argv[3]))
-    #pre_limit_sb_correction_method3(sys.argv[1],int(sys.argv[2]),int(sys.argv[3]))
-    #pre_limit_sb_correction_method4(sys.argv[1],int(sys.argv[2]),int(sys.argv[3]),int(sys.argv[4]),int(sys.argv[5]),int(sys.argv[6]),int(sys.argv[7]),sys.argv[8] )
+    if options.multi:
+        print 'multi mode'
+        #pre_limit_fitting_method(sys.argv[1],int(sys.argv[2]),int(sys.argv[3]))
+        #pre_limit_sb_correction_method(sys.argv[1],int(sys.argv[2]),int(sys.argv[3]))
+        #pre_limit_sb_correction_method2(sys.argv[1],int(sys.argv[2]),int(sys.argv[3]))
+        #pre_limit_sb_correction_method3(sys.argv[1],int(sys.argv[2]),int(sys.argv[3]))
+        #pre_limit_sb_correction_method4(sys.argv[1],int(sys.argv[2]),int(sys.argv[3]),int(sys.argv[4]),int(sys.argv[5]),int(sys.argv[6]),int(sys.argv[7]),sys.argv[8] )
