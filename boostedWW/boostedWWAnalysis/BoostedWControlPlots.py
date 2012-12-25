@@ -15,6 +15,7 @@ parser.add_option("-l","--lumi",action="store",type="float",dest="lumi")
 parser.add_option("-s","--scalefilename",action="store",type="string",dest="scalefilename")
 parser.add_option("-c","--cuts",action="store",type="string",dest="cuts")
 parser.add_option("-n","--channel",action="store",type="string",dest="channel")
+parser.add_option("-a","--addition",action="store",type="string",dest="addition")
 (options, args) = parser.parse_args()
 
 if os.path.isfile('tdrstyle.C'):
@@ -60,8 +61,12 @@ if options.channel:
     CHANNEL = options.channel
 #print CHANNEL + "zixu"
 
+if options.addition:
+    cutforfile=cutforfile+"_"+options.addition
+    plotdirectort=plotdirectort+"_"+options.addition
+
 plot0 = ProducePlot(CHANNEL)                                                                                  
-plot0.SetBinMinMax(50,200,800)                                                                         
+plot0.SetBinMinMax(80,200,1800)                                                                         
 plot0.SetCutWeightName(cut,"effwt*puwt")                                                               
 plot0.SetFilePath(filedirectory)                                                                       
 plot0.SetLumiTree(LUMI,Treename)                                                                       
