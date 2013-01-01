@@ -64,12 +64,12 @@ if __name__ == '__main__':
     isData = True;
     notData = False;
     #LUMI = 5.3
-    #CHANNEL = 'el' # or 'mu'
-    CHANNEL = 'mu' # or 'mu'
+    CHANNEL = 'el' # or 'mu'
+    #CHANNEL = 'mu' # or 'el'
     if CHANNEL == 'el':
-        LUMI = 13.9
+        LUMI = 5.145;#13.9
     elif CHANNEL == 'mu':
-        LUMI = 14.0
+        LUMI = 5.3;#14.0
 
     sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/"
     treename = ""
@@ -77,7 +77,7 @@ if __name__ == '__main__':
        sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/"
        treename = "WJet"
     if options.makeTMVAPlots:
-       sourcefiledirectory = "/uscms_data/d3/weizou/VBFHiggsAnalysis/BoostedWAnalysis2012/boostedWWAnalysis/trainingtrees/"
+       sourcefiledirectory = "/uscms_data/d3/weizou/VBFHiggsAnalysis/BoostedWAnalysis2012/boostedWWAnalysis/trainingtrees_%s/"%(CHANNEL)
        treename = "otree"
     lumifile = "MCScaleFactors.txt"
 
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     boostedWSamples.SetFileNames()
     boostedWSamples.SetLumi(LUMI)
     
-    singlemu600Sample = sampleWrapperClass("data",boostedWSamples.GetFileNames()["data"],CHANNEL,LUMI,LUMI,boostedWSamples.GetTreeName(),isData)
+    datasample = sampleWrapperClass("data",boostedWSamples.GetFileNames()["data"],CHANNEL,LUMI,LUMI,boostedWSamples.GetTreeName(),isData)
     
     #sigSCF = 200.;
     #ggH600SampleXS = 8.55627E1*sigSCF;
@@ -101,6 +101,7 @@ if __name__ == '__main__':
     #boostedWXS = 1.3*228.9E3;
     #WJetsSample_EffLumi = 8955318/boostedWXS;
     WJetsSample = sampleWrapperClass("WJets",boostedWSamples.GetFileNames()["WJets"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets")),LUMI,boostedWSamples.GetTreeName(),notData)
+    WJets_HerwigSample = sampleWrapperClass("WJets_Herwig",boostedWSamples.GetFileNames()["WJets_Herwig"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Herwig")),LUMI,boostedWSamples.GetTreeName(),notData)
     ZJetsSample = sampleWrapperClass("ZJets",boostedWSamples.GetFileNames()["ZJets"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZJets")),LUMI,boostedWSamples.GetTreeName(),notData)
 
     #TTbarSample_EffLumi = 6893735/225197.;
@@ -121,7 +122,7 @@ if __name__ == '__main__':
     sch_barSample = sampleWrapperClass("sch_bar",boostedWSamples.GetFileNames()["sch_bar"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"sch_bar")),LUMI,boostedWSamples.GetTreeName(),notData);
 
     #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
-    #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, singlemu600Sample );
+    #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, datasample );
 
     if options.createTrainingTrees:
         
@@ -129,27 +130,28 @@ if __name__ == '__main__':
         # create training tree
         #WJetsSample.createTrainingTree();
 
-        singlemu600Sample.createTrainingTree();
-        ggH600Sample.createTrainingTree();
-        ggH700Sample.createTrainingTree();        
-        ggH800Sample.createTrainingTree();        
-        ggH900Sample.createTrainingTree();        
-        ggH1000Sample.createTrainingTree();        
-        WJetsSample.createTrainingTree();
-        ZJetsSample.createTrainingTree();
-        TTbarSample.createTrainingTree();
-        WWSample.createTrainingTree();
-        WZSample.createTrainingTree();
-        ZZSample.createTrainingTree();
-        tchSample.createTrainingTree();
-        tWchSample.createTrainingTree();
-        schSample.createTrainingTree();
-        tch_barSample.createTrainingTree();
-        tWch_barSample.createTrainingTree();
-        sch_barSample.createTrainingTree();
+        #datasample.createTrainingTree();
+        #ggH600Sample.createTrainingTree();
+        #ggH700Sample.createTrainingTree();        
+        #ggH800Sample.createTrainingTree();        
+        #ggH900Sample.createTrainingTree();        
+        #ggH1000Sample.createTrainingTree();        
+        WJets_HerwigSample.createTrainingTree();
+        #WJetsSample.createTrainingTree();
+        #ZJetsSample.createTrainingTree();
+        #TTbarSample.createTrainingTree();
+        #WWSample.createTrainingTree();
+        #WZSample.createTrainingTree();
+        #ZZSample.createTrainingTree();
+        #tchSample.createTrainingTree();
+        #tWchSample.createTrainingTree();
+        #schSample.createTrainingTree();
+        #tch_barSample.createTrainingTree();
+        #tWch_barSample.createTrainingTree();
+        #sch_barSample.createTrainingTree();
 
     #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
-    #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, singlemu600Sample );    
+    #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, datasample );    
     
     if options.makeControlPlots:
                 
@@ -158,7 +160,7 @@ if __name__ == '__main__':
         if not os.path.isdir("controlPlots"): os.system("mkdir controlPlots");
         #myPlotter.makeControlPlots("controlPlots","nocuts");
         print "Please Check the Cuts used on the BoostedWControlPlots.py is reasonable"
-        Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50"
+        Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 200 && ggdboostedWevt == 1 && event_metMVA_met > 50  "
         #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50"
         #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberjets <= 1"
         #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets == 0"
@@ -174,28 +176,35 @@ if __name__ == '__main__':
         if not os.path.isdir("controlPlots_ttbar"): os.system("mkdir controlPlots_ttbar");
         #myPlotter.makeControlPlots("controlPlots","nocuts");
         print "Please Check the Cuts used on the BoostedWControlPlots.py is reasonable"
-        Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets >= 1 "
-        #Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50"
+        #Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 200 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_CA8_tau2tau1[0]< 0.524   "
+        #addition  = "ttbar_withoutjetnumber";
+        Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 200 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_CA8_tau2tau1[0]< 0.524  && GroomedJet_numberbjets >= 1 "
+        addition  = "ttbar";
         print "Cuts we apply: " + Cuts
         print "We don't put the cuts on the signal and try to compare the W jet performance with TTbar and Data!!!!"
         print "Make Sure the numberbjets cut is the last cut in the cut sequence"
         if options.noX:
-           p = subprocess.Popen(["python","BoostedWControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL,"-a","ttbar"])
+           p = subprocess.Popen(["python","BoostedWControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL,"-a",addition])
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
         else:
-           p = subprocess.Popen(["python","BoostedWControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL,"-a","ttbar"])
+           p = subprocess.Popen(["python","BoostedWControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL,"-a",addition])
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
 
     if options.makeSignalRegionControlPlots:        
         if not os.path.isdir("controlPlots_signalregion"): os.system("mkdir controlPlots_signalregion");
         print "Please Check the Cuts used on the BoostedWControlPlots.py is reasonable"
-        Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 200 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberjets <1 && GroomedJet_CA8_mass_pr[0]>=70 && GroomedJet_CA8_mass_pr[0]<=100"
+        Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 200 && ggdboostedWevt == 1 && event_metMVA_met > 50  && GroomedJet_CA8_mass_pr[0]>=70 && GroomedJet_CA8_mass_pr[0]<=100 && boostedW_lvj_m>400 && boostedW_lvj_m<1400 && GroomedJet_CA8_tau2tau1[0]< 0.525 && GroomedJet_numberjets <1"
+        addition  = "signalregion";
+        #Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 200 && ggdboostedWevt == 1 && event_metMVA_met > 50  && GroomedJet_CA8_mass_pr[0]>=70 && GroomedJet_CA8_mass_pr[0]<=100"
+        #Wtagger = "GroomedJet_CA8_tau2tau1[0]< 0.524"
+        #Cuts = Cuts + " && " + Wtagger;
+        #addition  = "signalregion_withoutjetnumber";
         print "Cuts we apply: " + Cuts
         if options.noX:
-           p = subprocess.Popen(["python","BoostedWControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL,"-a","signalregion"])
+           p = subprocess.Popen(["python","BoostedWControlPlots.py","-b","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL,"-a",addition])
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
         else:
-           p = subprocess.Popen(["python","BoostedWControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL,"-a","signalregion"])
+           p = subprocess.Popen(["python","BoostedWControlPlots.py","-f","%s"%sourcefiledirectory,"-t","%s"%treename,"-l","%f"%LUMI,"-s","%s"%lumifile,"-c","%s"%Cuts,"-n","%s"%CHANNEL,"-a",addition])
            if(p.wait() != None): raw_input( 'Press ENTER to continue\n ' )
      
     ##if options.makeTTBarControlPlots:        
