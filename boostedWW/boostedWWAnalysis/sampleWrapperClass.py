@@ -127,6 +127,7 @@ class sampleWrapperClass:
         
         # n bjets
         nbjets_ = array( 'f', [ 0. ] );
+        nbjetsCSV_ = array( 'f', [ 0. ] );
         njets_ = array( 'f', [ 0. ] );        
         jet_pt1frac_ = array( 'f', [ 0. ] );
         jet_pt2frac_ = array( 'f', [ 0. ] );
@@ -178,6 +179,7 @@ class sampleWrapperClass:
         otree.Branch("jet_rcore7", jet_rcore7_ , "jet_rcore7/F");
 
         otree.Branch("nbjets", nbjets_ , "nbjets/F");
+        otree.Branch("nbjetsCSV", nbjetsCSV_ , "nbjetsCSV_/F");
         otree.Branch("njets", njets_ , "njets/F");
         otree.Branch("jet_pt1frac", jet_pt1frac_ , "jet_pt1frac/F");
         otree.Branch("jet_pt2frac", jet_pt2frac_ , "jet_pt2frac/F");
@@ -353,6 +355,11 @@ class sampleWrapperClass:
                 jet_planarlow07_[0] = getattr( self.InputTree_, prefix + "_planarflow07");
                 
                 nbjets_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets" );
+                nbjetsCSV_[0] =0 ;
+                for i in range(0,6):
+                    if  getattr(self.InputTree_, "JetPFCor_bDiscriminatorCSV")[i] >=0.244 :nbjetsCSV_[0]=nbjetsCSV_[0]+1;
+                    #print i, getattr(self.InputTree_, "JetPFCor_bDiscriminatorCSV")[i], nbjetsCSV_[0];
+                
                 njets_[0] = getattr( self.InputTree_, "GroomedJet_numberjets" );
                 pt1FracVal = max( getattr( self.InputTree_, prefix + "_prsubjet1ptoverjetpt" ), getattr( self.InputTree_, prefix + "_prsubjet2ptoverjetpt" ) );
                 pt2FracVal = min( getattr( self.InputTree_, prefix + "_prsubjet1ptoverjetpt" ), getattr( self.InputTree_, prefix + "_prsubjet2ptoverjetpt" ) );
@@ -446,6 +453,7 @@ class sampleWrapperClass:
 
         self.InputTree_.SetBranchStatus("GroomedJet_numberjets",1);
         self.InputTree_.SetBranchStatus("GroomedJet_numberbjets",1);
+        self.InputTree_.SetBranchStatus("JetPFCor_bDiscriminatorCSV",1);
         self.InputTree_.SetBranchStatus(prefix + "_prsubjet1ptoverjetpt",1);
         self.InputTree_.SetBranchStatus(prefix + "_prsubjet2ptoverjetpt",1);
         self.InputTree_.SetBranchStatus(prefix + "_prsubjet1subjet2_deltaR",1);
