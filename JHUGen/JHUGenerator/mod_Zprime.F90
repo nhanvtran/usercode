@@ -19,13 +19,12 @@
       real(dp), intent(out) ::  sum
       real(dp), intent(in) :: p(4,6)
       integer, intent(in) :: MY_IDUP(6:9)
-      real(dp) :: pin(4,4)
-      complex(dp) :: A(2),qL,qR
-      integer :: i1,i2,i3,i4,ordering(1:4)
+      real(dp) :: s, pin(4,4)
+      complex(dp) :: A(2), sp(4,4), propG, propZ1, propZ2,qL,qR
+      integer :: i1,i2,i3,i4
       real(dp) :: aL1,aR1,aL2,aR2
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv
-      real(dp), parameter :: symmFact=1d0/2d0
 
 
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
@@ -38,7 +37,7 @@
 !---- full prefactor; 3 is  the color factor
       prefactor = 3d0*(Lambda_inv**2)**2*(one/two*M_V*Ga_V)**2*gZ_sq**2
 
-         if( DecayMode1.le.3 ) then!  Z decay
+         if( DecayMode1.le.3 ) then
               if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
                     aL1=aL_lep
                     aR1=aR_lep
@@ -55,16 +54,11 @@
                     aL1=0d0
                     aR1=0d0
               endif
-         elseif( DecayMode1.ge.4 .and. DecayMode1.le.6 ) then !  W decay
+         else
               aL1 = bL
               aR1 = bR
-         elseif( DecayMode1.eq.7 ) then !  photon decay
-         else
-              aL1=0d0
-              aR1=0d0            
          endif
-
-         if( DecayMode2.le.3 ) then!  Z decay
+         if( DecayMode2.le.3 ) then
               if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
                     aL2=aL_lep
                     aR2=aR_lep
@@ -81,60 +75,52 @@
                     aL2=0d0
                     aR2=0d0
               endif
-         elseif( DecayMode2.ge.4 .and. DecayMode2.le.6 ) then !  W decay
+         else
               aL2 = bL
               aR2 = bR
-         elseif( DecayMode2.eq.7 ) then !  photon decay
-         else
-              aL2=0d0
-              aR2=0d0  
          endif
 
 
+      s  = two*scr(p(:,1),p(:,2))
+      propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
 
+      s = two*scr(p(:,3),p(:,4))
+      propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+
+      s = two*scr(p(:,5),p(:,6))
+      propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
       sum = zero
 do i1=1,2
 do i3 = 1,2
 do i4 = 1,2
-!do i3 = -1,1! on-shell check!
-!do i4 = -1,1! on-shell check!
-   
-         ordering = (/3,4,5,6/)
-         call calcHelAmp(ordering,p(1:4,1:6),i1,i3,i4,A(1))
+!-------- For fermions, -1 == left, 1 == right
+         pin(1,:) = p(:,1)
+         pin(2,:) = p(:,2)
+         sp(1,:) = pol_dk2mom(dcmplx(p(:,2)),dcmplx(p(:,1)),-3+2*i1)  !qbq
+         sp(2,:) = sp(1,:)  !-- the same, isn't really needed but for uniform bookeeping
+         pin(3,:) = p(:,3) + p(:,4)
+         pin(4,:) = p(:,5) + p(:,6)
+         sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
+         sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-.mu+
 
-         if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-             ordering = (/5,4,3,6/)
-             call calcHelAmp(ordering,p(1:4,1:6),i1,i3,i4,A(2))
-             A(2) = -A(2) ! minus comes from fermi statistics
-         endif
-
-
+         call qqZprimeZZampl(pin,sp,A(1))
          if (i1.eq.1) then
-            A(:) = qL*A(:)
+            A(1) = qL*A(1)
          elseif(i1.eq.2) then
-            A(:) = qR*A(:)
+            A(1) = qR*A(1)
          endif
          if (i3.eq.1) then
-            A(:) = aL1*A(:)
+            A(1) = aL1*A(1)
           elseif(i3.eq.2) then
-            A(:) = aR1*A(:)
+            A(1) = aR1*A(1)
          endif
          if (i4.eq.1) then
-            A(:) = aL2*A(:)
+            A(1) = aL2*A(1)
          elseif(i4.eq.2) then
-            A(:) = aR2*A(:)
+            A(1) = aR2*A(1)
          endif
-
-
-         if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-             sum = sum + symmFact * (cdabs( A(1)*dconjg(A(1)) ) + cdabs( A(2)*dconjg(A(2)) ))
-             if( i3.eq.i4 ) sum = sum + symmFact * 2d0*dreal(A(1)*dconjg(A(2)))  
-         else
-             sum = sum + cdabs( A(1)*dconjg(A(1)) )
-         endif
-
-
+         sum = sum + abs(propG*propZ1*propZ2*A(1))**2
 enddo
 enddo
 enddo
@@ -142,79 +128,6 @@ enddo
          sum = sum*prefactor
 
       end subroutine
-
-
-
-
-     subroutine calcHelAmp(ordering,p,i1,i3,i4,A)
-     implicit none
-     integer :: ordering(1:4),i1,i3,i4,l1,l2,l3,l4
-     real(dp) :: p(1:4,1:6)
-     complex(dp) :: propG, propZ1, propZ2
-     real(dp) :: s, pin(4,4)
-     complex(dp) :: A(1:1), sp(4,4)
-
-
-      l1=ordering(1)
-      l2=ordering(2)
-      l3=ordering(3)
-      l4=ordering(4)
-
-      s  = two*scr(p(:,1),p(:,2))
-      propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
-
-
-!       s = two*scr(p(:,3),p(:,4))
-!       propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-!       s = two*scr(p(:,5),p(:,6))
-!       propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
-
-!-------- For fermions, -1 == left, 1 == right
-         pin(1,:) = p(:,1)
-         pin(2,:) = p(:,2)
-         sp(1,:) = pol_dk2mom(dcmplx(p(:,2)),dcmplx(p(:,1)),-3+2*i1) !qbq
-
-         sp(2,:) = sp(1,:)  !-- the same, isn't really needed but for uniform bookeeping
-!          pin(3,:) = p(:,3) + p(:,4)
-!          pin(4,:) = p(:,5) + p(:,6)
-!          sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
-!          sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-.mu+
-
-         pin(3,:) = p(:,l1)+p(:,l2)
-         pin(4,:) = p(:,l3)+p(:,l4)
-         sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-         sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
-         sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-         sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
-
-         s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-         propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-         s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-         propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
-
-!-- on-shell check
-!       sp(3,1:4) = pol_mass(dcmplx(p(1:4,3)+p(1:4,4)),dsqrt(2d0*scr(p(:,3),p(:,4))),i3)
-!       sp(4,1:4) = pol_mass(dcmplx(p(1:4,5)+p(1:4,6)),dsqrt(2d0*scr(p(:,5),p(:,6))),i4) 
-
-!        if( i3.eq.0 .and. i4.eq.0 ) then
-!             a(:) = 0d0
-!             return
-!        endif
-
-!-- end: on-shell check
-
-
-
-         call qqZprimeZZampl(pin,sp,A(1))
-
-         A(1) = A(1) * propG*propZ1*propZ2
-
-      end subroutine
-
-
-
 
 
 
@@ -235,7 +148,8 @@ enddo
       complex(dp) :: e3_q4,e4_q3
       complex(dp) :: q1(4),q2(4),q3(4),q4(4),q(4)
       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
-      complex(dp) :: yyy1,yyy2,yyy3,yyy4,xxx1,epsZpr(1:4,-1:+1)
+      complex(dp) :: yyy1,yyy2,yyy3,yyy4,xxx1
+      real(dp) :: q34
 
       q1 = dcmplx(p(1,:),0d0)
       q2 = dcmplx(p(2,:),0d0)
@@ -259,28 +173,10 @@ enddo
       q2_q3 = sc(q2,q3)
       q2_q4 = sc(q2,q4)
       q3_q4 = sc(q3,q4)
-      e1_e2 = sc(e1,e2)
 
+      e1_e2 = sc(e1,e2)
       e1_e3 = sc(e1,e3)
       e1_e4 = sc(e1,e4)
-
-
-
-
-
-
-!       epsZpr(1:4,-1) = pol_mass(q,m_reso,-1) 
-!       epsZpr(1:4, 0) = pol_mass(q,m_reso, 0)
-!       epsZpr(1:4,+1) = pol_mass(q,m_reso,+1)
-!       e1_e3 = sc(e1,epsZpr(1:4,-1)) * sc(e3,dconjg(epsZpr(1:4,-1)))  & 
-!             + sc(e1,epsZpr(1:4,+1)) * sc(e3,dconjg(epsZpr(1:4,+1)))  & 
-!             + sc(e1,epsZpr(1:4, 0)) * sc(e3,dconjg(epsZpr(1:4, 0)))
-!       e1_e4 = sc(e1,epsZpr(1:4,-1)) * sc(e4,dconjg(epsZpr(1:4,-1)))  & 
-!             + sc(e1,epsZpr(1:4,+1)) * sc(e4,dconjg(epsZpr(1:4,+1)))  & 
-!             + sc(e1,epsZpr(1:4, 0)) * sc(e4,dconjg(epsZpr(1:4, 0)))
-
-
-
 
       e2_e3 = sc(e2,e3)
       e2_e4 = sc(e2,e4)
@@ -300,33 +196,23 @@ enddo
       e4_q3 = sc(e4,q3)
 
 
+      q34 = 0.5_dp*(M_Reso**2 - two*M_V**2)
+
       res = czero
 
       xxx1 = (1d0,0d0)  !  different possibilities for fermion couplings
                         !  to zprime are accounted in the amplitude call
 
 
-      yyy1 = zprime_zz_1
-      yyy2 = zprime_zz_2
-
-
-       res= - e1_e3*e4_q3*xxx1*yyy1    &
-            - e1_e4*e3_q4*xxx1*yyy1    &
-            - et1(e1,e3,e4,q3)*xxx1*yyy2 + et1(e1,e3,e4,q4)*xxx1*yyy2
+      yyy1 = zprime_zz_v
+      yyy2 = zprime_zz_a
 
 
 
 
-!       e3 = pol_mass(q3,dreal(cdsqrt(sc(q3,q3))),-1) 
-!       e4 = pol_mass(q4,dreal(cdsqrt(sc(q4,q4))),-1)
-!       e1_e3 = sc(e1,e3)
-!       e1_e4 = sc(e1,e4)
-!       e3_q4 = sc(e3,q4)
-!       e4_q3 = sc(e4,q3)
-!print *, dreal(cdsqrt(sc(q3,q3))),dreal(cdsqrt(sc(q4,q4)))
-!print * , "e3x",q3,dreal(cdsqrt(sc(q3,q3))),-1
-!print *, - e1_e3*e4_q3 - e1_e4*e3_q4
-!pause
+       res= -e1_e3*e4_q3*xxx1*yyy1  &
+      - e1_e4*e3_q4*xxx1*yyy1    &
+      - et1(e1,e3,e4,q3)*xxx1*yyy2 + et1(e1,e3,e4,q4)*xxx1*yyy2
 
 
 
@@ -447,7 +333,7 @@ enddo
   end function pol_mless2
 
 
-  function pol_dk2mom(plepton,antilepton,i,outgoing)! CAREFUL: the final result is divided by 1/q.q !!
+  function pol_dk2mom(plepton,antilepton,i,outgoing)
     integer, intent(in) :: i
     integer :: j
     complex(dp), intent(in) :: plepton(:),antilepton(:)
@@ -460,9 +346,6 @@ enddo
 
     Ub(:)=ubar0(plepton,i)
     V(:)=v0(antilepton,-i)
-
-!print *, "ubar mom",plepton
-!print *, "v    mom",antilepton
 
     !---Now return in Kirill's notation  1=E,2=px,3=py,4=pz
     !   This is an expression for (-i)/qsq* (-i) Ub(+/-)) Gamma^\mu V(-/+)
@@ -603,73 +486,6 @@ enddo
     endif
 
   end function v0
-
-
-
-
-      function pol_mass(p,m,i)
-      implicit none
-      integer, intent(in) :: i
-      integer :: pol
-      complex(8), intent(in) :: p(4)
-      complex(8) :: pol_mass(4)
-      real(8),  intent(in) :: m
-      real(8) :: p0,px,py,pz, pv
-      real(8) :: ct,st,cphi,sphi
-
-          p0=dreal(p(1))
-          px=dreal(p(2))
-          py=dreal(p(3))
-          pz=dreal(p(4))
-
-          pv= dsqrt(dabs(p0**2 - m**2))
-          if(pv/m.lt.1d-8) then
-                if(i.eq.0) then
-                    pol_mass(1:4)=(0d0,0d0)
-                    return
-                endif
-                ct = 1d0; st=0d0
-          else
-                ct= pz/pv
-                st= dsqrt(dabs(1.0d0-ct**2))
-          endif
-
-
-          if (st .lt. 1D-15) then
-              cphi=1.0d0
-              sphi=0.0d0
-          else
-              cphi= px/pv/st
-              sphi= py/pv/st
-          endif
-
-
-!         i=0 is longitudinal polarization
-!         the following ifstatement distinguishes between
-!         positive and negative energies
-          if ( p0 .gt. 0.0d0) then
-          pol=i
-          else
-          pol=-i
-          endif
-
-          if(pol .eq. -1.or.pol .eq. 1) then
-              pol_mass(1)=dcmplx(0.0d0,0.0d0)
-              pol_mass(2)=dcmplx(ct*cphi/dsqrt(2d0),-pol*sphi/dsqrt(2d0))
-              pol_mass(3)=dcmplx(ct*sphi/dsqrt(2d0), pol*cphi/dsqrt(2d0))
-              pol_mass(4)=dcmplx(-st/dsqrt(2d0),0.0d0)
-          elseif (pol .eq. 0) then
-              pol_mass(1)= dcmplx(pv/m,0.0d0)
-              pol_mass(2)= dcmplx(p0/m/pv*px,0.0d0)
-              pol_mass(3)= dcmplx(p0/m/pv*py,0.0d0)
-              pol_mass(4)= dcmplx(p0/m/pv*pz,0.0d0)
-          else
-              print *,"wrong helicity setting in pol_mass"
-              stop
-          endif
-
-        end function pol_mass
-
 
 
 

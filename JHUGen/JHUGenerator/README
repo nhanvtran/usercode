@@ -21,13 +21,13 @@ command line parameters:
                   x=4:  X-> W1 W2, W1->lnu,
                   x=5:  X-> W1 W2, W1->2q,
                   x=6:  X-> W1 W2, W1->taunu
-                  x=7:  X-> gamma gamma 
    DataFile=x    (name of the output file), default value: "output"
    Process=x     (gives the resonance spin 0,1 or 2)
    OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness for Higgs, Z/W boson 1/2, resp.), default 000
-   if a parameter is not specified, the default value is chosen
+   if a parameter is not specified, the default value is choosen
 example call:
-   ./JHUGen Collider=1 Process=0 VegasNc1=100000 PChannel=0 OffXVV=011 DecayMode1=0 DecayMode2=0 DataFile=test1
+   ./graviton Collider=1 Process=2 VegasNc1=100000 PChannel=2 DecayMode=0 DataFile=testOutput
+   ./graviton Collider=1 Process=0 OffHZZ=011 VegasNc1=100000 PChannel=1 DecayMode=1 DataFile=testOutput
    * out-of-the-box: output datafile example is "data/outputTest.lhe" and terminal output is "data/outputTest_terminal.txt"
 
 
@@ -42,15 +42,6 @@ setting parameters to identify resonance properties:
 	All couplings are given in the file where they are defined in the paper (http://arxiv.org/abs/1001.3396)
 	Dimensionless couplings are given in Eq.2 (spin 0), Eq.4 (spin 1), Eq.5 [b's] and Eq.6 [c's] (spin 2)
 	Example Scenarios given in Table I.
-
-OffXVV=1XX note:
-      Eq.(7) uses m_V as the pole mass of the Z/W
-      "use_dynamic_MG" in mod_Parameters.F90 =>  
-      .true. (=default), the spin-2 resonance mass with MG^2=(p1+p2)^2, otherwise fixed at M_Reso^2. 
-
-DecayMode2=7 note:
-       Valid for spin-0 and spin-2, only OffXVV=000 or 100 are possible
-       photon couplings c3,c4,c7 are parameters to be specified (M_V=0 and g_9=0 in Eq.(7))
 
 -----------------------------------------
 file descriptions
@@ -68,10 +59,7 @@ cross section file: mod_CrossSection.f90, mod_Graviton.f90, mod_Zprime.f90, mod_
   the routine itself can be found in mod_Kinematics.f90
 
 
------------------------------------------
-Release notes...
------------------------------------------
 
-V2.0.2: Update random seed for gfort
+
 
 

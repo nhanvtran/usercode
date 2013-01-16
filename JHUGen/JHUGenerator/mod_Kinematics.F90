@@ -20,7 +20,6 @@ type(Histogram),allocatable :: Histo(:)
 contains
 
 
-
 SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP)
 use ModParameters
 implicit none
@@ -36,225 +35,169 @@ real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
 real(8) :: ntRnd
 character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
 
-do i=1,9
-!        print *, "my_idup(i) ",MY_IDUP(i)
-LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
-!        print *, "LHE_IDUP(i) ",LHE_IDUP(i)
-enddo
+    do i=1,9
+        LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+    enddo
 
-! NUP changes for gamma gamma final state
-if (LHE_IDUP(4).eq.22) then
-NUP=5
-else
-NUP=9
-endif
+    NUP=9
+    IDPRUP=100
+    XWGTUP=1.
+    SCALUP=1000.
+    AQEDUP=alpha_QED
+    AQCDUP=0d0
 
-IDPRUP=100
-XWGTUP=1.
-SCALUP=1000.
-AQEDUP=alpha_QED
-AQCDUP=0d0
+    ISTUP(1) = - 1
+    ISTUP(2) =  -1
+    ISTUP(3) = 2
+    ISTUP(4) = 2
+    ISTUP(5) = 2
+    ISTUP(6) = 1
+    ISTUP(7) = 1
+    ISTUP(8) = 1
+    ISTUP(9) = 1
 
-ISTUP(1) = - 1
-ISTUP(2) =  -1
-ISTUP(3) = 2
-ISTUP(4) = 2
-ISTUP(5) = 2
-ISTUP(6) = 1
-ISTUP(7) = 1
-ISTUP(8) = 1
-ISTUP(9) = 1
+    MOTHUP(1,1) = 0
+    MOTHUP(2,1) = 0
+    MOTHUP(1,2) = 0
+    MOTHUP(2,2) = 0
+    MOTHUP(1,3) = 1
+    MOTHUP(2,3) = 2
+    MOTHUP(1,4) = 3
+    MOTHUP(2,4) = 3
+    MOTHUP(1,5) = 3
+    MOTHUP(2,5) = 3
+    MOTHUP(1,6) = 4
+    MOTHUP(2,6) = 4
+    MOTHUP(1,7) = 4
+    MOTHUP(2,7) = 4
+    MOTHUP(1,8) = 5
+    MOTHUP(2,8) = 5
+    MOTHUP(1,9) = 5
+    MOTHUP(2,9) = 5
 
-if (LHE_IDUP(4).eq.22) then
-ISTUP(4) = 1
-ISTUP(5) = 1
-endif
+	! Added by Nhan
+	LHE_IDUP(3) = 39 ! X particle
+	Lifetime = 0.0
+	Spin = 1.0
 
+	do a=1,6
+		MomDummy(1,a) = 100.0d0*Mom(1,a)
+		MomDummy(2,a) = 100.0d0*Mom(2,a)
+		MomDummy(3,a) = 100.0d0*Mom(3,a)
+		MomDummy(4,a) = 100.0d0*Mom(4,a)
+        enddo
 
-MOTHUP(1,1) = 0
-MOTHUP(2,1) = 0
-MOTHUP(1,2) = 0
-MOTHUP(2,2) = 0
-MOTHUP(1,3) = 1
-MOTHUP(2,3) = 2
-MOTHUP(1,4) = 3
-MOTHUP(2,4) = 3
-MOTHUP(1,5) = 3
-MOTHUP(2,5) = 3
-MOTHUP(1,6) = 4
-MOTHUP(2,6) = 4
-MOTHUP(1,7) = 4
-MOTHUP(2,7) = 4
-MOTHUP(1,8) = 5
-MOTHUP(2,8) = 5
-MOTHUP(1,9) = 5
-MOTHUP(2,9) = 5
+	do b=1,4
+		Z1FV(b) = MomDummy(b,3)+MomDummy(b,4)
+		Z2FV(b) = MomDummy(b,5)+MomDummy(b,6)
+	enddo
 
-! Added by Nhan
-LHE_IDUP(3) = 39 ! X particle
-Lifetime = 0.0
-Spin = 1.0
+	do c=1,4
+		XFV(c) = Z1FV(c) + Z2FV(c)
+	enddo
 
-do a=1,6
-MomDummy(1,a) = 100.0d0*Mom(1,a)
-MomDummy(2,a) = 100.0d0*Mom(2,a)
-MomDummy(3,a) = 100.0d0*Mom(3,a)
-MomDummy(4,a) = 100.0d0*Mom(4,a)
-enddo
+        tmp = MomDummy(1,1)*MomDummy(1,1)-MomDummy(2,1)*MomDummy(2,1)-MomDummy(3,1)*MomDummy(3,1)-MomDummy(4,1)*MomDummy(4,1)
+        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+	Part1Mass = dSQRT(dabs(tmp))
 
-do b=1,4
-Z1FV(b) = MomDummy(b,3)+MomDummy(b,4)
-Z2FV(b) = MomDummy(b,5)+MomDummy(b,6)
-enddo
+        tmp = MomDummy(1,2)*MomDummy(1,2)-MomDummy(2,2)*MomDummy(2,2)-MomDummy(3,2)*MomDummy(3,2)-MomDummy(4,2)*MomDummy(4,2)
+        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+	Part2Mass = dSQRT(dabs(tmp))
 
-do c=1,4
-XFV(c) = Z1FV(c) + Z2FV(c)
-enddo
+        tmp = XFV(1)*XFV(1)-XFV(2)*XFV(2)-XFV(3)*XFV(3)-XFV(4)*XFV(4)
+        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+	XMass = dSQRT(dabs(tmp))
 
-tmp = MomDummy(1,1)*MomDummy(1,1)-MomDummy(2,1)*MomDummy(2,1)-MomDummy(3,1)*MomDummy(3,1)-MomDummy(4,1)*MomDummy(4,1)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-Part1Mass = dSQRT(dabs(tmp))
+        tmp = Z1FV(1)*Z1FV(1)-Z1FV(2)*Z1FV(2)-Z1FV(3)*Z1FV(3)-Z1FV(4)*Z1FV(4)
+        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+	V1Mass = dSQRT(dabs(tmp))
 
-tmp = MomDummy(1,2)*MomDummy(1,2)-MomDummy(2,2)*MomDummy(2,2)-MomDummy(3,2)*MomDummy(3,2)-MomDummy(4,2)*MomDummy(4,2)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-Part2Mass = dSQRT(dabs(tmp))
+        tmp = Z2FV(1)*Z2FV(1)-Z2FV(2)*Z2FV(2)-Z2FV(3)*Z2FV(3)-Z2FV(4)*Z2FV(4)
+        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+	V2Mass = dSQRT(dabs(tmp))
 
-tmp = XFV(1)*XFV(1)-XFV(2)*XFV(2)-XFV(3)*XFV(3)-XFV(4)*XFV(4)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-XMass = dSQRT(dabs(tmp))
+        tmp = MomDummy(1,3)*MomDummy(1,3)-MomDummy(2,3)*MomDummy(2,3)-MomDummy(3,3)*MomDummy(3,3)-MomDummy(4,3)*MomDummy(4,3)
+        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+	L11Mass = dSQRT(dABS(tmp))
 
-tmp = Z1FV(1)*Z1FV(1)-Z1FV(2)*Z1FV(2)-Z1FV(3)*Z1FV(3)-Z1FV(4)*Z1FV(4)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-V1Mass = dSQRT(dabs(tmp))
-if( V1Mass.lt.1d-5 ) then
-V1Mass=0d0
-endif
+        tmp = MomDummy(1,4)*MomDummy(1,4)-MomDummy(2,4)*MomDummy(2,4)-MomDummy(3,4)*MomDummy(3,4)-MomDummy(4,4)*MomDummy(4,4)
+        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+	L12Mass = dSQRT(dABS(tmp))
 
-tmp = Z2FV(1)*Z2FV(1)-Z2FV(2)*Z2FV(2)-Z2FV(3)*Z2FV(3)-Z2FV(4)*Z2FV(4)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-V2Mass = dSQRT(dabs(tmp))
-if( V2Mass.lt.1d-5 ) then
-V2Mass=0d0
-endif
+        tmp = MomDummy(1,5)*MomDummy(1,5)-MomDummy(2,5)*MomDummy(2,5)-MomDummy(3,5)*MomDummy(3,5)-MomDummy(4,5)*MomDummy(4,5)
+        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+	L21Mass = dSQRT(dABS(tmp))
 
-tmp = MomDummy(1,3)*MomDummy(1,3)-MomDummy(2,3)*MomDummy(2,3)-MomDummy(3,3)*MomDummy(3,3)-MomDummy(4,3)*MomDummy(4,3)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-L12Mass = dSQRT(dABS(tmp))
-if( L12Mass.lt.1d-5 ) then
-L12Mass=0d0
-endif
-if( tmp.lt.0d0 ) then
-MomDummy(1,3) = MomDummy(1,3) + 1d-7
-endif
-
-tmp = MomDummy(1,4)*MomDummy(1,4)-MomDummy(2,4)*MomDummy(2,4)-MomDummy(3,4)*MomDummy(3,4)-MomDummy(4,4)*MomDummy(4,4)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-L11Mass = dSQRT(dABS(tmp))
-if( L11Mass.lt.1d-5 ) then
-L11Mass=0d0
-endif
-if( tmp.lt.0d0 ) then
-MomDummy(1,4) = MomDummy(1,4) + 1d-7
-endif
-
-tmp = MomDummy(1,5)*MomDummy(1,5)-MomDummy(2,5)*MomDummy(2,5)-MomDummy(3,5)*MomDummy(3,5)-MomDummy(4,5)*MomDummy(4,5)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-L22Mass = dSQRT(dABS(tmp))
-if( L22Mass.lt.1d-5 ) then
-L22Mass=0d0
-endif
-if( tmp.lt.0d0 ) then
-MomDummy(1,5) = MomDummy(1,5) + 1d-7
-endif
-
-tmp = MomDummy(1,6)*MomDummy(1,6)-MomDummy(2,6)*MomDummy(2,6)-MomDummy(3,6)*MomDummy(3,6)-MomDummy(4,6)*MomDummy(4,6)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-L21Mass = dSQRT(dABS(tmp))
-if( L21Mass.lt.1d-5 ) then
-L21Mass=0d0
-endif
-if( tmp.lt.0d0 ) then
-MomDummy(1,6) = MomDummy(1,6) + 1d-7
-endif
+        tmp = MomDummy(1,6)*MomDummy(1,6)-MomDummy(2,6)*MomDummy(2,6)-MomDummy(3,6)*MomDummy(3,6)-MomDummy(4,6)*MomDummy(4,6)
+        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+	L22Mass = dSQRT(dABS(tmp))
 
 
-write(14,"(A)") "<event>"
-write(14,"(I1,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+    write(14,"(A)") "<event>"
+    write(14,"(I1,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 
 
 ! parton_a
-i=1
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,1),MomDummy(1,1),Part1Mass,Lifetime,Spin
+    i=1
+    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,1),MomDummy(1,1),Part1Mass,Lifetime,Spin
 
 ! parton_b
-i=2
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,2),MomDummy(1,2),Part2Mass,Lifetime,Spin
+    i=2
+    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,2),MomDummy(1,2),Part2Mass,Lifetime,Spin
 
 ! X
-i=3
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),XFV(2:4),XFV(1),XMass,Lifetime,Spin
+    i=3
+    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),XFV(2:4),XFV(1),XMass,Lifetime,Spin
 
 ! V1
-i=4
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z1FV(2:4),Z1FV(1),V1Mass,Lifetime,Spin
+    i=4
+    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z1FV(2:4),Z1FV(1),V1Mass,Lifetime,Spin
 
 ! V2
-i=5
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,Lifetime,Spin
+    i=5
+    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,Lifetime,Spin
 
 
-! decay product 1 (V1): l-, nu or q
-i=7
-if (LHE_IDUP(i).gt.-9000) then
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L12Mass,Lifetime,Spin
-endif
+! decay product 1 (V1)
+    i=7
+    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L12Mass,Lifetime,Spin
 
-! decay product 2 (V1): l+, nubar or qbar
-i=6
-if (LHE_IDUP(i).gt.-9000) then
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L11Mass,Lifetime,Spin
-endif
+! decay product 2 (V1)
+    i=6
+    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L11Mass,Lifetime,Spin
 
-! decay product 1 (V2): l-, nu or q
-i=9
-if (LHE_IDUP(i).gt.-9000) then
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L22Mass,Lifetime,Spin
-endif
+! decay product 1 (V2)
+    i=9
+    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L22Mass,Lifetime,Spin
 
-! decay product 2 (V2): l+, nubar or qbar
-i=8
-if (LHE_IDUP(i).gt.-9000) then
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
-endif
+! decay product 2 (V2)
+    i=8
+    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
 
-write(14,"(A)") "</event>"
+    write(14,"(A)") "</event>"
 
-! print * ,"check ", LHE_IDUP(6),MomDummy(1:4,4)
-! print * ,"check ", LHE_IDUP(7),MomDummy(1:4,3)
-! print * ,"check ", LHE_IDUP(8),MomDummy(1:4,6)
-! print * ,"check ", LHE_IDUP(9),MomDummy(1:4,5)
-! pause
 
 END SUBROUTINE
 
 
-SUBROUTINE EvalPhasespace_VDecay(VMom,MV,ML1,ML2,xRndPS,MomDK,PSWgt)
+
+SUBROUTINE EvalPhasespace_ZWDecay(ZMom,MZ,xRndPS,MomDK,PSWgt)
 use ModMisc
 use ModParameters
 implicit none
 real(8) :: PSWgt,PSWgt2,PSWgt3
-real(8) :: VMom(1:4),MomChk(1:4,1:3)
+real(8) :: ZMom(1:4),MomChk(1:4,1:3)
 real(8) :: MomDK(1:4,1:2)
-real(8) :: xRndPS(1:2),MV,ML1,ML2
+real(8) :: xRndPS(1:2),MZ
 integer,parameter :: N2=2
 real(8),parameter :: PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
 
 
-      call genps(2,MV,xRndPS(1:2),(/ML1,ML2/),MomDK(1:4,1:2),PSWgt2)
-
-!     boost all guys to the V boson frame:
-      call boost(MomDK(1:4,1),VMom(1:4),MV)
-      call boost(MomDK(1:4,2),VMom(1:4),MV)
+!     MomDK(1:4,i): i= 1:l+, 2:l-
+      call genps(2,MZ,xRndPS(1:2),(/0d0,0d0/),MomDK(1:4,1:2),PSWgt2)
+!     boost all guys to the ZW frame:
+      call boost(MomDK(1:4,1),ZMom(1:4),MZ)
+      call boost(MomDK(1:4,2),ZMom(1:4),MZ)
       PSWgt = PSWgt2*PiWgt2
 
 RETURN
@@ -264,7 +207,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE EvalPhasespace_2to2(EHat,Masses,xRndPS,Mom,PSWgt)
+SUBROUTINE EvalPhasespace_2to2ZW(EHat,Masses,xRndPS,Mom,PSWgt)
 use ModMisc
 use ModParameters
 implicit none
@@ -426,192 +369,89 @@ SUBROUTINE Kinematics(NumPart,MomExt,MomDK,applyPSCut,NBin)
 use ModMisc
 use ModParameters
 implicit none
-real(8) :: MomExt(:,:),MomDK(:,:), mZ1, mZ2, MReso
-real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
-real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
+real(8) :: MomExt(:,:),MomDK(:,:), mZ1, mZ2, MG
+real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),MomZ(1:4),MomG(1:4)
+real(8) :: MomLept(1:4,1:4)
 logical :: applyPSCut
 integer :: NumPart,NBin(:)
-real(8) :: pT_lepM,pT_lepP,y_lepM,y_lepP,MomFerm(1:4),MomZ2(1:4),MomReso(1:4),CosTheta1,Phi,Phi1,signPhi,signPhi1
-real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
+real(8) :: pT_lepM,pT_lepP
+real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ
 
-
-!  W^+/Z(MomExt(:,3))    -->    e^+(MomDK(:,2)) + nu_e(MomDK(:,1))       /   e^+(MomDK(:,2)) + e^-(MomDK(:,1))
-!  W^-/Z(MomExt(:,4))    -->    e^-(MomDK(:,3)) + nubar_e(MomDK(:,4))    /   e^-(MomDK(:,3)) + e^+(MomDK(:,4))
-
-!   MomDK(:,i): i=1 fermion
-!   MomDK(:,i): i=2 anti-fermion
-!   MomDK(:,i): i=3 fermion'
-!   MomDK(:,i): i=4 anti-fermion'
 
       applyPSCut = .false.
 
+!--- compute the invariant mass of the ``graviton''
+
+      mG = sqrt(2d0*(MomExt(1,1)*MomExt(1,2) - MomExt(2,1)*MomExt(2,2)   &
+      - MomExt(3,1)*MomExt(3,2) - MomExt(4,1)*MomExt(4,2)))
+
+!--- compute the invariant mass of the two pairs of leptons -- the ``Z'' masses
+      mZ1 = sqrt(2d0*(MomDK(1,1)*MomDK(1,2) - MomDK(2,1)*MomDK(2,2) &
+      - MomDK(3,1)*MomDK(3,2)  - MomDK(4,1)*MomDK(4,2)))
+
+      mZ2 = sqrt(2d0*(MomDK(1,3)*MomDK(1,4) - MomDK(2,3)*MomDK(2,4) &
+      - MomDK(3,3)*MomDK(3,4)  - MomDK(4,3)*MomDK(4,4)))
 
 
+!  eval kinematic variables
+!     angle
+      MomBoost(1)   =+MomExt(1,3)
+      MomBoost(2:4) =-MomExt(2:4,3)
 
-!--- compute the invariant mass of the resonance
-      MReso = sqrt(abs(   2d0*(MomExt(1:4,1).dot.MomExt(1:4,2))  ))
+      MomLepP(1:4)  = MomDK(1:4,1)
+      call boost(MomLepP(1:4),MomBoost(1:4),mZ1)
 
+      MomZ(1:4) = MomExt(1:4,4)
+      call boost(MomZ(1:4),MomBoost(1:4),mZ1)
 
+      CosPhi_LepPZ = (MomLepP(2)*MomZ(2)+MomLepP(3)*MomZ(3)  &
+      +MomLepP(4)*MomZ(4))/MomLepP(1)/dsqrt(MomZ(1)**2-mZ2**2)
 
-! !     associte lepton pairs 
-!       mZ1 = Get_MInv( MomDK(1:4,1)+MomDK(1:4,2) )
-!       mZ2 = Get_MInv( MomDK(1:4,1)+MomDK(1:4,4) )
-!       if( dabs(mZ1-m_V) .lt. dabs(mZ2-m_V)  ) then
-!           MomLept(1:4,1) = MomDK(1:4,1)
-!           MomLept(1:4,2) = MomDK(1:4,2)
-!           MomLept(1:4,3) = MomDK(1:4,3)
-!           MomLept(1:4,4) = MomDK(1:4,4)
-!       else
-!           MomLept(1:4,1) = MomDK(1:4,1)
-!           MomLept(1:4,2) = MomDK(1:4,4)
-!           MomLept(1:4,3) = MomDK(1:4,3)
-!           MomLept(1:4,4) = MomDK(1:4,2)
-!       endif
-      
-!     MC truth for lepton pairs 
-      MomLept(1:4,1:4) = MomDK(1:4,1:4)
+!     pT of leptons
+      pT_lepP = get_PT(MomDK(1:4,1))
+      pT_lepM = get_PT(MomDK(1:4,2))
 
+!     angle between lepton planes
+!      MomLepP(2:4) = MomDK(2:4,1).cross.MomDK(2:4,2)
+!      MomLepP(2:4) = MomLepP(2:4)/dsqrt( MomLepP(2)**2+MomLepP(3)**2+MomLepP(4)**2 )
+!      MomLepM(2:4) = MomDK(2:4,3).cross.MomDK(2:4,4)
+!      MomLepM(2:4) = MomLepM(2:4)/dsqrt( MomLepM(2)**2+MomLepM(3)**2+MomLepM(4)**2 )
 
-!--- compute the invariant mass of the two vector bosons, assuming Z1->l1+l2 and Z2->l3+l4
-      mZ1 = sqrt(abs( 2d0*(MomLept(1:4,1).dot.MomLept(1:4,2))  ))
-      mZ2 = sqrt(abs( 2d0*(MomLept(1:4,3).dot.MomLept(1:4,4))  ))
+      MomG(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
+      MomBoost(1)   =+MomG(1)
+      MomBoost(2:4) =-MomG(2:4)
+      MomLept = MomDK
+      call boost(MomLept(1:4,1),MomBoost(1:4),mG)
+      call boost(MomLept(1:4,2),MomBoost(1:4),mG)
+      call boost(MomLept(1:4,3),MomBoost(1:4),mG)
+      call boost(MomLept(1:4,4),MomBoost(1:4),mG)
 
+      MomLepP(2:4) = MomLept(2:4,1).cross.MomLept(2:4,2)
+      MomLepP(2:4) = MomLepP(2:4)/dsqrt( MomLepP(2)**2+MomLepP(3)**2+MomLepP(4)**2 )
+      MomLepM(2:4) = MomLept(2:4,3).cross.MomLept(2:4,4)
+      MomLepM(2:4) = MomLepM(2:4)/dsqrt( MomLepM(2)**2+MomLepM(3)**2+MomLepM(4)**2 )
 
+      CosPhi_LepPlanes = acos(MomLepP(2)*MomLepM(2)+MomLepP(3)*MomLepM(3)+MomLepP(4)*MomLepM(4))
 
+!     scattering angle of Z in graviton rest frame
+      MomG(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
+      MomBoost(1)   =+MomG(1)
+      MomBoost(2:4) =-MomG(2:4)
+      MomZ(1:4) = MomExt(1:4,4)
+      call boost(MomZ(1:4),MomBoost(1:4),mG)
+      CosThetaZ = MomZ(4)/dsqrt(MomZ(2)**2+MomZ(3)**2+MomZ(4)**2)
 
-
-!   compute pT of leptons in the lab frame
-      pT_lepP = get_PT(MomLept(1:4,2))
-      pT_lepM = get_PT(MomLept(1:4,3))
-
-      y_lepP = get_eta(MomLept(1:4,2))
-      y_lepM = get_eta(MomLept(1:4,3))
-
-
-
-
-
-
-! construct cos(theta1): angle between direction of fermion from Z1 and negative direction of opposite Z in Z1 rest frame
-
-      MomBoost(1)   = +MomExt(1,3)
-      MomBoost(2:4) = -MomExt(2:4,3)
-
-      MomFerm(1:4)  = MomLept(1:4,1)
-      call boost(MomFerm(1:4),MomBoost(1:4),mZ1)! boost fermion from Z1 into Z1 rest frame
-
-      MomZ2(1) = MomExt(1,4)
-      MomZ2(2:4) = -MomExt(2:4,4)
-      call boost(MomZ2(1:4),MomBoost(1:4),mZ1)! boost -Z2 into Z1 rest frame
-
-      CosTheta1 = Get_CosAlpha( MomFerm(1:4),MomZ2(1:4) )
-
-
-
-
-
-
-! construct Phi: angle between lepton planes in resonance rest frame
-!                equivalent to angle between normal vectors of lepton planes in resonance rest frame
-
-      MomReso(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
-      MomBoost(1)   = +MomReso(1)
-      MomBoost(2:4) = -MomReso(2:4)
-      MomLeptX(1:4,1:4) = MomLept(1:4,1:4)
-      ScatteringAxis(1:4) = MomExt(1:4,3)
-      call boost(MomLeptX(1:4,1),MomBoost(1:4),MReso)! boost all leptons into the resonance frame
-      call boost(MomLeptX(1:4,2),MomBoost(1:4),MReso)
-      call boost(MomLeptX(1:4,3),MomBoost(1:4),MReso)
-      call boost(MomLeptX(1:4,4),MomBoost(1:4),MReso)
-      call boost(ScatteringAxis(1:4),MomBoost(1:4),MReso)
-
-
-!     orthogonal vectors defined as p(fermion) x p(antifermion)
-      MomLeptPlane1(2:4) = (MomLeptX(2:4,1)).cross.(MomLeptX(2:4,2))! orthogonal vector to lepton plane
-      MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt( MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 )! normalize
-      
-      MomLeptPlane2(2:4) = (MomLeptX(2:4,3)).cross.(MomLeptX(2:4,4))! orthogonal vector to lepton plane
-      MomLeptPlane2(2:4) = MomLeptPlane2(2:4)/dsqrt( MomLeptPlane2(2)**2+MomLeptPlane2(3)**2+MomLeptPlane2(4)**2 )! normalize
-
-!     get the sign
-      dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomLeptPlane2(2:4))
-      signPhi = sign(1d0,  (dummy(2)*ScatteringAxis(2)+dummy(3)*ScatteringAxis(3)+dummy(4)*ScatteringAxis(4))  )! use q1
-
-      Phi = signPhi * acos(-1d0*(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4)))
-
-!print *, "phi",phi
-!pause
-
-! phi(ll)
-! Phi = acos((MomLept(2,2)*MomLept(2,3) + MomLept(3,2)*MomLept(3,3))/dsqrt(MomLept(2,2)**2+MomLept(3,2)**2)/dsqrt(MomLept(2,3)**2+MomLept(3,3)**2) )
-
-
-
-
-! construct cos(theta*):    scattering angle of Z's in graviton rest frame
-
-      MomReso(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
-      MomBoost(1)   = +MomReso(1)
-      MomBoost(2:4) = -MomReso(2:4)
-      MomZ2(1:4) = MomExt(1:4,4)
-!       if( mz1.lt.mz2 ) then 
-!           MomZ2(1:4) = MomExt(1:4,3)
-!       else
-!           MomZ2(1:4) = MomExt(1:4,4)          
-!       endif
-      call boost(MomZ2(1:4),MomBoost(1:4),MReso)
-      CosThetaStar = Get_CosTheta( MomZ2(1:4) )
-
-! print *, MomReso(1:4)
-!       MomZ2(1:4) = MomReso(1:4)
-!       call boost(MomZ2(1:4),MomBoost(1:4),MReso)
-! print *, MomZ2(1:4)
-! pause
-
-
-
-! construct Phi1:  angle between beam-scattering plane and the lepton plane of Z1 in the resonance rest frame
-
-      BeamAxis(1:4) = (/1d0,0d0,0d0,1d0/)!  energy components are dummies here and will not be used
-      ScatteringAxis(1:4) = MomExt(1:4,3)
-      MomReso(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
-      MomBoost(1)   = +MomReso(1)
-      MomBoost(2:4) = -MomReso(2:4)
-!       call boost(BeamAxis(1:4),MomBoost(1:4),MReso)
-      call boost(ScatteringAxis(1:4),MomBoost(1:4),MReso)
-
-
-      MomBeamScatterPlane(2:4) = (BeamAxis(2:4)).cross.(ScatteringAxis(2:4))! orthogonal vector to beam-scattering plane
-      MomBeamScatterPlane(2:4) = MomBeamScatterPlane(2:4)/dsqrt( MomBeamScatterPlane(2)**2+MomBeamScatterPlane(3)**2+MomBeamScatterPlane(4)**2 ) 
-
-!     get the sign
-      dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomBeamScatterPlane(2:4))
-      signPhi1 = sign(1d0,  (dummy(2)*ScatteringAxis(2)+dummy(3)*ScatteringAxis(3)+dummy(4)*ScatteringAxis(4))  )! use q1
-
-      Phi1 = signPhi1 * acos(MomLeptPlane1(2)*MomBeamScatterPlane(2) + MomLeptPlane1(3)*MomBeamScatterPlane(3) + MomLeptPlane1(4)*MomBeamScatterPlane(4))
-
-
-
+!     lepton invariant mass distribuion - should be Breit-Wignher
 
 !     binning
-      NBin(1)  = WhichBin(1,pT_lepP)
-      NBin(2)  = WhichBin(2,pT_lepM)
-      NBin(3)  = WhichBin(3,y_lepP)
-      NBin(4)  = WhichBin(4,y_lepM)
-      NBin(5)  = WhichBin(5,CosThetaStar)
-      NBin(6)  = WhichBin(6,Phi1)
-      NBin(7)  = WhichBin(7,CosTheta1)
-      NBin(8)  = WhichBin(8,Phi)
-
-if( mz1.gt.mz2 ) then 
-      NBin(9)  = WhichBin(9,mZ2)
-      NBin(10) = WhichBin(10,mZ1)
-else
-      NBin(9)  = WhichBin(9,mZ1)
-      NBin(10) = WhichBin(10,mZ2)
-endif
-
-      NBin(11) = WhichBin(11,mReso)
+      NBin(1) = WhichBin(1,pT_lepP)
+      NBin(2) = WhichBin(2,pT_lepM)
+      NBin(3) = WhichBin(3,CosPhi_LepPZ)
+      NBin(4) = WhichBin(4,CosPhi_LepPlanes)
+      NBin(5) = WhichBin(5,CosThetaZ)
+      NBin(6) = WhichBin(6,mZ1)
+      NBin(7) = WhichBin(7,mZ2)
+      NBin(8) = WhichBin(8,mG)
 
 return
 END SUBROUTINE
@@ -741,7 +581,6 @@ real(8) :: DKRnd
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
 !
 
-
    if( DecayMode1.eq.0 ) then! Z1->2l
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
@@ -784,10 +623,6 @@ real(8) :: DKRnd
         MY_IDUP(4) = Wp_
         MY_IDUP(6) = TaP_
         MY_IDUP(7) = NuT_
-   elseif( DecayMode1.eq.7 ) then! photon
-        MY_IDUP(4) = Pho_
-        MY_IDUP(6) = -9999
-        MY_IDUP(7) = -9999
    endif
 
 
@@ -833,10 +668,6 @@ real(8) :: DKRnd
         MY_IDUP(5) = Wm_
         MY_IDUP(8) = ANuT_
         MY_IDUP(9) = TaM_
-   elseif( DecayMode2.eq.7 ) then! photon
-        MY_IDUP(5) = Pho_
-        MY_IDUP(8) = -9999
-        MY_IDUP(9) = -9999
    endif
 
 
@@ -864,32 +695,6 @@ real(8) :: Value
 
 RETURN
 END FUNCTION
-
-
-
-
-
-FUNCTION WhichXBin(NHisto,XValue)
-use ModParameters
-implicit none
-integer :: WhichXBin,NHisto
-real(8) :: XValue
-integer :: i
-include "vegas_common.f"
-
-    whichxbin = int( xValue*NPart )!  uniform distribution
-
-
-!    do i=1,50!                         distribution according to vegas grid
-!       if( XValue .lt. xi(i,NHisto) ) then
-!           WhichXBin=i
-!           return
-!       endif
-!    enddo
-RETURN
-END FUNCTION
-
-
 
 
 

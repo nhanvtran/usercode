@@ -197,11 +197,7 @@ const double TwoPi=2.0*M_PI;
    cosT  = 2.0*XRan[1]-1.0;
    sinT = 2.0*sqrt( XRan[1]*(1.0-XRan[1]) );
 
-   //sincos(TwoPi*XRan[0], &sinP, &cosP);
-   sinP=sin(TwoPi*XRan[0]);
-   cosP=cos(TwoPi*XRan[0]);
-
-
+   sincos(TwoPi*XRan[0], &sinP, &cosP);
    absVec = kappa( *Energy, (*Mass), *MInv );
 
    Mom[0] = sqrt( sq((*Mass)) + sq(absVec) );
