@@ -14,7 +14,8 @@ from BoostedWSamples import *
 #from BoostedWSamples_ele import * 
 from trainingClass import *
 #from BoostedWSmallTreeSamples import *
-from BoostedWUtils import *
+
+#from BoostedWUtils import *
 
 #from helperUtils import *
 
@@ -71,7 +72,9 @@ if __name__ == '__main__':
     elif CHANNEL == 'mu':
         LUMI = 5.3;#14.0
 
-    sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/"
+#    sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/"
+    sourcefiledirectory = "/uscms_data/d2/andersj/Wjj/2012/data/Moriond2013/ReducedTrees/";    
+
     treename = ""
     if options.makeControlPlots or options.makeTTBarControlPlots: 
        sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/"
@@ -131,12 +134,12 @@ if __name__ == '__main__':
         #WJetsSample.createTrainingTree();
 
         #datasample.createTrainingTree();
-        #ggH600Sample.createTrainingTree();
+        ggH600Sample.createTrainingTree();
         #ggH700Sample.createTrainingTree();        
         #ggH800Sample.createTrainingTree();        
         #ggH900Sample.createTrainingTree();        
         #ggH1000Sample.createTrainingTree();        
-        WJets_HerwigSample.createTrainingTree();
+        #WJets_HerwigSample.createTrainingTree();
         #WJetsSample.createTrainingTree();
         #ZJetsSample.createTrainingTree();
         #TTbarSample.createTrainingTree();
@@ -328,9 +331,9 @@ if __name__ == '__main__':
 #    listOfTrainingVariables17 = ["jet_massdrop_pr","jet_qjetvol"];
 #    WWTraining17 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables17, "massdropqjet" );
 #    
-    listOfTrainingVariables18 = ["jet_qjetvol","jet_tau2tau1"];
-    WWTraining18 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables18,trainingMethod,"tau2tau1qjet" );
-    ungroomed_WWTraining18 = ungroomed_trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables18,trainingMethod,"tau2tau1qjet" );
+#    listOfTrainingVariables18 = ["jet_qjetvol","jet_tau2tau1"];
+#    WWTraining18 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables18,trainingMethod,"tau2tau1qjet" );
+#    ungroomed_WWTraining18 = ungroomed_trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables18,trainingMethod,"tau2tau1qjet" );
 #     
 #    listOfTrainingVariables19 = ["jet_massdrop_pr","jet_qjetvol","jet_tau2tau1","jet_pt1frac"];
 #    WWTraining19 = trainingClass( signalTrainingTreeName, backgroundTrainingTreeNames, listOfTrainingVariables19, "simplesubjet1pt" );

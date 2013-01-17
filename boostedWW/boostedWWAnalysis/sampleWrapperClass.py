@@ -22,6 +22,8 @@ from array import array
 import math
 from optparse import OptionParser
 
+from bsmReweighter import *
+
 ### ------------ h e l p e r s --------------------
 
 def getListRMS(list):
@@ -48,6 +50,17 @@ class sampleWrapperClass:
         self.Label_ = label;
         self.Channel_ = channel
         self.OFileName_ = "trainingtrees_"+channel+"/ofile_"+label+".root";
+    
+        # initialization for doing BSM reweighting
+        self.SignalMass_ = -1;
+        if file.find("HWW") > 0 and file.find("600") > 0: self.SignalMass_ = 600;
+        if file.find("HWW") > 0 and file.find("700") > 0: self.SignalMass_ = 700;
+        if file.find("HWW") > 0 and file.find("800") > 0: self.SignalMass_ = 800;
+        if file.find("HWW") > 0 and file.find("900") > 0: self.SignalMass_ = 900;    
+        if file.find("HWW") > 0 and file.find("1000") > 0: self.SignalMass_ = 1000;   
+        self.FitSMSignal = False;
+        self.FitSMSignal_mean = -1;
+        self.FitSMSignal_gamma = -1;
             
     def createTrainingTree(self):
         
@@ -75,6 +88,27 @@ class sampleWrapperClass:
 #        
 #        # fill histograms
 #        self.fillHistograms(True);
+
+    ### produce weights for alternative models
+    def GetInteferenceWeights(self, mass, Cprime, BRnew=0):
+        
+        massin = self.SignalMass_;
+        if massin < 0: return;
+        
+        massmin = {600:200,700:200,800:400,900:400,1000:400};
+        massmax = {600:1000,700:1200,800:1400,900:1600,1000:1800};
+
+        # read in original file and get lineshape 
+        if not self.FitSMSignal: 
+            fitSM = FitMassPoint(self.FileName_, massin, massmin[massin], massmax[massin]);
+            self.FitSMSignal_mean = fitSM[0];
+            self.FitSMSignal_gamma = fitSM[1];
+            self.FitSMSignal = True;
+    
+        # create a weight for the given event after switch is turned
+        weight_width = lineshapeWidthReweight(mass, self.FitSMSignal_mean, self.FitSMSignal_gamma, Cprime/(1.-BRnew), massmin[massin], massmax[massin]);
+        weight_xs = Cprime*(1-BRnew);   
+        return (weight_width*weight_xs);
 
     ### ------------------------------------------------
     def createBRDTree(self):
@@ -200,6 +234,25 @@ class sampleWrapperClass:
         #otree.Branch("ungroomedwjettaggerpt200_275", ungroomedwjettaggerpt200_275_, "ungroomedwjettaggerpt200_275/F")
         #otree.Branch("ungroomedwjettaggerpt275_500", ungroomedwjettaggerpt275_500_, "ungroomedwjettaggerpt275_500/F")
 
+        ##########################
+        # variables for BSM reweighting
+        genHMass_ = array( 'f', [ 0. ] );              
+        bsmReweight_cPrime01_brNew00_ = array( 'f', [ 0. ] );      
+        bsmReweight_cPrime02_brNew00_ = array( 'f', [ 0. ] );      
+        bsmReweight_cPrime03_brNew00_ = array( 'f', [ 0. ] );      
+        bsmReweight_cPrime04_brNew00_ = array( 'f', [ 0. ] );      
+        bsmReweight_cPrime05_brNew00_ = array( 'f', [ 0. ] );      
+        bsmReweight_cPrime07_brNew00_ = array( 'f', [ 0. ] );      
+        bsmReweight_cPrime10_brNew00_ = array( 'f', [ 0. ] );              
+        otree.Branch("genHMass", genHMass_ , "genHMass/F");        
+        otree.Branch("bsmReweight_cPrime01_brNew00", bsmReweight_cPrime01_brNew00_ , "bsmReweight_cPrime01_brNew00/F");        
+        otree.Branch("bsmReweight_cPrime02_brNew00", bsmReweight_cPrime02_brNew00_ , "bsmReweight_cPrime02_brNew00/F");        
+        otree.Branch("bsmReweight_cPrime03_brNew00", bsmReweight_cPrime03_brNew00_ , "bsmReweight_cPrime03_brNew00/F");        
+        otree.Branch("bsmReweight_cPrime04_brNew00", bsmReweight_cPrime04_brNew00_ , "bsmReweight_cPrime04_brNew00/F");        
+        otree.Branch("bsmReweight_cPrime05_brNew00", bsmReweight_cPrime05_brNew00_ , "bsmReweight_cPrime05_brNew00/F");        
+        otree.Branch("bsmReweight_cPrime07_brNew00", bsmReweight_cPrime07_brNew00_ , "bsmReweight_cPrime07_brNew00/F");        
+        otree.Branch("bsmReweight_cPrime10_brNew00", bsmReweight_cPrime10_brNew00_ , "bsmReweight_cPrime10_brNew00/F");        
+        ##########################
         prefix = self.JetPrefix_;
         
         NLoop = min(self.NTree_,1e9);
@@ -265,14 +318,22 @@ class sampleWrapperClass:
 
         for i in range(NLoop):
             
-            if i % 100000 == 0: print "i = ", i
+            if i % 10000 == 0: print "i = ", i
             
             self.InputTree_.GetEntry(i);
                         
             # make cuts
             #if getattr( self.InputTree_, "W_pt" ) > 180 and getattr( self.InputTree_, "GroomedJet_CA8_pt_pr" )[0] > 180 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_metMVA_met" ) > 50:
-            if getattr( self.InputTree_, "W_pt" ) > 180 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 180 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_metMVA_met" ) > 50:
-                            
+            leptonCut = 30;
+            leptonCutString = "W_muon_pt";
+            metCut = 50;
+            if self.Channel_ == "el": 
+                leptonCut = 35;    
+                leptonCutString = "W_electron_pt";
+                metCut = 70;
+
+            if getattr( self.InputTree_, "W_pt" ) > 200 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut and getattr( self.InputTree_, "numPFCorJetBTags") == 0 and getattr( self.InputTree_, "GroomedJet_CA8_deltaphi_METca8jet") > 2.0 and getattr( self.InputTree_, "GroomedJet_CA8_deltaR_lca8jet") > 1.57:
+ 
                 effwt = getattr( self.InputTree_, "effwt" );
                 puwt = getattr( self.InputTree_, "puwt" ); 
                 totSampleWeight = 1.;
@@ -306,6 +367,16 @@ class sampleWrapperClass:
                 avecomplexpolewtggH1000 = getattr(self.InputTree_,"avecomplexpolewtggH1000"); 
                 infe_Weight_H1000 = complexpolewtggH1000*interferencewtggH1000/avecomplexpolewtggH1000;
 
+                # produce weights for alternative models
+                genHMass_[0] = getattr(self.InputTree_,"W_H_mass_gen");
+                bsmReweight_cPrime01_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.1, 0. );
+                bsmReweight_cPrime02_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.2, 0. );
+                bsmReweight_cPrime03_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.3, 0. );
+                bsmReweight_cPrime04_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.4, 0. );                
+                bsmReweight_cPrime05_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.5, 0. );
+                bsmReweight_cPrime07_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.7, 0. );
+                bsmReweight_cPrime10_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 1.0, 0. );                
+                
                 
                 ###################################
                 # make training tree
@@ -436,6 +507,7 @@ class sampleWrapperClass:
 
 
         self.InputTree_.SetBranchStatus("event_metMVA_met",1);
+        self.InputTree_.SetBranchStatus("event_met_pfmet",1);
         self.InputTree_.SetBranchStatus("event_nPV",1);
         self.InputTree_.SetBranchStatus("boostedW_lvj_m",1);
         self.InputTree_.SetBranchStatus("W_pt",1);
@@ -466,6 +538,7 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus(prefix + "_deltaphi_METca8jet",1);
         self.InputTree_.SetBranchStatus(prefix + "_deltaphi_Vca8jet",1);
 
+        self.InputTree_.SetBranchStatus("W_H_mass_gen",1)
         self.InputTree_.SetBranchStatus("avecomplexpolewtggH600",1)
         self.InputTree_.SetBranchStatus("avecomplexpolewtggH700",1)
         self.InputTree_.SetBranchStatus("avecomplexpolewtggH800",1)
