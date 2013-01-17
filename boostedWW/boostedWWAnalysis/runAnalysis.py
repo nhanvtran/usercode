@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
     treename = ""
     if options.makeControlPlots or options.makeTTBarControlPlots: 
-       sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/"
+       sourcefiledirectory = "/uscms_data/d2/andersj/Wjj/2012/data/Moriond2013/ReducedTrees/"
        treename = "WJet"
     if options.makeTMVAPlots:
        sourcefiledirectory = "/uscms_data/d3/weizou/VBFHiggsAnalysis/BoostedWAnalysis2012/boostedWWAnalysis/trainingtrees_%s/"%(CHANNEL)
@@ -133,25 +133,25 @@ if __name__ == '__main__':
         # create training tree
         #WJetsSample.createTrainingTree();
 
-        #datasample.createTrainingTree();
+        datasample.createTrainingTree();
         ggH600Sample.createTrainingTree();
-        #ggH700Sample.createTrainingTree();        
-        #ggH800Sample.createTrainingTree();        
-        #ggH900Sample.createTrainingTree();        
-        #ggH1000Sample.createTrainingTree();        
-        #WJets_HerwigSample.createTrainingTree();
-        #WJetsSample.createTrainingTree();
-        #ZJetsSample.createTrainingTree();
-        #TTbarSample.createTrainingTree();
-        #WWSample.createTrainingTree();
-        #WZSample.createTrainingTree();
-        #ZZSample.createTrainingTree();
-        #tchSample.createTrainingTree();
-        #tWchSample.createTrainingTree();
-        #schSample.createTrainingTree();
-        #tch_barSample.createTrainingTree();
-        #tWch_barSample.createTrainingTree();
-        #sch_barSample.createTrainingTree();
+        ggH700Sample.createTrainingTree();        
+        ggH800Sample.createTrainingTree();        
+        ggH900Sample.createTrainingTree();        
+        ggH1000Sample.createTrainingTree();        
+        WJets_HerwigSample.createTrainingTree();
+        WJetsSample.createTrainingTree();
+        ZJetsSample.createTrainingTree();
+        TTbarSample.createTrainingTree();
+        WWSample.createTrainingTree();
+        WZSample.createTrainingTree();
+        ZZSample.createTrainingTree();
+        tchSample.createTrainingTree();
+        tWchSample.createTrainingTree();
+        schSample.createTrainingTree();
+        tch_barSample.createTrainingTree();
+        tWch_barSample.createTrainingTree();
+        sch_barSample.createTrainingTree();
 
     #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
     #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, datasample );    

@@ -137,6 +137,7 @@ class sampleWrapperClass:
         l_pt_ = array( 'f', [ 0. ] );
         l_eta_ = array( 'f', [ 0. ] );        
         mvaMET_ = array( 'f', [ 0. ] );                
+        pfMET_ = array( 'f', [ 0. ] );                
         nPV_ = array( 'f', [ 0. ] );                        
         totalEventWeight_ = array( 'f', [ 0. ] );                                
         eff_and_pu_Weight_ = array( 'f', [ 0. ] );                                
@@ -191,6 +192,7 @@ class sampleWrapperClass:
         otree.Branch("l_pt", l_pt_ , "l_pt/F");
         otree.Branch("l_eta", l_eta_ , "l_eta/F");
         otree.Branch("mvaMET", mvaMET_ , "mvaMET/F");
+        otree.Branch("pfMET", pfMET_ , "pfMET/F");        
         otree.Branch("nPV", nPV_ , "nPV/F");
         otree.Branch("totalEventWeight", totalEventWeight_ , "totalEventWeight/F");
         otree.Branch("eff_and_pu_Weight", eff_and_pu_Weight_ , "eff_and_pu_Weight/F");
@@ -368,14 +370,24 @@ class sampleWrapperClass:
                 infe_Weight_H1000 = complexpolewtggH1000*interferencewtggH1000/avecomplexpolewtggH1000;
 
                 # produce weights for alternative models
-                genHMass_[0] = getattr(self.InputTree_,"W_H_mass_gen");
-                bsmReweight_cPrime01_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.1, 0. );
-                bsmReweight_cPrime02_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.2, 0. );
-                bsmReweight_cPrime03_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.3, 0. );
-                bsmReweight_cPrime04_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.4, 0. );                
-                bsmReweight_cPrime05_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.5, 0. );
-                bsmReweight_cPrime07_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.7, 0. );
-                bsmReweight_cPrime10_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 1.0, 0. );                
+                if self.SignalMass_ > 0:
+                    genHMass_[0] = getattr(self.InputTree_,"W_H_mass_gen");
+                    bsmReweight_cPrime01_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.1, 0. );
+                    bsmReweight_cPrime02_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.2, 0. );
+                    bsmReweight_cPrime03_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.3, 0. );
+                    bsmReweight_cPrime04_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.4, 0. );                
+                    bsmReweight_cPrime05_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.5, 0. );
+                    bsmReweight_cPrime07_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.7, 0. );
+                    bsmReweight_cPrime10_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 1.0, 0. );                
+                else:   
+                    genHMass_[0] = -1;
+                    bsmReweight_cPrime01_brNew00_[0] = -1;
+                    bsmReweight_cPrime02_brNew00_[0] = -1;
+                    bsmReweight_cPrime03_brNew00_[0] = -1;
+                    bsmReweight_cPrime04_brNew00_[0] = -1;
+                    bsmReweight_cPrime05_brNew00_[0] = -1;
+                    bsmReweight_cPrime07_brNew00_[0] = -1;
+                    bsmReweight_cPrime10_brNew00_[0] = -1;
                 
                 
                 ###################################
@@ -394,6 +406,7 @@ class sampleWrapperClass:
                     l_eta_[0] = getattr( self.InputTree_, "W_electron_eta" );
 
                 mvaMET_[0] = getattr( self.InputTree_, "event_metMVA_met" );
+                pfMET_[0] = getattr( self.InputTree_, "event_met_pfmet" );        
                 nPV_[0] = getattr( self.InputTree_, "event_nPV" );
                 totalEventWeight_[0] = totSampleWeight;
                 eff_and_pu_Weight_[0] = effwt*puwt;
@@ -538,7 +551,7 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus(prefix + "_deltaphi_METca8jet",1);
         self.InputTree_.SetBranchStatus(prefix + "_deltaphi_Vca8jet",1);
 
-        self.InputTree_.SetBranchStatus("W_H_mass_gen",1)
+        if self.SignalMass_ > 0: self.InputTree_.SetBranchStatus("W_H_mass_gen",1)
         self.InputTree_.SetBranchStatus("avecomplexpolewtggH600",1)
         self.InputTree_.SetBranchStatus("avecomplexpolewtggH700",1)
         self.InputTree_.SetBranchStatus("avecomplexpolewtggH800",1)

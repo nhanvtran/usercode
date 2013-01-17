@@ -36,8 +36,8 @@ class Samples:
               self.filenames["data"] = self.filepath + "RD_WmunuJets_DataAll_GoldenJSON_5p3invfb.root"
               #self.filenames["data"] = self.filepath + "RD_WmunuJets_DataAll_GoldenJSON_14p0invfb.root"
               self.filenames["TTbar"] = self.filepath + "RD_mu_TTbar_CMSSW532.root"
-              self.filenames["WJets"] = self.filepath + "RD_mu_WpJPt100_CMSSW532.root"
-              self.filenames["WJets_Herwig"] = "/uscms_data/d3/zixu/Data/HerwigWJets/RD_mu_HerwigWpJ_CMSSW532.root"#herwig++ WJets
+              self.filenames["WJets"] = self.filepath + "RD_mu_WJets_madgraph_CMSSW532.root"
+              self.filenames["WJets_Herwig"] = self.filepath + "RD_mu_WJets_herwig_CMSSW532.root";
               self.filenames["ZJets"] = self.filepath + "RD_mu_ZpJ_CMSSW532.root"
               self.filenames["tch"] = self.filepath + "RD_mu_STopT_T_CMSSW532.root"
               self.filenames["tWch"] = self.filepath + "RD_mu_STopTW_T_CMSSW532.root"
@@ -57,8 +57,8 @@ class Samples:
               #self.filenames["data"] = self.filepath + "RD_WenuJets_DataAllSingleElectronTrigger_GoldenJSON_13p9invfb.root"
               self.filenames["data"] = "/uscms_data/d3/zixu/Data/RD_Tree_data12_ele/RD_WenuJets_DataAllSingleElectronTrigger_GoldenJSON_5p145.root"
               self.filenames["TTbar"] = self.filepath + "RD_el_TTbar_CMSSW532.root";
-              self.filenames["WJets"] = self.filepath + "RD_el_WpJPt100_CMSSW532.root";
-              self.filenames["WJets_Herwig"] = "/uscms_data/d3/zixu/Data/HerwigWJets/RD_el_HerwigWpJ_CMSSW532.root"#herwig++ WJets
+              self.filenames["WJets"] = self.filepath + "RD_el_WJets_madgraph_CMSSW532.root";
+              self.filenames["WJets_Herwig"] = self.filepath + "RD_el_WJets_herwig_CMSSW532.root";
               self.filenames["ZJets"] = self.filepath + "RD_el_ZpJ_CMSSW532.root"
               self.filenames["tch"] = self.filepath + "RD_el_STopT_T_CMSSW532.root"
               self.filenames["tWch"] = self.filepath + "RD_el_STopTW_T_CMSSW532.root"
