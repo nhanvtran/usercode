@@ -41,6 +41,7 @@ parser.add_option('--doTraining', action='store_true', dest='doTraining', defaul
 parser.add_option('--makeFinalTree', action='store_true', dest='makeFinalTree', default=False,
                   help='make Final Tree')
 #parser.add_option('-m', '--trainingMethod',action="store",type="string",dest="trainingMethod",default="BDT")
+parser.add_option('--channel',action="store",type="string",dest="channel",default="mu")
 parser.add_option('-m', '--trainingMethod',action="store",type="string",dest="trainingMethod",default="Likelihood")
 parser.add_option('-i', '--graphindex',action="store",type="int",dest="graphindex",default=0)
 
@@ -65,11 +66,14 @@ if __name__ == '__main__':
     isData = True;
     notData = False;
     #LUMI = 5.3
-    CHANNEL = 'el' # or 'mu'
+    #CHANNEL = 'el' # or 'mu'
     #CHANNEL = 'mu' # or 'el'
+    CHANNEL = options.channel
     if CHANNEL == 'el':
-        LUMI = 5.145;#13.9
+        #LUMI = 19.2;#13.9
+        LUMI = 5.145
     elif CHANNEL == 'mu':
+        #LUMI = 19.3;#14.0
         LUMI = 5.3;#14.0
 
 #    sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/"

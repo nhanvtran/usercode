@@ -33,8 +33,8 @@ class Samples:
 
       def SetFileNames(self):
           if self.channel == "mu":
-              self.filenames["data"] = self.filepath + "RD_WmunuJets_DataAll_GoldenJSON_5p3invfb.root"
-              #self.filenames["data"] = self.filepath + "RD_WmunuJets_DataAll_GoldenJSON_14p0invfb.root"
+#              self.filenames["data"] = self.filepath + "RD_WmunuJets_DataAll_GoldenJSON_19p3invfb.root"
+              self.filenames["data"] = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/RD_WmunuJets_DataAll_GoldenJSON_5p3invfb.root" 
               self.filenames["TTbar"] = self.filepath + "RD_mu_TTbar_CMSSW532.root"
               self.filenames["WJets"] = self.filepath + "RD_mu_WJets_madgraph_CMSSW532.root"
               self.filenames["WJets_Herwig"] = self.filepath + "RD_mu_WJets_herwig_CMSSW532.root";
@@ -54,8 +54,8 @@ class Samples:
               self.filenames["ggH900"] = self.filepath + "RD_mu_HWWMH900_CMSSW532_private.root"
               self.filenames["ggH1000"] = self.filepath + "RD_mu_HWWMH1000_CMSSW532_private.root"
           elif self.channel == "el":
-              #self.filenames["data"] = self.filepath + "RD_WenuJets_DataAllSingleElectronTrigger_GoldenJSON_13p9invfb.root"
-              self.filenames["data"] = "/uscms_data/d3/zixu/Data/RD_Tree_data12_ele/RD_WenuJets_DataAllSingleElectronTrigger_GoldenJSON_5p145.root"
+#              self.filenames["data"] = self.filepath + "RD_WenuJets_DataAllSingleElectronTrigger_GoldenJSON_19p2invfb.root"
+              self.filenames["data"] = "/uscms_data/d3/zixu/Data/RD_Tree_data12_ele/RD_WenuJets_DataAllSingleElectronTrigger_GoldenJSON_5p145.root"                            
               self.filenames["TTbar"] = self.filepath + "RD_el_TTbar_CMSSW532.root";
               self.filenames["WJets"] = self.filepath + "RD_el_WJets_madgraph_CMSSW532.root";
               self.filenames["WJets_Herwig"] = self.filepath + "RD_el_WJets_herwig_CMSSW532.root";

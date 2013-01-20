@@ -29,10 +29,12 @@ if os.path.isfile('tdrstyle.C'):
 ROOT.gSystem.Load("PDFs/Util_cxx.so")
 ROOT.gSystem.Load("PDFs/PdfDiagonalizer_cc.so")
 ROOT.gSystem.Load("PDFs/HWWLVJ_RooPdfs_cxx.so")
-ROOT.gSystem.Load("PDFs/RooEXO2011414Pdf_cxx.so")
+ROOT.gSystem.Load("PDFs/RooQCDPdf_cxx.so")
 ROOT.gSystem.Load("PDFs/RooBWRunPdf_cxx.so")
 
-from ROOT import draw_error_band, draw_error_band_extendPdf, draw_error_band_Decor, draw_error_band_shape_Decor, Calc_error_extendPdf, RooErfExpPdf, RooAlpha,PdfDiagonalizer, RooEXO2011414Pdf, RooBWRunPdf
+#ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit.so");
+
+from ROOT import draw_error_band, draw_error_band_extendPdf, draw_error_band_Decor, draw_error_band_shape_Decor, Calc_error_extendPdf, RooErfExpPdf, RooAlpha,PdfDiagonalizer, RooQCDPdf, RooBWRunPdf
 
 ############################################################
 ############################################
@@ -48,6 +50,8 @@ parser.add_option('--fitwtagger', action='store_true', dest='fitwtagger', defaul
 parser.add_option('--check', action='store_true', dest='check', default=False, help='check the workspace for limit setting')
 parser.add_option('--control', action='store_true', dest='control', default=False, help='control plot')
 parser.add_option('--fitsignal', action='store_true', dest='fitsignal', default=False, help='fit signal')
+parser.add_option('--cprime', action="store",type="int",dest="cprime",default=10)
+parser.add_option('--BRnew', action="store",type="int",dest="BRnew",default=0)
 
 
 (options, args) = parser.parse_args()
@@ -123,19 +127,21 @@ class doFit_wj_and_wlvj:
         self.file_VV_mc=("ofile_VV.root");# WW+WZ 
         self.file_TTbar_mc=("ofile_TTbar.root");
         self.file_STop_mc =("ofile_STop.root");#single Top
-
+        
         #result files: The event number, parameters and error write into a txt file. The dataset and pdfs write into a root file
-        self.file_rlt_txt           = "other_hwwlvj_%s_%s.txt"%(self.higgs_sample,self.channel)
-        self.file_rlt_root          = "hwwlvj_%s_%s_workspace.root"%(self.higgs_sample,self.channel)
-        self.file_datacard_unbin    = "hwwlvj_%s_%s_unbin.txt"%(self.higgs_sample,self.channel)
-        self.file_datacard_counting = "hwwlvj_%s_%s_counting.txt"%(self.higgs_sample,self.channel)
+        self.file_rlt_txt           = "other_hwwlvj_%s_%s_%02d_%02d.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        self.file_rlt_root          = "hwwlvj_%s_%s_%02d_%02d_workspace.root"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        self.file_datacard_unbin    = "hwwlvj_%s_%s_%02d_%02d_unbin.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        self.file_datacard_counting = "hwwlvj_%s_%s_%02d_%02d_counting.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        
+#        print "self.file_datacard_unbin ... ",self.file_datacard_unbin
         
         self.file_out=open(self.file_rlt_txt,"w");
         self.file_out.write("Welcome:\n");
         self.file_out.close()
         self.file_out=open(self.file_rlt_txt,"a+");
 
-        self.higgs_xs_scale=1.0; #higgs XS scale
+        self.higgs_xs_scale=50.0; #higgs XS scale
         
         self.color_palet={ #color palet
             #'WJets' : style.WJetsColor,
@@ -544,8 +550,8 @@ class doFit_wj_and_wlvj:
             rrv_p0=RooRealVar("rrv_p0_EXO2011414"+label+"_"+self.channel,"rrv_p0_EXO2011414"+label+"_"+self.channel,-500,-1000,0);
             rrv_p1=RooRealVar("rrv_p1_EXO2011414"+label+"_"+self.channel,"rrv_p1_EXO2011414"+label+"_"+self.channel,200,0,1000);
             rrv_p2=RooRealVar("rrv_p2_EXO2011414"+label+"_"+self.channel,"rrv_p2_EXO2011414"+label+"_"+self.channel,50,0,500);
-            model_pdf=RooEXO2011414Pdf("model_pdf"+label+"_"+self.channel+mass_spectrum,"model_pdf"+label+"_"+self.channel+mass_spectrum,rrv_x,rrv_p0,rrv_p1,rrv_p2);
-            #model_pdf=RooGenericPdf("RooEXO2011414Pdf"+label+"_"+self.channel+mass_spectrum,"RooEXO2011414Pdf"+label+"_"+self.channel+mass_spectrum,()%s()RooArgList(rrv_x,rrv_p0,rrv_p1,rrv_p2));
+            model_pdf=RooQCDPdf("model_pdf"+label+"_"+self.channel+mass_spectrum,"model_pdf"+label+"_"+self.channel+mass_spectrum,rrv_x,rrv_p0,rrv_p1,rrv_p2);
+            #model_pdf=RooGenericPdf("RooQCDPdf"+label+"_"+self.channel+mass_spectrum,"RooQCDPdf"+label+"_"+self.channel+mass_spectrum,()%s()RooArgList(rrv_x,rrv_p0,rrv_p1,rrv_p2));
 
         if in_model_name == "Keys":
             rdataset=self.workspace4fit_.data("rdataset_%s_signal_region_mlvj"%(self.higgs_sample))
@@ -1100,6 +1106,11 @@ class doFit_wj_and_wlvj:
                 tmp_interference_weight_H800=treeIn.interference_Weight_H800;
                 tmp_interference_weight_H900=treeIn.interference_Weight_H900;
                 tmp_interference_weight_H1000=treeIn.interference_Weight_H1000;
+                ## added by Nhan, getting additional BSM weight
+                bsmWeightName = "bsmReweight_cPrime%02d_brNew%02d"%(options.cprime,options.BRnew);
+                tmp_bsmWeight = getattr(treeIn, bsmWeightName);
+                if tmp_bsmWeight < 0: tmp_bsmWeight == 1;
+                
                 if label=="_ggH600":
                     tmp_event_weight=tmp_event_weight*tmp_interference_weight_H600
                     tmp_event_weight4fit=tmp_event_weight4fit*tmp_interference_weight_H600
@@ -1120,6 +1131,10 @@ class doFit_wj_and_wlvj:
 
                 if TString(label).Contains("ggH"):tmp_event_weight=tmp_event_weight/self.higgs_xs_scale; 
                 if TString(label).Contains("ggH"):tmp_event_weight4fit=tmp_event_weight4fit/self.higgs_xs_scale; 
+
+                ## added by Nhan
+                if TString(label).Contains("ggH"):tmp_event_weight=tmp_event_weight*tmp_bsmWeight;
+                if TString(label).Contains("ggH"):tmp_event_weight4fit=tmp_event_weight4fit*tmp_bsmWeight;
 
                 #wtagger_eff_reweight
                 if not label=="_data": tmp_event_weight=tmp_event_weight*self.rrv_wtagger_eff_reweight.getVal();
