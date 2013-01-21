@@ -9,7 +9,7 @@
 #include "Riostream.h" 
 
 //#include "../interface/HWWLVJ_RooPdfs.h"
-#include "HWWLVJ_RooPdfs.h" 
+#include "HWWLVJRooPdfs.h" 
 #include "RooAbsReal.h" 
 #include "RooAbsCategory.h" 
 #include "RooExponential.h" 
