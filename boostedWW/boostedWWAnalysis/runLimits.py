@@ -76,15 +76,16 @@ if __name__ == '__main__':
     CHAN = options.channel;
     DIR = "cards_"+CHAN;
     
-#    mass  = [ 600, 700, 800, 900,1000]
-    mass  = [ 600, 700, 800]    
+    mass  = [ 600, 700, 800, 900,1000]
+    #mass  = [ 600, 700, 800]    
     ccmlo = [ 550, 600, 650, 750, 800]  
     ccmhi = [ 700, 850,1000,1100,1150]  
-    mjlo  = [  30,  30,  30,  30,  30]  
-    mjhi  = [ 140, 140, 140, 140, 140]  
+    mjlo  = [  40,  40,  40,  40,  40]  
+    mjhi  = [ 130, 130, 130, 130, 130]  
     mlo   = [ 400, 400, 600, 650, 650]      
     mhi   = [1000,1000,1400,1400,1400]          
-    shape = ["ErfExp_v1","ErfExp_v1","Exp","Exp","Exp"]
+    shape = ["ErfPow2_v1","ErfPow2_v1","Exp","Exp","Exp"]
+    shapeAlt = ["ErfExp_v1","ErfExp_v1","Pow2","Pow2","Pow2"]
     
     BRnew = 00;
     cprime = [10,07,05,04,03,02,01];
@@ -121,7 +122,7 @@ if __name__ == '__main__':
     # =====================================
 
     if options.makeCards:
-
+        if not os.path.isdir("log"): os.system("mkdir log" );
         for i in range(mLo,mHi):
             for j in range(cpLo,cpHi):
                 
@@ -134,17 +135,18 @@ if __name__ == '__main__':
                 
                 time.sleep(3);
                 
-                command = "python doFit_class.py %s ggH%03d %02d %02d %02d %02d %02d %02d %s -b -m --cprime %02d --BRnew 00"%(CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], cprime[j]);
-                #print command
+                #command = "python doFit_class.py %s ggH%03d %02d %02d %02d %02d %02d %02d %s %s -b -m --cprime %02d --BRnew 00  >> log/log_%s_ggH%03d_%02d_%02d_%02d_%02d_%02d_%02d_%s_%s_cprime_%02d_BRnew_00"%(CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j], CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j]);
+                command = "nohup python doFit_class.py %s ggH%03d %02d %02d %02d %02d %02d %02d %s %s -b -m --cprime %02d --BRnew 00  >> log/log_%s_ggH%03d_%02d_%02d_%02d_%02d_%02d_%02d_%s_%s_cprime_%02d_BRnew_00 &"%(CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j], CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j]);
+                print command #raw_input("ENTER");
                 os.system(command);
                 
-                mvcmmd1 = "mv plots_"+CHAN+" "+DIR+"/plots_"+CHAN+"_"+str(mass[i])+"_"+str(cprime[j])+"_00";
+                #mvcmmd1 = "mv plots_"+CHAN+" "+DIR+"/plots_"+CHAN+"_"+str(mass[i])+"_"+str(cprime[j])+"_00";
                 #print mvcmmd1;
-                os.system(mvcmmd1);
+                #os.system(mvcmmd1);
             
-            mvcmmd0 = "mv hwwlvj_*_"+CHAN+"* other_*_"+CHAN+"* "+DIR+"/.";
+            #mvcmmd0 = "mv hwwlvj_*_"+CHAN+"* other_*_"+CHAN+"* "+DIR+"/.";
             #print mvcmmd0;
-            os.system(mvcmmd0);
+            #os.system(mvcmmd0);
 
 
     # =====================================

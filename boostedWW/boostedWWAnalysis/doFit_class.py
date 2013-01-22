@@ -4,14 +4,17 @@ import glob
 import math
 import array
 
+import ROOT
+
 from ROOT import gROOT, gStyle, gSystem, TLatex, TString, TF1,TFile,TLine, TLegend, TH1D,TH2D,THStack,TChain, TCanvas, TMatrixDSym, TMath, TText, TPad, RooFit, RooArgSet, RooArgList, RooArgSet, RooAbsData, RooAbsPdf, RooAddPdf, RooWorkspace, RooExtendPdf,RooCBShape, RooLandau, RooFFTConvPdf, RooGaussian, RooBifurGauss, RooDataSet, RooExponential,RooBreitWigner, RooVoigtian, RooNovosibirsk, RooRealVar,RooFormulaVar, RooDataHist, RooHistPdf,RooCategory, RooSimultaneous, RooGenericPdf,RooConstVar, RooKeysPdf, RooHistPdf, RooEffProd, RooProdPdf, TIter, kTRUE, kFALSE, kGray, kRed, kDashed, kGreen,kAzure, kOrange, kBlack,kBlue,kYellow,kCyan, kMagenta
 import subprocess
 from subprocess import Popen
+from optparse import OptionParser
 
-from sampleWrapperClass import *
-from trainingClass      import *
-from BoostedWSamples    import * 
-from mvaApplication     import *
+#from sampleWrapperClass import *
+#from trainingClass      import *
+#from BoostedWSamples    import * 
+#from mvaApplication     import *
 
 import sys
 
@@ -19,15 +22,15 @@ if os.path.isfile('tdrstyle.C'):
    gROOT.ProcessLine('.L tdrstyle.C')
    ROOT.setTDRStyle()
    print "Found tdrstyle.C file, using this style."
-   if os.path.isfile('CMSTopStyle.cc'):
-      gROOT.ProcessLine('.L CMSTopStyle.cc+')
-      style = ROOT.CMSTopStyle()
-      style.setupICHEPv1()
-      print "Found CMSTopStyle.cc file, use TOP style if requested in xml file."
+#   if os.path.isfile('CMSTopStyle.cc'):
+#      gROOT.ProcessLine('.L CMSTopStyle.cc')
+#      style = ROOT.CMSTopStyle()
+#      style.setupICHEPv1()
+#      print "Found CMSTopStyle.cc file, use TOP style if requested in xml file."
 
 
+ROOT.gSystem.Load("PDFs/HWWLVJRooPdfs_cxx.so")
 ROOT.gSystem.Load("PDFs/PdfDiagonalizer_cc.so")
-ROOT.gSystem.Load("PDFs/HWWLVJ_RooPdfs_cxx.so")
 #ROOT.gSystem.Load("PDFs/RooPowPdf_cxx.so")
 #ROOT.gSystem.Load("PDFs/RooPow2Pdf_cxx.so")
 #ROOT.gSystem.Load("PDFs/RooErfPowPdf_cxx.so")
@@ -72,8 +75,8 @@ class doFit_wj_and_wlvj:
         self.channel=in_channel;#el or muon
         self.higgs_sample=in_higgs_sample;
 
-        self.BinWidth_mlvj=40.;
-        self.BinWidth_mj=4;
+        self.BinWidth_mlvj=50.;
+        self.BinWidth_mj=5;
         nbins_mlvj=int((in_mlvj_max-in_mlvj_min)/self.BinWidth_mlvj);
         in_mlvj_max=in_mlvj_min+nbins_mlvj*self.BinWidth_mlvj;
         nbins_mj=int((in_mj_max-in_mj_min)/self.BinWidth_mj);
@@ -92,8 +95,8 @@ class doFit_wj_and_wlvj:
         self.workspace4limit_ = RooWorkspace("workspace4limit_","workspace4limit_");
 
         self.mj_sideband_lo_min=in_mj_min;
-        self.mj_sideband_lo_max=68;
-        self.mj_signal_min=68;
+        self.mj_sideband_lo_max=70;
+        self.mj_signal_min=70;
         self.mj_signal_max=100;
         self.mj_sideband_hi_min=100;
         self.mj_sideband_hi_max=in_mj_max;
@@ -142,10 +145,13 @@ class doFit_wj_and_wlvj:
         self.file_STop_mc =("ofile_STop.root");#single Top
         
         #result files: The event number, parameters and error write into a txt file. The dataset and pdfs write into a root file
-        self.file_rlt_txt           = "other_hwwlvj_%s_%s_%02d_%02d.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
-        self.file_rlt_root          = "hwwlvj_%s_%s_%02d_%02d_workspace.root"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
-        self.file_datacard_unbin    = "hwwlvj_%s_%s_%02d_%02d_unbin.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
-        self.file_datacard_counting = "hwwlvj_%s_%s_%02d_%02d_counting.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        if not os.path.isdir("cards_%s"%(self.channel)): os.system("mkdir cards_%s"%(self.channel));
+        self.rlt_DIR="cards_%s/"%(self.channel)
+
+        self.file_rlt_txt           = self.rlt_DIR+"other_hwwlvj_%s_%s_%02d_%02d.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        self.file_rlt_root          = self.rlt_DIR+"hwwlvj_%s_%s_%02d_%02d_workspace.root"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        self.file_datacard_unbin    = self.rlt_DIR+"hwwlvj_%s_%s_%02d_%02d_unbin.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        self.file_datacard_counting = self.rlt_DIR+"hwwlvj_%s_%s_%02d_%02d_counting.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
         
 
         
@@ -857,7 +863,7 @@ class doFit_wj_and_wlvj:
         mplot_pull_sideband.SetTitle("PULL");
         mplot_pull_sideband.GetYaxis().SetRangeUser(-5,5);
         parameters_list=model_pdf_sb_lo_WJets.getParameters(rdataset_WJets_sb_lo_mlvj);
-        self.draw_canvas( mplot_sb_lo, mplot_pull_sideband,parameters_list,"plots_%s_%s/other/"%(self.channel,self.PS_model), "m_lvj%s_sb_lo_sim"%(label),"",1,0)
+        self.draw_canvas( mplot_sb_lo, mplot_pull_sideband,parameters_list,self.rlt_DIR+"plots_%s_%s/other/"%(self.channel,self.PS_model), "m_lvj%s_sb_lo_sim"%(label),"",1,0)
 
         mplot_signal_region = rrv_x.frame(RooFit.Title("WJets sr"));
         rdataset_WJets_signal_region_mlvj.plotOn(mplot_signal_region);
@@ -868,7 +874,7 @@ class doFit_wj_and_wlvj:
         mplot_pull_signal_region.SetTitle("PULL");
         mplot_pull_signal_region.GetYaxis().SetRangeUser(-5,5);
         parameters_list=model_pdf_signal_region_WJets.getParameters(rdataset_WJets_signal_region_mlvj);
-        self.draw_canvas( mplot_signal_region, mplot_pull_signal_region,parameters_list,"plots_%s_%s/other/"%(self.channel,self.PS_model), "m_lvj%s_signal_region_sim"%(label),"",1,0);
+        self.draw_canvas( mplot_signal_region, mplot_pull_signal_region,parameters_list,self.rlt_DIR+"plots_%s_%s/other/"%(self.channel,self.PS_model), "m_lvj%s_signal_region_sim"%(label),"",1,0);
 
         model_pdf_sb_lo_WJets.plotOn(mplot,RooFit.Name("Sideband"));
         model_pdf_signal_region_WJets.plotOn(mplot, RooFit.LineColor(kRed) ,RooFit.Name("Signal Region"));
@@ -916,7 +922,7 @@ class doFit_wj_and_wlvj:
         else: 
             mplot.GetYaxis().SetRangeUser(0,0.24);
  
-        self.draw_canvas1(mplot,"plots_%s_%s/other/"%(self.channel,self.PS_model),"correction_pdf%s_%s_%s_M_lvj_signal_region_to_sideband"%(label,self.PS_model,self.MODEL_4_mlvj),0,0);
+        self.draw_canvas1(mplot,self.rlt_DIR+"plots_%s_%s/other/"%(self.channel,self.PS_model),"correction_pdf%s_%s_%s_M_lvj_signal_region_to_sideband"%(label,self.PS_model,self.MODEL_4_mlvj),0,0);
 
         correct_factor_pdf_deco.getParameters(rdataset_WJets_sb_lo_mlvj).Print("v");
 
@@ -964,7 +970,7 @@ class doFit_wj_and_wlvj:
          
         parameters_list=model.getParameters(rdataset_mj);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
-        self.draw_canvas( mplot, mplot_pull,parameters_list, "plots_%s_%s/m_j_fitting_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name)
+        self.draw_canvas( mplot, mplot_pull,parameters_list, self.rlt_DIR+"plots_%s_%s/m_j_fitting_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name)
         rfresult.Print(); 
         rfresult.covarianceMatrix().Print(); #raw_input("ENTER"); 
         
@@ -1002,7 +1008,7 @@ class doFit_wj_and_wlvj:
          
         parameters_list=model.getParameters(rdataset_mj);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
-        self.draw_canvas( mplot, mplot_pull,parameters_list, "plots_%s_%s/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name)
+        self.draw_canvas( mplot, mplot_pull,parameters_list, self.rlt_DIR+"plots_%s_%s/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name)
         rfresult.Print();
 
     ############# ---------------------------------------------------
@@ -1107,8 +1113,8 @@ class doFit_wj_and_wlvj:
         mplot_pull.GetYaxis().SetRangeUser(-5,5);
          
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
-        self.draw_canvas( mplot, mplot_pull,parameters_list, "plots_%s_%s/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name+"Total")
-        self.draw_canvas1(mplot,"plots_%s_%s/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max),"control_%s_%s"%(self.wtagger_lable,self.channel));
+        self.draw_canvas( mplot, mplot_pull,parameters_list, self.rlt_DIR+"plots_%s_%s/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name+"Total")
+        self.draw_canvas1(mplot,self.rlt_DIR+"plots_%s_%s/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max),"control_%s_%s"%(self.wtagger_lable,self.channel));
         
         #calculate the mva eff
         self.workspace4fit_.var("rrv_number_dataset_signal_region_data_"+self.channel+"_mj").Print()
@@ -1522,8 +1528,8 @@ class doFit_wj_and_wlvj:
 
         cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#signal region
         self.Make_Controlplots(cut,"before_nbjet");
-        cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && njets<2 && nbjetsCSV <1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#signal region
-        self.Make_Controlplots(cut,"signal_region");
+        #cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && njets<2 && nbjetsCSV <1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#signal region
+        #self.Make_Controlplots(cut,"signal_region");
 
         #cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=30 && jet_mass_pr<=70 && njets <1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#sb_lo
         #self.Make_Controlplots(cut,"sd_lo");
@@ -1545,6 +1551,8 @@ class doFit_wj_and_wlvj:
         self.make_controlplot("nPV",cut,tag,40,0,40,xtitle="nPV",ytitle="Events",logy=0 );
         self.make_controlplot("jet_tau2tau1",cut,tag,50,0,1,xtitle="jet_tau2tau1",ytitle="Events",logy=0 );
         self.make_controlplot("nbjets",cut,tag,5,-0.5,4.5,xtitle="number of b-jets",ytitle="Events",logy=0 );
+        self.make_controlplot("nbjetsCSV",cut,tag,5,-0.5,4.5,xtitle="number of b-jets(CSV)",ytitle="Events",logy=0 );
+        self.make_controlplot("nbjetsSSVHE",cut,tag,5,-0.5,4.5,xtitle="number of b-jets(SSVHE)",ytitle="Events",logy=0 );
         self.make_controlplot("njets",cut,tag,5,-0.5,4.5,xtitle="number of jets",ytitle="Events",logy=0 );
  
     ######## ++++++++++++++
@@ -1626,7 +1634,7 @@ class doFit_wj_and_wlvj:
         theLeg.SetY1(theLeg.GetY1NDC());
         theLeg.Draw();
 
-        Directory=TString("plots_%s_%s/controlplot_wtaggercut%s_nPV%sto%s/"%(self.channel, self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max)+self.higgs_sample+"/");
+        Directory=TString(self.rlt_DIR+"plots_%s_%s/controlplot_wtaggercut%s_nPV%sto%s/"%(self.channel, self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max)+self.higgs_sample+"_%02d_%02d/"%(options.cprime,options.BRnew));
         if not Directory.EndsWith("/"):Directory=Directory.Append("/");
         if not os.path.isdir(Directory.Data()): os.system("mkdir -p  "+Directory.Data());
 
@@ -1686,7 +1694,7 @@ class doFit_wj_and_wlvj:
          
         parameters_list=model.getParameters(rdataset);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
-        self.draw_canvas( mplot, mplot_pull,parameters_list,"plots_%s_%s/m_lvj_fitting/"%(self.channel,self.PS_model), in_file_name,"m_lvj"+in_range+in_model_name)
+        self.draw_canvas( mplot, mplot_pull,parameters_list,self.rlt_DIR+"plots_%s_%s/m_lvj_fitting/"%(self.channel,self.PS_model), in_file_name,"m_lvj"+in_range+in_model_name)
         #rfresult.Print(); rfresult.covarianceMatrix().Print(); raw_input("ENTER");
 
         #normalize the number of total events to lumi
@@ -1790,7 +1798,7 @@ class doFit_wj_and_wlvj:
         
         parameters_list=model_data.getParameters(rdataset_data_mj);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
-        self.draw_canvas( mplot, mplot_pull,parameters_list,"plots_%s_%s/m_j_fitting_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), "m_j_sideband%s"%(label),"",1)
+        self.draw_canvas( mplot, mplot_pull,parameters_list,self.rlt_DIR+"plots_%s_%s/m_j_fitting_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), "m_j_sideband%s"%(label),"",1)
 
         self.get_mj_normalization_insignalregion("_data");
         self.get_mj_normalization_insignalregion("_TTbar");
@@ -1884,7 +1892,7 @@ class doFit_wj_and_wlvj:
     
         parameters_list=model_data.getParameters(rdataset_data_mlvj);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1)
-        self.draw_canvas( mplot, mplot_pull,parameters_list,"plots_%s_%s/m_lvj_fitting/"%(self.channel,self.PS_model), "m_lvj_sb_lo%s"%(label),"",1,1)
+        self.draw_canvas( mplot, mplot_pull,parameters_list,self.rlt_DIR+"plots_%s_%s/m_lvj_fitting/"%(self.channel,self.PS_model), "m_lvj_sb_lo%s"%(label),"",1,1)
 
         #model deco
         wsfit_tmp=RooWorkspace("wsfit_tmp%s_sb_lo_from_fitting_mlvj"%(label));
@@ -2274,7 +2282,7 @@ class doFit_wj_and_wlvj:
         leg=self.legend4Plot(mplot,0);
         mplot.addObject(leg);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
-        self.draw_canvas1(mplot,"plots_%s_%s/m_lvj_fitting/"%(self.channel,self.PS_model),"check_workspace_for_limit",0,1);
+        self.draw_canvas1(mplot,self.rlt_DIR+"plots_%s_%s/m_lvj_fitting/"%(self.channel,self.PS_model),"check_workspace_for_limit",0,1);
 
         if workspace.var("rrv_num_floatparameter_in_last_fitting"):   nPar_float_in_fitTo= int(workspace.var("rrv_num_floatparameter_in_last_fitting").getVal());
         else:
@@ -2374,7 +2382,7 @@ class doFit_wj_and_wlvj:
             param=par.Next();
 
 
-        Directory=TString(in_directory+self.higgs_sample+"/");
+        Directory=TString(in_directory+self.higgs_sample+"_%02d_%02d/"%(options.cprime,options.BRnew));
         if not Directory.EndsWith("/"):Directory=Directory.Append("/");
         if not os.path.isdir(Directory.Data()): os.system("mkdir -p  "+Directory.Data());
 
@@ -2418,7 +2426,7 @@ class doFit_wj_and_wlvj:
         pad2.cd();
         mplot_addition.Draw();
 
-        Directory=TString(in_directory+self.higgs_sample+"/");
+        Directory=TString(in_directory+self.higgs_sample+"_%02d_%02d/"%(options.cprime,options.BRnew));
         if not Directory.EndsWith("/"):Directory=Directory.Append("/");
         if not os.path.isdir(Directory.Data()): os.system("mkdir -p  "+Directory.Data());
 
@@ -2455,7 +2463,7 @@ class doFit_wj_and_wlvj:
         banner.SetNDC(); banner.SetTextSize(0.025);
         banner.Draw();
 
-        Directory=TString(in_directory+self.higgs_sample+"/");
+        Directory=TString(in_directory+self.higgs_sample+"_%02d_%02d/"%(options.cprime,options.BRnew));
         if not Directory.EndsWith("/"):Directory=Directory.Append("/");
         if not os.path.isdir(Directory.Data()): os.system("mkdir -p  "+Directory.Data());
 
@@ -2661,7 +2669,7 @@ def Fit_Signal(channel):
 def control_single(channel):
     print "control_single for %s sampel"%(channel)
     #control_single_sb_correction("method1",channel, "ggH600",500,700,30,140,400,1000,"ErfExp_v1")
-    control_single_sb_correction("method1",channel, "controlplot",500,1300,20,130,400,1400,"ErfExp_v1")
+    control_single_sb_correction("method1",channel, "ggH600",500,1300,20,130,400,1400,"ErfExp_v1")
 
 def check_workspace(channel, higgs):
     boostedW_fitter=doFit_wj_and_wlvj(channel,higgs); boostedW_fitter.read_workspace()
