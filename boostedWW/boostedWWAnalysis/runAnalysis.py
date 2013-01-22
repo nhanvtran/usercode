@@ -107,7 +107,7 @@ if __name__ == '__main__':
 
     #boostedWXS = 1.3*228.9E3;
     #WJetsSample_EffLumi = 8955318/boostedWXS;
-    WJetsSample = sampleWrapperClass("WJets",boostedWSamples.GetFileNames()["WJets"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets")),LUMI,boostedWSamples.GetTreeName(),notData)
+    WJetsSample = sampleWrapperClass("WJets_Pythia",boostedWSamples.GetFileNames()["WJets_Pythia"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Pythia")),LUMI,boostedWSamples.GetTreeName(),notData)
     WJets_HerwigSample = sampleWrapperClass("WJets_Herwig",boostedWSamples.GetFileNames()["WJets_Herwig"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Herwig")),LUMI,boostedWSamples.GetTreeName(),notData)
     ZJetsSample = sampleWrapperClass("ZJets",boostedWSamples.GetFileNames()["ZJets"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZJets")),LUMI,boostedWSamples.GetTreeName(),notData)
 
