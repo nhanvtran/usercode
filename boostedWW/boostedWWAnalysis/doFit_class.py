@@ -119,7 +119,7 @@ class doFit_wj_and_wlvj:
 
         #prepare the data and mc files
         self.file_Directory="trainingtrees_%s/"%(self.channel);
-        #self.file_Directory="trainingtrees_wtagger_%s/"%(self.channel);
+        #self.file_Directory="trainingtrees_19_Jan22/trainingtrees_%s/"%(self.channel);
 
         self.PS_model= options.psmodel
         #self.PS_model="pythia"; #self.PS_model="herwig"
@@ -199,8 +199,8 @@ class doFit_wj_and_wlvj:
         self.nPV_max= 100;
 
 		#mva cut:el 65; mu: 50
-        self.mva_cut=50;
-        if self.channel=="el":self.mva_cut=65; 
+        self.mvaMET_cut=0;
+        if self.channel=="el":self.mvaMET_cut=0; 
         #deltaPhi_METj cut
         self.deltaPhi_METj_cut =2.0;
 
@@ -491,7 +491,7 @@ class doFit_wj_and_wlvj:
             rrv_width_ErfExp = RooRealVar("rrv_width_ErfExp"+label+"_"+self.channel,"rrv_width_ErfExp"+label+"_"+self.channel,30.,10,200.);
             rrv_mean_gaus=RooRealVar("rrv_mean_gaus"+label+"_"+self.channel,"rrv_mean_gaus"+label+"_"+self.channel,84,78,88);
             rrv_sigma_gaus=RooRealVar("rrv_sigma_gaus"+label+"_"+self.channel,"rrv_sigma_gaus"+label+"_"+self.channel,7,4,10);
-            rrv_high = RooRealVar("rrv_high"+label+"_"+self.channel,"rrv_high"+label+"_"+self.channel,0.7,0.,1.);
+            rrv_high = RooRealVar("rrv_high"+label+"_"+self.channel,"rrv_high"+label+"_"+self.channel,0.5,0.,1.);
             erfExp = ROOT.RooErfExpPdf("erfExp"+label+"_"+self.channel,"erfExp"+label+"_"+self.channel,rrv_x,rrv_c_ErfExp,rrv_mean_gaus,rrv_width_ErfExp);
             gaus = RooGaussian("gaus"+label+"_"+self.channel,"gaus"+label+"_"+self.channel, rrv_x,rrv_mean_gaus,rrv_sigma_gaus);
             model_pdf =RooAddPdf("model_pdf"+label+"_"+self.channel+mass_spectrum,"model_pdf"+label+"_"+self.channel+mass_spectrum,RooArgList(erfExp,gaus),RooArgList(rrv_high))
@@ -955,9 +955,9 @@ class doFit_wj_and_wlvj:
 
         mplot = rrv_mass_j.frame(RooFit.Title(in_file_name+" fitted by "+in_model_name));
         rdataset_mj.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2));
-        model.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines());
+        #model.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines());
         #draw_error_band(rdataset_mj, model,self.workspace4fit_.var("rrv_number"+label+"_"+self.channel+"_mj") ,rfresult,mplot,6,"L");
-        draw_error_band_extendPdf(rdataset_mj, model, rfresult,mplot,6,"L");
+        #draw_error_band_extendPdf(rdataset_mj, model, rfresult,mplot,6,"L");
         rdataset_mj.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) );
         model.plotOn( mplot , RooFit.VLines());
 
@@ -1030,7 +1030,7 @@ class doFit_wj_and_wlvj:
         rdataset_TTbar_mj.Print();
         rdataset_STop_mj = self.workspace4fit_.data("rdataset_STop_"+self.channel+"_mj"); 
         rdataset_VV_mj = self.workspace4fit_.data("rdataset_VV_"+self.channel+"_mj"); 
-        rdataset_WJets_mj = self.workspace4fit_.data("rdataset_WJets_"+self.channel+"_mj"); 
+        rdataset_WJets_mj = self.workspace4fit_.data("rdataset_WJets0_"+self.channel+"_mj"); 
         rdataset_TotalMC_mj= rdataset_TTbar_mj.Clone("rdataset_TotalMC_"+self.channel+"_mj");
         rdataset_TotalMC_mj.append(rdataset_STop_mj);
         rdataset_TotalMC_mj.append(rdataset_VV_mj);
@@ -1119,7 +1119,7 @@ class doFit_wj_and_wlvj:
         #calculate the mva eff
         self.workspace4fit_.var("rrv_number_dataset_signal_region_data_"+self.channel+"_mj").Print()
         self.workspace4fit_.var("rrv_number_dataset_signal_region_VV_"+self.channel+"_mj").Print()
-        self.workspace4fit_.var("rrv_number_dataset_signal_region_WJets_"+self.channel+"_mj").Print()
+        self.workspace4fit_.var("rrv_number_dataset_signal_region_WJets0_"+self.channel+"_mj").Print()
         self.workspace4fit_.var("rrv_number_dataset_signal_region_STop_"+self.channel+"_mj").Print()
         self.workspace4fit_.var("rrv_number_dataset_signal_region_TTbar_"+self.channel+"_mj").Print()
 
@@ -1217,7 +1217,7 @@ class doFit_wj_and_wlvj:
             else:
                 discriminantCut=False;
 
-            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.njets<2 and treeIn.nbjetsCSV <1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mva_cut:
+            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.njets<2 and treeIn.nbjetsSSVHE <1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mvaMET_cut:
             #if treeIn.ungroomed_jet_pt > 200. and discriminantCut and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjets <1 and treeIn.njets<1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max :
             #if treeIn.ungroomed_jet_pt > 200. and discriminantCut and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjets <1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max :
             #if treeIn.ungroomed_jet_pt > 200. and discriminantCut and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.njets ==0 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max :
@@ -1379,7 +1379,8 @@ class doFit_wj_and_wlvj:
                 discriminantCut=False;
                 #discriminantCut=True;
 
-            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjetsCSV >1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mva_cut:
+            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE >1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mvaMET_cut:
+            #if treeIn.ungroomed_jet_pt > 200. and discriminantCut and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE >1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mvaMET_cut:
             #if treeIn.ungroomed_jet_pt > 200. and discriminantCut and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjets >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max  :
                 tmp_event_weight= treeIn.totalEventWeight;
                 tmp_event_weight4fit= treeIn.eff_and_pu_Weight;
@@ -1429,7 +1430,8 @@ class doFit_wj_and_wlvj:
                 if treeIn.jet_mass_pr >=self.mj_sideband_hi_min and treeIn.jet_mass_pr <self.mj_sideband_hi_max: hnum_4region.Fill(1,tmp_event_weight);
                 hnum_4region.Fill(2,tmp_event_weight);
 
-            if treeIn.ungroomed_jet_pt > 200. and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjetsCSV >1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mva_cut:
+            if treeIn.ungroomed_jet_pt > 200. and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE >1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mvaMET_cut:
+            #if treeIn.ungroomed_jet_pt > 200. and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE >1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mvaMET_cut:
             #if treeIn.ungroomed_jet_pt > 200. and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjets >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max  :
                 tmp_event_weight= treeIn.totalEventWeight;
                 tmp_event_weight4fit= treeIn.eff_and_pu_Weight;
@@ -1528,7 +1530,7 @@ class doFit_wj_and_wlvj:
 
         cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#signal region
         self.Make_Controlplots(cut,"before_nbjet");
-        #cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && njets<2 && nbjetsCSV <1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#signal region
+        #cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && njets<2 && nbjetsSSVHE <1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#signal region
         #self.Make_Controlplots(cut,"signal_region");
 
         #cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=30 && jet_mass_pr<=70 && njets <1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#sb_lo
@@ -2487,8 +2489,8 @@ class doFit_wj_and_wlvj:
 
     ######## ++++++++++++++
     def GetLumi(self):
-        if self.channel=="el": return 5.1#13.9;
-        if self.channel=="mu": return 5.3#14.0;
+        if self.channel=="el": return 5.1#19.2#13.9;
+        if self.channel=="mu": return 5.3#19.3#14.0;
 
     ######## ++++++++++++++
     def get_data(self):
@@ -2655,9 +2657,9 @@ def control_single_sb_correction(method, channel, higgs_sample="ggH600", in_mlvj
 
 def pre_limit_simple(channel):
     print "pre_limit_simple for %s sampel"%(channel)
-    #pre_limit_sb_correction_without_systermatic(channel, "ggH600",550,700,40,128,400,1000,"ErfPow2_v1","ErfPow2_v1");
+    pre_limit_sb_correction_without_systermatic(channel, "ggH600",550,700,40,128,400,1000,"ErfPow2_v1","ErfPow2_v1");
     #pre_limit_sb_correction_without_systermatic(channel,"ggH800",650,1000,40,128,600,1400,"Exp","Exp")
-    pre_limit_sb_correction_without_systermatic(channel,"ggH1000",800,1150,40,128,650,1400,"Exp","Exp")
+    #pre_limit_sb_correction_without_systermatic(channel,"ggH1000",800,1150,40,128,650,1400,"Exp","Exp")
   
 def Fit_Signal(channel):
     fit_signal("method1",channel, "ggH600",500,700,30,140,200,1400,"ErfExp_v1")
