@@ -401,6 +401,104 @@ Double_t  ErfPow2(Double_t x,Double_t c0,Double_t c1, Double_t offset, Double_t 
    return ErfPow2(x,c0,c1,offset,width_tmp)/ErfPow2(x,c0a,c1a,offseta,widtha_tmp);
  } 
 
+
+//////////////////////////////////RooErfPowExpPdf.cxx
+ClassImp(RooErfPowExpPdf) 
+
+Double_t  ErfPowExp(Double_t x,Double_t c0,Double_t c1, Double_t offset, Double_t width){
+        if(width<1e-2)width=1e-2;
+   Double_t sqrt_s=2000.;
+   return TMath::Power(x/sqrt_s ,-1*(c1*TMath::Log(x/sqrt_s)) )*TMath::Exp(-1*x/sqrt_s*c0)*(1+ TMath::Erf((x-offset)/width)) /2. ; 
+ }
+
+ RooErfPowExpPdf::RooErfPowExpPdf(const char *name, const char *title, 
+                        RooAbsReal& _x,
+                        RooAbsReal& _c0,
+                        RooAbsReal& _c1,
+                        RooAbsReal& _offset,
+                        RooAbsReal& _width) :
+   RooAbsPdf(name,title), 
+   x("x","x",this,_x),
+   c0("c0","c0",this,_c0),
+   c1("c1","c1",this,_c1),
+   offset("offset","offset",this,_offset),
+   width("width","width",this,_width)
+ { 
+ } 
+
+
+ RooErfPowExpPdf::RooErfPowExpPdf(const RooErfPowExpPdf& other, const char* name) :  
+   RooAbsPdf(other,name), 
+   x("x",this,other.x),
+   c0("c0",this,other.c0),
+   c1("c1",this,other.c1),
+   offset("offset",this,other.offset),
+   width("width",this,other.width)
+ { 
+ } 
+
+
+
+ Double_t RooErfPowExpPdf::evaluate() const 
+ { 
+   // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
+   Double_t width_tmp=width; if(width<1e-2){ width_tmp=1e-2;}
+   return ErfPowExp(x,c0,c1,offset,width_tmp);
+ } 
+
+
+ /////////////////////////////////////////////////////////
+
+ ClassImp(RooAlpha4ErfPowExpPdf) 
+
+ RooAlpha4ErfPowExpPdf::RooAlpha4ErfPowExpPdf(const char *name, const char *title, 
+                        RooAbsReal& _x,
+                        RooAbsReal& _c0,
+                        RooAbsReal& _c1,
+                        RooAbsReal& _offset,
+                        RooAbsReal& _width,
+                        RooAbsReal& _c0a,
+                        RooAbsReal& _c1a,
+                        RooAbsReal& _offseta,
+                        RooAbsReal& _widtha) :
+   RooAbsPdf(name,title), 
+   x("x","x",this,_x),
+   c0("c0","c0",this,_c0),
+   c1("c1","c1",this,_c1),
+   offset("offset","offset",this,_offset),
+   width("width","width",this,_width),
+   c0a("c0a","c0a",this,_c0a),
+   c1a("c1a","c1a",this,_c1a),
+   offseta("offseta","offseta",this,_offseta),
+   widtha("widtha","widtha",this,_widtha)
+ { 
+ } 
+
+
+ RooAlpha4ErfPowExpPdf::RooAlpha4ErfPowExpPdf(const RooAlpha4ErfPowExpPdf& other, const char* name) :  
+   RooAbsPdf(other,name), 
+   x("x",this,other.x),
+   c0("c0",this,other.c0),
+   c1("c1",this,other.c1),
+   offset("offset",this,other.offset),
+   width("width",this,other.width),
+   c0a("c0a",this,other.c0a),
+   c1a("c1a",this,other.c1a),
+   offseta("offseta",this,other.offseta),
+   widtha("widtha",this,other.widtha)
+ { 
+ } 
+
+
+
+ Double_t RooAlpha4ErfPowExpPdf::evaluate() const 
+ { 
+   // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
+    Double_t width_tmp=width; if(width<1e-2){ width_tmp=1e-2;}
+    Double_t widtha_tmp=widtha; if(widtha<1e-2){ widtha_tmp=1e-2;}
+   return ErfPowExp(x,c0,c1,offset,width_tmp)/ErfPowExp(x,c0a,c1a,offseta,widtha_tmp);
+ } 
+
 //////////////////////////////////////////RooErfPowPdf.cxx
 ClassImp(RooErfPowPdf) 
 
@@ -1161,7 +1259,7 @@ double Calc_error( char* rpdfname, char* xaxis_name , RooArgList &paras, RooWork
 
         double signal_number_media=signalInt_var;
         val[j]=signal_number_media;
-        cout<<"signal_number_tmp="<<signal_number_media<<endl;
+        //cout<<"signal_number_tmp="<<signal_number_media<<endl;
 	}
 	for(Int_t ipara=0;ipara<paras.getSize();ipara++){ ws.var(paras[ipara].GetName())->setVal(0.); }
 
