@@ -61,6 +61,24 @@ class sampleWrapperClass:
         self.FitSMSignal = False;
         self.FitSMSignal_mean = -1;
         self.FitSMSignal_gamma = -1;
+    
+        # ---------- Set up jet corrections on the fly of R >= 0.7 jets
+        if isData == 0 :
+            jecStr = [
+                      fDir + "GR_R_42_V23_L1FastJet_AK7PFchs.txt",
+                      fDir + "GR_R_42_V23_L2Relative_AK7PFchs.txt",
+                      fDir + "GR_R_42_V23_L3Absolute_AK7PFchs.txt",
+                      ]
+        else :
+            jecStr = [
+                      fDir + "GR_R_42_V23_L1FastJet_AK7PFchs.txt",
+                      fDir + "GR_R_42_V23_L2Relative_AK7PFchs.txt",
+                      fDir + "GR_R_42_V23_L3Absolute_AK7PFchs.txt",
+                      fDir + "GR_R_42_V23_L2L3Residual_AK7PFchs.txt",
+                      ]
+        jecPars = ROOT.std.vector(ROOT.JetCorrectorParameters)()
+        jecUncStr = ROOT.std.string(fDir + "GR_R_42_V23_Uncertainty_AK7PFchs.txt")
+        jecUnc = ROOT.JetCorrectionUncertainty( jecUncStr )
             
     def createTrainingTree(self):
         
