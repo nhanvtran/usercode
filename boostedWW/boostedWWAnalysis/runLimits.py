@@ -76,18 +76,32 @@ if __name__ == '__main__':
     CHAN = options.channel;
     DIR = "cards_"+CHAN;
     
+<<<<<<< runLimits.py
+    mass  = [ 600, 700, 800, 900,1000]
+#    mass  = [ 600, 700, 800]    
+    ccmlo = [ 550, 600, 650, 750, 800]  
+    ccmhi = [ 700, 850,1000,1100,1150]  
+    mjlo  = [  30,  30,  30,  30,  30]  
+    mjhi  = [ 140, 140, 140, 140, 140]  
+=======
     mass  = [ 600, 700, 800, 900,1000]
     #mass  = [ 600, 700, 800]    
     ccmlo = [ 550, 600, 700, 800, 900]  
     ccmhi = [ 700, 850, 950,1100,1200]  
     mjlo  = [  40,  40,  40,  40,  40]  
     mjhi  = [ 130, 130, 130, 130, 130]  
+>>>>>>> 1.3
     mlo   = [ 400, 400, 600, 650, 650]      
     mhi   = [1000,1000,1400,1400,1400]          
+<<<<<<< runLimits.py
+#    shape = ["ErfExp_v1","ErfExp_v1","Exp","Exp","Exp"]
+    shape = ["ErfPow2_v1 ErfExp_v1","ErfPow2_v1 ErfExp_v1","Exp Pow2","Exp Pow2","Exp Pow2"]
+=======
     shape = ["ErfPowExp_v1","ErfPowExp_v1","Exp","Exp","Exp"]
     shapeAlt = ["ErfPow2_v1","ErfPow2_v1","Pow","Pow","Pow"]
     #shape = ["ErfPow2_v1","ErfPow2_v1","Exp","Exp","Exp"]
     #shapeAlt = ["ErfExp_v1","ErfExp_v1","Pow2","Pow2","Pow2"]
+>>>>>>> 1.3
     
     BRnew = 00;
     cprime = [10,07,05,04,03,02,01];
@@ -142,9 +156,15 @@ if __name__ == '__main__':
                 print command #raw_input("ENTER");
                 os.system(command);
                 
+<<<<<<< runLimits.py
+                #mvcmmd1 = "mv plots_"+CHAN+"* "+DIR+"/plots_"+CHAN+"_"+str(mass[i])+"_"+str(cprime[j])+"_00";
+                ##print mvcmmd1;
+                #os.system(mvcmmd1);
+=======
                 #mvcmmd1 = "mv plots_"+CHAN+" "+DIR+"/plots_"+CHAN+"_"+str(mass[i])+"_"+str(cprime[j])+"_00";
                 #print mvcmmd1;
                 #os.system(mvcmmd1);
+>>>>>>> 1.3
             
             #mvcmmd0 = "mv hwwlvj_*_"+CHAN+"* other_*_"+CHAN+"* "+DIR+"/.";
             #print mvcmmd0;
@@ -248,8 +268,12 @@ if __name__ == '__main__':
         drawColors.append(ROOT.kGray+2);                          
         drawColors.append(ROOT.kOrange+2);                                          
                 
+        oneLine = ROOT.TF1("oneLine","1",599,1001);
+        oneLine.SetLineColor(ROOT.kRed);
+        oneLine.SetLineWidth(3);
+
         can = ROOT.TCanvas("can","can",800,800);
-        hrl = can.DrawFrame(599,0,801,25);
+        hrl = can.DrawFrame(599,0.5,1001,100.0);
         hrl.GetYaxis().SetTitle("#mu' = C' #times #mu");
         hrl.GetXaxis().SetTitle("mass (GeV)");
         can.SetGrid();
@@ -257,7 +281,9 @@ if __name__ == '__main__':
         tGraphs[2].Draw("f");
         tGraphs[1].Draw("PL");
         tGraphs[0].Draw("PL");
-                
+            
+        oneLine.Draw("LSAMES");
+
         for k in range(1,nCprimes):
 #            tGraphs[k*4].SetLineColor(k+1);
 #            tGraphs[k*4+1].SetLineColor(k+1);
@@ -271,6 +297,8 @@ if __name__ == '__main__':
             tGraphs[k*4+1].Draw("PL");   
                          
         leg.Draw();
+
+        ROOT.gPad.SetLogy();
         can.SaveAs("test.eps");
 
 

@@ -138,6 +138,16 @@ def lineshapeWidthReweight(point, meanSM, gammaSM, Cprime, massmin, massmax):
     weight = model2_pdf.getVal()/model1_pdf.getVal();
     return weight;
 
+def IntfRescale(curIntfRw,cPrime,BRnew):
+
+    curIoverS = curIntfRw - 1;
+    newWeight = 1 + ((1-BRnew)*curIoverS)/cPrime;
+    if newWeight < 0: newWeight = 0.01;
+    ratio = newWeight/curIntfRw;
+        
+    return ratio;
+
+
 #if __name__ == '__main__':
 #
 #

@@ -70,18 +70,20 @@ if __name__ == '__main__':
     #CHANNEL = 'mu' # or 'el'
     CHANNEL = options.channel
     if CHANNEL == 'el':
-        #LUMI = 19.2;#13.9
-        LUMI = 5.145
+        LUMI = 19.2;#13.9
+        #LUMI = 5.145
     elif CHANNEL == 'mu':
-        #LUMI = 19.3;#14.0
-        LUMI = 5.3;#14.0
+        LUMI = 19.3;#14.0
+        #LUMI = 5.3;#14.0
 
 #    sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/"
-    sourcefiledirectory = "/uscms_data/d2/andersj/Wjj/2012/data/Moriond2013/ReducedTrees/";    
+    sourcefiledirectory = "/uscms_data/d2/andersj/Wjj/2012/data/Moriond2013/ReducedTrees/"; 
+#    sourcefiledirectory = "/uscmst1b_scratch/lpc1/3DayLifetime/weizou/BoostedWSample_v2/"
+#    sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/RD_GenJets/";    
 
     treename = ""
     if options.makeControlPlots or options.makeTTBarControlPlots: 
-       sourcefiledirectory = "/uscms_data/d2/andersj/Wjj/2012/data/Moriond2013/ReducedTrees/"
+#       sourcefiledirectory = "/uscmst1b_scratch/lpc1/3DayLifetime/weizou/BoostedWSample_v2/"
        treename = "WJet"
     if options.makeTMVAPlots:
        sourcefiledirectory = "/uscms_data/d3/weizou/VBFHiggsAnalysis/BoostedWAnalysis2012/boostedWWAnalysis/trainingtrees_%s/"%(CHANNEL)
@@ -105,9 +107,15 @@ if __name__ == '__main__':
     ggH900Sample = sampleWrapperClass("ggH900",boostedWSamples.GetFileNames()["ggH900"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH900")),LUMI,boostedWSamples.GetTreeName(),notData)
     ggH1000Sample = sampleWrapperClass("ggH1000",boostedWSamples.GetFileNames()["ggH1000"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH1000")),LUMI,boostedWSamples.GetTreeName(),notData)
 
+    vbfH600Sample = sampleWrapperClass("vbfH600",boostedWSamples.GetFileNames()["vbfH600"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"vbfH600")),LUMI,boostedWSamples.GetTreeName(),notData)
+    vbfH700Sample = sampleWrapperClass("vbfH700",boostedWSamples.GetFileNames()["vbfH700"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"vbfH700")),LUMI,boostedWSamples.GetTreeName(),notData)
+    vbfH800Sample = sampleWrapperClass("vbfH800",boostedWSamples.GetFileNames()["vbfH800"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"vbfH800")),LUMI,boostedWSamples.GetTreeName(),notData)
+    vbfH900Sample = sampleWrapperClass("vbfH900",boostedWSamples.GetFileNames()["vbfH900"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"vbfH900")),LUMI,boostedWSamples.GetTreeName(),notData)
+    vbfH1000Sample = sampleWrapperClass("vbfH1000",boostedWSamples.GetFileNames()["vbfH1000"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"vbfH1000")),LUMI,boostedWSamples.GetTreeName(),notData)
+
     #boostedWXS = 1.3*228.9E3;
     #WJetsSample_EffLumi = 8955318/boostedWXS;
-    WJetsSample = sampleWrapperClass("WJets_Pythia",boostedWSamples.GetFileNames()["WJets_Pythia"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Pythia")),LUMI,boostedWSamples.GetTreeName(),notData)
+    WJets_PythiaSample = sampleWrapperClass("WJets_Pythia",boostedWSamples.GetFileNames()["WJets_Pythia"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Pythia")),LUMI,boostedWSamples.GetTreeName(),notData)
     WJets_HerwigSample = sampleWrapperClass("WJets_Herwig",boostedWSamples.GetFileNames()["WJets_Herwig"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Herwig")),LUMI,boostedWSamples.GetTreeName(),notData)
     ZJetsSample = sampleWrapperClass("ZJets",boostedWSamples.GetFileNames()["ZJets"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZJets")),LUMI,boostedWSamples.GetTreeName(),notData)
 
@@ -137,25 +145,30 @@ if __name__ == '__main__':
         # create training tree
         #WJetsSample.createTrainingTree();
 
-        datasample.createTrainingTree();
+#        datasample.createTrainingTree();
+        vbfH600Sample.createTrainingTree();
+        vbfH700Sample.createTrainingTree();        
+        vbfH800Sample.createTrainingTree();        
+        vbfH900Sample.createTrainingTree();        
+        vbfH1000Sample.createTrainingTree(); 
         ggH600Sample.createTrainingTree();
         ggH700Sample.createTrainingTree();        
         ggH800Sample.createTrainingTree();        
         ggH900Sample.createTrainingTree();        
         ggH1000Sample.createTrainingTree();        
-        WJets_HerwigSample.createTrainingTree();
-        WJetsSample.createTrainingTree();
-        ZJetsSample.createTrainingTree();
-        TTbarSample.createTrainingTree();
-        WWSample.createTrainingTree();
-        WZSample.createTrainingTree();
-        ZZSample.createTrainingTree();
-        tchSample.createTrainingTree();
-        tWchSample.createTrainingTree();
-        schSample.createTrainingTree();
-        tch_barSample.createTrainingTree();
-        tWch_barSample.createTrainingTree();
-        sch_barSample.createTrainingTree();
+#        WJets_HerwigSample.createTrainingTree();
+#        WJets_PythiaSample.createTrainingTree();
+#        ZJetsSample.createTrainingTree();
+#        TTbarSample.createTrainingTree();
+#        WWSample.createTrainingTree();
+#        WZSample.createTrainingTree();
+#        ZZSample.createTrainingTree();
+#        tchSample.createTrainingTree();
+#        tWchSample.createTrainingTree();
+#        schSample.createTrainingTree();
+#        tch_barSample.createTrainingTree();
+#        tWch_barSample.createTrainingTree();
+#        sch_barSample.createTrainingTree();
 
     #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
     #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, datasample );    
@@ -167,7 +180,11 @@ if __name__ == '__main__':
         if not os.path.isdir("controlPlots"): os.system("mkdir controlPlots");
         #myPlotter.makeControlPlots("controlPlots","nocuts");
         print "Please Check the Cuts used on the BoostedWControlPlots.py is reasonable"
-        Cuts = "W_pt > 180 && GroomedJet_CA8_pt[0] > 200 && ggdboostedWevt == 1 && event_metMVA_met > 50  "
+        Cuts = "W_pt > 200 && GroomedJet_CA8_pt[0] > 200 && ggdboostedWevt == 1 && event_met_pfmet > 50 && GroomedJet_CA8_deltaphi_METca8jet > 2.0 && GroomedJet_CA8_deltaR_lca8jet > 1.57";
+        if CHANNEL == "el": Cuts = Cuts + " && event_met_pfmet > 70 && W_electron_pt > 35";   
+        if CHANNEL == "mu": Cuts = Cuts + " && W_muon_pt > 30"; 
+        Cuts = Cuts + "&& numPFCorJetBTags < 1";
+
         #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50"
         #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberjets <= 1"
         #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets == 0"
@@ -272,7 +289,7 @@ if __name__ == '__main__':
     # do the training
     # get the training tree names
     signalTrainingTreeName = ggH600Sample.getTrainingTreeName();
-    backgroundTrainingTreeNames = WJetsSample.getTrainingTreeName();
+    backgroundTrainingTreeNames = WJets_PythiaSample.getTrainingTreeName();
     
     trainingMethod = options.trainingMethod
     # Trainings

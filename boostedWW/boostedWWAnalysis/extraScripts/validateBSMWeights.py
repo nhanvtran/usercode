@@ -29,7 +29,7 @@ parser.add_option('-m','--mass', action="store", type="int", dest="mass", defaul
 (options, args) = parser.parse_args()
 ############################################################
 
-if __name__ == '__main__':
+def drawLines(gen=True):
 
     fileName = "../trainingtrees_"+options.channel+"/ofile_ggH"+str(options.mass)+".root";
     file = ROOT.TFile(fileName);
@@ -38,8 +38,8 @@ if __name__ == '__main__':
     print "n: ", tree.GetEntries()
 
 
-    masses_min = {600:200, 700:200, 800:250, 900:400, 1000:400}
-    masses_max = {600:1000, 700:1000, 800:1200, 900:1600, 1000:1600}
+    masses_min = {600:350, 700:200, 800:250, 900:400, 1000:400}
+    masses_max = {600:850, 700:1000, 800:1200, 900:1600, 1000:1600}
     
     h_01 = ROOT.TH1F("h_01","h_01",50,masses_min[options.mass],masses_max[options.mass]);
     h_02 = ROOT.TH1F("h_02","h_02",50,masses_min[options.mass],masses_max[options.mass]);
@@ -52,39 +52,70 @@ if __name__ == '__main__':
     for i in range(tree.GetEntries()):
         
         tree.GetEntry(i);
-        h_01.Fill( tree.genHMass,tree.interference_Weight_H600*tree.bsmReweight_cPrime01_brNew00 );
-        h_02.Fill( tree.genHMass,tree.interference_Weight_H600*tree.bsmReweight_cPrime02_brNew00 );
-        h_03.Fill( tree.genHMass,tree.interference_Weight_H600*tree.bsmReweight_cPrime03_brNew00 );
-        h_04.Fill( tree.genHMass,tree.interference_Weight_H600*tree.bsmReweight_cPrime04_brNew00 );
-        h_05.Fill( tree.genHMass,tree.interference_Weight_H600*tree.bsmReweight_cPrime05_brNew00 );
-        h_07.Fill( tree.genHMass,tree.interference_Weight_H600*tree.bsmReweight_cPrime07_brNew00 );    
-        h_10.Fill( tree.genHMass,tree.interference_Weight_H600*tree.bsmReweight_cPrime10_brNew00 );        
+        
+        themass = 0;
+        if gen: themass = tree.genHMass
+        else: themass = tree.mass_lvj        
+        
+        intfWeight = getattr( tree, "interference_Weight_H%03d"%(options.mass) );
+        
+        h_01.Fill( themass,intfWeight*tree.bsmReweight_cPrime01_brNew00 );
+        h_02.Fill( themass,intfWeight*tree.bsmReweight_cPrime02_brNew00 );
+        h_03.Fill( themass,intfWeight*tree.bsmReweight_cPrime03_brNew00 );
+        h_04.Fill( themass,intfWeight*tree.bsmReweight_cPrime04_brNew00 );
+        h_05.Fill( themass,intfWeight*tree.bsmReweight_cPrime05_brNew00 );
+        h_07.Fill( themass,intfWeight*tree.bsmReweight_cPrime07_brNew00 );    
+        h_10.Fill( themass,intfWeight*tree.bsmReweight_cPrime10_brNew00 );        
         
 
     can = ROOT.TCanvas("can","can",800,800);
 
     maxY = max(h_01.GetMaximum(),h_02.GetMaximum(),h_03.GetMaximum(),h_04.GetMaximum(),h_05.GetMaximum(),h_07.GetMaximum(),h_10.GetMaximum());
 
-    h_01.SetLineColor(ROOT.kBlue-3);
-    h_02.SetLineColor(ROOT.kBlue-2);
+    h_01.SetLineColor(ROOT.kRed);
+    h_02.SetLineColor(ROOT.kCyan-2);
     h_03.SetLineColor(ROOT.kBlue-1);
     h_04.SetLineColor(ROOT.kMagenta);
-    h_05.SetLineColor(ROOT.kRed+1);
-    h_07.SetLineColor(ROOT.kRed+2);
-    h_10.SetLineColor(ROOT.kRed+3);
-    h_01.SetMaximum( 2.0*maxY );
+    h_05.SetLineColor(ROOT.kBlack+1);
+    h_07.SetLineColor(ROOT.kYellow-2);
+    h_10.SetLineColor(ROOT.kGreen-3);
+
+    h_01.Scale(1./h_01.Integral());
+    h_02.Scale(1./h_02.Integral());
+    h_03.Scale(1./h_03.Integral());
+    h_04.Scale(1./h_04.Integral());
+    h_05.Scale(1./h_05.Integral());
+    h_07.Scale(1./h_07.Integral());
+    h_10.Scale(1./h_10.Integral());
+
+    leg = ROOT.TLegend(0.2, 0.6, 0.4, 0.88);
+    leg.SetFillStyle(0);
+    leg.SetBorderSize(0);
+    leg.AddEntry(h_01,"C'^{2} = 0.1","l");
+    leg.AddEntry(h_03,"C'^{2} = 0.3","l");
+    leg.AddEntry(h_07,"C'^{2} = 0.7","l");
+    leg.AddEntry(h_10,"C'^{2} = 1.0","l");
+
+#    h_01.SetMaximum( 1.2*maxY );
     h_01.Draw();
-    h_02.Draw("sames");
+    if gen: h_01.SetTitle("; m_{H, gen} (GeV); a.u.");
+    else: h_01.SetTitle("; m {l+ MET + J} (GeV); a.u.");
+#    h_02.Draw("sames");
     h_03.Draw("sames");
-    h_04.Draw("sames");
-    h_05.Draw("sames");
+#    h_04.Draw("sames");
+#    h_05.Draw("sames");
     h_07.Draw("sames");
     h_10.Draw("sames");
     
-    ROOT.gPad.SetLogy();
-    can.SaveAs("test_"+options.channel+"_"+str(options.mass)+".eps");
+    leg.Draw();
 
-    print "end"
+#    ROOT.gPad.SetLogy();
+    if gen: can.SaveAs("test_"+options.channel+"_"+str(options.mass)+"_gen.eps");
+    else: can.SaveAs("test_"+options.channel+"_"+str(options.mass)+"_reco.eps");
         
 
+if __name__ == '__main__':
+
+    drawLines(True);
+    drawLines(False);
     

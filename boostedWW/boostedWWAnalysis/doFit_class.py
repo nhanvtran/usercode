@@ -30,6 +30,10 @@ if os.path.isfile('tdrstyle.C'):
 
 ROOT.gSystem.Load("PDFs/HWWLVJRooPdfs_cxx.so")
 ROOT.gSystem.Load("PDFs/PdfDiagonalizer_cc.so")
+<<<<<<< doFit_class.py
+ROOT.gSystem.Load("PDFs/HWWLVJRooPdfs_cxx.so")
+=======
+>>>>>>> 1.17
 #ROOT.gSystem.Load("PDFs/RooPowPdf_cxx.so")
 #ROOT.gSystem.Load("PDFs/RooPow2Pdf_cxx.so")
 #ROOT.gSystem.Load("PDFs/RooErfPowPdf_cxx.so")
@@ -162,7 +166,7 @@ class doFit_wj_and_wlvj:
         self.file_out.close()
         self.file_out=open(self.file_rlt_txt,"a+");
 
-        self.higgs_xs_scale=50.0; #higgs XS scale
+        self.higgs_xs_scale=1.0; #higgs XS scale
         
         self.color_palet={ #color palet
             #'WJets' : style.WJetsColor,
@@ -909,7 +913,11 @@ class doFit_wj_and_wlvj:
         mplot_pull_sideband.SetTitle("PULL");
         mplot_pull_sideband.GetYaxis().SetRangeUser(-5,5);
         parameters_list=model_pdf_sb_lo_WJets.getParameters(rdataset_WJets_sb_lo_mlvj);
+<<<<<<< doFit_class.py
+        self.draw_canvas( mplot_sb_lo, mplot_pull_sideband,parameters_list,"plots_%s_%s_%02d_%02d/other/"%(self.channel,self.PS_model,options.cprime,options.BRnew), "m_lvj%s_sb_lo_sim"%(label),"",1,0)
+=======
         self.draw_canvas( mplot_sb_lo, mplot_pull_sideband,parameters_list,self.rlt_DIR+"plots_%s_%s/other/"%(self.channel,self.PS_model), "m_lvj%s_sb_lo_sim"%(label),"",1,0)
+>>>>>>> 1.17
 
         mplot_signal_region = rrv_x.frame(RooFit.Title("WJets sr"));
         rdataset_WJets_signal_region_mlvj.plotOn(mplot_signal_region);
@@ -920,7 +928,11 @@ class doFit_wj_and_wlvj:
         mplot_pull_signal_region.SetTitle("PULL");
         mplot_pull_signal_region.GetYaxis().SetRangeUser(-5,5);
         parameters_list=model_pdf_signal_region_WJets.getParameters(rdataset_WJets_signal_region_mlvj);
+<<<<<<< doFit_class.py
+        self.draw_canvas( mplot_signal_region, mplot_pull_signal_region,parameters_list,"plots_%s_%s_%02d_%02d/other/"%(self.channel,self.PS_model,options.cprime,options.BRnew), "m_lvj%s_signal_region_sim"%(label),"",1,0);
+=======
         self.draw_canvas( mplot_signal_region, mplot_pull_signal_region,parameters_list,self.rlt_DIR+"plots_%s_%s/other/"%(self.channel,self.PS_model), "m_lvj%s_signal_region_sim"%(label),"",1,0);
+>>>>>>> 1.17
 
         model_pdf_sb_lo_WJets.plotOn(mplot,RooFit.Name("Sideband"));
         model_pdf_signal_region_WJets.plotOn(mplot, RooFit.LineColor(kRed) ,RooFit.Name("Signal Region"));
@@ -967,7 +979,11 @@ class doFit_wj_and_wlvj:
         else: 
             mplot.GetYaxis().SetRangeUser(0,0.28);
  
+<<<<<<< doFit_class.py
+        self.draw_canvas1(mplot,"plots_%s_%s_%02d_%02d/other/"%(self.channel,self.PS_model,options.cprime,options.BRnew),"correction_pdf%s_%s_%s_M_lvj_signal_region_to_sideband"%(label,self.PS_model,self.MODEL_4_mlvj),0,0);
+=======
         self.draw_canvas1(mplot,self.rlt_DIR+"plots_%s_%s/other/"%(self.channel,self.PS_model),"correction_pdf%s_%s_%s_M_lvj_signal_region_to_sideband"%(label,self.PS_model,self.MODEL_4_mlvj),0,0);
+>>>>>>> 1.17
 
         correct_factor_pdf_deco.getParameters(rdataset_WJets_sb_lo_mlvj).Print("v");
 
@@ -1015,7 +1031,11 @@ class doFit_wj_and_wlvj:
          
         parameters_list=model.getParameters(rdataset_mj);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
+<<<<<<< doFit_class.py
+        self.draw_canvas( mplot, mplot_pull,parameters_list, "plots_%s_%s_%02d_%02d/m_j_fitting_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model,options.cprime,options.BRnew, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name)
+=======
         self.draw_canvas( mplot, mplot_pull,parameters_list, self.rlt_DIR+"plots_%s_%s/m_j_fitting_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name)
+>>>>>>> 1.17
         rfresult.Print(); 
         rfresult.covarianceMatrix().Print(); #raw_input("ENTER"); 
         
@@ -1053,7 +1073,11 @@ class doFit_wj_and_wlvj:
          
         parameters_list=model.getParameters(rdataset_mj);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
+<<<<<<< doFit_class.py
+        self.draw_canvas( mplot, mplot_pull,parameters_list, "plots_%s_%s_%02d_%02d/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model,options.cprime,options.BRnew, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name)
+=======
         self.draw_canvas( mplot, mplot_pull,parameters_list, self.rlt_DIR+"plots_%s_%s/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name)
+>>>>>>> 1.17
         rfresult.Print();
 
     ############# ---------------------------------------------------
@@ -1158,8 +1182,13 @@ class doFit_wj_and_wlvj:
         mplot_pull.GetYaxis().SetRangeUser(-5,5);
          
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
+<<<<<<< doFit_class.py
+        self.draw_canvas( mplot, mplot_pull,parameters_list, "plots_%s_%s_%02d_%02d/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model,options.cprime,options.BRnew, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name+"Total")
+        self.draw_canvas1(mplot,"plots_%s_%s_%02d_%02d/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model,options.cprime,options.BRnew, self.wtagger_cut, self.nPV_min, self.nPV_max),"control_%s_%s"%(self.wtagger_lable,self.channel));
+=======
         self.draw_canvas( mplot, mplot_pull,parameters_list, self.rlt_DIR+"plots_%s_%s/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name+"Total")
         self.draw_canvas1(mplot,self.rlt_DIR+"plots_%s_%s/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max),"control_%s_%s"%(self.wtagger_lable,self.channel));
+>>>>>>> 1.17
         
         #calculate the mva eff
         self.workspace4fit_.var("rrv_number_dataset_signal_region_data_"+self.channel+"_mj").Print()
@@ -1567,6 +1596,11 @@ class doFit_wj_and_wlvj:
 
     ######## ++++++++++++++
     def ControlPlots(self):
+
+
+#        cut="ungroomed_jet_pt>200 && nbjetsCSV < 1"
+#        self.Make_Controlplots(cut,"simple");
+
         #cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && nbjets >=1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#ttbar control sample
         #self.Make_Controlplots(cut,"ttbar_control_sample");
 
@@ -1579,7 +1613,8 @@ class doFit_wj_and_wlvj:
         #cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && nbjets<1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#before_cut
         #self.Make_Controlplots(cut,"bf_cut");
 
-        cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#signal region
+        cut="ungroomed_jet_pt>200";#signal region
+        #cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#signal region
         self.Make_Controlplots(cut,"before_nbjet");
         cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && njets<2 && nbjetsSSVHE <1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#signal region
         self.Make_Controlplots(cut,"signal_region");
@@ -1687,7 +1722,11 @@ class doFit_wj_and_wlvj:
         theLeg.SetY1(theLeg.GetY1NDC());
         theLeg.Draw();
 
+<<<<<<< doFit_class.py
+        Directory=TString("plots_%s_%s_%02d_%02d/controlplot_wtaggercut%s_nPV%sto%s/"%(self.channel, self.PS_model,options.cprime,options.BRnew, self.wtagger_cut, self.nPV_min, self.nPV_max)+self.higgs_sample+"/");
+=======
         Directory=TString(self.rlt_DIR+"plots_%s_%s/controlplot_wtaggercut%s_nPV%sto%s/"%(self.channel, self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max)+self.higgs_sample+"_%02d_%02d/"%(options.cprime,options.BRnew));
+>>>>>>> 1.17
         if not Directory.EndsWith("/"):Directory=Directory.Append("/");
         if not os.path.isdir(Directory.Data()): os.system("mkdir -p  "+Directory.Data());
 
@@ -1747,7 +1786,11 @@ class doFit_wj_and_wlvj:
          
         parameters_list=model.getParameters(rdataset);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
+<<<<<<< doFit_class.py
+        self.draw_canvas( mplot, mplot_pull,parameters_list,"plots_%s_%s_%02d_%02d/m_lvj_fitting/"%(self.channel,self.PS_model,options.cprime,options.BRnew), in_file_name,"m_lvj"+in_range+in_model_name)
+=======
         self.draw_canvas( mplot, mplot_pull,parameters_list,self.rlt_DIR+"plots_%s_%s/m_lvj_fitting/"%(self.channel,self.PS_model), in_file_name,"m_lvj"+in_range+in_model_name)
+>>>>>>> 1.17
         #rfresult.Print(); rfresult.covarianceMatrix().Print(); raw_input("ENTER");
 
         #normalize the number of total events to lumi
@@ -1852,7 +1895,11 @@ class doFit_wj_and_wlvj:
         
         parameters_list=model_data.getParameters(rdataset_data_mj);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
+<<<<<<< doFit_class.py
+        self.draw_canvas( mplot, mplot_pull,parameters_list,"plots_%s_%s_%02d_%02d/m_j_fitting_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model,options.cprime,options.BRnew, self.wtagger_cut, self.nPV_min, self.nPV_max), "m_j_sideband%s"%(label),"",1)
+=======
         self.draw_canvas( mplot, mplot_pull,parameters_list,self.rlt_DIR+"plots_%s_%s/m_j_fitting_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), "m_j_sideband%s"%(label),"",1)
+>>>>>>> 1.17
 
         self.get_mj_normalization_insignalregion("_data");
         self.get_mj_normalization_insignalregion("_TTbar");
@@ -1946,7 +1993,11 @@ class doFit_wj_and_wlvj:
     
         parameters_list=model_data.getParameters(rdataset_data_mlvj);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1)
+<<<<<<< doFit_class.py
+        self.draw_canvas( mplot, mplot_pull,parameters_list,"plots_%s_%s_%02d_%02d/m_lvj_fitting/"%(self.channel,self.PS_model,options.cprime,options.BRnew), "m_lvj_sb_lo%s"%(label),"",1,1)
+=======
         self.draw_canvas( mplot, mplot_pull,parameters_list,self.rlt_DIR+"plots_%s_%s/m_lvj_fitting/"%(self.channel,self.PS_model), "m_lvj_sb_lo%s"%(label),"",1,1)
+>>>>>>> 1.17
 
         #model deco
         wsfit_tmp=RooWorkspace("wsfit_tmp%s_sb_lo_from_fitting_mlvj"%(label));
@@ -2337,7 +2388,11 @@ class doFit_wj_and_wlvj:
         leg=self.legend4Plot(mplot,0);
         mplot.addObject(leg);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
+<<<<<<< doFit_class.py
+        self.draw_canvas1(mplot,"plots_%s_%s_%02d_%02d/m_lvj_fitting/"%(self.channel,self.PS_model,options.cprime,options.BRnew),"check_workspace_for_limit",0,1);
+=======
         self.draw_canvas1(mplot,self.rlt_DIR+"plots_%s_%s/m_lvj_fitting/"%(self.channel,self.PS_model),"check_workspace_for_limit",0,1);
+>>>>>>> 1.17
 
         if workspace.var("rrv_num_floatparameter_in_last_fitting"):   nPar_float_in_fitTo= int(workspace.var("rrv_num_floatparameter_in_last_fitting").getVal());
         else:

@@ -125,7 +125,7 @@ class ProducePlot:
          if(self.samples.GetFileNames().has_key("Wbb") and self.samples.GetFileNames().has_key("Wcc") and self.samples.GetFileNames().has_key("Wlight")):
             wjet1D = self.drawhistograms["Wbb"] + self.drawhistograms["Wcc"] + self.drawhistograms["Wlight"]
          else:
-            wjet1D = self.drawhistograms["WJets"]
+            wjet1D = self.drawhistograms["WJets_Pythia"]
          wjet1D.SetFillColor(kGreen-3)
          #############WJet########################################
          
@@ -224,6 +224,7 @@ class ProducePlot:
              lumierror = allmc1D.GetBinContent(ibin) * 0.022
              statisticerror = allmc1D.GetBinError(ibin)
              allerror = sqrt(pow(ttbarerror,2) + pow(wjeterror,2) + pow(lumierror,2) + pow(statisticerror,2))
+             allerror = statisticerror             
              ylowlist.append(allerror)
              yhighlist.append(allerror)
 

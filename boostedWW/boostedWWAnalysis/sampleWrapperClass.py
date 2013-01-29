@@ -96,7 +96,7 @@ class sampleWrapperClass:
         if massin < 0: return;
         
         massmin = {600:200,700:200,800:400,900:400,1000:400};
-        massmax = {600:1000,700:1200,800:1400,900:1600,1000:1800};
+        massmax = {600:1200,700:1200,800:1500,900:1600,1000:1800};
 
         # read in original file and get lineshape 
         if not self.FitSMSignal: 
@@ -147,6 +147,11 @@ class sampleWrapperClass:
         interference_Weight_H800_ = array( 'f', [ 0. ] );                                
         interference_Weight_H900_ = array( 'f', [ 0. ] );                                
         interference_Weight_H1000_ = array( 'f', [ 0. ] );                                
+        cps_Weight_H600_ = array( 'f', [ 0. ] );                                
+        cps_Weight_H700_ = array( 'f', [ 0. ] );                                
+        cps_Weight_H800_ = array( 'f', [ 0. ] );                                
+        cps_Weight_H900_ = array( 'f', [ 0. ] );                                
+        cps_Weight_H1000_ = array( 'f', [ 0. ] );                                
         
         jet_grsens_ft_ = array( 'f', [ 0. ] );
         jet_grsens_tr_ = array( 'f', [ 0. ] );
@@ -162,6 +167,11 @@ class sampleWrapperClass:
         
         # n bjets
         nbjets_ = array( 'f', [ 0. ] );
+#        nbjets_ = array( 'f', [ 0. ] );
+#        nbjets_ = array( 'f', [ 0. ] );
+#        nbjets_ = array( 'f', [ 0. ] );
+#        nbjets_ = array( 'f', [ 0. ] );
+        
         nbjetsCSV_ = array( 'f', [ 0. ] );
         nbjetsSSVHE_ = array( 'f', [ 0. ] );        
         njets_ = array( 'f', [ 0. ] );        
@@ -203,6 +213,11 @@ class sampleWrapperClass:
         otree.Branch("interference_Weight_H800", interference_Weight_H800_ , "interference_Weight_H800/F");
         otree.Branch("interference_Weight_H900", interference_Weight_H900_ , "interference_Weight_H900/F");
         otree.Branch("interference_Weight_H1000", interference_Weight_H1000_ , "interference_Weight_H1000/F");
+        otree.Branch("cps_Weight_H600", cps_Weight_H600_ , "cps_Weight_H600/F");
+        otree.Branch("cps_Weight_H700", cps_Weight_H700_ , "cps_Weight_H700/F");
+        otree.Branch("cps_Weight_H800", cps_Weight_H800_ , "cps_Weight_H800/F");
+        otree.Branch("cps_Weight_H900", cps_Weight_H900_ , "cps_Weight_H900/F");
+        otree.Branch("cps_Weight_H1000", cps_Weight_H1000_ , "cps_Weight_H1000/F");
 
         otree.Branch("jet_grsens_ft", jet_grsens_ft_ , "jet_grsens_ft/F");
         otree.Branch("jet_grsens_tr", jet_grsens_tr_ , "jet_grsens_tr/F");
@@ -322,7 +337,7 @@ class sampleWrapperClass:
 
         for i in range(NLoop):
             
-            if i % 100000 == 0: print "i = ", i
+            if i % 1000 == 0: print "i = ", i
             
             self.InputTree_.GetEntry(i);
                         
@@ -372,15 +387,21 @@ class sampleWrapperClass:
                 infe_Weight_H1000 = complexpolewtggH1000*interferencewtggH1000/avecomplexpolewtggH1000;
 
                 # produce weights for alternative models
-                if self.SignalMass_ > 0:
+#                if self.SignalMass_ > 0:
+                if False:                    
+                    curIntfRw = getattr(self.InputTree_,"interferencewtggH%03d"%(self.SignalMass_));
+                    
+#                    print "new: ",IntfRescale(curIntfRw,0.1,0.)*curIntfRw,", old: ",curIntfRw
+#                    print "new: ",IntfRescale(curIntfRw,1.0,0.)*curIntfRw,", old: ",curIntfRw                                        
+                    
                     genHMass_[0] = getattr(self.InputTree_,"W_H_mass_gen");
-                    bsmReweight_cPrime01_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.1, 0. );
-                    bsmReweight_cPrime02_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.2, 0. );
-                    bsmReweight_cPrime03_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.3, 0. );
-                    bsmReweight_cPrime04_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.4, 0. );                
-                    bsmReweight_cPrime05_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.5, 0. );
-                    bsmReweight_cPrime07_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.7, 0. );
-                    bsmReweight_cPrime10_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 1.0, 0. );                
+                    bsmReweight_cPrime01_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.1, 0. )*IntfRescale(curIntfRw,0.1,0.);
+                    bsmReweight_cPrime02_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.2, 0. )*IntfRescale(curIntfRw,0.2,0.);
+                    bsmReweight_cPrime03_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.3, 0. )*IntfRescale(curIntfRw,0.3,0.);
+                    bsmReweight_cPrime04_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.4, 0. )*IntfRescale(curIntfRw,0.4,0.);                
+                    bsmReweight_cPrime05_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.5, 0. )*IntfRescale(curIntfRw,0.5,0.);
+                    bsmReweight_cPrime07_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.7, 0. )*IntfRescale(curIntfRw,0.7,0.);
+                    bsmReweight_cPrime10_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 1.0, 0. )*IntfRescale(curIntfRw,1.0,0.);                
                 else:   
                     genHMass_[0] = -1;
                     bsmReweight_cPrime01_brNew00_[0] = -1;
@@ -418,6 +439,11 @@ class sampleWrapperClass:
                 interference_Weight_H800_[0] = infe_Weight_H800;
                 interference_Weight_H900_[0] = infe_Weight_H900;
                 interference_Weight_H1000_[0] = infe_Weight_H1000;
+                cps_Weight_H600_[0] = complexpolewtggH600/avecomplexpolewtggH600;
+                cps_Weight_H700_[0] = complexpolewtggH700/avecomplexpolewtggH700;
+                cps_Weight_H800_[0] = complexpolewtggH800/avecomplexpolewtggH800;
+                cps_Weight_H900_[0] = complexpolewtggH900/avecomplexpolewtggH900;
+                cps_Weight_H1000_[0] = complexpolewtggH1000/avecomplexpolewtggH1000;
 
                 jet_grsens_ft_[0] = getattr( self.InputTree_, prefix + "_mass_ft" )[0] / getattr( self.InputTree_, prefix + "_mass" )[0];
                 jet_grsens_tr_[0] = getattr( self.InputTree_, prefix + "_mass_tr" )[0] / getattr( self.InputTree_, prefix + "_mass" )[0];
@@ -541,6 +567,14 @@ class sampleWrapperClass:
 
         self.InputTree_.SetBranchStatus("GroomedJet_numberjets",1);
         self.InputTree_.SetBranchStatus("GroomedJet_numberbjets",1);
+
+        self.InputTree_.SetBranchStatus("GroomedJet_numberbjets_csvl",1);
+        self.InputTree_.SetBranchStatus("GroomedJet_numberbjets_csvm",1);
+        self.InputTree_.SetBranchStatus("GroomedJet_numberbjets_ssvhem",1);
+        self.InputTree_.SetBranchStatus("GroomedJet_numberbjets_csvl_veto",1);
+        self.InputTree_.SetBranchStatus("GroomedJet_numberbjets_csvm_veto",1);
+        self.InputTree_.SetBranchStatus("GroomedJet_numberbjets_ssvhem_veto",1);
+
         self.InputTree_.SetBranchStatus("JetPFCor_bDiscriminatorCSV",1);
         self.InputTree_.SetBranchStatus("numPFCorJetBTags",1);
         self.InputTree_.SetBranchStatus(prefix + "_prsubjet1ptoverjetpt",1);
