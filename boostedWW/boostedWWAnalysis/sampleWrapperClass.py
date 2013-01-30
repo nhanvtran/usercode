@@ -17,12 +17,21 @@ ROOT.gStyle.SetPadTopMargin(0.09);
 ROOT.gStyle.SetPadLeftMargin(0.16);
 
 import os
+import sys
 
 from array import array
 import math
 from optparse import OptionParser
 
 from bsmReweighter import *
+
+
+# FWLITE stuff
+import sys
+from DataFormats.FWLite import Events, Handle
+ROOT.gSystem.Load('libCondFormatsJetMETObjects')
+ROOT.gSystem.Load('libFWCoreFWLite');
+ROOT.gSystem.Load('libFWCoreUtilities');  
 
 ### ------------ h e l p e r s --------------------
 
@@ -63,22 +72,9 @@ class sampleWrapperClass:
         self.FitSMSignal_gamma = -1;
     
         # ---------- Set up jet corrections on the fly of R >= 0.7 jets
-        if isData == 0 :
-            jecStr = [
-                      fDir + "GR_R_42_V23_L1FastJet_AK7PFchs.txt",
-                      fDir + "GR_R_42_V23_L2Relative_AK7PFchs.txt",
-                      fDir + "GR_R_42_V23_L3Absolute_AK7PFchs.txt",
-                      ]
-        else :
-            jecStr = [
-                      fDir + "GR_R_42_V23_L1FastJet_AK7PFchs.txt",
-                      fDir + "GR_R_42_V23_L2Relative_AK7PFchs.txt",
-                      fDir + "GR_R_42_V23_L3Absolute_AK7PFchs.txt",
-                      fDir + "GR_R_42_V23_L2L3Residual_AK7PFchs.txt",
-                      ]
-        jecPars = ROOT.std.vector(ROOT.JetCorrectorParameters)()
-        jecUncStr = ROOT.std.string(fDir + "GR_R_42_V23_Uncertainty_AK7PFchs.txt")
-        jecUnc = ROOT.JetCorrectionUncertainty( jecUncStr )
+        fDir = "JECs/"      
+        jecUncStr = ROOT.std.string(fDir + "GR_R_53_V10_Uncertainty_AK7PFchs.txt")
+        self.jecUnc_ = ROOT.JetCorrectionUncertainty(jecUncStr)
             
     def createTrainingTree(self):
         
@@ -151,6 +147,10 @@ class sampleWrapperClass:
         jet_mass_pr_ = array( 'f', [ 0. ] );
         jet_pt_pr_ = array( 'f', [ 0. ] );
         ungroomed_jet_pt_ = array( 'f', [ 0. ] );
+        j_jecfactor_up_ = array( 'f', [ 0. ] );
+        j_jecfactor_dn_ = array( 'f', [ 0. ] );
+        jet_mass_pr_up_ = array( 'f', [ 0. ] );
+        jet_mass_pr_dn_ = array( 'f', [ 0. ] );
         
         l_pt_ = array( 'f', [ 0. ] );
         l_eta_ = array( 'f', [ 0. ] );        
@@ -184,11 +184,13 @@ class sampleWrapperClass:
         jet_rcore7_ = array( 'f', [ 0. ] );
         
         # n bjets
-        nbjets_ = array( 'f', [ 0. ] );
 #        nbjets_ = array( 'f', [ 0. ] );
-#        nbjets_ = array( 'f', [ 0. ] );
-#        nbjets_ = array( 'f', [ 0. ] );
-#        nbjets_ = array( 'f', [ 0. ] );
+        nbjets_cvsl_ = array( 'f', [ 0. ] );
+        nbjets_cvsm_ = array( 'f', [ 0. ] );
+        nbjets_ssvhem_ = array( 'f', [ 0. ] );
+        nbjets_csvl_veto_ = array( 'f', [ 0. ] );
+        nbjets_csvm_veto_ = array( 'f', [ 0. ] );
+        nbjets_ssvhem_veto_ = array( 'f', [ 0. ] );
         
         nbjetsCSV_ = array( 'f', [ 0. ] );
         nbjetsSSVHE_ = array( 'f', [ 0. ] );        
@@ -218,6 +220,11 @@ class sampleWrapperClass:
         otree.Branch("jet_pt_pr", jet_pt_pr_ , "jet_pt_pr/F");
         otree.Branch("ungroomed_jet_pt", ungroomed_jet_pt_, "ungroomed_jet_pt/F");
         otree.Branch("jet_mass_pr", jet_mass_pr_ , "jet_mass_pr/F");
+        otree.Branch("j_jecfactor_up", j_jecfactor_up_ , "j_jecfactor_up/F");
+        otree.Branch("j_jecfactor_dn", j_jecfactor_dn_ , "j_jecfactor_dn/F");        
+        otree.Branch("jet_mass_pr_up", jet_mass_pr_up_ , "jet_mass_pr_up/F");
+        otree.Branch("jet_mass_pr_dn", jet_mass_pr_dn_ , "jet_mass_pr_dn/F");
+        
         otree.Branch("l_pt", l_pt_ , "l_pt/F");
         otree.Branch("l_eta", l_eta_ , "l_eta/F");
         otree.Branch("mvaMET", mvaMET_ , "mvaMET/F");
@@ -248,7 +255,13 @@ class sampleWrapperClass:
         otree.Branch("jet_rcore6", jet_rcore6_ , "jet_rcore6/F");
         otree.Branch("jet_rcore7", jet_rcore7_ , "jet_rcore7/F");
 
-        otree.Branch("nbjets", nbjets_ , "nbjets/F");
+#        otree.Branch("nbjets", nbjets_ , "nbjets/F");
+        otree.Branch("nbjets_cvsl", nbjets_cvsl_ , "nbjets_cvsl/F");
+        otree.Branch("nbjets_cvsm", nbjets_cvsm_ , "nbjets_cvsm/F");
+        otree.Branch("nbjets_ssvhem", nbjets_ssvhem_ , "nbjets_ssvhem/F");
+        otree.Branch("nbjets_csvl_veto", nbjets_csvl_veto_ , "nbjets_csvl_veto/F");
+        otree.Branch("nbjets_csvm_veto", nbjets_csvm_veto_ , "nbjets_csvm_veto/F");        
+        otree.Branch("nbjets_ssvhem_veto", nbjets_ssvhem_veto_ , "nbjets_ssvhem_veto/F");                
         otree.Branch("nbjetsCSV", nbjetsCSV_ , "nbjetsCSV_/F");
         otree.Branch("nbjetsSSVHE", nbjetsSSVHE_ , "nbjetsSSVHE_/F");        
         otree.Branch("njets", njets_ , "njets/F");
@@ -439,6 +452,29 @@ class sampleWrapperClass:
                 jet_pt_pr_[0] = getattr( self.InputTree_, prefix + "_pt_pr" )[0];
                 ungroomed_jet_pt_[0] = getattr( self.InputTree_, prefix+"_pt" )[0];
                 
+                self.jecUnc_.setJetEta( getattr( self.InputTree_, prefix+"_eta" )[0] )
+                self.jecUnc_.setJetPt( getattr( self.InputTree_, prefix+"_pt" )[0] );                        
+                j_jecfactor_up_[0] = self.jecUnc_.getUncertainty( True )
+                self.jecUnc_.setJetEta( getattr( self.InputTree_, prefix+"_eta" )[0] )
+                self.jecUnc_.setJetPt( getattr( self.InputTree_, prefix+"_pt" )[0] );               
+                j_jecfactor_dn_[0] = self.jecUnc_.getUncertainty( False ) 
+
+                j_jecfactor_up_[0] = math.sqrt( j_jecfactor_up_[0]**2 + 0.02**2 );
+                j_jecfactor_dn_[0] = math.sqrt( j_jecfactor_dn_[0]**2 + 0.02**2 );
+                curjes_up = 1 + j_jecfactor_up_[0]
+                curjes_dn = 1 - j_jecfactor_dn_[0]
+
+                jorig_pt = getattr( self.InputTree_, prefix + "_pt_pr" )[0];    
+                jorig_eta = getattr( self.InputTree_, prefix + "_eta_pr" )[0];    
+                jorig_phi = getattr( self.InputTree_, prefix + "_phi_pr" )[0];    
+                jorig_e = getattr( self.InputTree_, prefix + "_e_pr" )[0];                        
+                jdef_ptetaphie = ROOT.TLorentzVector();
+                jdef_ptetaphie.SetPtEtaPhiE(jorig_pt, jorig_eta, jorig_phi, jorig_e)
+                jdef_up = ROOT.TLorentzVector(jdef_ptetaphie.Px() * curjes_up, jdef_ptetaphie.Py() * curjes_up, jdef_ptetaphie.Pz() * curjes_up, jdef_ptetaphie.E() * curjes_up)                    
+                jdef_dn = ROOT.TLorentzVector(jdef_ptetaphie.Px() * curjes_dn, jdef_ptetaphie.Py() * curjes_dn, jdef_ptetaphie.Pz() * curjes_dn, jdef_ptetaphie.E() * curjes_dn)
+                jet_mass_pr_up_[0] = jdef_up.M();  
+                jet_mass_pr_dn_[0] = jdef_dn.M();  
+                    
                 if self.Channel_ == "mu" :
                     l_pt_[0] = getattr( self.InputTree_, "W_muon_pt" );
                     l_eta_[0] = getattr( self.InputTree_, "W_muon_eta" );
@@ -484,7 +520,14 @@ class sampleWrapperClass:
                 jet_planarlow06_[0] = getattr( self.InputTree_, prefix + "_planarflow06");
                 jet_planarlow07_[0] = getattr( self.InputTree_, prefix + "_planarflow07");
                 
-                nbjets_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets" );
+#                nbjets_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets" );
+                nbjets_cvsl_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl" );
+                nbjets_cvsm_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm" );
+                nbjets_ssvhem_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem" );
+                nbjets_csvl_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl_veto" );
+                nbjets_csvm_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm_veto" );
+                nbjets_ssvhem_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem_veto" );
+
                 nbjetsCSV_[0] =0 ;
                 for i in range(0,6):
                     if  getattr(self.InputTree_, "JetPFCor_bDiscriminatorCSV")[i] >=0.244 :nbjetsCSV_[0]=nbjetsCSV_[0]+1;
@@ -572,6 +615,10 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus("boostedW_lvj_m",1);
         self.InputTree_.SetBranchStatus("W_pt",1);
         self.InputTree_.SetBranchStatus(prefix + "_pt_pr",1);
+        self.InputTree_.SetBranchStatus(prefix + "_eta_pr",1);
+        self.InputTree_.SetBranchStatus(prefix + "_phi_pr",1);
+        self.InputTree_.SetBranchStatus(prefix + "_e_pr",1);
+        self.InputTree_.SetBranchStatus(prefix + "_eta",1);
         self.InputTree_.SetBranchStatus(prefix + "_pt",1);
         self.InputTree_.SetBranchStatus(prefix + "_massdrop_pr",1);
         self.InputTree_.SetBranchStatus(prefix + "_mass",1);

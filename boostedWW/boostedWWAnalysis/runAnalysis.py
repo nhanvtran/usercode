@@ -77,9 +77,9 @@ if __name__ == '__main__':
         #LUMI = 5.3;#14.0
 
 #    sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/"
-    sourcefiledirectory = "/uscms_data/d2/andersj/Wjj/2012/data/Moriond2013/ReducedTrees/"; 
-#    sourcefiledirectory = "/uscmst1b_scratch/lpc1/3DayLifetime/weizou/BoostedWSample_v2/"
-#    sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/RD_GenJets/";    
+#    sourcefiledirectory = "/uscms_data/d2/andersj/Wjj/2012/data/Moriond2013/ReducedTrees/"; 
+    sourcefiledirectory = "/uscmst1b_scratch/lpc1/3DayLifetime/weizou/BoostedWSample_v2/"
+#    sourcefiledirectory = "/uscms_data/d3/lnujj/RDTrees_BoostedW_2013_1_29/";    
 
     treename = ""
     if options.makeControlPlots or options.makeTTBarControlPlots: 
@@ -145,7 +145,7 @@ if __name__ == '__main__':
         # create training tree
         #WJetsSample.createTrainingTree();
 
-#        datasample.createTrainingTree();
+        datasample.createTrainingTree();
         vbfH600Sample.createTrainingTree();
         vbfH700Sample.createTrainingTree();        
         vbfH800Sample.createTrainingTree();        
@@ -156,19 +156,19 @@ if __name__ == '__main__':
         ggH800Sample.createTrainingTree();        
         ggH900Sample.createTrainingTree();        
         ggH1000Sample.createTrainingTree();        
-#        WJets_HerwigSample.createTrainingTree();
-#        WJets_PythiaSample.createTrainingTree();
-#        ZJetsSample.createTrainingTree();
-#        TTbarSample.createTrainingTree();
-#        WWSample.createTrainingTree();
-#        WZSample.createTrainingTree();
-#        ZZSample.createTrainingTree();
-#        tchSample.createTrainingTree();
-#        tWchSample.createTrainingTree();
-#        schSample.createTrainingTree();
-#        tch_barSample.createTrainingTree();
-#        tWch_barSample.createTrainingTree();
-#        sch_barSample.createTrainingTree();
+        WJets_HerwigSample.createTrainingTree();
+        WJets_PythiaSample.createTrainingTree();
+        ZJetsSample.createTrainingTree();
+        TTbarSample.createTrainingTree();
+        WWSample.createTrainingTree();
+        WZSample.createTrainingTree();
+        ZZSample.createTrainingTree();
+        tchSample.createTrainingTree();
+        tWchSample.createTrainingTree();
+        schSample.createTrainingTree();
+        tch_barSample.createTrainingTree();
+        tWch_barSample.createTrainingTree();
+        sch_barSample.createTrainingTree();
 
     #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
     #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, datasample );    
@@ -183,8 +183,9 @@ if __name__ == '__main__':
         Cuts = "W_pt > 200 && GroomedJet_CA8_pt[0] > 200 && ggdboostedWevt == 1 && event_met_pfmet > 50 && GroomedJet_CA8_deltaphi_METca8jet > 2.0 && GroomedJet_CA8_deltaR_lca8jet > 1.57";
         if CHANNEL == "el": Cuts = Cuts + " && event_met_pfmet > 70 && W_electron_pt > 35";   
         if CHANNEL == "mu": Cuts = Cuts + " && W_muon_pt > 30"; 
-        Cuts = Cuts + "&& numPFCorJetBTags < 1";
-
+#        Cuts = Cuts + " && numPFCorJetBTags < 1";
+        Cuts = Cuts + " && GroomedJet_numberbjets_csvm > 0";
+        
         #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50"
         #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberjets <= 1"
         #Cuts = "W_pt > 180 && GroomedJet_CA8_pt_pr[0] > 180 && ggdboostedWevt == 1 && event_metMVA_met > 50 && GroomedJet_numberbjets == 0"
