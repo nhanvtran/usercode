@@ -151,6 +151,11 @@ class sampleWrapperClass:
         j_jecfactor_dn_ = array( 'f', [ 0. ] );
         jet_mass_pr_up_ = array( 'f', [ 0. ] );
         jet_mass_pr_dn_ = array( 'f', [ 0. ] );
+
+        isttbar_ = array( 'i', [ 0 ] );                
+        jet_mass_pr_ttbar_ = array( 'f', [ 0. ] );        
+        jet_pt_ttbar_ = array( 'f', [ 0. ] );        
+        tau2tau1_ttbar_ = array( 'f', [ 0. ] );                
         
         l_pt_ = array( 'f', [ 0. ] );
         l_eta_ = array( 'f', [ 0. ] );        
@@ -224,6 +229,11 @@ class sampleWrapperClass:
         otree.Branch("j_jecfactor_dn", j_jecfactor_dn_ , "j_jecfactor_dn/F");        
         otree.Branch("jet_mass_pr_up", jet_mass_pr_up_ , "jet_mass_pr_up/F");
         otree.Branch("jet_mass_pr_dn", jet_mass_pr_dn_ , "jet_mass_pr_dn/F");
+
+        otree.Branch("isttbar", isttbar_ , "isttbar/F");        
+        otree.Branch("jet_pt_ttbar", jet_pt_ttbar_ , "jet_pt_ttbar/F");        
+        otree.Branch("tau2tau1_ttbar", tau2tau1_ttbar_ , "tau2tau1_ttbar/F");        
+        otree.Branch("jet_mass_pr_ttbar", jet_mass_pr_ttbar_ , "jet_mass_pr_ttbar/F");        
         
         otree.Branch("l_pt", l_pt_ , "l_pt/F");
         otree.Branch("l_eta", l_eta_ , "l_eta/F");
@@ -368,12 +378,49 @@ class sampleWrapperClass:
 
         for i in range(NLoop):
             
-            if i % 1000 == 0: print "i = ", i
+            if i % 10000 == 0: print "i = ", i
             
             self.InputTree_.GetEntry(i);
-                        
+                                    
+            ttbarlike = 0;
+
+            if self.Channel_ == 'mu': lepLabel = "muon";
+            if self.Channel_ == 'el': lepLabel = "electron";
+            index_ca8_in_oppoHemi = [];
+            for i in range(6):
+                if getattr( self.InputTree_, "GroomedJet_CA8_pt" )[i] > 200:
+                    j_ca8_eta = getattr( self.InputTree_, "GroomedJet_CA8_eta" )[i]
+                    j_ca8_phi = getattr( self.InputTree_, "GroomedJet_CA8_phi" )[i]
+                    l_eta = getattr( self.InputTree_, "W_"+lepLabel+"_eta" )
+                    l_phi = getattr( self.InputTree_, "W_"+lepLabel+"_phi" )
+                    dR_lj = math.sqrt( (l_eta - j_ca8_eta)**2 + (l_phi - j_ca8_phi)**2 );
+#                    print "dR_lj: ", dR_lj
+                    if dR_lj > ROOT.TMath.Pi()/2.: index_ca8_in_oppoHemi.append(i);
+
+            minMass = -1;
+            theca8Index = -1;
+            for i in range(len(index_ca8_in_oppoHemi)):
+                curmass = getattr( self.InputTree_, "GroomedJet_CA8_mass_pr" )[index_ca8_in_oppoHemi[i]]
+                if curmass > minMass: 
+                    minMass = curmass;
+                    theca8Index = index_ca8_in_oppoHemi[i];
+
+            if theca8Index >= 0:
+                for i in range(6):
+                    if getattr( self.InputTree_, "JetPFCor_Pt" )[i] > 30:
+                        j_ca8_eta = getattr( self.InputTree_, "GroomedJet_CA8_eta" )[theca8Index]
+                        j_ca8_phi = getattr( self.InputTree_, "GroomedJet_CA8_phi" )[theca8Index]
+                        j_ak5_eta = getattr( self.InputTree_, "JetPFCor_Eta" )[i]
+                        j_ak5_phi = getattr( self.InputTree_, "JetPFCor_Phi" )[i]
+                        l_eta = getattr( self.InputTree_, "W_"+lepLabel+"_eta" )
+                        l_phi = getattr( self.InputTree_, "W_"+lepLabel+"_phi" )                
+                        dR_jj = math.sqrt( (j_ak5_eta - j_ca8_eta)**2 + (j_ak5_phi - j_ca8_phi)**2 );
+                        dR_lj = math.sqrt( (l_eta - j_ca8_eta)**2 + (l_phi - j_ca8_phi)**2 );
+#                        print "dR_jj: ", dR_jj
+                        if dR_lj > ROOT.TMath.Pi()/2. and dR_jj > 0.8 and getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.244: 
+                            ttbarlike = 1
+
             # make cuts
-            #if getattr( self.InputTree_, "W_pt" ) > 180 and getattr( self.InputTree_, "GroomedJet_CA8_pt_pr" )[0] > 180 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_metMVA_met" ) > 50:
             leptonCut = 30;
             leptonCutString = "W_muon_pt";
             metCut = 50;
@@ -382,7 +429,10 @@ class sampleWrapperClass:
                 leptonCutString = "W_electron_pt";
                 metCut = 70;
 
-            if getattr( self.InputTree_, "W_pt" ) > 200 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut and getattr( self.InputTree_, "GroomedJet_CA8_deltaphi_METca8jet") > 2.0 and getattr( self.InputTree_, "GroomedJet_CA8_deltaR_lca8jet") > 1.57:
+            signallike = False;
+            if getattr( self.InputTree_, "W_pt" ) > 200 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut and getattr( self.InputTree_, "GroomedJet_CA8_deltaphi_METca8jet") > 2.0 and getattr( self.InputTree_, "GroomedJet_CA8_deltaR_lca8jet") > 1.57: signallike = True;
+
+            if (ttbarlike and getattr( self.InputTree_, "W_pt" ) > 100) or signallike == True:                
  
                 effwt = getattr( self.InputTree_, "effwt" );
                 puwt = getattr( self.InputTree_, "puwt" ); 
@@ -449,6 +499,17 @@ class sampleWrapperClass:
                 mass_lvj_[0] = getattr( self.InputTree_, "boostedW_lvj_m" );
                 v_pt_[0] = getattr( self.InputTree_, "W_pt" );
                 jet_mass_pr_[0] = getattr( self.InputTree_, prefix + "_mass_pr" )[0];
+
+                isttbar_[0] = ttbarlike;
+                if ttbarlike == 1:
+                    jet_mass_pr_ttbar_[0] = getattr( self.InputTree_, prefix + "_mass_pr" )[theca8Index];
+                    jet_pt_ttbar_[0] = getattr( self.InputTree_, prefix + "_pt" )[theca8Index];
+                    tau2tau1_ttbar_[0] = getattr( self.InputTree_, prefix + "_tau2tau1" )[theca8Index];                    
+                else:
+                    jet_mass_pr_ttbar_[0] = -1;
+                    jet_pt_ttbar_[0] = -1;
+                    tau2tau1_ttbar_[0] = -1;
+
                 jet_pt_pr_[0] = getattr( self.InputTree_, prefix + "_pt_pr" )[0];
                 ungroomed_jet_pt_[0] = getattr( self.InputTree_, prefix+"_pt" )[0];
                 
@@ -604,9 +665,12 @@ class sampleWrapperClass:
         if self.Channel_ == "mu" :
             self.InputTree_.SetBranchStatus("W_muon_pt",1);
             self.InputTree_.SetBranchStatus("W_muon_eta",1);
+            self.InputTree_.SetBranchStatus("W_muon_phi",1);
+        
         elif self.Channel_ == "el":
             self.InputTree_.SetBranchStatus("W_electron_pt",1);
             self.InputTree_.SetBranchStatus("W_electron_eta",1);
+            self.InputTree_.SetBranchStatus("W_electron_phi",1);
 
 
         self.InputTree_.SetBranchStatus("event_metMVA_met",1);
@@ -640,6 +704,9 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus("GroomedJet_numberbjets_csvm_veto",1);
         self.InputTree_.SetBranchStatus("GroomedJet_numberbjets_ssvhem_veto",1);
 
+        self.InputTree_.SetBranchStatus("JetPFCor_Pt",1);
+        self.InputTree_.SetBranchStatus("JetPFCor_Eta",1);
+        self.InputTree_.SetBranchStatus("JetPFCor_Phi",1);
         self.InputTree_.SetBranchStatus("JetPFCor_bDiscriminatorCSV",1);
         self.InputTree_.SetBranchStatus("numPFCorJetBTags",1);
         self.InputTree_.SetBranchStatus(prefix + "_prsubjet1ptoverjetpt",1);

@@ -34,6 +34,7 @@ class Samples:
       def SetFileNames(self):
           if self.channel == "mu":
               self.filenames["data"] = self.filepath + "RD_WmunuJets_DataAll_GoldenJSON_19p3invfb.root"
+#              self.filenames["data"] = "extraScripts/RDclone.root" 
 #              self.filenames["data"] = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/RD_WmunuJets_DataAll_GoldenJSON_5p3invfb.root" 
               self.filenames["TTbar"] = self.filepath + "RD_mu_TTbar_CMSSW532.root"
               self.filenames["WJets_Pythia"] = self.filepath + "RD_mu_WJets_madgraph_CMSSW532.root"

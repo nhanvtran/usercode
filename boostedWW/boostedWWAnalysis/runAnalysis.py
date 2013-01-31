@@ -78,8 +78,8 @@ if __name__ == '__main__':
 
 #    sourcefiledirectory = "/eos/uscms/store/user/lnujj/Moriond2013/ReducedTrees/"
 #    sourcefiledirectory = "/uscms_data/d2/andersj/Wjj/2012/data/Moriond2013/ReducedTrees/"; 
-    sourcefiledirectory = "/uscmst1b_scratch/lpc1/3DayLifetime/weizou/BoostedWSample_v2/"
-#    sourcefiledirectory = "/uscms_data/d3/lnujj/RDTrees_BoostedW_2013_1_29/";    
+#    sourcefiledirectory = "/uscmst1b_scratch/lpc1/3DayLifetime/weizou/BoostedWSample_v2/"
+    sourcefiledirectory = "/uscms_data/d3/lnujj/RDTrees_BoostedW_2013_1_29/";    
 
     treename = ""
     if options.makeControlPlots or options.makeTTBarControlPlots: 
