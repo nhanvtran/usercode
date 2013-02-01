@@ -4,6 +4,7 @@ import glob
 import math
 import array
 import ROOT
+import ntpath
 
 from ROOT import gROOT, gStyle, gSystem, TLatex, TString, TF1,TFile,TLine, TLegend, TH1D,TH2D,THStack,TChain, TCanvas, TMatrixDSym, TMath, TText, TPad, RooFit, RooArgSet, RooArgList, RooArgSet, RooAbsData, RooAbsPdf, RooAddPdf, RooWorkspace, RooExtendPdf,RooCBShape, RooLandau, RooFFTConvPdf, RooGaussian, RooBifurGauss, RooDataSet, RooExponential,RooBreitWigner, RooVoigtian, RooNovosibirsk, RooRealVar,RooFormulaVar, RooDataHist, RooHistPdf,RooCategory, RooSimultaneous, RooGenericPdf,RooConstVar, RooKeysPdf, RooHistPdf, RooEffProd, RooProdPdf, TIter, kTRUE, kFALSE, kGray, kRed, kDashed, kGreen,kAzure, kOrange, kBlack,kBlue,kYellow,kCyan, kMagenta
 import subprocess
@@ -196,9 +197,12 @@ class doFit_wj_and_wlvj:
         #PU study: 0-11,11-15,15-100
         self.nPV_min=  0;
         self.nPV_max= 300;
-		#met cut:el 65; mu: 50
+		#met cut:el 70; mu: 50
         self.pfMET_cut=50;
-        if self.channel=="el":self.pfMET_cut=65; 
+        self.lpt_cut = 30;
+        if self.channel=="el":
+            self.pfMET_cut=70; 
+            self.lpt_cut = 35;        
         #deltaPhi_METj cut
         self.deltaPhi_METj_cut =2.0;
 
@@ -1272,7 +1276,7 @@ class doFit_wj_and_wlvj:
             #jet mass, jet mass up, jet mass down
             tmp_jet_mass=getattr(treeIn, jet_mass);
 
-            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE <1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max :
+            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE < 1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.v_pt > 200 and treeIn.pfMET > self.pfMET_cut and treeIn.l_pt > self.lpt_cut:
                 #print tmp_jet_mass_dn, tmp_jet_mass, tmp_jet_mass_up;
                 tmp_event_weight= treeIn.totalEventWeight;
                 tmp_event_weight4fit= treeIn.eff_and_pu_Weight;
@@ -1450,18 +1454,17 @@ class doFit_wj_and_wlvj:
             discriminantCut = False; 
 
             wtagger=-1;
-            wtagger=treeIn.jet_tau2tau1;
+            #            wtagger=treeIn.jet_tau2tau1;
+            wtagger=treeIn.tau2tau1_ttbar
             if wtagger <self.wtagger_cut:
                 discriminantCut=True;
             else:
                 discriminantCut=False;
-                #discriminantCut=True;
+            #discriminantCut=True;
+            
+            #            if discriminantCut and treeIn.ungroomed_jet_pt > 200. and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjets_cvsm >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mvaMET_cut:
+            if discriminantCut and treeIn.isttbar > 0 and treeIn.l_pt >= 40 and treeIn.pfMET > 50 and treeIn.jet_pt_ttbar > 200 and treeIn.v_pt > 160:
 
-            #jet mass, jet mass up, jet mass down
-            tmp_jet_mass=getattr(treeIn, jet_mass);
-            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max :
-            #if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mvaMET_cut:
-            #if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjets >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max  :
                 tmp_event_weight= treeIn.totalEventWeight;
                 tmp_event_weight4fit= treeIn.eff_and_pu_Weight;
                 tmp_interference_weight_H600=treeIn.interference_Weight_H600;
@@ -1510,9 +1513,9 @@ class doFit_wj_and_wlvj:
                 if tmp_jet_mass >=self.mj_sideband_hi_min and tmp_jet_mass <self.mj_sideband_hi_max: hnum_4region.Fill(1,tmp_event_weight);
                 hnum_4region.Fill(2,tmp_event_weight);
 
-            if treeIn.ungroomed_jet_pt > 200.  and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max :
-            #if treeIn.ungroomed_jet_pt > 200. and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mvaMET_cut:
-            #if treeIn.ungroomed_jet_pt > 200. and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjets >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max  :
+                #            if treeIn.ungroomed_jet_pt > 200.  and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjets_cvsm >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mvaMET_cut:
+            if treeIn.isttbar > 0 and treeIn.l_pt >= 40 and treeIn.pfMET > 50 and treeIn.jet_pt_ttbar > 200 and treeIn.v_pt > 160:
+
                 tmp_event_weight= treeIn.totalEventWeight;
                 tmp_event_weight4fit= treeIn.eff_and_pu_Weight;
                 tmp_interference_weight_H600=treeIn.interference_Weight_H600;
@@ -1697,8 +1700,8 @@ class doFit_wj_and_wlvj:
         hist_data.GetXaxis().SetLabelSize(0.04);
         hist_data.GetYaxis().SetLabelSize(0.04);
 
-        banner = TLatex(0.18,0.85,("#splitline{CMS Preliminary}{%.1f fb^{-1} at #sqrt{s}=8TeV %s+jets}"%(self.GetLumi(),self.channel)));
-        banner.SetNDC(); banner.SetTextSize(0.025);
+        banner = TLatex(0.18,0.96,("CMS Preliminary, %.1f fb^{-1} at #sqrt{s}=8TeV %s+jets"%(self.GetLumi(),self.channel)));
+        banner.SetNDC(); banner.SetTextSize(0.028);
         banner.Draw();
 
         theLeg = TLegend(0.65, 0.57, 0.92, 0.87, "", "NDC");
@@ -2130,7 +2133,8 @@ class doFit_wj_and_wlvj:
         datacard_out.write( "\nkmax *" )
         datacard_out.write( "\n--------------- ")
         if mode == "unbin":
-            datacard_out.write( "\nshapes * * %s %s:$PROCESS_%s"%(self.file_rlt_root, self.workspace4limit_.GetName(), self.channel))
+            fnOnly = ntpath.basename(self.file_rlt_root)
+            datacard_out.write( "\nshapes * * %s %s:$PROCESS_%s"%(fnOnly, self.workspace4limit_.GetName(), self.channel))
             datacard_out.write( "\n--------------- ")
         datacard_out.write( "\nbin 1 ")
         if mode == "unbin":
@@ -2478,8 +2482,8 @@ class doFit_wj_and_wlvj:
 
         pad2.cd();
         mplot.Draw();
-        banner = TLatex(0.18,0.85,("#splitline{CMS Preliminary}{%.1f fb^{-1} at #sqrt{s}=8TeV %s+jets}"%(self.GetLumi(),self.channel)));
-        banner.SetNDC(); banner.SetTextSize(0.025);
+        banner = TLatex(0.18,0.96,("CMS Preliminary, %.1f fb^{-1} at #sqrt{s}=8TeV %s+jets"%(self.GetLumi(),self.channel)));
+        banner.SetNDC(); banner.SetTextSize(0.028);
         banner.Draw();
 
         pad1.cd();
@@ -2540,8 +2544,8 @@ class doFit_wj_and_wlvj:
 
         pad1.cd();
         mplot.Draw();
-        banner = TLatex(0.18,0.85,("#splitline{CMS Preliminary}{%.1f fb^{-1} at #sqrt{s}=8TeV %s+jets}"%(self.GetLumi(),self.channel)));
-        banner.SetNDC(); banner.SetTextSize(0.025);
+        banner = TLatex(0.18,0.96,("CMS Preliminary, %.1f fb^{-1} at #sqrt{s}=8TeV %s+jets"%(self.GetLumi(),self.channel)));
+        banner.SetNDC(); banner.SetTextSize(0.028);
         banner.Draw();
 
         pad2.cd();
@@ -2580,8 +2584,8 @@ class doFit_wj_and_wlvj:
         in_obj.GetXaxis().SetLabelSize(0.04);
         in_obj.GetYaxis().SetLabelSize(0.04);
 
-        banner = TLatex(0.18,0.85,("#splitline{CMS Preliminary}{%.1f fb^{-1} at #sqrt{s}=8TeV %s+jets}"%(self.GetLumi(),self.channel)));
-        banner.SetNDC(); banner.SetTextSize(0.025);
+        banner = TLatex(0.18,0.96,("CMS Preliminary, %.1f fb^{-1} at #sqrt{s}=8TeV %s+jets"%(self.GetLumi(),self.channel)));
+        banner.SetNDC(); banner.SetTextSize(0.028);
         banner.Draw();
 
         Directory=TString(in_directory+self.higgs_sample+"_%02d_%02d/"%(options.cprime,options.BRnew));
@@ -2612,8 +2616,8 @@ class doFit_wj_and_wlvj:
             if self.channel=="el": return 19.2#13.9;
             if self.channel=="mu": return 19.3#14.0;
 
-        if self.channel=="el": return 5.1#19.2#13.9;
-        if self.channel=="mu": return 5.3#19.3#14.0;
+        if self.channel=="el": return 19.2#5.1#19.2#13.9;
+        if self.channel=="mu": return 19.3#5.3#19.3#14.0;
 
 
     ######## ++++++++++++++
