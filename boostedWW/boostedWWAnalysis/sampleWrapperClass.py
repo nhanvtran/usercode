@@ -152,7 +152,8 @@ class sampleWrapperClass:
         jet_mass_pr_up_ = array( 'f', [ 0. ] );
         jet_mass_pr_dn_ = array( 'f', [ 0. ] );
 
-        isttbar_ = array( 'i', [ 0 ] );                
+        isttbar_ = array( 'i', [ 0 ] );     
+        issignal_ = array( 'i', [ 0 ] );             
         jet_mass_pr_ttbar_ = array( 'f', [ 0. ] );        
         jet_pt_ttbar_ = array( 'f', [ 0. ] );        
         tau2tau1_ttbar_ = array( 'f', [ 0. ] );                
@@ -230,7 +231,8 @@ class sampleWrapperClass:
         otree.Branch("jet_mass_pr_up", jet_mass_pr_up_ , "jet_mass_pr_up/F");
         otree.Branch("jet_mass_pr_dn", jet_mass_pr_dn_ , "jet_mass_pr_dn/F");
 
-        otree.Branch("isttbar", isttbar_ , "isttbar/F");        
+        otree.Branch("issignal", issignal_ , "issignal/I");        
+        otree.Branch("isttbar", isttbar_ , "isttbar/I");        
         otree.Branch("jet_pt_ttbar", jet_pt_ttbar_ , "jet_pt_ttbar/F");        
         otree.Branch("tau2tau1_ttbar", tau2tau1_ttbar_ , "tau2tau1_ttbar/F");        
         otree.Branch("jet_mass_pr_ttbar", jet_mass_pr_ttbar_ , "jet_mass_pr_ttbar/F");        
@@ -378,7 +380,7 @@ class sampleWrapperClass:
 
         for i in range(NLoop):
             
-            if i % 10000 == 0: print "i = ", i
+            if i % 1000 == 0: print "i = ", i
             
             self.InputTree_.GetEntry(i);
                                     
@@ -429,8 +431,8 @@ class sampleWrapperClass:
                 leptonCutString = "W_electron_pt";
                 metCut = 70;
 
-            signallike = False;
-            if getattr( self.InputTree_, "W_pt" ) > 200 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut and getattr( self.InputTree_, "GroomedJet_CA8_deltaphi_METca8jet") > 2.0 and getattr( self.InputTree_, "GroomedJet_CA8_deltaR_lca8jet") > 1.57: signallike = True;
+            signallike = 0;
+            if getattr( self.InputTree_, "W_pt" ) > 200 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut and getattr( self.InputTree_, "GroomedJet_CA8_deltaphi_METca8jet") > 2.0 and getattr( self.InputTree_, "GroomedJet_CA8_deltaR_lca8jet") > 1.57: signallike = 1;
 
             if (ttbarlike and getattr( self.InputTree_, "W_pt" ) > 100) or signallike == True:                
  
@@ -500,7 +502,11 @@ class sampleWrapperClass:
                 v_pt_[0] = getattr( self.InputTree_, "W_pt" );
                 jet_mass_pr_[0] = getattr( self.InputTree_, prefix + "_mass_pr" )[0];
 
+                issignal_[0] = signallike;
                 isttbar_[0] = ttbarlike;
+            
+#                print "signallike: ",signallike,",",issignal_[0];
+#                print "ttbarlike: ",ttbarlike,",",isttbar_[0];            
                 if ttbarlike == 1:
                     jet_mass_pr_ttbar_[0] = getattr( self.InputTree_, prefix + "_mass_pr" )[theca8Index];
                     jet_pt_ttbar_[0] = getattr( self.InputTree_, prefix + "_pt" )[theca8Index];
