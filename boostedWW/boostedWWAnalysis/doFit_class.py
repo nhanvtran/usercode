@@ -1816,29 +1816,20 @@ class doFit_wj_and_wlvj:
         #jet mass uncertainty on WJets normalization
         self.WJets_normlization_uncertainty_from_jet_mass= ( TMath.Abs(rrv_WJets0massup.getVal()-rrv_WJets0.getVal())+TMath.Abs(rrv_WJets0massdn.getVal()-rrv_WJets0.getVal() ) )/2./rrv_WJets0.getVal();  
 
-        rrv_STop=self.workspace4fit_.var("rrv_number_dataset_signal_region_STop_mu_mj")
-        rrv_STopmassup=self.workspace4fit_.var("rrv_number_dataset_signal_region_STopmassup_mu_mj")
-        rrv_STopmassdn=self.workspace4fit_.var("rrv_number_dataset_signal_region_STopmassdn_mu_mj")
+        rrv_STop      =self.workspace4fit_.var("rrv_number_dataset_signal_region_STop_%s_mj"%(self.channel))
+        rrv_STopmassup=self.workspace4fit_.var("rrv_number_dataset_signal_region_STopmassup_%s_mj"%(self.channel))
+        rrv_STopmassdn=self.workspace4fit_.var("rrv_number_dataset_signal_region_STopmassdn_%s_mj"%(self.channel))
         self.STop_normlization_uncertainty_from_jet_mass=( TMath.Abs(rrv_STopmassup.getVal()-rrv_STop.getVal())+TMath.Abs(rrv_STopmassdn.getVal()-rrv_STop.getVal() ) )/2./rrv_STop.getVal();  
 
-        rrv_TTbar=self.workspace4fit_.var("rrv_number_dataset_signal_region_TTbar_mu_mj")
-        rrv_TTbarmassup=self.workspace4fit_.var("rrv_number_dataset_signal_region_TTbarmassup_mu_mj")
-        rrv_TTbarmassdn=self.workspace4fit_.var("rrv_number_dataset_signal_region_TTbarmassdn_mu_mj")
+        rrv_TTbar      =self.workspace4fit_.var("rrv_number_dataset_signal_region_TTbar_%s_mj"%(self.channel))
+        rrv_TTbarmassup=self.workspace4fit_.var("rrv_number_dataset_signal_region_TTbarmassup_%s_mj"%(self.channel))
+        rrv_TTbarmassdn=self.workspace4fit_.var("rrv_number_dataset_signal_region_TTbarmassdn_%s_mj"%(self.channel))
         self.TTbar_normlization_uncertainty_from_jet_mass=( TMath.Abs(rrv_TTbarmassup.getVal()-rrv_TTbar.getVal())+TMath.Abs(rrv_TTbarmassdn.getVal()-rrv_TTbar.getVal() ) )/2./rrv_TTbar.getVal();  
 
-        rrv_VV=self.workspace4fit_.var("rrv_number_dataset_signal_region_VV_mu_mj")
-        rrv_VVmassup=self.workspace4fit_.var("rrv_number_dataset_signal_region_VVmassup_mu_mj")
-        rrv_VVmassdn=self.workspace4fit_.var("rrv_number_dataset_signal_region_VVmassdn_mu_mj")
+        rrv_VV      =self.workspace4fit_.var("rrv_number_dataset_signal_region_VV_%s_mj"%(self.channel))
+        rrv_VVmassup=self.workspace4fit_.var("rrv_number_dataset_signal_region_VVmassup_%s_mj"%(self.channel))
+        rrv_VVmassdn=self.workspace4fit_.var("rrv_number_dataset_signal_region_VVmassdn_%s_mj"%(self.channel))
         self.VV_normlization_uncertainty_from_jet_mass=( TMath.Abs(rrv_VVmassup.getVal()-rrv_VV.getVal())+TMath.Abs(rrv_VVmassdn.getVal()-rrv_VV.getVal() ) )/2./rrv_VV.getVal();  
-
-        #rrv_ggH=self.workspace4fit_.var("rrv_number_dataset_signal_region_ggH_mu_mj")
-        #rrv_ggHmassup=self.workspace4fit_.var("rrv_number_dataset_signal_region_ggHmassup_mu_mj")
-        #rrv_ggHmassdn=self.workspace4fit_.var("rrv_number_dataset_signal_region_ggHmassdn_mu_mj")
-        #self.ggH_normlization_uncertainty_from_jet_mass=( TMath.Abs(rrv_ggHmassup.getVal()-rrv_ggH.getVal())+TMath.Abs(rrv_ggHmassdn.getVal()-rrv_ggH.getVal() ) )/2./rrv_ggH.getVal();  
-        #rrv_vbfH=self.workspace4fit_.var("rrv_number_dataset_signal_region_vbfH_mu_mj")
-        #rrv_vbfHmassup=self.workspace4fit_.var("rrv_number_dataset_signal_region_vbfHmassup_mu_mj")
-        #rrv_vbfHmassdn=self.workspace4fit_.var("rrv_number_dataset_signal_region_vbfHmassdn_mu_mj")
-        #self.vbfH_normlization_uncertainty_from_jet_mass=( TMath.Abs(rrv_vbfHmassup.getVal()-rrv_vbfH.getVal())+TMath.Abs(rrv_vbfHmassdn.getVal()-rrv_vbfH.getVal() ) )/2./rrv_vbfH.getVal();  
 
         #raw_input("ENTER");
     ######## ++++++++++++++
