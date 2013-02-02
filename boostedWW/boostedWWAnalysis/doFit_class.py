@@ -116,7 +116,8 @@ class doFit_wj_and_wlvj:
 
         #prepare the data and mc files
         if options.fitwtagger:
-            self.file_Directory="trainingtrees_19_Jan24/trainingtrees_%s/"%(self.channel);
+            #self.file_Directory="trainingtrees_19_Jan24/trainingtrees_%s/"%(self.channel);
+            self.file_Directory="trainingtrees_%s/"%(self.channel);
         else: 
             self.file_Directory="trainingtrees_%s/"%(self.channel);
 
@@ -211,9 +212,13 @@ class doFit_wj_and_wlvj:
 
         #wtagger_eff reweight between data and mc
         if self.channel=="mu":
+            #self.rrv_wtagger_eff_reweight=RooRealVar("rrv_wtagger_eff_reweight","rrv_wtagger_eff_reweight",0.89);
+            #self.rrv_wtagger_eff_reweight.setError(0.03);
             self.rrv_wtagger_eff_reweight=RooRealVar("rrv_wtagger_eff_reweight","rrv_wtagger_eff_reweight",0.95);
             self.rrv_wtagger_eff_reweight.setError(0.06);
         if self.channel=="el":
+            #self.rrv_wtagger_eff_reweight=RooRealVar("rrv_wtagger_eff_reweight","rrv_wtagger_eff_reweight",0.86);
+            #self.rrv_wtagger_eff_reweight.setError(0.03);
             self.rrv_wtagger_eff_reweight=RooRealVar("rrv_wtagger_eff_reweight","rrv_wtagger_eff_reweight",0.91);
             self.rrv_wtagger_eff_reweight.setError(0.06);
         print "wtagger efficiency correction: %s +/- %s"%(self.rrv_wtagger_eff_reweight.getVal(), self.rrv_wtagger_eff_reweight.getError());
@@ -1168,7 +1173,7 @@ class doFit_wj_and_wlvj:
         mplot_pull.GetYaxis().SetRangeUser(-5,5);
          
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
-        self.draw_canvas( mplot, mplot_pull,parameters_list,"plots_%s_%s/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), label+in_file_name, in_model_name+"Total")
+        self.draw_canvas( mplot, mplot_pull,parameters_list,"plots_%s_%s/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max), in_file_name, in_model_name+"Total")
         self.draw_canvas1(mplot,"plots_%s_%s/m_j_fitting_TTbar_controlsample_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_cut, self.nPV_min, self.nPV_max),"control_%s_%s"%(self.wtagger_lable,self.channel));
         
         #calculate the mva eff
@@ -1462,6 +1467,7 @@ class doFit_wj_and_wlvj:
                 discriminantCut=False;
             #discriminantCut=True;
             
+            tmp_jet_mass=getattr(treeIn, jet_mass);
             #            if discriminantCut and treeIn.ungroomed_jet_pt > 200. and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjets_cvsm >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mvaMET_cut:
             if discriminantCut and treeIn.isttbar > 0 and treeIn.l_pt >= 40 and treeIn.pfMET > 50 and treeIn.jet_pt_ttbar > 200 and treeIn.v_pt > 160:
 
