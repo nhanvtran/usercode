@@ -2395,9 +2395,10 @@ class doFit_wj_and_wlvj:
             signal_scale=5;
         else: signal_scale=10;
         model_pdf_ggH.plotOn(mplot,RooFit.Normalization(scale_number_ggH*signal_scale),RooFit.Name("%s #times %s"%(self.higgs_sample, signal_scale)),RooFit.DrawOption("L"), RooFit.LineColor(self.color_palet["Signal"]), RooFit.VLines());
-        model_pdf_vbfH.plotOn(mplot,RooFit.Normalization(scale_number_vbfH*signal_scale),RooFit.Name("VBF Higgs #times %s"%(signal_scale)),RooFit.DrawOption("L"), RooFit.LineColor(self.color_palet["vbfSignal"]), RooFit.VLines());
+        model_pdf_vbfH.plotOn(mplot,RooFit.Normalization(scale_number_vbfH*signal_scale),RooFit.Name("%s #times %s"%(self.vbfhiggs_sample,signal_scale)),RooFit.DrawOption("L"), RooFit.LineColor(self.color_palet["vbfSignal"]), RooFit.VLines());
         data_obs.plotOn(mplot, RooFit.Name("data"));
         model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Invisible());
+        hpull=mplot.pullHist();
         
         #floatpara_list=workspace.FindObject("floatpara_list");
         self.FloatingParams.Print("v");
@@ -2407,8 +2408,12 @@ class doFit_wj_and_wlvj:
         leg=self.legend4Plot(mplot,0);
         mplot.addObject(leg);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
-        self.draw_canvas1(mplot,"plots_%s_%s/m_lvj_fitting/"%(self.channel,self.PS_model),"check_workspace_for_limit",0,1);
 
+        mplot_pull = rrv_x.frame(RooFit.Title("Pull Distribution"));
+        mplot_pull.addPlotable(hpull,"P");
+        mplot_pull.SetTitle("PULL");
+        parameters_list=RooArgList();
+        self.draw_canvas( mplot, mplot_pull,parameters_list,"plots_%s_%s/m_lvj_fitting/"%(self.channel,self.PS_model),"check_workspace_for_limit","",0,1);
         if workspace.var("rrv_num_floatparameter_in_last_fitting"):   nPar_float_in_fitTo= int(workspace.var("rrv_num_floatparameter_in_last_fitting").getVal());
         else:
             nPar_float_in_fitTo=1;
@@ -2464,21 +2469,39 @@ class doFit_wj_and_wlvj:
 
     ######## ++++++++++++++
     def draw_canvas(self, mplot, mplot_pull,parameters_list,in_directory, in_file_name, in_model_name="", show_constant_parameter=0, log=0):# mplot + pull + parameters
+
         mplot.GetXaxis().SetTitleOffset(1.1);
         mplot.GetYaxis().SetTitleOffset(1.1);
         mplot.GetXaxis().SetTitleSize(0.04);
         mplot.GetYaxis().SetTitleSize(0.04);
         mplot.GetXaxis().SetLabelSize(0.04);
         mplot.GetYaxis().SetLabelSize(0.04);
-        mplot_pull.GetYaxis().SetTitleOffset(1.0);
+        #mplot_pull.GetYaxis().SetTitleOffset(0.50);
+    	mplot_pull.GetXaxis().SetLabelSize(0.09);
+    	mplot_pull.GetYaxis().SetLabelSize(0.13);
+    	mplot_pull.GetYaxis().SetNdivisions(205);
 
+        mplot_pull.GetYaxis().SetTitle("PULL");
+        mplot_pull.GetYaxis().SetTitleOffset(0.50);
+        mplot_pull.GetYaxis().SetTitleSize(0.08);
+        mplot_pull.GetYaxis().SetRangeUser(-5,5);
         cMassFit = TCanvas("cMassFit","cMassFit",1000,800);
-        pad1=TPad("pad1","pad1",0.,0. ,0.8,0.2);
-        pad2=TPad("pad2","pad2",0.,0.2,0.8,1. );
-        pad3=TPad("pad3","pad3",0.8,0.,1,1);
-        pad1.Draw();
-        pad2.Draw();
-        pad3.Draw();
+        # if parameters_list is empty, don't draw pad3
+        par_first=parameters_list.createIterator();
+        par_first.Reset();
+        param_first=par_first.Next()
+        if param_first:
+            pad1=TPad("pad1","pad1",0.,0. ,0.8,0.2);
+            pad2=TPad("pad2","pad2",0.,0.2,0.8,1. );
+            pad3=TPad("pad3","pad3",0.8,0.,1,1);
+            pad1.Draw();
+            pad2.Draw();
+            pad3.Draw();
+        else:
+            pad1=TPad("pad1","pad1",0.1,0. ,0.9,0.2);
+            pad2=TPad("pad2","pad2",0.1,0.2,0.9,1. );
+            pad1.Draw();
+            pad2.Draw();
 
         pad2.cd();
         mplot.Draw();
@@ -2489,22 +2512,23 @@ class doFit_wj_and_wlvj:
         pad1.cd();
         mplot_pull.Draw();
 
-        pad3.cd();
-        latex=TLatex();
-        latex.SetTextSize(0.1);
-        par=parameters_list.createIterator();
-        par.Reset();
-        param=par.Next()
-        i=0;
-        while param:
-            if (not  param.isConstant() ) or show_constant_parameter:
-                param.Print();
-                icolor=1;#if a paramenter is constant, color is 2
-                if param.isConstant(): icolor=2
-                latex.DrawLatex(0,0.9-i*0.04,"#color[%s]{%s}"%(icolor,param.GetName()) );
-                latex.DrawLatex(0,0.9-i*0.04-0.02," #color[%s]{%4.3e +/- %2.1e}"%(icolor,param.getVal(),param.getError()) );
-                i=i+1;
-            param=par.Next();
+        if param_first:
+            pad3.cd();
+            latex=TLatex();
+            latex.SetTextSize(0.1);
+            par=parameters_list.createIterator();
+            par.Reset();
+            param=par.Next()
+            i=0;
+            while param:
+                if (not  param.isConstant() ) or show_constant_parameter:
+                    param.Print();
+                    icolor=1;#if a paramenter is constant, color is 2
+                    if param.isConstant(): icolor=2
+                    latex.DrawLatex(0,0.9-i*0.04,"#color[%s]{%s}"%(icolor,param.GetName()) );
+                    latex.DrawLatex(0,0.9-i*0.04-0.02," #color[%s]{%4.3e +/- %2.1e}"%(icolor,param.getVal(),param.getError()) );
+                    i=i+1;
+                param=par.Next();
 
 
         Directory=TString(in_directory+self.higgs_sample+"_%02d_%02d/"%(options.cprime,options.BRnew));
