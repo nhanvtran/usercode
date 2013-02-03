@@ -184,33 +184,23 @@ class doFit_wj_and_wlvj:
         self.wtagger_label="medium";#75%
         #self.wtagger_label="loose";#90%
         #self.wtagger_label="nocut";#nocut
-
-        #if self.wtagger_label=="tight":
-        #    if self.channel=="el":self.wtagger_cut=0.41  ;
-        #    if self.channel=="mu":self.wtagger_cut=0.41  ;
-        #if self.wtagger_label=="medium":
-        #    if self.channel=="el":self.wtagger_cut=0.53  ;
-        #    if self.channel=="mu":self.wtagger_cut=0.53  ;
-        #if self.wtagger_label=="loose":
-        #    if self.channel=="el":self.wtagger_cut=0.64  ;
-        #    if self.channel=="mu":self.wtagger_cut=0.63  ;
         if self.wtagger_label=="tight":
-            if self.channel=="el":self.wtagger_cut=0.45  ;
-            if self.channel=="mu":self.wtagger_cut=0.45  ;
+            if self.channel=="el":self.wtagger_cut=0.43  ;
+            if self.channel=="mu":self.wtagger_cut=0.43  ;
         if self.wtagger_label=="medium":
-            if self.channel=="el":self.wtagger_cut=0.58  ;
-            if self.channel=="mu":self.wtagger_cut=0.57  ;
+            if self.channel=="el":self.wtagger_cut=0.55  ;
+            if self.channel=="mu":self.wtagger_cut=0.55  ;
         if self.wtagger_label=="loose":
-            if self.channel=="el":self.wtagger_cut=0.68  ;
-            if self.channel=="mu":self.wtagger_cut=0.67  ;
+            if self.channel=="el":self.wtagger_cut=0.66  ;
+            if self.channel=="mu":self.wtagger_cut=0.65  ;
         if self.wtagger_label=="nocut": self.wtagger_cut=10000;
 
         #medium wtagger_eff reweight between data and mc
         if self.channel=="mu":
-            self.rrv_wtagger_eff_reweight=RooRealVar("rrv_wtagger_eff_reweight","rrv_wtagger_eff_reweight",0.92);
+            self.rrv_wtagger_eff_reweight=RooRealVar("rrv_wtagger_eff_reweight","rrv_wtagger_eff_reweight",0.93);
             self.rrv_wtagger_eff_reweight.setError(0.04);
         if self.channel=="el":
-            self.rrv_wtagger_eff_reweight=RooRealVar("rrv_wtagger_eff_reweight","rrv_wtagger_eff_reweight",0.90);
+            self.rrv_wtagger_eff_reweight=RooRealVar("rrv_wtagger_eff_reweight","rrv_wtagger_eff_reweight",0.93);
             self.rrv_wtagger_eff_reweight.setError(0.04);
         print "wtagger efficiency correction: %s +/- %s"%(self.rrv_wtagger_eff_reweight.getVal(), self.rrv_wtagger_eff_reweight.getError());
 
@@ -1487,7 +1477,8 @@ class doFit_wj_and_wlvj:
             tmp_jet_mass=getattr(treeIn, jet_mass);
             #            if discriminantCut and treeIn.ungroomed_jet_pt > 200. and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjets_cvsm >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mvaMET_cut:
             
-            if discriminantCut and treeIn.mass_lvj > 0 and treeIn.isttbar > 0 and treeIn.l_pt >= self.lpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.jet_pt_ttbar > 200 and treeIn.v_pt > 200:
+            #if discriminantCut and treeIn.mass_lvj > 0 and treeIn.isttbar > 0 and treeIn.l_pt >= self.lpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.jet_pt_ttbar > 200 and treeIn.v_pt > 200:#Feb2
+            if discriminantCut and treeIn.mass_lvj > 0 and treeIn.isttbar > 0 and treeIn.l_pt >= 40 and treeIn.pfMET > 50 and treeIn.jet_pt_ttbar > 200 and treeIn.v_pt > 160:
 
                 tmp_event_weight= treeIn.totalEventWeight;
                 tmp_event_weight4fit= treeIn.eff_and_pu_Weight;
@@ -1538,7 +1529,8 @@ class doFit_wj_and_wlvj:
                 hnum_4region.Fill(2,tmp_event_weight);
 
                 #            if treeIn.ungroomed_jet_pt > 200.  and treeIn.jet_mass_pr >= rrv_mass_j.getMin() and treeIn.jet_mass_pr<=rrv_mass_j.getMax() and treeIn.nbjets_cvsm >=1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.deltaphi_METca8jet>self.deltaPhi_METj_cut and treeIn.mvaMET> self.mvaMET_cut:
-            if treeIn.mass_lvj > 0 and treeIn.isttbar > 0 and treeIn.l_pt >= self.lpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.jet_pt_ttbar > 200 and treeIn.v_pt > 200:
+            #if treeIn.mass_lvj > 0 and treeIn.isttbar > 0 and treeIn.l_pt >= self.lpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.jet_pt_ttbar > 200 and treeIn.v_pt > 200:
+            if  treeIn.mass_lvj > 0 and treeIn.isttbar > 0 and treeIn.l_pt >= 40 and treeIn.pfMET > 50 and treeIn.jet_pt_ttbar > 200 and treeIn.v_pt > 160:
 
                 tmp_event_weight= treeIn.totalEventWeight;
                 tmp_event_weight4fit= treeIn.eff_and_pu_Weight;
