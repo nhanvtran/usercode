@@ -233,23 +233,30 @@ class doFit_wj_and_wlvj:
         self.XS_TTbar_uncertainty=0.063;# from AN-12-368 table8 
         self.XS_STop_uncertainty =0.05 ;# from AN-12-368 table8 
         self.XS_VV_uncertainty   =0.10 ;# from AN-12-368 table8 
-        self.XS_ggH_uncertainty  =0.15; self.XS_vbfH_uncertainty  =0.05;
+        self.QCDscale_ggH    =0.10; self.QCDscale_vbfH    =0.01;
+        self.pdf_gg           =0.0; self.pdf_vbf          =0.0;
+        self.hwwlnJ_pdfAcc_gg=0.03; self.hwwlnJ_pdfAcc_vbf=0.01;
         # from twiki https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt8TeV,  
         if self.higgs_sample=="ggH600": 
-            self.XS_ggH_uncertainty   =0.16;
-            self.XS_vbfH_uncertainty  =0.04;
+            self.QCDscale_ggH =0.059;   self.QCDscale_vbfH=0.007
+            self.pdf_gg       =0.095;   self.pdf_vbf      =0.036
+            self.hwwlnJ_pdfAcc_gg=0.036;self.hwwlnJ_pdfAcc_vbf=0.007
         if self.higgs_sample=="ggH700": 
-            self.XS_ggH_uncertainty   =0.16;
-            self.XS_vbfH_uncertainty  =0.05;
+            self.QCDscale_ggH =0.060;   self.QCDscale_vbfH=0.008;
+            self.pdf_gg       =0.101;   self.pdf_vbf      =0.042
+            self.hwwlnJ_pdfAcc_gg=0.038;self.hwwlnJ_pdfAcc_vbf=0.008
         if self.higgs_sample=="ggH800": 
-            self.XS_ggH_uncertainty   =0.17;
-            self.XS_vbfH_uncertainty  =0.06;
+            self.QCDscale_ggH =0.061;   self.QCDscale_vbfH=0.010;
+            self.pdf_gg       =0.106;   self.pdf_vbf      =0.047;
+            self.hwwlnJ_pdfAcc_gg=0.040;self.hwwlnJ_pdfAcc_vbf=0.009
         if self.higgs_sample=="ggH900": 
-            self.XS_ggH_uncertainty   =0.18;
-            self.XS_vbfH_uncertainty  =0.07;
+            self.QCDscale_ggH =0.063;   self.QCDscale_vbfH=0.012
+            self.pdf_gg       =0.111;   self.pdf_vbf      =0.053
+            self.hwwlnJ_pdfAcc_gg=0.042;self.hwwlnJ_pdfAcc_vbf=0.010
         if self.higgs_sample=="ggH1000": 
-            self.XS_ggH_uncertainty   =0.19;
-            self.XS_vbfH_uncertainty  =0.07;
+            self.QCDscale_ggH =0.065;   self.QCDscale_vbfH=0.013;
+            self.pdf_gg       =0.121;   self.pdf_vbf      =0.059; 
+            self.hwwlnJ_pdfAcc_gg=0.046;self.hwwlnJ_pdfAcc_vbf=0.011
         self.interference_ggH_uncertainty=0.1;
         self.interference_vbfH_uncertainty=0.5;
         #normlization uncertainty from jet_mass
@@ -262,8 +269,8 @@ class doFit_wj_and_wlvj:
         self.lep_eff_uncertainty=0.02;
 
         #b tag scale uncertainty
-        self.btag_scale=1.0;
-        self.btag_scale_uncertainty=1.0;
+        self.btag_scale=0.98;
+        self.btag_scale_uncertainty=0.025;
 
 
         # shape parameter uncertainty
@@ -1359,7 +1366,9 @@ class doFit_wj_and_wlvj:
                     tmp_event_weight4fit=tmp_event_weight4fit/self.higgs_xs_scale; 
 
                 #wtagger_eff_reweight
-                if not label=="_data": tmp_event_weight=tmp_event_weight*self.rrv_wtagger_eff_reweight.getVal();
+                if not label=="_data": 
+                    tmp_event_weight=tmp_event_weight*self.rrv_wtagger_eff_reweight.getVal();
+                    tmp_event_weight=tmp_event_weight*self.btag_scale;
                 
                 rrv_mass_lvj.setVal(treeIn.mass_lvj);
                 if tmp_jet_mass >= self.mj_sideband_lo_min and tmp_jet_mass < self.mj_sideband_lo_max:
@@ -1388,7 +1397,10 @@ class doFit_wj_and_wlvj:
                 if tmp_jet_mass >=self.mj_sideband_hi_min and tmp_jet_mass <self.mj_sideband_hi_max: hnum_4region.Fill(1,tmp_event_weight);
                 hnum_4region.Fill(2,tmp_event_weight);
 
-        if not label=="_data": tmp_scale_to_lumi=tmp_scale_to_lumi*self.rrv_wtagger_eff_reweight.getVal();
+        if not label=="_data": 
+            tmp_scale_to_lumi=tmp_scale_to_lumi*self.rrv_wtagger_eff_reweight.getVal();
+            tmp_scale_to_lumi=tmp_scale_to_lumi*self.btag_scale;
+
         rrv_scale_to_lumi=RooRealVar("rrv_scale_to_lumi"+label+"_"+self.channel,"rrv_scale_to_lumi"+label+"_"+self.channel,tmp_scale_to_lumi)
         rrv_scale_to_lumi.Print()
         getattr(self.workspace4fit_,"import")(rrv_scale_to_lumi)
@@ -2170,7 +2182,7 @@ class doFit_wj_and_wlvj:
             datacard_out.write( "\nobservation %0.2f "%(self.workspace4limit_.var("observation_for_counting").getVal()) )
         datacard_out.write( "\n------------------------------" )
         datacard_out.write( "\nbin                1         1             1        1        1       1" )
-        datacard_out.write( "\nprocess            %s   %s      WJets    TTbar    STop    VV "%(self.higgs_sample,self.vbfhiggs_sample) )
+        datacard_out.write( "\nprocess            %s    %s       WJets    TTbar    STop    VV "%(self.higgs_sample,self.vbfhiggs_sample) )
         datacard_out.write( "\nprocess            -1        0             1        2        3       4" )
         if mode == "unbin":
             datacard_out.write( "\nrate               %0.2f    %0.2f       %0.2f   %0.2f    %0.2f    %0.2f "%(self.workspace4limit_.var("rate_%s_for_unbin"%(self.higgs_sample)).getVal(),self.workspace4limit_.var("rate_%s_for_unbin"%(self.vbfhiggs_sample)).getVal(), self.workspace4limit_.var("rate_WJets_for_unbin").getVal(), self.workspace4limit_.var("rate_TTbar_for_unbin").getVal(), self.workspace4limit_.var("rate_STop_for_unbin").getVal(), self.workspace4limit_.var("rate_VV_for_unbin").getVal()  ) )
@@ -2178,9 +2190,13 @@ class doFit_wj_and_wlvj:
             datacard_out.write( "\nrate               %0.2f    %0.2f    %0.2f   %0.2f    %0.2f    %0.2f"%(self.workspace4limit_.var("rate_%s_for_counting"%(self.higgs_sample)).getVal(),self.workspace4limit_.var("rate_%s_for_counting"%(self.vbfhiggs_sample)).getVal(), self.workspace4limit_.var("rate_WJets_for_counting").getVal(), self.workspace4limit_.var("rate_TTbar_for_counting").getVal(), self.workspace4limit_.var("rate_STop_for_counting").getVal(), self.workspace4limit_.var("rate_VV_for_counting").getVal()  ) )
         datacard_out.write( "\n-------------------------------- " )
         datacard_out.write( "\nlumi     lnN       %0.3f     %0.3f         -        %0.3f   %0.3f   %0.3f"%(1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty) )
-        datacard_out.write( "\nXS_ggH   lnN       %0.3f     -             -        -       -       -"%(1.+self.XS_ggH_uncertainty))
-        datacard_out.write( "\nXS_vbfH  lnN       -         %0.3f         -        -       -       -"%(1.+self.XS_vbfH_uncertainty) )
-        datacard_out.write( "\nintf_ggH lnN       %0.3f     -             -        -       -       -"%(1.+self.interference_ggH_uncertainty) )
+        datacard_out.write( "\nQCDscale_ggH lnN   %0.3f     -             -        -       -       -"%(1.+self.QCDscale_ggH))
+        datacard_out.write( "\npdf_gg       lnN   %0.3f     -             -        -       -       -"%(1.+self.pdf_gg))
+        datacard_out.write( "\nhwwlnJ_pdfAcc_gg lnN %0.3f   -             -        -       -       -"%(1.+self.hwwlnJ_pdfAcc_gg) )
+        datacard_out.write( "\nQCDscale_vbfH lnN  -         %0.3f         -        -       -       -"%(1.+self.QCDscale_vbfH) )
+        datacard_out.write( "\npdf_qqbar     lnN  -         %0.3f         -        -       -       -"%(1.+self.pdf_vbf))
+        datacard_out.write( "\nhwwlnJ_pdfAcc_vbf lnN -      %0.3f         -        -       -       -"%(1.+self.hwwlnJ_pdfAcc_vbf))
+        datacard_out.write( "\nintf_ggH  lnN      %0.3f     -             -        -       -       -"%(1.+self.interference_ggH_uncertainty) )
         datacard_out.write( "\nintf_vbfH lnN      -         %0.3f         -        -       -       -"%(1.+self.interference_vbfH_uncertainty) )
         datacard_out.write( "\nXS_TTbar lnN       -         -             -        %0.3f   -       -"%(1+self.XS_TTbar_uncertainty) )
         datacard_out.write( "\nXS_STop  lnN       -         -             -        -       %0.3f   -"%(1+self.XS_STop_uncertainty) )
@@ -2192,6 +2208,7 @@ class doFit_wj_and_wlvj:
             datacard_out.write( "\nWJ_norm_%s lnN     -         -             %0.3f    -       -       -"%(self.channel, 1+ self.workspace4limit_.var("rate_WJets_for_unbin").getError()/self.workspace4limit_.var("rate_WJets_for_unbin").getVal() ) );
         datacard_out.write( "\nJetMass_%s lnN     -         -             %0.3f    %0.3f   %0.3f   %0.3f"%(self.channel, 1+self.WJets_normlization_uncertainty_from_jet_mass, 1+self.TTbar_normlization_uncertainty_from_jet_mass, 1+self.STop_normlization_uncertainty_from_jet_mass, 1+self.VV_normlization_uncertainty_from_jet_mass ) )
         datacard_out.write( "\nwtagger_%s lnN     %0.3f     %0.3f         -        %0.3f   %0.3f   %0.3f"%(self.channel, 1+self.rrv_wtagger_eff_reweight.getError()/self.rrv_wtagger_eff_reweight.getVal(), 1+self.rrv_wtagger_eff_reweight.getError()/self.rrv_wtagger_eff_reweight.getVal(), 1+self.rrv_wtagger_eff_reweight.getError()/self.rrv_wtagger_eff_reweight.getVal(), 1+self.rrv_wtagger_eff_reweight.getError()/self.rrv_wtagger_eff_reweight.getVal(), 1+self.rrv_wtagger_eff_reweight.getError()/self.rrv_wtagger_eff_reweight.getVal() ) );
+        datacard_out.write( "\nbtagger_%s lnN     %0.3f     %0.3f         -        %0.3f   %0.3f   %0.3f"%(self.channel, 1+self.btag_scale_uncertainty, 1+self.btag_scale_uncertainty, 1+self.btag_scale_uncertainty, 1+self.btag_scale_uncertainty, 1+self.btag_scale_uncertainty ) );
         datacard_out.write( "\ntrigger_%s lnN     %0.3f     %0.3f         -        %0.3f   %0.3f   %0.3f"%(self.channel, 1+self.lep_trigger_uncertainty,1+self.lep_trigger_uncertainty,1+self.lep_trigger_uncertainty,1+self.lep_trigger_uncertainty,1+self.lep_trigger_uncertainty ) );
         datacard_out.write( "\neff_%s   lnN       %0.3f     %0.3f         -        %0.3f   %0.3f   %0.3f"%(self.channel, 1+self.lep_eff_uncertainty,1+self.lep_eff_uncertainty,1+self.lep_eff_uncertainty,1+self.lep_eff_uncertainty,1+self.lep_eff_uncertainty ) );
         if mode == "unbin":
