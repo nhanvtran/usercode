@@ -25,6 +25,7 @@ from optparse import OptionParser
 
 from bsmReweighter import *
 
+from ROOT import RooTrace
 
 # FWLITE stuff
 import sys
@@ -70,11 +71,26 @@ class sampleWrapperClass:
         self.FitSMSignal = False;
         self.FitSMSignal_mean = -1;
         self.FitSMSignal_gamma = -1;
-    
+        self.isVBF_ = False;
+        if file.find("VBF") > 0: self.isVBF_ = True;
+        ###### reweight file
+        if self.SignalMass_ > 0:
+            self.rwName = "H_CPSrw_%03d"%(self.SignalMass_);
+            self.rwF = ROOT.TFile("CPSrw/"+self.rwName+".root");
+            self.h_rwCPS = self.rwF.Get(self.rwName);
+            #print h_rwCPS.GetName();
+            #print "Integral of rWCPS histogram: ", h_rwCPS.Integral();
+            self.x_rwCPS = self.h_rwCPS.GetXaxis();
+        ######        
+        
+        
         # ---------- Set up jet corrections on the fly of R >= 0.7 jets
         fDir = "JECs/"      
         jecUncStr = ROOT.std.string(fDir + "GR_R_53_V10_Uncertainty_AK7PFchs.txt")
         self.jecUnc_ = ROOT.JetCorrectionUncertainty(jecUncStr)
+    
+    def getLabel(self):
+        return self.Label_
             
     def createTrainingTree(self):
         
@@ -152,11 +168,7 @@ class sampleWrapperClass:
         jet_mass_pr_up_ = array( 'f', [ 0. ] );
         jet_mass_pr_dn_ = array( 'f', [ 0. ] );
 
-        isttbar_ = array( 'i', [ 0 ] );     
         issignal_ = array( 'i', [ 0 ] );             
-        jet_mass_pr_ttbar_ = array( 'f', [ 0. ] );        
-        jet_pt_ttbar_ = array( 'f', [ 0. ] );        
-        tau2tau1_ttbar_ = array( 'f', [ 0. ] );                
         
         l_pt_ = array( 'f', [ 0. ] );
         l_eta_ = array( 'f', [ 0. ] );        
@@ -232,10 +244,6 @@ class sampleWrapperClass:
         otree.Branch("jet_mass_pr_dn", jet_mass_pr_dn_ , "jet_mass_pr_dn/F");
 
         otree.Branch("issignal", issignal_ , "issignal/I");        
-        otree.Branch("isttbar", isttbar_ , "isttbar/I");        
-        otree.Branch("jet_pt_ttbar", jet_pt_ttbar_ , "jet_pt_ttbar/F");        
-        otree.Branch("tau2tau1_ttbar", tau2tau1_ttbar_ , "tau2tau1_ttbar/F");        
-        otree.Branch("jet_mass_pr_ttbar", jet_mass_pr_ttbar_ , "jet_mass_pr_ttbar/F");        
         
         otree.Branch("l_pt", l_pt_ , "l_pt/F");
         otree.Branch("l_eta", l_eta_ , "l_eta/F");
@@ -289,6 +297,8 @@ class sampleWrapperClass:
         otree.Branch("deltaR_lca8jet", deltaR_lca8jet_, "deltaR_lca8jet/F");
         otree.Branch("deltaphi_METca8jet", deltaphi_METca8jet_, "deltaphi_METca8jet/F");
         otree.Branch("deltaphi_Vca8jet", deltaphi_Vca8jet_, "deltaphi_Vca8jet/F");
+        
+        
 
         #otree.Branch("ca8wjettaggerpt200_275", ca8wjettaggerpt200_275_, "ca8wjettaggerpt200_275/F")
         #otree.Branch("ca8wjettaggerpt275_500", ca8wjettaggerpt275_500_, "ca8wjettaggerpt275_500/F")
@@ -296,25 +306,96 @@ class sampleWrapperClass:
         #otree.Branch("ungroomedwjettaggerpt200_275", ungroomedwjettaggerpt200_275_, "ungroomedwjettaggerpt200_275/F")
         #otree.Branch("ungroomedwjettaggerpt275_500", ungroomedwjettaggerpt275_500_, "ungroomedwjettaggerpt275_500/F")
 
+        ##########################     
+        # variables for ttbar control region
+        ttb_nak5_same_       = array( 'f', [ 0. ] );        
+        ttb_nak5_same_csvl_  = array( 'f', [ 0. ] );        
+        ttb_nak5_same_csvm_  = array( 'f', [ 0. ] );        
+        ttb_nak5_oppo_       = array( 'f', [ 0. ] );        
+        ttb_nak5_oppo_csvl_  = array( 'f', [ 0. ] );        
+        ttb_nak5_oppo_csvm_  = array( 'f', [ 0. ] );        
+        ttb_nak5_oppoveto_       = array( 'f', [ 0. ] );        
+        ttb_nak5_oppoveto_csvl_  = array( 'f', [ 0. ] );        
+        ttb_nak5_oppoveto_csvm_  = array( 'f', [ 0. ] );        
+        ttb_ht_  = array( 'f', [ 0. ] );                
+        ttb_ca8_mass_pr_  = array( 'f', [ 0. ] );                        
+        ttb_ca8_ungroomed_pt_  = array( 'f', [ 0. ] );                        
+        ttb_ca8_tau2tau1_  = array( 'f', [ 0. ] );                        
+        ttb_ca8_mu_  = array( 'f', [ 0. ] );                        
+        ttb_mlvj_  = array( 'f', [ 0. ] );                        
+        
+        isttbar_ = array( 'i', [ 0 ] );            
+        
+        otree.Branch("ttb_nak5_same", ttb_nak5_same_ , "ttb_nak5_same/F");        
+        otree.Branch("ttb_nak5_same_csvl", ttb_nak5_same_csvl_ , "ttb_nak5_same_csvl/F");        
+        otree.Branch("ttb_nak5_same_csvm", ttb_nak5_same_csvm_ , "ttb_nak5_same_csvm/F");        
+        otree.Branch("ttb_nak5_oppo", ttb_nak5_oppo_ , "ttb_nak5_oppo/F");                
+        otree.Branch("ttb_nak5_oppo_csvl", ttb_nak5_oppo_csvl_ , "ttb_nak5_oppo_csvl/F");                
+        otree.Branch("ttb_nak5_oppo_csvm", ttb_nak5_oppo_csvm_ , "ttb_nak5_oppo_csvm/F");        
+        otree.Branch("ttb_nak5_oppoveto", ttb_nak5_oppoveto_ , "ttb_nak5_oppoveto/F");        
+        otree.Branch("ttb_nak5_oppoveto_csvl", ttb_nak5_oppoveto_csvl_ , "ttb_nak5_oppoveto_csvl/F");        
+        otree.Branch("ttb_nak5_oppoveto_csvm", ttb_nak5_oppoveto_csvm_ , "ttb_nak5_oppoveto_csvm/F");        
+        
+        otree.Branch("ttb_ht", ttb_ht_ , "ttb_ht_/F");                
+        otree.Branch("ttb_ca8_mass_pr", ttb_ca8_mass_pr_ , "ttb_ca8_mass_pr/F");                
+        otree.Branch("ttb_ca8_ungroomed_pt", ttb_ca8_ungroomed_pt_ , "ttb_ca8_ungroomed_pt/F");                
+        otree.Branch("ttb_ca8_tau2tau1", ttb_ca8_tau2tau1_ , "ttb_ca8_tau2tau1/F");                
+        otree.Branch("ttb_ca8_mu", ttb_ca8_mu_ , "ttb_ca8_mu/F");                
+        otree.Branch("ttb_mlvj", ttb_mlvj_ , "ttb_mlvj/F");                
+        
+        otree.Branch("isttbar", isttbar_ , "isttbar/I"); 
+        
+        ##########################
+        
         ##########################
         # variables for BSM reweighting
         genHMass_ = array( 'f', [ 0. ] );              
-        bsmReweight_cPrime01_brNew00_ = array( 'f', [ 0. ] );      
-        bsmReweight_cPrime02_brNew00_ = array( 'f', [ 0. ] );      
-        bsmReweight_cPrime03_brNew00_ = array( 'f', [ 0. ] );      
-        bsmReweight_cPrime04_brNew00_ = array( 'f', [ 0. ] );      
-        bsmReweight_cPrime05_brNew00_ = array( 'f', [ 0. ] );      
-        bsmReweight_cPrime07_brNew00_ = array( 'f', [ 0. ] );      
-        bsmReweight_cPrime10_brNew00_ = array( 'f', [ 0. ] );              
         otree.Branch("genHMass", genHMass_ , "genHMass/F");        
-        otree.Branch("bsmReweight_cPrime01_brNew00", bsmReweight_cPrime01_brNew00_ , "bsmReweight_cPrime01_brNew00/F");        
-        otree.Branch("bsmReweight_cPrime02_brNew00", bsmReweight_cPrime02_brNew00_ , "bsmReweight_cPrime02_brNew00/F");        
-        otree.Branch("bsmReweight_cPrime03_brNew00", bsmReweight_cPrime03_brNew00_ , "bsmReweight_cPrime03_brNew00/F");        
-        otree.Branch("bsmReweight_cPrime04_brNew00", bsmReweight_cPrime04_brNew00_ , "bsmReweight_cPrime04_brNew00/F");        
-        otree.Branch("bsmReweight_cPrime05_brNew00", bsmReweight_cPrime05_brNew00_ , "bsmReweight_cPrime05_brNew00/F");        
-        otree.Branch("bsmReweight_cPrime07_brNew00", bsmReweight_cPrime07_brNew00_ , "bsmReweight_cPrime07_brNew00/F");        
-        otree.Branch("bsmReweight_cPrime10_brNew00", bsmReweight_cPrime10_brNew00_ , "bsmReweight_cPrime10_brNew00/F");        
+        
+        cprimeVals = [1,2,3,4,5,6,7,8,9,10]
+        brnewVals = [00, 01, 02, 03, 04, 05]
+        bsmReweights = [];        
+        for i in range(len(cprimeVals)): 
+            col_bsmReweights = [];
+            for j in range(len(brnewVals)): 
+                col_bsmReweights.append( array( 'f', [ 0. ] ) );
+            bsmReweights.append( col_bsmReweights );
+
+        for i in range(len(cprimeVals)): 
+            for j in range(len(brnewVals)): 
+                brname = "bsmReweight_cPrime%02d_brNew%02d"%(cprimeVals[i],brnewVals[j]);
+                #print brname
+                otree.Branch(brname, bsmReweights[i][j] , brname);        
         ##########################
+
+        ##########################
+        # variables for GEN
+        gen_parton1_px_fromttbar_ = array( 'f', [ 0. ] );
+        gen_parton1_py_fromttbar_ = array( 'f', [ 0. ] );
+        gen_parton1_pz_fromttbar_ = array( 'f', [ 0. ] );
+        gen_parton1_e_fromttbar_ = array( 'f', [ 0. ] );
+        gen_parton1_id_fromttbar_ = array( 'i', [ 0 ] );
+        gen_parton2_px_fromttbar_ = array( 'f', [ 0. ] );
+        gen_parton2_py_fromttbar_ = array( 'f', [ 0. ] );
+        gen_parton2_pz_fromttbar_ = array( 'f', [ 0. ] );
+        gen_parton2_e_fromttbar_ = array( 'f', [ 0. ] );
+        gen_parton2_id_fromttbar_ = array( 'i', [ 0 ] );
+
+        otree.Branch("gen_parton1_px_fromttbar", gen_parton1_px_fromttbar_ , "gen_parton1_px_fromttbar/F");        
+        otree.Branch("gen_parton1_py_fromttbar", gen_parton1_py_fromttbar_ , "gen_parton1_py_fromttbar/F");        
+        otree.Branch("gen_parton1_pz_fromttbar", gen_parton1_pz_fromttbar_ , "gen_parton1_pz_fromttbar/F");        
+        otree.Branch("gen_parton1_e_fromttbar", gen_parton1_e_fromttbar_ , "gen_parton1_e_fromttbar/F");        
+        otree.Branch("gen_parton1_id_fromttbar", gen_parton1_id_fromttbar_ , "gen_parton1_id_fromttbar/F");        
+
+        otree.Branch("gen_parton2_px_fromttbar", gen_parton2_px_fromttbar_ , "gen_parton2_px_fromttbar/F");        
+        otree.Branch("gen_parton2_py_fromttbar", gen_parton2_py_fromttbar_ , "gen_parton2_py_fromttbar/F");        
+        otree.Branch("gen_parton2_pz_fromttbar", gen_parton2_pz_fromttbar_ , "gen_parton2_pz_fromttbar/F");        
+        otree.Branch("gen_parton2_e_fromttbar", gen_parton2_e_fromttbar_ , "gen_parton2_e_fromttbar/F");        
+        otree.Branch("gen_parton2_id_fromttbar", gen_parton2_id_fromttbar_ , "gen_parton2_id_fromttbar/F");        
+
+        ##########################
+        
+
         prefix = self.JetPrefix_;
         
         NLoop = min(self.NTree_,1e9);
@@ -378,12 +459,21 @@ class sampleWrapperClass:
         #ungroomed_reader1_.BookMVA(TMVAMethod,ungroomed_weight1_)
         #ungroomed_reader2_.BookMVA(TMVAMethod,ungroomed_weight2_)
 
+        RooTrace.active(ROOT.kTRUE);
+        RooTrace.mark();
         for i in range(NLoop):
+#        for i in range(2):            
             
-            if i % 1000 == 0: print "i = ", i
+            if i % 10000 == 0: 
+                print "i = ", i
+
             
+
             self.InputTree_.GetEntry(i);
-                                    
+
+
+            # ---------- ttbar control region
+
             ttbarlike = 0;
 
             if self.Channel_ == 'mu': lepLabel = "muon";
@@ -407,9 +497,23 @@ class sampleWrapperClass:
                     minMass = curmass;
                     theca8Index = index_ca8_in_oppoHemi[i];
 
+            index_ak5_in_sameHemi = [];
+            index_ak5_in_oppoHemi = [];
+            index_ak5_in_oppoHemi_vetoca8 = [];
+            index_ak5_in_sameHemi_csvl = [];
+            index_ak5_in_oppoHemi_csvl = [];
+            index_ak5_in_oppoHemi_vetoca8_csvl = [];
+            index_ak5_in_sameHemi_csvm = [];
+            index_ak5_in_oppoHemi_csvm = [];
+            index_ak5_in_oppoHemi_vetoca8_csvm = [];
+            ttb_ht = getattr( self.InputTree_, "W_"+lepLabel+"_pt" );
+            ttb_ht += getattr( self.InputTree_, "event_met_pfmet" ); 
+        
             if theca8Index >= 0:
                 for i in range(6):
                     if getattr( self.InputTree_, "JetPFCor_Pt" )[i] > 30:
+                        ttb_ht += getattr( self.InputTree_, "JetPFCor_Pt" )[i]
+                        
                         j_ca8_eta = getattr( self.InputTree_, "GroomedJet_CA8_eta" )[theca8Index]
                         j_ca8_phi = getattr( self.InputTree_, "GroomedJet_CA8_phi" )[theca8Index]
                         j_ak5_eta = getattr( self.InputTree_, "JetPFCor_Eta" )[i]
@@ -417,10 +521,76 @@ class sampleWrapperClass:
                         l_eta = getattr( self.InputTree_, "W_"+lepLabel+"_eta" )
                         l_phi = getattr( self.InputTree_, "W_"+lepLabel+"_phi" )                
                         dR_jj = math.sqrt( (j_ak5_eta - j_ca8_eta)**2 + (j_ak5_phi - j_ca8_phi)**2 );
-                        dR_lj = math.sqrt( (l_eta - j_ca8_eta)**2 + (l_phi - j_ca8_phi)**2 );
-#                        print "dR_jj: ", dR_jj
-                        if dR_lj > ROOT.TMath.Pi()/2. and dR_jj > 0.8 and getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.244: 
-                            ttbarlike = 1
+#                        dR_lj = math.sqrt( (l_eta - j_ca8_eta)**2 + (l_phi - j_ca8_phi)**2 );
+                        dR_lj = math.sqrt( (l_eta - j_ak5_eta)**2 + (l_phi - j_ak5_phi)**2 );
+                        
+                        if dR_lj < ROOT.TMath.Pi()/2.: 
+                            index_ak5_in_sameHemi.append( i );
+                            if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.244: index_ak5_in_sameHemi_csvl.append(i);
+                            if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.679: index_ak5_in_sameHemi_csvm.append(i);                        
+                        else: 
+                            index_ak5_in_oppoHemi.append( i );    
+                            if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.244: index_ak5_in_oppoHemi_csvl.append(i);
+                            if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.679: index_ak5_in_oppoHemi_csvm.append(i);                                            
+                        if dR_lj > ROOT.TMath.Pi()/2. and dR_jj > 0.8: 
+                            index_ak5_in_oppoHemi_vetoca8.append( i );
+                            if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.244: index_ak5_in_oppoHemi_vetoca8_csvl.append(i);
+                            if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.679: index_ak5_in_oppoHemi_vetoca8_csvm.append(i);                                                        
+                
+#                print "n ca8s: ", len(index_ca8_in_oppoHemi), " and minMass: ", minMass;                
+#                print "  --- n ak5s: same = ", len(index_ak5_in_sameHemi), ", and oppo = ", len(index_ak5_in_oppoHemi), ", and oppo veto: ",len(index_ak5_in_oppoHemi_vetoca8);
+
+                ttb_nak5_same_[0] = len(index_ak5_in_sameHemi);
+                ttb_nak5_same_csvl_[0] = len(index_ak5_in_sameHemi_csvl);
+                ttb_nak5_same_csvm_[0] = len(index_ak5_in_sameHemi_csvm);
+                ttb_nak5_oppo_[0] = len(index_ak5_in_oppoHemi);
+                ttb_nak5_oppo_csvl_[0] = len(index_ak5_in_oppoHemi_csvl);
+                ttb_nak5_oppo_csvm_[0] = len(index_ak5_in_oppoHemi_csvm);
+                ttb_nak5_oppoveto_[0] = len(index_ak5_in_oppoHemi_vetoca8);
+                ttb_nak5_oppoveto_csvl_[0] = len(index_ak5_in_oppoHemi_vetoca8_csvl);
+                ttb_nak5_oppoveto_csvm_[0] = len(index_ak5_in_oppoHemi_vetoca8_csvm);
+                ttb_ht_[0] = ttb_ht;
+                ttb_ca8_mass_pr_[0] = getattr( self.InputTree_, "GroomedJet_CA8_mass_pr" )[theca8Index];
+                ttb_ca8_ungroomed_pt_[0] = getattr( self.InputTree_, "GroomedJet_CA8_pt" )[theca8Index];
+                ttb_ca8_tau2tau1_[0] = getattr( self.InputTree_, "GroomedJet_CA8_tau2tau1" )[theca8Index];
+                ttb_ca8_mu_[0] = getattr( self.InputTree_, "GroomedJet_CA8_massdrop_pr" )[theca8Index];
+
+                ttb_ca8J_p4 = ROOT.TLorentzVector();        
+                ttb_ca8J_pt = getattr( self.InputTree_, "GroomedJet_CA8_pt_pr" )[theca8Index];    
+                ttb_ca8J_eta = getattr( self.InputTree_, "GroomedJet_CA8_eta_pr" )[theca8Index];    
+                ttb_ca8J_phi = getattr( self.InputTree_, "GroomedJet_CA8_phi_pr" )[theca8Index];    
+                ttb_ca8J_e = getattr( self.InputTree_, "GroomedJet_CA8_e_pr" )[theca8Index];                        
+                ttb_ca8J_p4.SetPtEtaPhiE(ttb_ca8J_pt, ttb_ca8J_eta, ttb_ca8J_phi, ttb_ca8J_e)
+                ttb_V_p4 = ROOT.TLorentzVector(self.InputTree_.W_px,self.InputTree_.W_py,self.InputTree_.W_pz,self.InputTree_.W_e);                    
+                ttb_mlvj_[0] = (ttb_V_p4+ttb_ca8J_p4).M();
+
+                oppo1same1 = ttb_nak5_same_csvl_[0] > 0 and ttb_nak5_oppo_csvl_[0] > 0;
+                oppo2same0 = ttb_nak5_same_csvl_[0] == 0 and ttb_nak5_oppo_csvl_[0] > 1;
+                if oppo1same1 or oppo2same0:
+                    isttbar_[0] = 1
+                    
+            else:
+
+                ttb_nak5_same_[0] = -1;
+                ttb_nak5_same_csvl_[0] = -1;
+                ttb_nak5_same_csvm_[0] = -1;
+                ttb_nak5_oppo_[0] = -1;
+                ttb_nak5_oppo_csvl_[0] = -1;
+                ttb_nak5_oppo_csvm_[0] = -1;
+                ttb_nak5_oppoveto_[0] = -1;
+                ttb_nak5_oppoveto_csvl_[0] = -1;
+                ttb_nak5_oppoveto_csvm_[0] = -1;
+                ttb_ht_[0] = -1;
+                ttb_ca8_mass_pr_[0] = -1;
+                ttb_ca8_ungroomed_pt_[0] = -1;
+                ttb_ca8_tau2tau1_[0] = -1;
+                ttb_ca8_mu_[0] = -1;
+                ttb_mlvj_[0] = -1;
+                isttbar_[0] = 0
+                        
+
+
+            # ---------- end ttbar control region
 
             # make cuts
             leptonCut = 30;
@@ -443,58 +613,64 @@ class sampleWrapperClass:
                 else: totSampleWeight = wSampleWeight*effwt*puwt;
                 #print puwt;
 
+                rwCPS = 1;
+                if self.SignalMass_ > 0:
+                    binVal = self.x_rwCPS.FindBin(self.InputTree_.W_H_mass_gen);
+                    if binVal > self.h_rwCPS.GetNbinsX(): binVal = self.h_rwCPS.GetNbinsX();
+                    if binVal < 1: binVal = 1;
+                    #print "binVal: ",binVal;
+                    rwCPS = self.h_rwCPS.GetBinContent( binVal );
+
                 #interference weight
-                complexpolewtggH600    = getattr(self.InputTree_,"complexpolewtggH600"); 
+                complexpolewtggH600    = getattr(self.InputTree_,"complexpolewtggH600")*rwCPS; 
                 interferencewtggH600   = getattr(self.InputTree_,"interferencewtggH600");
                 avecomplexpolewtggH600 = getattr(self.InputTree_,"avecomplexpolewtggH600"); 
                 infe_Weight_H600 = complexpolewtggH600*interferencewtggH600/avecomplexpolewtggH600;
 
-                complexpolewtggH700    = getattr(self.InputTree_,"complexpolewtggH700"); 
+                complexpolewtggH700    = getattr(self.InputTree_,"complexpolewtggH700")*rwCPS; 
                 interferencewtggH700   = getattr(self.InputTree_,"interferencewtggH700");
                 avecomplexpolewtggH700 = getattr(self.InputTree_,"avecomplexpolewtggH700"); 
                 infe_Weight_H700 = complexpolewtggH700*interferencewtggH700/avecomplexpolewtggH700;
 
-                complexpolewtggH800    = getattr(self.InputTree_,"complexpolewtggH800"); 
+                complexpolewtggH800    = getattr(self.InputTree_,"complexpolewtggH800")*rwCPS; 
                 interferencewtggH800   = getattr(self.InputTree_,"interferencewtggH800");
                 avecomplexpolewtggH800 = getattr(self.InputTree_,"avecomplexpolewtggH800"); 
                 infe_Weight_H800 = complexpolewtggH800*interferencewtggH800/avecomplexpolewtggH800;
 
-                complexpolewtggH900    = getattr(self.InputTree_,"complexpolewtggH900"); 
+                complexpolewtggH900    = getattr(self.InputTree_,"complexpolewtggH900")*rwCPS; 
                 interferencewtggH900   = getattr(self.InputTree_,"interferencewtggH900");
                 avecomplexpolewtggH900 = getattr(self.InputTree_,"avecomplexpolewtggH900"); 
                 infe_Weight_H900 = complexpolewtggH900*interferencewtggH900/avecomplexpolewtggH900;
 
-                complexpolewtggH1000    = getattr(self.InputTree_,"complexpolewtggH1000"); 
+                complexpolewtggH1000    = getattr(self.InputTree_,"complexpolewtggH1000")*rwCPS; 
                 interferencewtggH1000   = getattr(self.InputTree_,"interferencewtggH1000");
                 avecomplexpolewtggH1000 = getattr(self.InputTree_,"avecomplexpolewtggH1000"); 
                 infe_Weight_H1000 = complexpolewtggH1000*interferencewtggH1000/avecomplexpolewtggH1000;
 
                 # produce weights for alternative models
-#                if self.SignalMass_ > 0:
-                if False:                    
+                if self.SignalMass_ > 0:
+#                if False:                    
                     curIntfRw = getattr(self.InputTree_,"interferencewtggH%03d"%(self.SignalMass_));
                     
 #                    print "new: ",IntfRescale(curIntfRw,0.1,0.)*curIntfRw,", old: ",curIntfRw
 #                    print "new: ",IntfRescale(curIntfRw,1.0,0.)*curIntfRw,", old: ",curIntfRw                                        
                     
                     genHMass_[0] = getattr(self.InputTree_,"W_H_mass_gen");
-                    bsmReweight_cPrime01_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.1, 0. )*IntfRescale(curIntfRw,0.1,0.);
-                    bsmReweight_cPrime02_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.2, 0. )*IntfRescale(curIntfRw,0.2,0.);
-                    bsmReweight_cPrime03_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.3, 0. )*IntfRescale(curIntfRw,0.3,0.);
-                    bsmReweight_cPrime04_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.4, 0. )*IntfRescale(curIntfRw,0.4,0.);                
-                    bsmReweight_cPrime05_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.5, 0. )*IntfRescale(curIntfRw,0.5,0.);
-                    bsmReweight_cPrime07_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 0.7, 0. )*IntfRescale(curIntfRw,0.7,0.);
-                    bsmReweight_cPrime10_brNew00_[0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), 1.0, 0. )*IntfRescale(curIntfRw,1.0,0.);                
+                    for i in range(len(cprimeVals)): 
+                        for j in range(len(brnewVals)): 
+                            curCprime = float(cprimeVals[i])/10.;
+                            curBRnew = float(brnewVals[j])/10.;
+                            if self.isVBF_: 
+                                bsmReweights[i][j][0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), curCprime, curBRnew );  
+                            else:
+                                bsmReweights[i][j][0] = self.GetInteferenceWeights( getattr(self.InputTree_,"W_H_mass_gen"), curCprime, curBRnew )*IntfRescale(curIntfRw,curCprime,curBRnew);
+                
                 else:   
                     genHMass_[0] = -1;
-                    bsmReweight_cPrime01_brNew00_[0] = -1;
-                    bsmReweight_cPrime02_brNew00_[0] = -1;
-                    bsmReweight_cPrime03_brNew00_[0] = -1;
-                    bsmReweight_cPrime04_brNew00_[0] = -1;
-                    bsmReweight_cPrime05_brNew00_[0] = -1;
-                    bsmReweight_cPrime07_brNew00_[0] = -1;
-                    bsmReweight_cPrime10_brNew00_[0] = -1;
-                
+                    for i in range(len(cprimeVals)): 
+                        for j in range(len(brnewVals)): 
+                            bsmReweights[i][j][0] = -1;
+            
                 
                 ###################################
                 # make training tree
@@ -503,18 +679,6 @@ class sampleWrapperClass:
                 jet_mass_pr_[0] = getattr( self.InputTree_, prefix + "_mass_pr" )[0];
 
                 issignal_[0] = signallike;
-                isttbar_[0] = ttbarlike;
-            
-#                print "signallike: ",signallike,",",issignal_[0];
-#                print "ttbarlike: ",ttbarlike,",",isttbar_[0];            
-                if ttbarlike == 1:
-                    jet_mass_pr_ttbar_[0] = getattr( self.InputTree_, prefix + "_mass_pr" )[theca8Index];
-                    jet_pt_ttbar_[0] = getattr( self.InputTree_, prefix + "_pt" )[theca8Index];
-                    tau2tau1_ttbar_[0] = getattr( self.InputTree_, prefix + "_tau2tau1" )[theca8Index];                    
-                else:
-                    jet_mass_pr_ttbar_[0] = -1;
-                    jet_pt_ttbar_[0] = -1;
-                    tau2tau1_ttbar_[0] = -1;
 
                 jet_pt_pr_[0] = getattr( self.InputTree_, prefix + "_pt_pr" )[0];
                 ungroomed_jet_pt_[0] = getattr( self.InputTree_, prefix+"_pt" )[0];
@@ -588,12 +752,12 @@ class sampleWrapperClass:
                 jet_planarlow07_[0] = getattr( self.InputTree_, prefix + "_planarflow07");
                 
 #                nbjets_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets" );
-                nbjets_cvsl_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl" );
-                nbjets_cvsm_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm" );
-                nbjets_ssvhem_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem" );
-                nbjets_csvl_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl_veto" );
-                nbjets_csvm_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm_veto" );
-                nbjets_ssvhem_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem_veto" );
+#                nbjets_cvsl_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl" );
+#                nbjets_cvsm_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm" );
+#                nbjets_ssvhem_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem" );
+#                nbjets_csvl_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl_veto" );
+#                nbjets_csvm_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm_veto" );
+#                nbjets_ssvhem_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem_veto" );
 
                 nbjetsCSV_[0] =0 ;
                 for i in range(0,6):
@@ -617,7 +781,18 @@ class sampleWrapperClass:
 
                 listOfVarArray2[0][0] = jet_qjetvol_[0]
                 listOfVarArray2[1][0] = jet_tau2tau1_[0]
-               
+
+#                gen_parton1_px_fromttbar_[0] =  self.InputTree_.W_tParton_px[0];
+#                gen_parton1_py_fromttbar_[0] =  self.InputTree_.W_tParton_py[0];
+#                gen_parton1_pz_fromttbar_[0] =  self.InputTree_.W_tParton_pz[0];
+#                gen_parton1_e_fromttbar_[0] =   self.InputTree_.W_tParton_E[0]
+#                gen_parton1_id_fromttbar_[0] =  self.InputTree_.W_tParton_Id[0]
+#                gen_parton2_px_fromttbar_[0] =  self.InputTree_.W_tParton_px[1];
+#                gen_parton2_py_fromttbar_[0] =  self.InputTree_.W_tParton_py[1];
+#                gen_parton2_pz_fromttbar_[0] =  self.InputTree_.W_tParton_pz[1];
+#                gen_parton2_e_fromttbar_[0] =   self.InputTree_.W_tParton_E[1]
+#                gen_parton1_id_fromttbar_[0] =  self.InputTree_.W_tParton_Id[1]
+                                       
                 #if jet_pt_pr_[0] > 200 and jet_pt_pr_[0] < 275: 
                 #   ca8wjettaggerpt200_275_[0] = reader1_.EvaluateMVA(TMVAMethod)
                 #   ca8wjettaggerpt275_500_[0] = -1;
@@ -684,12 +859,18 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus("event_nPV",1);
         self.InputTree_.SetBranchStatus("boostedW_lvj_m",1);
         self.InputTree_.SetBranchStatus("W_pt",1);
+        self.InputTree_.SetBranchStatus("W_px",1);
+        self.InputTree_.SetBranchStatus("W_py",1);
+        self.InputTree_.SetBranchStatus("W_pz",1);
+        self.InputTree_.SetBranchStatus("W_e",1);
         self.InputTree_.SetBranchStatus(prefix + "_pt_pr",1);
         self.InputTree_.SetBranchStatus(prefix + "_eta_pr",1);
         self.InputTree_.SetBranchStatus(prefix + "_phi_pr",1);
         self.InputTree_.SetBranchStatus(prefix + "_e_pr",1);
         self.InputTree_.SetBranchStatus(prefix + "_eta",1);
+        self.InputTree_.SetBranchStatus(prefix + "_phi",1);
         self.InputTree_.SetBranchStatus(prefix + "_pt",1);
+        self.InputTree_.SetBranchStatus(prefix + "_e",1);
         self.InputTree_.SetBranchStatus(prefix + "_massdrop_pr",1);
         self.InputTree_.SetBranchStatus(prefix + "_mass",1);
         self.InputTree_.SetBranchStatus(prefix + "_mass_pr",1);        
@@ -744,5 +925,46 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus("interferencewtggH900",1)
         self.InputTree_.SetBranchStatus("interferencewtggH1000",1)
 
+        # GEN INFO  
 
+        self.InputTree_.SetBranchStatus("W_tb_px",1)
+        self.InputTree_.SetBranchStatus("W_tb_py",1)
+        self.InputTree_.SetBranchStatus("W_tb_pz",1)
+        self.InputTree_.SetBranchStatus("W_tb_E",1)
+        self.InputTree_.SetBranchStatus("W_tb_Id",1)
+        self.InputTree_.SetBranchStatus("W_tbbar_px",1)
+        self.InputTree_.SetBranchStatus("W_tbbar_py",1)
+        self.InputTree_.SetBranchStatus("W_tbbar_pz",1)
+        self.InputTree_.SetBranchStatus("W_tbbar_E",1)
+        self.InputTree_.SetBranchStatus("W_tbbar_Id",1)
+        self.InputTree_.SetBranchStatus("W_tMet_px",1)
+        self.InputTree_.SetBranchStatus("W_tMet_py",1)
+        self.InputTree_.SetBranchStatus("W_tMet_pz",1)
+        self.InputTree_.SetBranchStatus("W_tMet_E",1)
+        self.InputTree_.SetBranchStatus("W_tMet_Id",1)
+        self.InputTree_.SetBranchStatus("W_tLepton_px",1)
+        self.InputTree_.SetBranchStatus("W_tLepton_py",1)
+        self.InputTree_.SetBranchStatus("W_tLepton_pz",1)
+        self.InputTree_.SetBranchStatus("W_tLepton_E",1)
+        self.InputTree_.SetBranchStatus("W_tLepton_Id",1)
 
+        self.InputTree_.SetBranchStatus("W_tParton_*",1)
+#        self.InputTree_.SetBranchStatus("W_tParton_py",1)
+#        self.InputTree_.SetBranchStatus("W_tParton_pz",1)
+#        self.InputTree_.SetBranchStatus("W_tParton_E",1)
+#        self.InputTree_.SetBranchStatus("W_tParton_Id",1)
+
+        self.InputTree_.SetBranchStatus("W_neutrino_px_gen",1)
+        self.InputTree_.SetBranchStatus("W_neutrino_py_gen",1)
+        self.InputTree_.SetBranchStatus("W_neutrino_pz_gen",1)
+        self.InputTree_.SetBranchStatus("W_neutrino_e_gen",1)
+        if self.Channel_ == "el":
+            self.InputTree_.SetBranchStatus("W_electron_px_gen",1)
+            self.InputTree_.SetBranchStatus("W_electron_py_gen",1)
+            self.InputTree_.SetBranchStatus("W_electron_pz_gen",1)
+            self.InputTree_.SetBranchStatus("W_electron_e_gen",1)
+        if self.Channel_ == "mu":
+            self.InputTree_.SetBranchStatus("W_muon_px_gen",1)
+            self.InputTree_.SetBranchStatus("W_muon_py_gen",1)
+            self.InputTree_.SetBranchStatus("W_muon_pz_gen",1)
+            self.InputTree_.SetBranchStatus("W_muon_e_gen",1)

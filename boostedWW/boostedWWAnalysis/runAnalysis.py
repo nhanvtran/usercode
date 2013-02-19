@@ -42,6 +42,8 @@ parser.add_option('--makeFinalTree', action='store_true', dest='makeFinalTree', 
                   help='make Final Tree')
 #parser.add_option('-m', '--trainingMethod',action="store",type="string",dest="trainingMethod",default="BDT")
 parser.add_option('--channel',action="store",type="string",dest="channel",default="mu")
+parser.add_option('--sampleToProcess',action="store",type="string",dest="sampleToProcess",default=None)
+
 parser.add_option('-m', '--trainingMethod',action="store",type="string",dest="trainingMethod",default="Likelihood")
 parser.add_option('-i', '--graphindex',action="store",type="int",dest="graphindex",default=0)
 
@@ -80,6 +82,7 @@ if __name__ == '__main__':
 #    sourcefiledirectory = "/uscms_data/d2/andersj/Wjj/2012/data/Moriond2013/ReducedTrees/"; 
 #    sourcefiledirectory = "/uscmst1b_scratch/lpc1/3DayLifetime/weizou/BoostedWSample_v2/"
     sourcefiledirectory = "/uscms_data/d3/lnujj/RDTrees_BoostedW_2013_1_29/";    
+
 
     treename = ""
     if options.makeControlPlots or options.makeTTBarControlPlots: 
@@ -121,6 +124,11 @@ if __name__ == '__main__':
 
     #TTbarSample_EffLumi = 6893735/225197.;
     TTbarSample = sampleWrapperClass("TTbar",boostedWSamples.GetFileNames()["TTbar"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar")),LUMI,boostedWSamples.GetTreeName(),notData);
+    TTbarSample_matchDn = sampleWrapperClass("TTbar_matchDn",boostedWSamples.GetFileNames()["TTbar_matchDn"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_matchDn")),LUMI,boostedWSamples.GetTreeName(),notData);
+    TTbarSample_matchUp = sampleWrapperClass("TTbar_matchUp",boostedWSamples.GetFileNames()["TTbar_matchUp"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_matchUp")),LUMI,boostedWSamples.GetTreeName(),notData);
+    TTbarSample_Powheg = sampleWrapperClass("TTbar_Powheg",boostedWSamples.GetFileNames()["TTbar_Powheg"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_Powheg")),LUMI,boostedWSamples.GetTreeName(),notData);
+    TTbarSample_scaleDn = sampleWrapperClass("TTbar_scaleDn",boostedWSamples.GetFileNames()["TTbar_scaleDn"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_scaleDn")),LUMI,boostedWSamples.GetTreeName(),notData);
+    TTbarSample_scaleUp = sampleWrapperClass("TTbar_scaleUp",boostedWSamples.GetFileNames()["TTbar_scaleUp"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_scaleUp")),LUMI,boostedWSamples.GetTreeName(),notData);
 
     #WWSample_EffLumi = 9450414/33.61E3;
     WWSample = sampleWrapperClass("WW",boostedWSamples.GetFileNames()["WW"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WW")),LUMI,boostedWSamples.GetTreeName(),notData);
@@ -139,36 +147,54 @@ if __name__ == '__main__':
     #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
     #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, datasample );
 
+    allSamples = [datasample,
+                  ggH600Sample,ggH700Sample,ggH800Sample,ggH900Sample,ggH1000Sample,
+                  vbfH600Sample,vbfH700Sample,vbfH800Sample,vbfH900Sample,vbfH1000Sample,
+                  WJets_PythiaSample,WJets_HerwigSample,ZJetsSample,TTbarSample,
+                  WWSample,WZSample,ZZSample,
+                  tchSample,tWchSample,schSample,tch_barSample,tWch_barSample,sch_barSample];
+
+
     if options.createTrainingTrees:
         
         # ---------------------------------------------------
         # create training tree
         #WJetsSample.createTrainingTree();
 
-        datasample.createTrainingTree();
-        vbfH600Sample.createTrainingTree();
-        vbfH700Sample.createTrainingTree();        
-        vbfH800Sample.createTrainingTree();        
-        vbfH900Sample.createTrainingTree();        
-        vbfH1000Sample.createTrainingTree(); 
-        ggH600Sample.createTrainingTree();
-        ggH700Sample.createTrainingTree();        
-        ggH800Sample.createTrainingTree();        
-        ggH900Sample.createTrainingTree();        
-        ggH1000Sample.createTrainingTree();        
-        WJets_HerwigSample.createTrainingTree();
-        WJets_PythiaSample.createTrainingTree();
-        ZJetsSample.createTrainingTree();
-        TTbarSample.createTrainingTree();
-        WWSample.createTrainingTree();
-        WZSample.createTrainingTree();
-        ZZSample.createTrainingTree();
-        tchSample.createTrainingTree();
-        tWchSample.createTrainingTree();
-        schSample.createTrainingTree();
-        tch_barSample.createTrainingTree();
-        tWch_barSample.createTrainingTree();
-        sch_barSample.createTrainingTree();
+        if options.sampleToProcess == None:
+            datasample.createTrainingTree();
+            vbfH600Sample.createTrainingTree();
+            vbfH700Sample.createTrainingTree();        
+            vbfH800Sample.createTrainingTree();        
+            vbfH900Sample.createTrainingTree();        
+            vbfH1000Sample.createTrainingTree(); 
+            ggH600Sample.createTrainingTree();
+            ggH700Sample.createTrainingTree();        
+            ggH800Sample.createTrainingTree();        
+            ggH900Sample.createTrainingTree();        
+            ggH1000Sample.createTrainingTree();        
+            WJets_HerwigSample.createTrainingTree();
+            WJets_PythiaSample.createTrainingTree();
+            ZJetsSample.createTrainingTree();
+            TTbarSample.createTrainingTree();
+            TTbarSample_matchDn.createTrainingTree();
+            TTbarSample_matchUp.createTrainingTree();
+            TTbarSample_Powheg.createTrainingTree();
+            TTbarSample_scaleDn.createTrainingTree();            
+            TTbarSample_scaleUp.createTrainingTree();            
+            WWSample.createTrainingTree();
+            WZSample.createTrainingTree();
+            ZZSample.createTrainingTree();
+            tchSample.createTrainingTree();
+            tWchSample.createTrainingTree();
+            schSample.createTrainingTree();
+            tch_barSample.createTrainingTree();
+            tWch_barSample.createTrainingTree();
+            sch_barSample.createTrainingTree();
+        else:
+            for i in range(len(allSamples)):
+                if options.sampleToProcess == allSamples[i].getLabel():
+                    allSamples[i].createTrainingTree();
 
     #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
     #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, datasample );    
