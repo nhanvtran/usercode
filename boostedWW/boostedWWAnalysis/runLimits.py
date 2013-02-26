@@ -75,16 +75,27 @@ if __name__ == '__main__':
     
     CHAN = options.channel;
     DIR = "cards_"+CHAN;
-    
+
+    #mass  = [ 600, 700, 800, 900,1000]
+    #ccmlo = [ 550, 600, 600, 750, 800]  
+    #ccmhi = [ 700, 850, 900,1100,1200]  
+    #mjlo  = [  40,  40,  40,  40,  40]  
+    #mjhi  = [ 130, 130, 130, 130, 130]  
+    #mlo   = [ 400, 400, 400, 600, 600]      
+    #mhi   = [1000,1000,1000,1400,1400]          
+    #shape    = ["ErfPowExp_v1","ErfPowExp_v1","ErfPowExp_v1","Exp","Exp"]
+    #shapeAlt = [  "ErfPow2_v1",  "ErfPow2_v1",  "ErfPow2_v1","Pow","Pow"]
+     
     mass  = [ 600, 700, 800, 900,1000]
-    ccmlo = [ 550, 600, 700, 800, 900]  
+    ccmlo = [ 550, 600, 700, 750, 800]  
     ccmhi = [ 700, 850, 950,1100,1200]  
     mjlo  = [  40,  40,  40,  40,  40]  
     mjhi  = [ 130, 130, 130, 130, 130]  
-    mlo   = [ 400, 400, 600, 650, 650]      
+    mlo   = [ 400, 400, 600, 600, 600]      
     mhi   = [1000,1000,1400,1400,1400]          
     shape    = ["ErfPowExp_v1","ErfPowExp_v1","Exp","Exp","Exp"]
     shapeAlt = [  "ErfPow2_v1",  "ErfPow2_v1","Pow","Pow","Pow"]
+
     #mass  = [ 600, 800]
     #ccmlo = [ 550, 700]  
     #ccmhi = [ 700, 950]  
@@ -144,7 +155,7 @@ if __name__ == '__main__':
                 
                 time.sleep(3);
                 
-                command = "nohup python doFit_class.py %s ggH%03d %02d %02d %02d %02d %02d %02d %s %s -b -m --cprime %02d --BRnew 00 &"%(CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j]);
+                command = "nohup python doFit_class.py %s ggH%03d %02d %02d %02d %02d %02d %02d %s %s -b -m --cprime %02d --BRnew 00 > /dev/null &"%(CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j]);
                 #command = "nohup python doFit_class.py %s ggH%03d %02d %02d %02d %02d %02d %02d %s %s -b -m --cprime %02d --BRnew 00  > log/log_%s_ggH%03d_%02d_%02d_%02d_%02d_%02d_%02d_%s_%s_cprime_%02d_BRnew_00 &"%(CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j], CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j]);
                 #command = "python doFit_class.py %s ggH%03d %02d %02d %02d %02d %02d %02d %s %s -b -m --cprime %02d --BRnew 00  >> log/log_%s_ggH%03d_%02d_%02d_%02d_%02d_%02d_%02d_%s_%s_cprime_%02d_BRnew_00 "%(CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j], CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j]);
                 print command #raw_input("ENTER");
