@@ -151,6 +151,7 @@ if __name__ == '__main__':
                   ggH600Sample,ggH700Sample,ggH800Sample,ggH900Sample,ggH1000Sample,
                   vbfH600Sample,vbfH700Sample,vbfH800Sample,vbfH900Sample,vbfH1000Sample,
                   WJets_PythiaSample,WJets_HerwigSample,ZJetsSample,TTbarSample,
+                  TTbarSample_matchDn,TTbarSample_matchUp,TTbarSample_scaleDn,TTbarSample_scaleUp,TTbarSample_Powheg,
                   WWSample,WZSample,ZZSample,
                   tchSample,tWchSample,schSample,tch_barSample,tWch_barSample,sch_barSample];
 
@@ -163,34 +164,34 @@ if __name__ == '__main__':
 
         if options.sampleToProcess == None:
             datasample.createTrainingTree();
-            vbfH600Sample.createTrainingTree();
-            vbfH700Sample.createTrainingTree();        
-            vbfH800Sample.createTrainingTree();        
-            vbfH900Sample.createTrainingTree();        
-            vbfH1000Sample.createTrainingTree(); 
-            ggH600Sample.createTrainingTree();
-            ggH700Sample.createTrainingTree();        
-            ggH800Sample.createTrainingTree();        
-            ggH900Sample.createTrainingTree();        
-            ggH1000Sample.createTrainingTree();        
-            WJets_HerwigSample.createTrainingTree();
-            WJets_PythiaSample.createTrainingTree();
-            ZJetsSample.createTrainingTree();
+#            vbfH600Sample.createTrainingTree();
+#            vbfH700Sample.createTrainingTree();        
+#            vbfH800Sample.createTrainingTree();        
+#            vbfH900Sample.createTrainingTree();        
+#            vbfH1000Sample.createTrainingTree(); 
+#            ggH600Sample.createTrainingTree();
+#            ggH700Sample.createTrainingTree();        
+#            ggH800Sample.createTrainingTree();        
+#            ggH900Sample.createTrainingTree();        
+#            ggH1000Sample.createTrainingTree();        
+#            WJets_HerwigSample.createTrainingTree();
+#            WJets_PythiaSample.createTrainingTree();
+#            ZJetsSample.createTrainingTree();
             TTbarSample.createTrainingTree();
-            TTbarSample_matchDn.createTrainingTree();
-            TTbarSample_matchUp.createTrainingTree();
-            TTbarSample_Powheg.createTrainingTree();
-            TTbarSample_scaleDn.createTrainingTree();            
-            TTbarSample_scaleUp.createTrainingTree();            
-            WWSample.createTrainingTree();
-            WZSample.createTrainingTree();
-            ZZSample.createTrainingTree();
-            tchSample.createTrainingTree();
-            tWchSample.createTrainingTree();
-            schSample.createTrainingTree();
-            tch_barSample.createTrainingTree();
-            tWch_barSample.createTrainingTree();
-            sch_barSample.createTrainingTree();
+#            TTbarSample_matchDn.createTrainingTree();
+#            TTbarSample_matchUp.createTrainingTree();
+#            TTbarSample_Powheg.createTrainingTree();
+#            TTbarSample_scaleDn.createTrainingTree();            
+#            TTbarSample_scaleUp.createTrainingTree();            
+#            WWSample.createTrainingTree();
+#            WZSample.createTrainingTree();
+#            ZZSample.createTrainingTree();
+#            tchSample.createTrainingTree();
+#            tWchSample.createTrainingTree();
+#            schSample.createTrainingTree();
+#            tch_barSample.createTrainingTree();
+#            tWch_barSample.createTrainingTree();
+#            sch_barSample.createTrainingTree();
         else:
             for i in range(len(allSamples)):
                 if options.sampleToProcess == allSamples[i].getLabel():

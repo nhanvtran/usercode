@@ -232,6 +232,9 @@ class sampleWrapperClass:
 
         #ungroomedwjettaggerpt200_275_ = array( 'f', [0.] )
         #ungroomedwjettaggerpt275_500_ = array( 'f', [0.] )
+
+        event_ = array( 'i', [0] );
+        otree.Branch("event", event_ , "event/I");
     
         otree.Branch("mass_lvj", mass_lvj_ , "mass_lvj/F");
         otree.Branch("v_pt", v_pt_ , "v_pt/F");
@@ -319,6 +322,12 @@ class sampleWrapperClass:
         ttb_nak5_oppoveto_csvm_  = array( 'f', [ 0. ] );        
         ttb_ht_  = array( 'f', [ 0. ] );                
         ttb_ca8_mass_pr_  = array( 'f', [ 0. ] );                        
+
+        ttb_ca8_px_  = array( 'f', [ 0. ] );                        
+        ttb_ca8_py_  = array( 'f', [ 0. ] );                                
+        ttb_ca8_pz_  = array( 'f', [ 0. ] );                                
+        ttb_ca8_e_  = array( 'f', [ 0. ] );                                
+        
         ttb_ca8_ungroomed_pt_  = array( 'f', [ 0. ] );                        
         ttb_ca8_tau2tau1_  = array( 'f', [ 0. ] );                        
         ttb_ca8_mu_  = array( 'f', [ 0. ] );                        
@@ -338,6 +347,12 @@ class sampleWrapperClass:
         
         otree.Branch("ttb_ht", ttb_ht_ , "ttb_ht_/F");                
         otree.Branch("ttb_ca8_mass_pr", ttb_ca8_mass_pr_ , "ttb_ca8_mass_pr/F");                
+
+        otree.Branch("ttb_ca8_px", ttb_ca8_px_ , "ttb_ca8_px/F");                
+        otree.Branch("ttb_ca8_py", ttb_ca8_py_ , "ttb_ca8_py/F");                
+        otree.Branch("ttb_ca8_pz", ttb_ca8_pz_ , "ttb_ca8_pz/F");                
+        otree.Branch("ttb_ca8_e", ttb_ca8_e_ , "ttb_ca8_e/F");                
+
         otree.Branch("ttb_ca8_ungroomed_pt", ttb_ca8_ungroomed_pt_ , "ttb_ca8_ungroomed_pt/F");                
         otree.Branch("ttb_ca8_tau2tau1", ttb_ca8_tau2tau1_ , "ttb_ca8_tau2tau1/F");                
         otree.Branch("ttb_ca8_mu", ttb_ca8_mu_ , "ttb_ca8_mu/F");                
@@ -464,10 +479,8 @@ class sampleWrapperClass:
         for i in range(NLoop):
 #        for i in range(2):            
             
-            if i % 10000 == 0: 
+            if i % 100 == 0: 
                 print "i = ", i
-
-            
 
             self.InputTree_.GetEntry(i);
 
@@ -552,6 +565,7 @@ class sampleWrapperClass:
                 ttb_ht_[0] = ttb_ht;
                 ttb_ca8_mass_pr_[0] = getattr( self.InputTree_, "GroomedJet_CA8_mass_pr" )[theca8Index];
                 ttb_ca8_ungroomed_pt_[0] = getattr( self.InputTree_, "GroomedJet_CA8_pt" )[theca8Index];
+            
                 ttb_ca8_tau2tau1_[0] = getattr( self.InputTree_, "GroomedJet_CA8_tau2tau1" )[theca8Index];
                 ttb_ca8_mu_[0] = getattr( self.InputTree_, "GroomedJet_CA8_massdrop_pr" )[theca8Index];
 
@@ -563,9 +577,15 @@ class sampleWrapperClass:
                 ttb_ca8J_p4.SetPtEtaPhiE(ttb_ca8J_pt, ttb_ca8J_eta, ttb_ca8J_phi, ttb_ca8J_e)
                 ttb_V_p4 = ROOT.TLorentzVector(self.InputTree_.W_px,self.InputTree_.W_py,self.InputTree_.W_pz,self.InputTree_.W_e);                    
                 ttb_mlvj_[0] = (ttb_V_p4+ttb_ca8J_p4).M();
+            
+                ttb_ca8_px_[0] = ttb_ca8J_p4.Px();
+                ttb_ca8_py_[0] = ttb_ca8J_p4.Py();
+                ttb_ca8_pz_[0] = ttb_ca8J_p4.Pz();
+                ttb_ca8_e_[0] =  ttb_ca8J_p4.E();
 
-                oppo1same1 = ttb_nak5_same_csvl_[0] > 0 and ttb_nak5_oppo_csvl_[0] > 0;
+                oppo1same1 = ttb_nak5_same_csvl_[0] > 0 or ttb_nak5_oppo_csvl_[0] > 0;
                 oppo2same0 = ttb_nak5_same_csvl_[0] == 0 and ttb_nak5_oppo_csvl_[0] > 1;
+                oppo2same0 = False
                 if oppo1same1 or oppo2same0:
                     isttbar_[0] = 1
                     
@@ -588,6 +608,10 @@ class sampleWrapperClass:
                 ttb_mlvj_[0] = -1;
                 isttbar_[0] = 0
                         
+                ttb_ca8_px_[0] = 0;
+                ttb_ca8_py_[0] = 0;
+                ttb_ca8_pz_[0] = 0;
+                ttb_ca8_e_[0] = 0;
 
 
             # ---------- end ttbar control region
@@ -602,10 +626,19 @@ class sampleWrapperClass:
                 metCut = 70;
 
             signallike = 0;
-            if getattr( self.InputTree_, "W_pt" ) > 200 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut and getattr( self.InputTree_, "GroomedJet_CA8_deltaphi_METca8jet") > 2.0 and getattr( self.InputTree_, "GroomedJet_CA8_deltaR_lca8jet") > 1.57: signallike = 1;
+            if getattr( self.InputTree_, "W_pt" ) > 200 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut and getattr( self.InputTree_, "GroomedJet_CA8_deltaphi_METca8jet") > 2.0 and getattr( self.InputTree_, "GroomedJet_CA8_deltaR_lca8jet") > 1.57 and self.InputTree_.numPFCorJetBTags == 0: signallike = 1;
 
-            if (ttbarlike and getattr( self.InputTree_, "W_pt" ) > 100) or signallike == True:                
- 
+            ttbarlike = 0;
+            if isttbar_[0] == 1 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut:
+                ttbarlike = 1;
+
+#            if ttbarlike == 1 or signallike == 1:    
+#                print "ttbarlike = ",ttbarlike," and signallike = ",signallike
+            if ttbarlike == 1 or signallike == 1:                
+             
+                event_[0] = self.InputTree_.event_evtNo;
+                #print "self.InputTree_.event_evtNo = ",self.InputTree_.event_evtNo, " and ",event_[0]
+                
                 effwt = getattr( self.InputTree_, "effwt" );
                 puwt = getattr( self.InputTree_, "puwt" ); 
                 totSampleWeight = 1.;
@@ -837,6 +870,7 @@ class sampleWrapperClass:
         
         self.InputTree_.SetBranchStatus("*",0);
         
+        self.InputTree_.SetBranchStatus("event_evtNo",1);
         self.InputTree_.SetBranchStatus("ggdboostedWevt",1);
         self.InputTree_.SetBranchStatus("effwt",1);
         self.InputTree_.SetBranchStatus("puwt",1);
