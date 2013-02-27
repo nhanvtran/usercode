@@ -1,5 +1,5 @@
 # ----------------
-# scale factor is sigma/Nevents
+# scale factor is sigma(fb)/Nevents
 # ----------------
 
 ## ggH signal 
@@ -28,6 +28,8 @@ WZ 3.32091133166744455e-03
 ZZ 8.55418768712285600e-04
 ####WJet Pt100##################
 WJets_Pythia 3.32283007705589037e-02
+####WJet Pt100##################
+WJets_Pythia180 3.52100485201239065e-03
 ####WJet Herwig++##################
 WJets_Herwig 2.24477956923949673e-02
 #WJets 2.33527765844721985e-02

@@ -43,6 +43,7 @@ class Samples:
               self.filenames["TTbar_scaleDn"] = self.filepath + "RD_mu_TTJetsScaleup_CMSSW532.root"
               self.filenames["TTbar_scaleUp"] = self.filepath + "RD_mu_TTJetsScaledown_CMSSW532.root"
               self.filenames["WJets_Pythia"] = self.filepath + "RD_mu_WJets_madgraph_CMSSW532.root"
+              self.filenames["WJets_Pythia180"] = self.filepath + "RD_mu_WJetsptW180_madgraph_CMSSW532.root"              
 #              self.filenames["WJets_Pythia"] = self.filepath + "RD_el_WpJPt100_CMSSW532.root"
               self.filenames["WJets_Herwig"] = self.filepath + "RD_mu_WJets_herwig_CMSSW532.root";
               self.filenames["ZJets"] = self.filepath + "RD_mu_ZpJ_CMSSW532.root"
@@ -75,6 +76,7 @@ class Samples:
               self.filenames["TTbar_scaleDn"] = self.filepath + "RD_el_TTJetsScaleup_CMSSW532.root"
               self.filenames["TTbar_scaleUp"] = self.filepath + "RD_el_TTJetsScaledown_CMSSW532.root"              
               self.filenames["WJets_Pythia"] = self.filepath + "RD_el_WJets_madgraph_CMSSW532.root";
+              self.filenames["WJets_Pythia180"] = self.filepath + "RD_el_WJetsptW180_madgraph_CMSSW532.root"                            
 #              self.filenames["WJets_Pythia"] = self.filepath + "RD_el_WpJPt100_CMSSW532.root";              
               self.filenames["WJets_Herwig"] = self.filepath + "RD_el_WJets_herwig_CMSSW532.root";
               self.filenames["ZJets"] = self.filepath + "RD_el_ZpJ_CMSSW532.root"

@@ -479,7 +479,7 @@ class sampleWrapperClass:
         for i in range(NLoop):
 #        for i in range(2):            
             
-            if i % 100 == 0: 
+            if i % 10000 == 0: 
                 print "i = ", i
 
             self.InputTree_.GetEntry(i);

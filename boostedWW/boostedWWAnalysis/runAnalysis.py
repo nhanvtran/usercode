@@ -119,6 +119,7 @@ if __name__ == '__main__':
     #boostedWXS = 1.3*228.9E3;
     #WJetsSample_EffLumi = 8955318/boostedWXS;
     WJets_PythiaSample = sampleWrapperClass("WJets_Pythia",boostedWSamples.GetFileNames()["WJets_Pythia"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Pythia")),LUMI,boostedWSamples.GetTreeName(),notData)
+    WJets_Pythia180Sample = sampleWrapperClass("WJets_Pythia180",boostedWSamples.GetFileNames()["WJets_Pythia180"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Pythia180")),LUMI,boostedWSamples.GetTreeName(),notData)
     WJets_HerwigSample = sampleWrapperClass("WJets_Herwig",boostedWSamples.GetFileNames()["WJets_Herwig"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Herwig")),LUMI,boostedWSamples.GetTreeName(),notData)
     ZJetsSample = sampleWrapperClass("ZJets",boostedWSamples.GetFileNames()["ZJets"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZJets")),LUMI,boostedWSamples.GetTreeName(),notData)
 
@@ -150,7 +151,7 @@ if __name__ == '__main__':
     allSamples = [datasample,
                   ggH600Sample,ggH700Sample,ggH800Sample,ggH900Sample,ggH1000Sample,
                   vbfH600Sample,vbfH700Sample,vbfH800Sample,vbfH900Sample,vbfH1000Sample,
-                  WJets_PythiaSample,WJets_HerwigSample,ZJetsSample,TTbarSample,
+                  WJets_PythiaSample,WJets_Pythia180Sample,WJets_HerwigSample,ZJetsSample,TTbarSample,
                   TTbarSample_matchDn,TTbarSample_matchUp,TTbarSample_scaleDn,TTbarSample_scaleUp,TTbarSample_Powheg,
                   WWSample,WZSample,ZZSample,
                   tchSample,tWchSample,schSample,tch_barSample,tWch_barSample,sch_barSample];
@@ -176,8 +177,9 @@ if __name__ == '__main__':
 #            ggH1000Sample.createTrainingTree();        
 #            WJets_HerwigSample.createTrainingTree();
 #            WJets_PythiaSample.createTrainingTree();
+            WJets_Pythia180Sample.createTrainingTree();
 #            ZJetsSample.createTrainingTree();
-            TTbarSample.createTrainingTree();
+#            TTbarSample.createTrainingTree();
 #            TTbarSample_matchDn.createTrainingTree();
 #            TTbarSample_matchUp.createTrainingTree();
 #            TTbarSample_Powheg.createTrainingTree();
