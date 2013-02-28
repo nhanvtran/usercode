@@ -66,6 +66,11 @@ class Samples:
               self.filenames["vbfH800"] = self.filepath + "RD_mu_VBFHWWMH800_CMSSW532_private.root"
               self.filenames["vbfH900"] = self.filepath + "RD_mu_VBFHWWMH900_CMSSW532_private.root"
               self.filenames["vbfH1000"] = self.filepath + "RD_mu_VBFHWWMH1000_CMSSW532_private.root"
+              self.filenames["rsg1000_kMpl01_py"] = self.filepath + "RD_mu_RSGravitonToWW_kMpl01_M-1000_pythia_CMSSW532_private.root"          
+              self.filenames["rsg1000_kMpl01_hw"] = self.filepath + "RD_mu_RSGravitonToWW_kMpl01_M-1000_herwig_CMSSW532_private.root"          
+              self.filenames["rsg1500_kMpl01_py"] = self.filepath + "RD_mu_RSGravitonToWW_kMpl01_M-1500_pythia_CMSSW532_private.root"          
+              self.filenames["rsg1500_kMpl01_hw"] = self.filepath + "RD_mu_RSGravitonToWW_kMpl01_M-1500_herwig_CMSSW532_private.root"          
+              self.filenames["rsg2000_kMpl01_py"] = self.filepath + "RD_mu_RSGravitonToWW_kMpl01_M-2000_pythia_CMSSW532_private.root"                    
           elif self.channel == "el":
               self.filenames["data"] = self.filepath + "RD_WenuJets_DataAllSingleElectronTrigger_GoldenJSON_19p2invfb.root"
 #              self.filenames["data"] = "/uscms_data/d3/zixu/Data/RD_Tree_data12_ele/RD_WenuJets_DataAllSingleElectronTrigger_GoldenJSON_5p145.root"                            
@@ -99,6 +104,11 @@ class Samples:
               self.filenames["vbfH800"] = self.filepath + "RD_el_VBFHWWMH800_CMSSW532_private.root"
               self.filenames["vbfH900"] = self.filepath + "RD_el_VBFHWWMH900_CMSSW532_private.root"
               self.filenames["vbfH1000"] = self.filepath + "RD_el_VBFHWWMH1000_CMSSW532_private.root"
+              self.filenames["rsg1000_kMpl01_py"] = self.filepath + "RD_el_RSGravitonToWW_kMpl01_M-1000_pythia_CMSSW532_private.root"          
+              self.filenames["rsg1000_kMpl01_hw"] = self.filepath + "RD_el_RSGravitonToWW_kMpl01_M-1000_herwig_CMSSW532_private.root"          
+              self.filenames["rsg1500_kMpl01_py"] = self.filepath + "RD_el_RSGravitonToWW_kMpl01_M-1500_pythia_CMSSW532_private.root"          
+              self.filenames["rsg1500_kMpl01_hw"] = self.filepath + "RD_el_RSGravitonToWW_kMpl01_M-1500_herwig_CMSSW532_private.root"          
+              self.filenames["rsg2000_kMpl01_py"] = self.filepath + "RD_el_RSGravitonToWW_kMpl01_M-2000_pythia_CMSSW532_private.root"                    
 
 
       def GetLumiScaleFactor(self,txtfile,keyname):

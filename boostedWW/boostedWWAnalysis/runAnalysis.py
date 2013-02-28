@@ -116,6 +116,13 @@ if __name__ == '__main__':
     vbfH900Sample = sampleWrapperClass("vbfH900",boostedWSamples.GetFileNames()["vbfH900"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"vbfH900")),LUMI,boostedWSamples.GetTreeName(),notData)
     vbfH1000Sample = sampleWrapperClass("vbfH1000",boostedWSamples.GetFileNames()["vbfH1000"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"vbfH1000")),LUMI,boostedWSamples.GetTreeName(),notData)
 
+
+    rsg1000Sample_kMpl01_py = sampleWrapperClass("rsg1000_kMpl01_py",boostedWSamples.GetFileNames()["rsg1000_kMpl01_py"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"rsg1000_kMpl01_py")),LUMI,boostedWSamples.GetTreeName(),notData)
+    rsg1000Sample_kMpl01_hw = sampleWrapperClass("rsg1000_kMpl01_hw",boostedWSamples.GetFileNames()["rsg1000_kMpl01_hw"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"rsg1000_kMpl01_hw")),LUMI,boostedWSamples.GetTreeName(),notData)
+    rsg1500Sample_kMpl01_py = sampleWrapperClass("rsg1500_kMpl01_py",boostedWSamples.GetFileNames()["rsg1500_kMpl01_py"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"rsg1500_kMpl01_py")),LUMI,boostedWSamples.GetTreeName(),notData)
+    rsg1500Sample_kMpl01_hw = sampleWrapperClass("rsg1500_kMpl01_hw",boostedWSamples.GetFileNames()["rsg1500_kMpl01_hw"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"rsg1500_kMpl01_hw")),LUMI,boostedWSamples.GetTreeName(),notData)
+    rsg2000Sample_kMpl01_py = sampleWrapperClass("rsg2000_kMpl01_py",boostedWSamples.GetFileNames()["rsg2000_kMpl01_py"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"rsg2000_kMpl01_py")),LUMI,boostedWSamples.GetTreeName(),notData)
+    
     #boostedWXS = 1.3*228.9E3;
     #WJetsSample_EffLumi = 8955318/boostedWXS;
     WJets_PythiaSample = sampleWrapperClass("WJets_Pythia",boostedWSamples.GetFileNames()["WJets_Pythia"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Pythia")),LUMI,boostedWSamples.GetTreeName(),notData)
@@ -151,6 +158,7 @@ if __name__ == '__main__':
     allSamples = [datasample,
                   ggH600Sample,ggH700Sample,ggH800Sample,ggH900Sample,ggH1000Sample,
                   vbfH600Sample,vbfH700Sample,vbfH800Sample,vbfH900Sample,vbfH1000Sample,
+                  rsg1000Sample_kMpl01_py,rsg1000Sample_kMpl01_hw,rsg1500Sample_kMpl01_py,rsg1500Sample_kMpl01_hw,rsg2000Sample_kMpl01_py,
                   WJets_PythiaSample,WJets_Pythia180Sample,WJets_HerwigSample,ZJetsSample,TTbarSample,
                   TTbarSample_matchDn,TTbarSample_matchUp,TTbarSample_scaleDn,TTbarSample_scaleUp,TTbarSample_Powheg,
                   WWSample,WZSample,ZZSample,
