@@ -119,6 +119,7 @@ class JetSubstructureTools {
     float rcore11_;
     float rcore12_;
 
+		int hasPrunedSubjets_;
     fastjet::PseudoJet prunedSubJet1_;
     fastjet::PseudoJet prunedSubJet2_;    
     
@@ -184,7 +185,7 @@ JetSubstructureTools::JetSubstructureTools( double radii, std::vector<float> c_p
 //    NsubParameters paraNsub = NsubParameters(mNsubjettinessKappa, mJetRadius);   
 //    Nsubjettiness routine(nsub_kt_axes, paraNsub);
     
-        // define n-subjettiness
+        // define new n-subjettiness
     float mNsubjettinessKappa = 1.;
     double beta = mNsubjettinessKappa; // power for angular dependence, e.g. beta = 1 --> linear k-means, beta = 2 --> quadratic/classic k-means
     double R0 = mJetRadius; // Characteristic jet radius for normalization            
@@ -222,11 +223,17 @@ JetSubstructureTools::JetSubstructureTools( double radii, std::vector<float> c_p
                 
                 int nsubjetstokeep = 2;
                 std::vector<fastjet::PseudoJet> prunedSubjets = transformedJet.associated_cluster_sequence()->exclusive_subjets(transformedJet,nsubjetstokeep);    
-                
+
+								hasPrunedSubjets_ = 1;
                 prunedSubJet1_ = prunedSubjets.at(0);
                 prunedSubJet2_ = prunedSubjets.at(1);
                 
             }
+						else{
+							hasPrunedSubjets_ = 0;
+							prunedSubJet1_ = fastjet::PseudoJet(0,0,0,0);
+							prunedSubJet2_ = fastjet::PseudoJet(0,0,0,0);
+						}
         }
         else{ std::cout << "error in number of transformers" << std::endl;}                    
         transctr++;
