@@ -59,7 +59,7 @@ parser.add_option('--BRnew', action="store",type="int",dest="BRnew",default=0)
 ############################################################
 
 class doFit_wj_and_wlvj:
-    def __init__(self, in_channel="mu",in_higgs_sample="ggH600", in_mlvj_signal_region_min=500, in_mlvj_signal_region_max=700, in_mj_min=30, in_mj_max=140, in_mlvj_min=400., in_mlvj_max=1400., fit_model="ErfExp_v1", fit_model_alter="ErfPow_v1"):
+    def __init__(self, in_channel="mu",in_higgs_sample="ggH600", in_mlvj_signal_region_min=500, in_mlvj_signal_region_max=700, in_mj_min=30, in_mj_max=140, in_mlvj_min=400., in_mlvj_max=1400., fit_model="ErfExp_v1", fit_model_alter="ErfPow_v1", input_workspace=None):
         print "Begin to fit"
 
         RooAbsPdf.defaultIntegratorConfig().setEpsRel(1e-9) ;
@@ -87,7 +87,10 @@ class doFit_wj_and_wlvj:
         rrv_mass_lvj= RooRealVar("rrv_mass_lvj","mass(lvj)",(in_mlvj_min+in_mlvj_max)/2.,in_mlvj_min,in_mlvj_max,"GeV/c^{2}");
         rrv_mass_lvj.setBins(nbins_mlvj);
 
-        self.workspace4fit_ = RooWorkspace("workspace4fit_","workspace4fit_");
+        if input_workspace is None:
+            self.workspace4fit_ = RooWorkspace("workspace4fit_","workspace4fit_");
+        else:
+            self.workspace4fit_ = input_workspace;
         getattr(self.workspace4fit_,"import")(rrv_mass_j);
         getattr(self.workspace4fit_,"import")(rrv_mass_lvj);
 
@@ -3639,6 +3642,27 @@ class doFit_wj_and_wlvj:
         print "________________________________________________________________________" 
 
     ####### +++++++++++++++
+    def get_TTbar_controlsample(self):
+        print "get_TTbar_controlsample"
+        #self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_data,"_data"); #self.fit_mj_singlebackground_MC_TTbar_controlsample(self.file_data,"_data","ErfExpGaus");
+        #self.saveHist("_data");
+
+        rrv_mass_j = self.workspace4fit_.var("rrv_mass_j");
+        self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_STop_mc,"_STop");  
+        self.fit_mj_single_MC(self.file_STop_mc,"_STop","ErfExpGaus_sp","_TTbar_controlsample");
+        self.fit_mj_single_MC(self.file_STop_mc,"_STop_failedtau2tau1cut","Exp","_TTbar_controlsample");
+        self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_WJets0_mc,"_WJets0");
+        self.fit_mj_single_MC(self.file_WJets0_mc,"_WJets0","ErfExp","_TTbar_controlsample");
+        self.fit_mj_single_MC(self.file_WJets0_mc,"_WJets0_failedtau2tau1cut","Exp","_TTbar_controlsample");
+        self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_VV_mc,"_VV");     
+        self.fit_mj_single_MC(self.file_VV_mc,"_VV","ErfExpGaus_sp","_TTbar_controlsample");
+        self.fit_mj_single_MC(self.file_VV_mc,"_VV_failedtau2tau1cut","Exp","_TTbar_controlsample");
+        self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_TTbar_mc,"_TTbar"); #self.fit_mj_singlebackground_MC_TTbar_controlsample(self.file_TTbar_mc,"_TTbar","ErfExpGaus");
+        self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_pseudodata,"_TotalMC");#self.fit_mj_singlebackground_MC_TTbar_controlsample(self.file_pseudodata,"_pseudodata","ErfExpGaus");
+        self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_data,"_data"); #self.fit_mj_singlebackground_MC_TTbar_controlsample(self.file_data,"_data","ErfExpGaus");
+
+
+    ####### +++++++++++++++
     def fit_TTbar_controlsample(self):
         print "fit_TTbar_controlsample"
         #self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_data,"_data"); #self.fit_mj_singlebackground_MC_TTbar_controlsample(self.file_data,"_data","ErfExpGaus");
@@ -3684,11 +3708,51 @@ class doFit_wj_and_wlvj:
         self.prepare_limit("sideband_correction_method1")
         self.read_workspace()
 
+class doFit_wj_and_wlvj_simultaneous:
+    def __init__(self):
+        self.workspace4fit_ = RooWorkspace("workspace4fit_","workspace4fit_");
+
+        self.boostedW_fitter_el=doFit_wj_and_wlvj("el","ggH600",500,700,40,130, 400., 1400., "ErfExp_v1", "ErfPow_v1", self.workspace4fit_)
+        self.boostedW_fitter_mu=doFit_wj_and_wlvj("mu","ggH600",500,700,40,130, 400., 1400., "ErfExp_v1", "ErfPow_v1", self.workspace4fit_)
+        self.boostedW_fitter_el.get_TTbar_controlsample();
+        self.boostedW_fitter_mu.get_TTbar_controlsample();
+        self.workspace4fit_.data("rdataset_data_mu_mj").Print(); self.workspace4fit_.data("rdataset_data_el_mj").Print();
+
+        sample_type=RooCategory("sample_type","sample_type");
+        sample_type.defineType("mu_pass");
+        sample_type.defineType("mu_fail");
+        sample_type.defineType("el_pass");
+        sample_type.defineType("el_fail");
+        rrv_weight = RooRealVar("rrv_weight","rrv_weight",0. ,10000000.) 
+
+        rdataset_data_mu_mj=self.workspace4fit_.data("rdataset_data_mu_mj");
+        rdataset_data_el_mj=self.workspace4fit_.data("rdataset_data_el_mj");
+        rdataset_data_mu_mj_fail = self.workspace4fit_.data("rdataset_data_failedtau2tau1cut_mu_mj"); 
+        rdataset_data_el_mj_fail = self.workspace4fit_.data("rdataset_data_failedtau2tau1cut_el_mj"); 
+
+        rrv_mj=self.workspace4fit_.var("rrv_mj");
+        combData_data=RooDataSet("combData_data","combData_data",RooArgSet(rrv_mj,rrv_weight),RooFit.WeightVar(rrv_weight),RooFit.Index(sample_type),RooFit.Import("mu_pass",rdataset_data_mu_mj),RooFit.Import("el_pass",rdataset_data_el_mj),RooFit.Import("mu_fail",rdataset_data_mu_mj_fail),RooFit.Import("el_fail",rdataset_data_el_mj_fail) );
+        combData_data.Print();
+
+        rdataset_TotalMC_mu_mj=self.workspace4fit_.data("rdataset_TotalMC_mu_mj");
+        rdataset_TotalMC_el_mj=self.workspace4fit_.data("rdataset_TotalMC_el_mj");
+        rdataset_TotalMC_mu_mj_fail = self.workspace4fit_.data("rdataset_TotalMC_failedtau2tau1cut_mu_mj"); 
+        rdataset_TotalMC_el_mj_fail = self.workspace4fit_.data("rdataset_TotalMC_failedtau2tau1cut_el_mj"); 
+
+        rrv_mj=self.workspace4fit_.var("rrv_mj");
+        combData_TotalMC=RooDataSet("combData_TotalMC","combData_TotalMC",RooArgSet(rrv_mj,rrv_weight),RooFit.WeightVar(rrv_weight),RooFit.Index(sample_type),RooFit.Import("mu_pass",rdataset_TotalMC_mu_mj),RooFit.Import("el_pass",rdataset_TotalMC_el_mj),RooFit.Import("mu_fail",rdataset_TotalMC_mu_mj_fail),RooFit.Import("el_fail",rdataset_TotalMC_el_mj_fail) );
+        combData_TotalMC.Print();
+
+
 def control_sample(channel="mu"):
     print "control sample "+channel;
     #boostedW_fitter=doFit_wj_and_wlvj(channel,"ggH600",500,700,0,220) #(channel,"ggH600",500,700,40,140)
     boostedW_fitter=doFit_wj_and_wlvj(channel,"ggH600",500,700,40,130) #(channel,"ggH600",500,700,40,140)
     boostedW_fitter.fit_TTbar_controlsample();
+
+def control_sample_simultaneous():
+    print "control_sample_simultaneous";
+    boostedW_fitter_sim=doFit_wj_and_wlvj_simultaneous()
 
 
 def pre_limit_fitting_method(channel, higgs_sample="ggH600", in_mlvj_signal_region_min=500, in_mlvj_signal_region_max=700, in_mj_min=30, in_mj_max=140, in_mlvj_min=400, in_mlvj_max=1400): 
@@ -3748,6 +3812,7 @@ if __name__ == '__main__':
     if options.fitwtagger:
         print 'fitwtagger for %s sample'%(channel)
         control_sample(channel);#mu for muon sample; el for el sample
+        #control_sample_simultaneous();#mu for muon sample; el for el sample
         
     if options.control:
         print 'control for %s sample'%(channel);
