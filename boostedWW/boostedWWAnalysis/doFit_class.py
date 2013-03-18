@@ -29,12 +29,6 @@ if os.path.isfile('tdrstyle.C'):
 #      print "Found CMSTopStyle.cc file, use TOP style if requested in xml file."
 
 
-ROOT.gSystem.Load("PDFs/HWWLVJRooPdfs_cxx.so")
-ROOT.gSystem.Load("PDFs/PdfDiagonalizer_cc.so")
-#ROOT.gSystem.Load("PDFs/Statistic_cxx.so")
-
-from ROOT import draw_error_band, draw_error_band_extendPdf, draw_error_band_Decor, draw_error_band_shape_Decor, Calc_error_extendPdf, Calc_error, RooErfExpPdf, RooAlpha, RooAlpha4ErfPowPdf, RooAlpha4ErfPow2Pdf, RooAlpha4ErfPowExpPdf, PdfDiagonalizer, RooPowPdf, RooPow2Pdf, RooErfPowExpPdf, RooErfPowPdf, RooErfPow2Pdf, RooQCDPdf, RooUser1Pdf, RooBWRunPdf#, ClopperPearsonLimits
-
 ############################################################
 ############################################
 #            Job steering                  #
@@ -54,10 +48,19 @@ parser.add_option('--control', action='store_true', dest='control', default=Fals
 parser.add_option('--fitsignal', action='store_true', dest='fitsignal', default=False, help='fit signal')
 parser.add_option('--cprime', action="store",type="int",dest="cprime",default=10)
 parser.add_option('--BRnew', action="store",type="int",dest="BRnew",default=0)
+parser.add_option('--inPath', action="store",type="string",dest="inPath",default="./")
 
 
 (options, args) = parser.parse_args()
 ############################################################
+
+ROOT.gSystem.Load(options.inPath+"/PDFs/HWWLVJRooPdfs_cxx.so")
+ROOT.gSystem.Load(options.inPath+"/PDFs/PdfDiagonalizer_cc.so")
+#ROOT.gSystem.Load("PDFs/Statistic_cxx.so")
+
+from ROOT import draw_error_band, draw_error_band_extendPdf, draw_error_band_Decor, draw_error_band_shape_Decor, Calc_error_extendPdf, Calc_error, RooErfExpPdf, RooAlpha, RooAlpha4ErfPowPdf, RooAlpha4ErfPow2Pdf, RooAlpha4ErfPowExpPdf, PdfDiagonalizer, RooPowPdf, RooPow2Pdf, RooErfPowExpPdf, RooErfPowPdf, RooErfPow2Pdf, RooQCDPdf, RooUser1Pdf, RooBWRunPdf#, ClopperPearsonLimits
+
+
 
 class doFit_wj_and_wlvj:
     def __init__(self, in_channel="mu",in_higgs_sample="ggH600", in_mlvj_signal_region_min=500, in_mlvj_signal_region_max=700, in_mj_min=30, in_mj_max=140, in_mlvj_min=400., in_mlvj_max=1400., fit_model="ErfExp_v1", fit_model_alter="ErfPow_v1", input_workspace=None):
@@ -2261,7 +2264,7 @@ class doFit_wj_and_wlvj:
     ########## ---------------------------------------------------
     def get_mj_and_mlvj_dataset(self,in_file_name, label, jet_mass="jet_mass_pr"):# to get the shape of m_lvj
         # read in tree
-        fileIn_name=TString(self.file_Directory+in_file_name);
+        fileIn_name=TString(options.inPath+"/"+self.file_Directory+in_file_name);
         fileIn = TFile(fileIn_name.Data());
         treeIn = fileIn.Get("otree");
         
@@ -2309,7 +2312,7 @@ class doFit_wj_and_wlvj:
             tmp_jet_mass=getattr(treeIn, jet_mass);
 
             #if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE < 1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.v_pt > self.vpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.l_pt > self.lpt_cut:
-            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjetsCSVM < 1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.v_pt > self.vpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.l_pt > self.lpt_cut:
+            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjets_csvm_veto < 1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.v_pt > self.vpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.l_pt > self.lpt_cut:
                 #print tmp_jet_mass_dn, tmp_jet_mass, tmp_jet_mass_up;
                 tmp_event_weight= treeIn.totalEventWeight;
                 tmp_event_weight4fit= treeIn.eff_and_pu_Weight;
@@ -2464,7 +2467,7 @@ class doFit_wj_and_wlvj:
     ########## ---------------------------------------------------
     def get_mj_and_mlvj_dataset_TTbar_controlsample(self,in_file_name, label, jet_mass="ttb_ca8_mass_pr"):# to get the shape of m_lvj
         # read in tree
-        fileIn_name=TString(self.file_Directory+in_file_name);
+        fileIn_name=TString(options.inPath+"/"+self.file_Directory+in_file_name);
         fileIn = TFile(fileIn_name.Data());
         treeIn = fileIn.Get("otree");
         
