@@ -31,9 +31,9 @@ if os.path.isfile('tdrstyle.C'):
 
 ROOT.gSystem.Load("PDFs/HWWLVJRooPdfs_cxx.so")
 ROOT.gSystem.Load("PDFs/PdfDiagonalizer_cc.so")
-ROOT.gSystem.Load("PDFs/Statistic_cxx.so")
+#ROOT.gSystem.Load("PDFs/Statistic_cxx.so")
 
-from ROOT import draw_error_band, draw_error_band_extendPdf, draw_error_band_Decor, draw_error_band_shape_Decor, Calc_error_extendPdf, Calc_error, RooErfExpPdf, RooAlpha, RooAlpha4ErfPowPdf, RooAlpha4ErfPow2Pdf, RooAlpha4ErfPowExpPdf, PdfDiagonalizer, RooPowPdf, RooPow2Pdf, RooErfPowExpPdf, RooErfPowPdf, RooErfPow2Pdf, RooQCDPdf, RooUser1Pdf, RooBWRunPdf, ClopperPearsonLimits
+from ROOT import draw_error_band, draw_error_band_extendPdf, draw_error_band_Decor, draw_error_band_shape_Decor, Calc_error_extendPdf, Calc_error, RooErfExpPdf, RooAlpha, RooAlpha4ErfPowPdf, RooAlpha4ErfPow2Pdf, RooAlpha4ErfPowExpPdf, PdfDiagonalizer, RooPowPdf, RooPow2Pdf, RooErfPowExpPdf, RooErfPowPdf, RooErfPow2Pdf, RooQCDPdf, RooUser1Pdf, RooBWRunPdf#, ClopperPearsonLimits
 
 ############################################################
 ############################################
