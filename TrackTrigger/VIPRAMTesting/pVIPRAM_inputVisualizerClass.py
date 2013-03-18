@@ -231,6 +231,7 @@ class inputVisualizer:
         f = open(fn, "w")
 
         for i in range(self.tree.GetEntries()):
+            if i % 100 == 0: "Writing out, cycle: ", i
             self.tree.GetEntry(i);
             
             thisString = ""; 

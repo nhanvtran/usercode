@@ -86,7 +86,7 @@ class inputBuilder:
     # -------------------
     # initializeLoadPhase
     def initializeLoadPhase(self):
-        print "initializing load phase..."
+        #print "initializing load phase..."
         
         self.counter[0] = self.cycleCtr;
 
@@ -116,7 +116,7 @@ class inputBuilder:
         self.CompareNow[0] = 0;        
         for i in range(32): self.DataOut[i] = 0;
         
-        print self.DataOut
+        #print self.DataOut
         
         #fill, ctr++
         self.cycleCtr += 1;
@@ -124,14 +124,12 @@ class inputBuilder:
 
     # -------------------
     # loadRandomPatterns
-    def loadRandomPatterns(self, nPatterns):
-        print "loading random patterns..."
-
+    #def loadRandomPatterns(self, nPatterns):
+    #    #print "loading random patterns..."
+        
     # -------------------
     # loadUniformPatterns
     def loadUniformPatterns(self, row, col, iVal, disableInputs = 1):
-        print "loading random patterns..."
-
         # primary
         
         self.counter[0] = self.cycleCtr;
@@ -181,12 +179,12 @@ class inputBuilder:
         self.cycleCtr += 1;            
         self.tree.Fill();
 
-        print self.DataOut
+        #print self.DataOut
 
     # -------------------
     # loadUniformPatterns
     def loadSinglePattern(self, row, col, iVal, disableInputs = 1):
-        print "loading random patterns..."
+        #print "loading random patterns..."
         
         # primary
         
@@ -201,10 +199,10 @@ class inputBuilder:
         
         self.InputD_bit0[0] = disableInputs;
         
-        self.iInputA[row][col] = iVal;
-        self.iInputB[row][col] = iVal;
-        self.iInputC[row][col] = iVal;
-        self.iInputD[row][col] = iVal;
+        self.iInputA[row][col] = iVal[0];
+        self.iInputB[row][col] = iVal[1];
+        self.iInputC[row][col] = iVal[2];
+        self.iInputD[row][col] = iVal[3];
         
         self.LatchData[0] = 0;
         self.cycleCtr += 1;
@@ -221,12 +219,15 @@ class inputBuilder:
         self.counter[0] = self.cycleCtr;
         self.Primary[0] = 0;
         
-        ternary_iVal = self.flipTernaryBits(iVal);
+        ternary_iVal_0 = self.flipTernaryBits(iVal[0]);
+        ternary_iVal_1 = self.flipTernaryBits(iVal[1]);
+        ternary_iVal_2 = self.flipTernaryBits(iVal[2]);
+        ternary_iVal_3 = self.flipTernaryBits(iVal[3]);        
         
-        self.InputA[0] = ternary_iVal;
-        self.InputB[0] = ternary_iVal;
-        self.InputC[0] = ternary_iVal;
-        self.InputD[0] = ternary_iVal;
+        self.InputA[0] = ternary_iVal_0;
+        self.InputB[0] = ternary_iVal_1;
+        self.InputC[0] = ternary_iVal_2;
+        self.InputD[0] = ternary_iVal_3;
         
         self.LatchData[0] = 0;
         self.cycleCtr += 1;
@@ -237,7 +238,7 @@ class inputBuilder:
         self.cycleCtr += 1;            
         self.tree.Fill();
         
-        print self.DataOut
+        #print self.DataOut
 
     # -------------------
     # flipTernaryBits
@@ -264,7 +265,7 @@ class inputBuilder:
     # -------------------
     # initializeRunPhase
     def initializeRunPhase(self, logic = [1,1,1,1]):
-        print "initializing run phase..."
+        #print "initializing run phase..."
         
         self.counter[0] = self.cycleCtr;
         
@@ -280,10 +281,10 @@ class inputBuilder:
         self.InputB[0] = 0;
         self.InputC[0] = 0;
         self.InputD[0] = 0;
-        self.InputA_bit0[0] = 1;
-        self.InputB_bit0[0] = 1;
-        self.InputC_bit0[0] = 1;
-        self.InputD_bit0[0] = 1;
+        #self.InputA_bit0[0] = 1;
+        #self.InputB_bit0[0] = 1;
+        #self.InputC_bit0[0] = 1;
+        #self.InputD_bit0[0] = 1;
         
         self.Miss0[0] = logic[0];
         self.Miss1[0] = logic[1];
@@ -299,7 +300,7 @@ class inputBuilder:
         self.cycleCtr += 1;
         self.tree.Fill();
 
-        print self.DataOut
+        #print self.DataOut
 
 
     # -------------------
@@ -334,7 +335,7 @@ class inputBuilder:
                 
             self.checkPatternInternally( pattern );
 
-            print self.DataOut
+            #print self.DataOut
 
                 
     # checkPatternInternally
@@ -360,7 +361,7 @@ class inputBuilder:
         self.cycleCtr += 1;
         self.tree.Fill();
 
-        print self.DataOut
+        #print self.DataOut
         
         
         self.CompareNow[0] = 0;                    
@@ -397,7 +398,7 @@ class inputBuilder:
     # -------------------
     # close
     def close(self):
-        print "closing "+self.fn+"..."
+        #print "closing "+self.fn+"..."
         self.tree.Write();
         self.file.Close();
 
