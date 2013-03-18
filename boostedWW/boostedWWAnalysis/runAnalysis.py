@@ -131,7 +131,7 @@ if __name__ == '__main__':
     ZJetsSample = sampleWrapperClass("ZJets",boostedWSamples.GetFileNames()["ZJets"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZJets")),LUMI,boostedWSamples.GetTreeName(),notData)
 
     #TTbarSample_EffLumi = 6893735/225197.;
-    TTbarSample = sampleWrapperClass("TTbar",boostedWSamples.GetFileNames()["TTbar"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar")),LUMI,boostedWSamples.GetTreeName(),notData);
+    TTbarSample_MG = sampleWrapperClass("TTbar_MG",boostedWSamples.GetFileNames()["TTbar_MG"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_MG")),LUMI,boostedWSamples.GetTreeName(),notData);
     TTbarSample_matchDn = sampleWrapperClass("TTbar_matchDn",boostedWSamples.GetFileNames()["TTbar_matchDn"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_matchDn")),LUMI,boostedWSamples.GetTreeName(),notData);
     TTbarSample_matchUp = sampleWrapperClass("TTbar_matchUp",boostedWSamples.GetFileNames()["TTbar_matchUp"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_matchUp")),LUMI,boostedWSamples.GetTreeName(),notData);
     TTbarSample_Powheg = sampleWrapperClass("TTbar_Powheg",boostedWSamples.GetFileNames()["TTbar_Powheg"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_Powheg")),LUMI,boostedWSamples.GetTreeName(),notData);
@@ -159,7 +159,7 @@ if __name__ == '__main__':
                   ggH600Sample,ggH700Sample,ggH800Sample,ggH900Sample,ggH1000Sample,
                   vbfH600Sample,vbfH700Sample,vbfH800Sample,vbfH900Sample,vbfH1000Sample,
                   rsg1000Sample_kMpl01_py,rsg1000Sample_kMpl01_hw,rsg1500Sample_kMpl01_py,rsg1500Sample_kMpl01_hw,rsg2000Sample_kMpl01_py,
-                  WJets_PythiaSample,WJets_Pythia180Sample,WJets_HerwigSample,ZJetsSample,TTbarSample,
+                  WJets_PythiaSample,WJets_Pythia180Sample,WJets_HerwigSample,ZJetsSample,TTbarSample_MG,
                   TTbarSample_matchDn,TTbarSample_matchUp,TTbarSample_scaleDn,TTbarSample_scaleUp,TTbarSample_Powheg,
                   WWSample,WZSample,ZZSample,
                   tchSample,tWchSample,schSample,tch_barSample,tWch_barSample,sch_barSample];
@@ -173,35 +173,35 @@ if __name__ == '__main__':
 
         if options.sampleToProcess == None:
             datasample.createTrainingTree();
-#            vbfH600Sample.createTrainingTree();
-#            vbfH700Sample.createTrainingTree();        
-#            vbfH800Sample.createTrainingTree();        
-#            vbfH900Sample.createTrainingTree();        
-#            vbfH1000Sample.createTrainingTree(); 
-#            ggH600Sample.createTrainingTree();
-#            ggH700Sample.createTrainingTree();        
-#            ggH800Sample.createTrainingTree();        
-#            ggH900Sample.createTrainingTree();        
-#            ggH1000Sample.createTrainingTree();        
-#            WJets_HerwigSample.createTrainingTree();
-#            WJets_PythiaSample.createTrainingTree();
+            vbfH600Sample.createTrainingTree();
+            vbfH700Sample.createTrainingTree();        
+            vbfH800Sample.createTrainingTree();        
+            vbfH900Sample.createTrainingTree();        
+            vbfH1000Sample.createTrainingTree(); 
+            ggH600Sample.createTrainingTree();
+            ggH700Sample.createTrainingTree();        
+            ggH800Sample.createTrainingTree();        
+            ggH900Sample.createTrainingTree();        
+            ggH1000Sample.createTrainingTree();        
+            WJets_HerwigSample.createTrainingTree();
+            WJets_PythiaSample.createTrainingTree();
             WJets_Pythia180Sample.createTrainingTree();
-#            ZJetsSample.createTrainingTree();
-#            TTbarSample.createTrainingTree();
-#            TTbarSample_matchDn.createTrainingTree();
-#            TTbarSample_matchUp.createTrainingTree();
-#            TTbarSample_Powheg.createTrainingTree();
-#            TTbarSample_scaleDn.createTrainingTree();            
-#            TTbarSample_scaleUp.createTrainingTree();            
-#            WWSample.createTrainingTree();
-#            WZSample.createTrainingTree();
-#            ZZSample.createTrainingTree();
-#            tchSample.createTrainingTree();
-#            tWchSample.createTrainingTree();
-#            schSample.createTrainingTree();
-#            tch_barSample.createTrainingTree();
-#            tWch_barSample.createTrainingTree();
-#            sch_barSample.createTrainingTree();
+            ZJetsSample.createTrainingTree();
+            TTbarSample_MG.createTrainingTree();
+            TTbarSample_matchDn.createTrainingTree();
+            TTbarSample_matchUp.createTrainingTree();
+            TTbarSample_Powheg.createTrainingTree();
+            TTbarSample_scaleDn.createTrainingTree();            
+            TTbarSample_scaleUp.createTrainingTree();            
+            WWSample.createTrainingTree();
+            WZSample.createTrainingTree();
+            ZZSample.createTrainingTree();
+            tchSample.createTrainingTree();
+            tWchSample.createTrainingTree();
+            schSample.createTrainingTree();
+            tch_barSample.createTrainingTree();
+            tWch_barSample.createTrainingTree();
+            sch_barSample.createTrainingTree();
         else:
             for i in range(len(allSamples)):
                 if options.sampleToProcess == allSamples[i].getLabel():
