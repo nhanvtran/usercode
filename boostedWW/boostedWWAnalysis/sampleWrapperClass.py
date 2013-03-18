@@ -68,6 +68,7 @@ class sampleWrapperClass:
         if file.find("HWW") > 0 and file.find("800") > 0: self.SignalMass_ = 800;
         if file.find("HWW") > 0 and file.find("900") > 0: self.SignalMass_ = 900;    
         if file.find("HWW") > 0 and file.find("1000") > 0: self.SignalMass_ = 1000;   
+        self.SignalMass_ = -1;
         self.FitSMSignal = False;
         self.FitSMSignal_mean = -1;
         self.FitSMSignal_gamma = -1;
@@ -211,6 +212,7 @@ class sampleWrapperClass:
         nbjets_ssvhem_veto_ = array( 'f', [ 0. ] );
         
         nbjetsCSV_ = array( 'f', [ 0. ] );
+        nbjetsCSVM_ = array( 'f', [ 0. ] );
         nbjetsSSVHE_ = array( 'f', [ 0. ] );        
         njets_ = array( 'f', [ 0. ] );        
         jet_pt1frac_ = array( 'f', [ 0. ] );
@@ -286,6 +288,7 @@ class sampleWrapperClass:
         otree.Branch("nbjets_csvm_veto", nbjets_csvm_veto_ , "nbjets_csvm_veto/F");        
         otree.Branch("nbjets_ssvhem_veto", nbjets_ssvhem_veto_ , "nbjets_ssvhem_veto/F");                
         otree.Branch("nbjetsCSV", nbjetsCSV_ , "nbjetsCSV_/F");
+        otree.Branch("nbjetsCSVM", nbjetsCSVM_ , "nbjetsCSVM/F");
         otree.Branch("nbjetsSSVHE", nbjetsSSVHE_ , "nbjetsSSVHE_/F");        
         otree.Branch("njets", njets_ , "njets/F");
         otree.Branch("jet_pt1frac", jet_pt1frac_ , "jet_pt1frac/F");
@@ -793,8 +796,10 @@ class sampleWrapperClass:
 #                nbjets_ssvhem_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem_veto" );
 
                 nbjetsCSV_[0] =0 ;
+                nbjetsCSVM_[0] =0 ;
                 for i in range(0,6):
                     if  getattr(self.InputTree_, "JetPFCor_bDiscriminatorCSV")[i] >=0.244 :nbjetsCSV_[0]=nbjetsCSV_[0]+1;
+                    if  getattr(self.InputTree_, "JetPFCor_bDiscriminatorCSV")[i] >=0.679 :nbjetsCSVM_[0]=nbjetsCSVM_[0]+1;
                     #print i, getattr(self.InputTree_, "JetPFCor_bDiscriminatorCSV")[i], nbjetsCSV_[0];
                 nbjetsSSVHE_[0] = getattr( self.InputTree_, "numPFCorJetBTags");
                 
