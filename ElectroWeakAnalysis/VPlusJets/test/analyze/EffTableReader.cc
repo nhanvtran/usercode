@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 // Adapted From Following Description:
 // Original Author:  Fedor Ratnikov Nov 9, 2007
-// $Id: EffTableReader.cc,v 1.1 2012/03/13 04:11:47 ntran Exp $
+// $Id: EffTableReader.cc,v 1.1 2011/11/28 06:30:44 kalanand Exp $
 // Generic parameters for Jet corrections
 //----------------------------------------------------------------------------
 #include "EffTableReader.h"
@@ -60,7 +60,7 @@ EffTableReader::Record::Record (const std::string& fLine)
      unsigned nParam = 0;
 
      if (tokens.size() < 4) {
-        std::cout << "=====================------EffTableReader error: " 
+        std::cout << "EffTableReader error: " 
                   << "at least 4 tokens are expected: minPt, maxPt, eff, error. " 
                   << "Line ->>" << fLine << "<<-" << std::endl;  
      }
@@ -72,7 +72,7 @@ EffTableReader::Record::Record (const std::string& fLine)
         nParam = 2;
      }
      else if (tokens.size() != 6) {
-        std::cout << "+++++++++++++++++++++------EffTableReader error: " 
+        std::cout << "EffTableReader error: " 
                   << "exactly 6 tokens are expected: minPt, maxPt, minEta, maxEta, eff, error. " 
                   << "Line ->>" << fLine << "<<-" << std::endl;  
      }

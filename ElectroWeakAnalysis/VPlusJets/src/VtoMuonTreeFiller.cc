@@ -170,19 +170,6 @@ void ewk::VtoMuonTreeFiller::fill(const edm::Event& iEvent)
         mu1Type  = muon1->type();
         mu1_numberOfChambers  = muon1->numberOfChambers();      
         mu1_numberOfMatches   = muon1->numberOfMatches();
-        
-        // more selections
-        if ( muon1->globalTrack().isNonnull() && muon1->innerTrack().isNonnull() ){
-            mu1_nchi2 = muon1->globalTrack()->normalizedChi2();
-            mu1_pixelHits = muon1->innerTrack()->hitPattern().numberOfValidPixelHits();
-            mu1_trackerHits = muon1->innerTrack()->hitPattern().numberOfValidTrackerHits();
-            mu1_muonHits = muon1->globalTrack()->hitPattern().numberOfValidMuonHits();
-            //std::cout << "mu1_normalizedChi2: " << mu1_normalizedChi2 << ", isGlobal: " << isGlobal << ", isTracker: " << isTracker << ", mu1_validHits: " << mu1_validHits << ", mu1_d0: " << mu1_d0 << std::endl;
-        }
-
-        mu1_isGlobal = muon1->isGlobalMuon();
-        mu1_isTracker = muon1->isTrackerMuon();
-        
         mu1Theta          = muon1->theta();
         mu1Eta            = muon1->eta();    
         mu1Phi            = muon1->phi();
@@ -195,12 +182,11 @@ void ewk::VtoMuonTreeFiller::fill(const edm::Event& iEvent)
         
         // vertex 
         edm::Handle<reco::BeamSpot>  beamSpot;
-        //if(runoverAOD){
-//        iEvent.getByLabel(mInputBeamSpot, beamSpot);
-//        mu1d0bsp = muon1->innerTrack()->dxy( beamSpot->position() ) ;
-//        mu1dz000 = muon1->vertex().z();
-//        std::cout << "mu1d0bsp: " << mu1d0bsp << ", mu1dz000: " << mu1dz000 << std::endl;
-        //}
+        if(runoverAOD){
+            iEvent.getByLabel(mInputBeamSpot, beamSpot);
+            mu1d0bsp = muon1->innerTrack()->dxy( beamSpot->position() ) ;
+            mu1dz000 = muon1->vertex().z();
+        }
         // pf isolation
         //mu1pfiso_sumChargedHadronPt   = muon1->pfIsolationR03().sumChargedHadronPt;
         //mu1pfiso_sumChargedParticlePt = muon1->pfIsolationR03().sumChargedParticlePt;
@@ -220,18 +206,6 @@ void ewk::VtoMuonTreeFiller::fill(const edm::Event& iEvent)
         mu2_trackiso       = muon2->isolationR03().sumPt;
         mu2_ecaliso        = muon2->isolationR03().emEt;
         mu2_hcaliso        = muon2->isolationR03().hadEt;
-        
-        if ( muon2->globalTrack().isNonnull() && muon2->innerTrack().isNonnull() ){
-            mu2_nchi2 = muon2->globalTrack()->normalizedChi2();
-            mu2_pixelHits = muon2->innerTrack()->hitPattern().numberOfValidPixelHits();
-            mu2_trackerHits = muon2->innerTrack()->hitPattern().numberOfValidTrackerHits();
-            mu2_muonHits = muon2->globalTrack()->hitPattern().numberOfValidMuonHits();
-                //std::cout << "mu1_normalizedChi2: " << mu1_normalizedChi2 << ", isGlobal: " << isGlobal << ", isTracker: " << isTracker << ", mu1_validHits: " << mu1_validHits << ", mu1_d0: " << mu1_d0 << std::endl;
-        }
-        
-        mu2_isGlobal = muon2->isGlobalMuon();
-        mu2_isTracker = muon2->isTrackerMuon();
-        
         
         mu2Type  = muon2->type();
         mu2_numberOfChambers = muon2->numberOfChambers();
@@ -299,13 +273,6 @@ void ewk::VtoMuonTreeFiller::SetBranches()
     
     SetBranch( &mu1d0bsp,          lept1+"_d0bsp" );
     SetBranch( &mu1dz000,          lept1+"_dz000" );
-
-    SetBranch( &mu1_nchi2,          lept1+"_nchi2" );
-    SetBranch( &mu1_pixelHits,          lept1+"_pixelHits" );
-    SetBranch( &mu1_trackerHits,          lept1+"_trackerHits" );    
-    SetBranch( &mu1_muonHits,          lept1+"_muonHits" );
-    SetBranch( &mu1_isGlobal,          lept1+"_isGlobal" );
-    SetBranch( &mu1_isTracker,          lept1+"_isTracker" );    
     
     SetBranch( &mu1pfiso_sumChargedHadronPt,            lept1+"_pfiso_sumChargedHadronPt" );
     SetBranch( &mu1pfiso_sumChargedParticlePt,          lept1+"_pfiso_sumChargedParticlePt" );
@@ -336,14 +303,6 @@ void ewk::VtoMuonTreeFiller::SetBranches()
         SetBranch( &mu2Type, lept2+"_type" );
         SetBranch( &mu2_numberOfChambers, lept2+"_numberOfChambers" );
         SetBranch( &mu2_numberOfMatches,  lept2+"_numberOfMatches" );
-        
-        SetBranch( &mu2_nchi2,          lept2+"_nchi2" );
-        SetBranch( &mu2_pixelHits,          lept2+"_pixelHits" );
-        SetBranch( &mu2_trackerHits,          lept2+"_trackerHits" );    
-        SetBranch( &mu2_muonHits,          lept2+"_muonHits" );
-        SetBranch( &mu2_isGlobal,          lept2+"_isGlobal" );
-        SetBranch( &mu2_isTracker,          lept2+"_isTracker" );    
-        
     }	  
 }
 /////////////////////////////////////////////////////////////////////////
@@ -395,13 +354,6 @@ void ewk::VtoMuonTreeFiller::init()
     mu1_numberOfChambers   = -10.;
     mu1_numberOfMatches    = -1.;
     
-    mu1_nchi2 = 100.;
-    mu1_pixelHits = 0;
-    mu1_trackerHits = 0;
-    mu1_muonHits = 0;
-    mu1_isGlobal = 0;     
-    mu1_isTracker = 0;
-    
     mu1d0bsp            = -99999.;
     mu1dz000            = -99999.;
     
@@ -433,13 +385,6 @@ void ewk::VtoMuonTreeFiller::init()
     mu2_trackiso    = 500.0;
     mu2_hcaliso     = 500.0;
     mu2_ecaliso     = 500.0;
-    
-    mu2_nchi2 = 100.;
-    mu2_pixelHits = 0;
-    mu2_trackerHits = 0;
-    mu2_muonHits = 0;
-    mu2_isGlobal = 0;     
-    mu2_isTracker = 0;
     
     // initialization done
 }

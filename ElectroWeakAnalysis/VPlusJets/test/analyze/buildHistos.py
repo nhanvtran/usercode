@@ -46,7 +46,7 @@ def buildHistos(dirname,oname,isData,scaleFactors,channel):
         jtypesToI = jtypesToI_d 
 
     pt_binLo = [125,125,150,200,300]
-    pt_binHi = [1000,150,200,300,1000]
+    pt_binHi = [1000,155,200,300,1000]
     
     ooo = oname+"_ch"+str(channel)+".root"
     fo = ROOT.TFile(ooo, "recreate")
@@ -56,15 +56,12 @@ def buildHistos(dirname,oname,isData,scaleFactors,channel):
     from ROOT import TH1F, TProfile
     # event quantities
     h_v_pt = ROOT.TH1F("h_v_pt","; V pT; count",100,0.,500.)
-    h_v_mass = ROOT.TH1F("h_v_mass","; V mass; count",100,0.,200.)
     h_v_mt = ROOT.TH1F("h_v_mt","; V mT; count",100,0.,200.)
     h_e_met = ROOT.TH1F("h_e_met","; MET; count",100,0.,200.)   
     h_e_nvert = ROOT.TH1F("h_e_nvert","; nvertex; count",40,0.,40.)   
     h_e_nvert_weighted = ROOT.TH1F("h_e_nvert_weighted","; nvertex; count",40,0.,40.)   
     h_l_pt = ROOT.TH1F("h_l_pt","; lepton pT; count",100,0.,300.)
     h_l_eta = ROOT.TH1F("h_l_eta","; lepton eta; count",100,-3.,3.)
-    h_lplus_pt = ROOT.TH1F("h_lplus_pt","; lepton pT; count",100,0.,300.)
-    h_lplus_eta = ROOT.TH1F("h_lplus_eta","; lepton eta; count",100,-3.,3.)
 
     # per jet type quantities
     """
@@ -117,51 +114,14 @@ def buildHistos(dirname,oname,isData,scaleFactors,channel):
     prPt_pt_ovCA8 = []    
     prPt_pt_ovCA8g = []    
 
-    # profile, ratio of mass, vs nV
-    prNV_mass_ovAK5 = []    
-    prNV_mass_ovAK5g = []    
-    prNV_mass_ovAK7 = []    
-    prNV_mass_ovAK7g = []    
-    prNV_mass_ovAK8 = []    
-    prNV_mass_ovAK8g = []    
-    prNV_mass_ovCA8 = []    
-    prNV_mass_ovCA8g = []    
-    # profile, ratio of pt, vs nV
-    prNV_pt_ovAK5 = []    
-    prNV_pt_ovAK5g = []    
-    prNV_pt_ovAK7 = []    
-    prNV_pt_ovAK7g = []    
-    prNV_pt_ovAK8 = []    
-    prNV_pt_ovAK8g = []    
-    prNV_pt_ovCA8 = []    
-    prNV_pt_ovCA8g = []    
-    
-    # profile, ratio of mass, vs nV
-    prEta_mass_ovAK5 = []    
-    prEta_mass_ovAK5g = []    
-    prEta_mass_ovAK7 = []    
-    prEta_mass_ovAK7g = []    
-    prEta_mass_ovAK8 = []    
-    prEta_mass_ovAK8g = []    
-    prEta_mass_ovCA8 = []    
-    prEta_mass_ovCA8g = []    
-    # profile, ratio of pt, vs nV
-    prEta_pt_ovAK5 = []    
-    prEta_pt_ovAK5g = []    
-    prEta_pt_ovAK7 = []    
-    prEta_pt_ovAK7g = []    
-    prEta_pt_ovAK8 = []    
-    prEta_pt_ovAK8g = []    
-    prEta_pt_ovCA8 = []    
-    prEta_pt_ovCA8g = []    
 
     h_pt = []
     h_area = []   
     h_eta = []
     
-    pr_ptBins = array( 'd', [ 100,125,150,175,200,225,250,275,300,350,425,500 ] )
+    pr_ptBins = array( 'd', [ 125,150,175,200,225,250,275,300,350,425,500 ] )
     #pr_ptBins = [ 125,150,200,300,1000 ]
-    npr_ptBins = 11
+    npr_ptBins = 10
     for x in range(len(jtypes)):
         h_eta.append( ROOT.TH1F("h_"+jtypes[x]+"_eta",";jet eta; count",100,-3,3) )
         h_area.append( ROOT.TH1F("h_"+jtypes[x]+"_area",";jet area; count",150,0.,3.) )
@@ -209,42 +169,6 @@ def buildHistos(dirname,oname,isData,scaleFactors,channel):
         prPt_pt_ovAK8g.append( ROOT.TH2F("prPt_pt"+jtypes[x]+"_ovAK8g","; pT; ratio of masses",npr_ptBins,pr_ptBins,150,0.,3.) )
         prPt_pt_ovCA8.append( ROOT.TH2F("prPt_pt"+jtypes[x]+"_ovCA8","; pT; ratio of masses",npr_ptBins,pr_ptBins,150,0.,3.) )
         prPt_pt_ovCA8g.append( ROOT.TH2F("prPt_pt"+jtypes[x]+"_ovCA8g","; pT; ratio of masses",npr_ptBins,pr_ptBins,150,0.,3.) )
-        # TProfile because they are non-gaussian distributions, versus NV
-        prNV_mass_ovAK5.append( ROOT.TH2F("prNV_mass"+jtypes[x]+"_ovAK5","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        prNV_mass_ovAK5g.append( ROOT.TH2F("prNV_mass"+jtypes[x]+"_ovAK5g","; nV; ratio of masses",40,0,40,150,0.,3.) )        
-        prNV_mass_ovAK7.append( ROOT.TH2F("prNV_mass"+jtypes[x]+"_ovAK7","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        prNV_mass_ovAK7g.append( ROOT.TH2F("prNV_mass"+jtypes[x]+"_ovAK7g","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        prNV_mass_ovAK8.append( ROOT.TH2F("prNV_mass"+jtypes[x]+"_ovAK8","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        prNV_mass_ovAK8g.append( ROOT.TH2F("prNV_mass"+jtypes[x]+"_ovAK8g","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        prNV_mass_ovCA8.append( ROOT.TH2F("prNV_mass"+jtypes[x]+"_ovCA8","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        prNV_mass_ovCA8g.append( ROOT.TH2F("prNV_mass"+jtypes[x]+"_ovCA8g","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        # TH2F in fit slices
-        prNV_pt_ovAK5.append( ROOT.TH2F("prNV_pt"+jtypes[x]+"_ovAK5","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        prNV_pt_ovAK5g.append( ROOT.TH2F("prNV_pt"+jtypes[x]+"_ovAK5g","; nV; ratio of masses",40,0,40,150,0.,3.) )        
-        prNV_pt_ovAK7.append( ROOT.TH2F("prNV_pt"+jtypes[x]+"_ovAK7","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        prNV_pt_ovAK7g.append( ROOT.TH2F("prNV_pt"+jtypes[x]+"_ovAK7g","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        prNV_pt_ovAK8.append( ROOT.TH2F("prNV_pt"+jtypes[x]+"_ovAK8","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        prNV_pt_ovAK8g.append( ROOT.TH2F("prNV_pt"+jtypes[x]+"_ovAK8g","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        prNV_pt_ovCA8.append( ROOT.TH2F("prNV_pt"+jtypes[x]+"_ovCA8","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        prNV_pt_ovCA8g.append( ROOT.TH2F("prNV_pt"+jtypes[x]+"_ovCA8g","; nV; ratio of masses",40,0,40,150,0.,3.) )
-        # TProfile because they are non-gaussian distributions, versus Eta
-        prEta_mass_ovAK5.append( ROOT.TH2F("prEta_mass"+jtypes[x]+"_ovAK5","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        prEta_mass_ovAK5g.append( ROOT.TH2F("prEta_mass"+jtypes[x]+"_ovAK5g","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )        
-        prEta_mass_ovAK7.append( ROOT.TH2F("prEta_mass"+jtypes[x]+"_ovAK7","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        prEta_mass_ovAK7g.append( ROOT.TH2F("prEta_mass"+jtypes[x]+"_ovAK7g","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        prEta_mass_ovAK8.append( ROOT.TH2F("prEta_mass"+jtypes[x]+"_ovAK8","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        prEta_mass_ovAK8g.append( ROOT.TH2F("prEta_mass"+jtypes[x]+"_ovAK8g","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        prEta_mass_ovCA8.append( ROOT.TH2F("prEta_mass"+jtypes[x]+"_ovCA8","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        prEta_mass_ovCA8g.append( ROOT.TH2F("prEta_mass"+jtypes[x]+"_ovCA8g","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        # TH2F in fit slices
-        prEta_pt_ovAK5.append( ROOT.TH2F("prEta_pt"+jtypes[x]+"_ovAK5","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        prEta_pt_ovAK5g.append( ROOT.TH2F("prEta_pt"+jtypes[x]+"_ovAK5g","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )        
-        prEta_pt_ovAK7.append( ROOT.TH2F("prEta_pt"+jtypes[x]+"_ovAK7","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        prEta_pt_ovAK7g.append( ROOT.TH2F("prEta_pt"+jtypes[x]+"_ovAK7g","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        prEta_pt_ovAK8.append( ROOT.TH2F("prEta_pt"+jtypes[x]+"_ovAK8","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        prEta_pt_ovAK8g.append( ROOT.TH2F("prEta_pt"+jtypes[x]+"_ovAK8g","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        prEta_pt_ovCA8.append( ROOT.TH2F("prEta_pt"+jtypes[x]+"_ovCA8","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
-        prEta_pt_ovCA8g.append( ROOT.TH2F("prEta_pt"+jtypes[x]+"_ovCA8g","; eta; ratio of masses",10,-2.5,2.5,150,0.,3.) )
         
         ### Fancy, but too slow
         """
@@ -289,48 +213,31 @@ def buildHistos(dirname,oname,isData,scaleFactors,channel):
             # accumulate all the different event weights: MC scale factor, PU reweighting, trigger/ID reweighting
             curSF = scaleFactors[nfiles]*chain.e_puwt*chain.e_effwt
             if isData[nfiles] == 1: curSF = 1.
-            curSF_noPUweight = scaleFactors[nfiles]*chain.e_effwt
 
             # if chain.eventClass == 1:
             additionalCuts = False
-            if channel == 1 and chain.e_met > 30 and chain.l_pt > 35:   
+            if channel == 1 and chain.e_met > 35 and chain.l_pt > 35:   
                 additionalCuts = True
-            if channel == 2 and chain.e_met > 30 and chain.l_pt > 30:   
+            if channel == 2 and chain.e_met > 35 and chain.l_pt > 25:   
                 additionalCuts = True
-            if channel == 3 and chain.e_met > 0 and chain.l_pt > 20 and chain.lplus_pt > 20:   
-                additionalCuts = True
-            if channel == 4 and chain.e_met > 0 and chain.l_pt > 20 and chain.lplus_pt > 20: 
-                additionalCuts = True
-
-            if channel == 2: ctr1 = ctr1+1
-            if channel == 2 and additionalCuts: ctr2 = ctr2+1
-            
             if chain.e_class == channel and additionalCuts:
                            
                 h_v_pt.Fill( chain.v_pt, curSF )
-                h_v_mass.Fill( chain.v_mass, curSF )
                 h_v_mt.Fill( chain.v_mt, curSF )
                 h_e_met.Fill( chain.e_met, curSF )
-                h_e_nvert.Fill( chain.e_nvert )
-                h_e_nvert_weighted.Fill( chain.e_nvert, curSF )
+                h_e_nvert.Fill( chain.e_met )
+                h_e_nvert_weighted.Fill( chain.e_met, curSF )
                 h_l_pt.Fill( chain.l_pt, curSF )
                 h_l_eta.Fill( chain.l_eta, curSF )   
-                h_l_pt.Fill( chain.l_pt, curSF )
-                h_l_eta.Fill( chain.l_eta, curSF )                   
-                h_lplus_pt.Fill( chain.lplus_pt, curSF )
-                h_lplus_eta.Fill( chain.lplus_eta, curSF )                   
-                
                 for jitr in range(len(jtypes)):
                     
                     cur_jpt = chain.GetLeaf("j_"+jtypes[jitr]+"_pt").GetValue()
                     
-                    if cur_jpt > 100:
+                    if cur_jpt > 125:
                     
                         cur_jm = chain.GetLeaf("j_"+jtypes[jitr]+"_mass").GetValue()
-                        cur_jeta = chain.GetLeaf("j_"+jtypes[jitr]+"_eta").GetValue()
-                        cur_nv = chain.e_nvert
                         h_area[jitr].Fill( chain.GetLeaf("j_"+jtypes[jitr]+"_area").GetValue(), curSF )
-                        h_eta[jitr].Fill( cur_jeta, curSF )                    
+                        h_eta[jitr].Fill( chain.GetLeaf("j_"+jtypes[jitr]+"_eta").GetValue(), curSF )                    
                         h_pt[jitr].Fill( cur_jpt, curSF )
                         h_mass[jitr].Fill( cur_jm, curSF )
                         if ( cur_jpt > pt_binLo[0] ) and ( cur_jpt < pt_binHi[0] ) : h_mass_0bin[jitr].Fill( cur_jm, curSF )
@@ -348,35 +255,15 @@ def buildHistos(dirname,oname,isData,scaleFactors,channel):
                         hrat_pt_ovAK7[jitr].Fill( cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_pt").GetValue(), curSF )
                         hrat_pt_ovAK8[jitr].Fill( cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_pt").GetValue(), curSF )
                         hrat_pt_ovCA8[jitr].Fill( cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_pt").GetValue(), curSF )
-
-                        prPt_mass_ovAK5[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_mass").GetValue(), curSF )
-                        prPt_mass_ovAK7[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_mass").GetValue(), curSF )
-                        prPt_mass_ovAK8[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_mass").GetValue(), curSF )
-                        prPt_mass_ovCA8[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_mass").GetValue(), curSF )
-                        prPt_pt_ovAK5[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_pt").GetValue(), curSF )
-                        prPt_pt_ovAK7[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_pt").GetValue(), curSF )
-                        prPt_pt_ovAK8[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_pt").GetValue(), curSF )
-                        prPt_pt_ovCA8[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_pt").GetValue(), curSF )
-
-                        prNV_mass_ovAK5[jitr].Fill( cur_nv, cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_mass").GetValue(), curSF_noPUweight )
-                        prNV_mass_ovAK7[jitr].Fill( cur_nv, cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_mass").GetValue(), curSF_noPUweight )
-                        prNV_mass_ovAK8[jitr].Fill( cur_nv, cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_mass").GetValue(), curSF_noPUweight )
-                        prNV_mass_ovCA8[jitr].Fill( cur_nv, cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_mass").GetValue(), curSF_noPUweight )
-                        prNV_pt_ovAK5[jitr].Fill( cur_nv, cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_pt").GetValue(), curSF_noPUweight )
-                        prNV_pt_ovAK7[jitr].Fill( cur_nv, cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_pt").GetValue(), curSF_noPUweight )
-                        prNV_pt_ovAK8[jitr].Fill( cur_nv, cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_pt").GetValue(), curSF_noPUweight )
-                        prNV_pt_ovCA8[jitr].Fill( cur_nv, cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_pt").GetValue(), curSF_noPUweight )
-
-                        prEta_mass_ovAK5[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_eta").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_mass").GetValue(), curSF )
-                        prEta_mass_ovAK7[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_eta").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_mass").GetValue(), curSF )
-                        prEta_mass_ovAK8[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_eta").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_mass").GetValue(), curSF )
-                        prEta_mass_ovCA8[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_eta").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_mass").GetValue(), curSF )
-                        prEta_pt_ovAK5[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_eta").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_pt").GetValue(), curSF )
-                        prEta_pt_ovAK7[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_eta").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_pt").GetValue(), curSF )
-                        prEta_pt_ovAK8[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_eta").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_pt").GetValue(), curSF )
-                        prEta_pt_ovCA8[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_eta").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_pt").GetValue(), curSF )
-
-                        
+                        prPt_mass_ovAK5[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_mass").GetValue() )
+                        prPt_mass_ovAK7[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_mass").GetValue() )
+                        prPt_mass_ovAK8[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_mass").GetValue() )
+                        prPt_mass_ovCA8[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_mass").GetValue() )
+                        prPt_pt_ovAK5[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5"]]+"_pt").GetValue() )
+                        prPt_pt_ovAK7[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7"]]+"_pt").GetValue() )
+                        prPt_pt_ovAK8[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8"]]+"_pt").GetValue() )
+                        prPt_pt_ovCA8[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8"]]+"_pt").GetValue() )
+                    
                         ## for Gen, only compare against the same cone size
                         if isData[nfiles] == 0:
                             if (jtypes[jitr].find("ak5") >= 0) and chain.GetLeaf("j_"+jtypes[jtypesToI["ak5g"]]+"_mass").GetValue() > 0.:
@@ -385,40 +272,24 @@ def buildHistos(dirname,oname,isData,scaleFactors,channel):
                                 hrat_pt_ovAK5g[jitr].Fill( cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5g"]]+"_pt").GetValue(), curSF )
                                 prPt_mass_ovAK5g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak5g"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5g"]]+"_mass").GetValue() )
                                 prPt_pt_ovAK5g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak5g"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5g"]]+"_pt").GetValue() )
-                                prNV_mass_ovAK5g[jitr].Fill( cur_nv, cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5g"]]+"_mass").GetValue() )
-                                prNV_pt_ovAK5g[jitr].Fill( cur_nv, cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5g"]]+"_pt").GetValue() )
-                                prEta_mass_ovAK5g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak5g"]]+"_eta").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5g"]]+"_mass").GetValue() )
-                                prEta_pt_ovAK5g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak5g"]]+"_eta").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak5g"]]+"_pt").GetValue() )
 
                             if (jtypes[jitr].find("ak7") >= 0) and chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_mass").GetValue() > 0.:                    
                                 hrat_mass_ovAK7g[jitr].Fill( cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_mass").GetValue(), curSF )                    
                                 hrat_pt_ovAK7g[jitr].Fill( cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_pt").GetValue(), curSF )                    
                                 prPt_mass_ovAK7g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_mass").GetValue() )                     
                                 prPt_pt_ovAK7g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_pt").GetValue() )                    
-                                prNV_mass_ovAK7g[jitr].Fill( cur_nv, cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_mass").GetValue() )
-                                prNV_pt_ovAK7g[jitr].Fill( cur_nv, cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_pt").GetValue() )
-                                prEta_mass_ovAK7g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_eta").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_mass").GetValue() )
-                                prEta_pt_ovAK7g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_eta").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak7g"]]+"_pt").GetValue() )
 
                             if (jtypes[jitr].find("ak8") >= 0) and chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_mass").GetValue() > 0.:                
-                                hrat_mass_ovAK8g[jitr].Fill( cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_mass").GetValue(), curSF )  
-                                hrat_pt_ovAK8g[jitr].Fill( cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_pt").GetValue(), curSF )
-                                prPt_mass_ovAK8g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_mass").GetValue() )
-                                prPt_pt_ovAK8g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_pt").GetValue() )
-                                prNV_mass_ovAK8g[jitr].Fill( cur_nv, cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_mass").GetValue() )
-                                prNV_pt_ovAK8g[jitr].Fill( cur_nv, cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_pt").GetValue() )
-                                prEta_mass_ovAK8g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_eta").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_mass").GetValue() )
-                                prEta_pt_ovAK8g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_eta").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_pt").GetValue() )
+                                    hrat_mass_ovAK8g[jitr].Fill( cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_mass").GetValue(), curSF )  
+                                    hrat_pt_ovAK8g[jitr].Fill( cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_pt").GetValue(), curSF )
+                                    prPt_mass_ovAK8g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_mass").GetValue() )
+                                    prPt_pt_ovAK8g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ak8g"]]+"_pt").GetValue() )
 
                             if (jtypes[jitr].find("ca8") >= 0) and chain.GetLeaf("j_"+jtypes[jtypesToI["ca8g"]]+"_mass").GetValue() > 0.:                
                                 hrat_mass_ovCA8g[jitr].Fill( cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8g"]]+"_mass").GetValue(), curSF )                    
                                 hrat_pt_ovCA8g[jitr].Fill( cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8g"]]+"_pt").GetValue(), curSF )                                        
                                 prPt_mass_ovCA8g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ca8g"]]+"_pt").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI    ["ca8g"]]+"_mass").GetValue() )                    
                                 prPt_pt_ovCA8g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ca8g"]]+"_pt").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8g"]]+"_pt").GetValue() )                    
-                                prNV_mass_ovCA8g[jitr].Fill( cur_nv, cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8g"]]+"_mass").GetValue() )
-                                prNV_pt_ovCA8g[jitr].Fill( cur_nv, cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8g"]]+"_pt").GetValue() )
-                                prEta_mass_ovCA8g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ca8g"]]+"_eta").GetValue(), cur_jm/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8g"]]+"_mass").GetValue() )
-                                prEta_pt_ovCA8g[jitr].Fill( chain.GetLeaf("j_"+jtypes[jtypesToI["ca8g"]]+"_eta").GetValue(), cur_jpt/ chain.GetLeaf("j_"+jtypes[jtypesToI["ca8g"]]+"_pt").GetValue() )
                            
     #################################################
     # Put into directories different channels
@@ -426,14 +297,11 @@ def buildHistos(dirname,oname,isData,scaleFactors,channel):
     fo.cd()
     h_v_pt.Write()
     h_v_mt.Write()
-    h_v_mass.Write()
     h_e_met.Write()                            
     h_e_nvert.Write()                            
     h_e_nvert_weighted.Write()                            
     h_l_pt.Write()                            
     h_l_eta.Write()                                                            
-    h_lplus_pt.Write()                            
-    h_lplus_eta.Write()                                                            
     for x in range(len(jtypes)):
         h_eta[x].Write()
         h_pt[x].Write()
@@ -471,6 +339,7 @@ def buildHistos(dirname,oname,isData,scaleFactors,channel):
         prPt_mass_ovAK8g[x].Write()
         prPt_mass_ovCA8[x].Write()
         prPt_mass_ovCA8g[x].Write()
+                        
         prPt_pt_ovAK5[x].Write()            
         prPt_pt_ovAK5g[x].Write()            
         prPt_pt_ovAK7[x].Write()            
@@ -479,41 +348,7 @@ def buildHistos(dirname,oname,isData,scaleFactors,channel):
         prPt_pt_ovAK8g[x].Write()            
         prPt_pt_ovCA8[x].Write()            
         prPt_pt_ovCA8g[x].Write()            
-
-        prNV_mass_ovAK5[x].Write()
-        prNV_mass_ovAK5g[x].Write()
-        prNV_mass_ovAK7[x].Write()
-        prNV_mass_ovAK7g[x].Write()
-        prNV_mass_ovAK8[x].Write()
-        prNV_mass_ovAK8g[x].Write()
-        prNV_mass_ovCA8[x].Write()
-        prNV_mass_ovCA8g[x].Write()
-        prNV_pt_ovAK5[x].Write()            
-        prNV_pt_ovAK5g[x].Write()            
-        prNV_pt_ovAK7[x].Write()            
-        prNV_pt_ovAK7g[x].Write()            
-        prNV_pt_ovAK8[x].Write()            
-        prNV_pt_ovAK8g[x].Write()            
-        prNV_pt_ovCA8[x].Write()            
-        prNV_pt_ovCA8g[x].Write()            
-
-        prEta_mass_ovAK5[x].Write()
-        prEta_mass_ovAK5g[x].Write()
-        prEta_mass_ovAK7[x].Write()
-        prEta_mass_ovAK7g[x].Write()
-        prEta_mass_ovAK8[x].Write()
-        prEta_mass_ovAK8g[x].Write()
-        prEta_mass_ovCA8[x].Write()
-        prEta_mass_ovCA8g[x].Write()
-        prEta_pt_ovAK5[x].Write()            
-        prEta_pt_ovAK5g[x].Write()            
-        prEta_pt_ovAK7[x].Write()            
-        prEta_pt_ovAK7g[x].Write()            
-        prEta_pt_ovAK8[x].Write()            
-        prEta_pt_ovAK8g[x].Write()            
-        prEta_pt_ovCA8[x].Write()            
-        prEta_pt_ovCA8g[x].Write()            
-                                    
+                        
     fo.Close()
 
 ############################################################

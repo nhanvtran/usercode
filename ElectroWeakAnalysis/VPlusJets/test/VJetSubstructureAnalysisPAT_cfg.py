@@ -120,7 +120,6 @@ process.VplusJetSubstructure = cms.EDAnalyzer("VplusJetSubstructureAnalysis",
                                               srcJetsforRho = cms.string("kt6PFJets"),
                                               srcJetsforRho_lepIso = cms.string("kt6PFJets"),
                                               srcPrimaryVertex = cms.InputTag("goodOfflinePrimaryVertices"),                               
-                                              srcBeamSpot  = cms.InputTag("offlineBeamSpot"),
                                               
                                               runningOverMC = cms.bool(isMC),			
                                               runningOverAOD = cms.bool(False)	
