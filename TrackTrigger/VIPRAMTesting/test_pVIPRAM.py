@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 import ROOT
+import os
 
 from pVIPRAM_inputBuilderClass import *
 from pVIPRAM_inputVisualizerClass import *
@@ -33,6 +34,7 @@ if __name__ == '__main__':
     # -------------------------------------------------
     # testing individual rows and columns
     if options.testA:
+        if not os.path.isdir("testInputSingle"): os.system("mkdir testInputSingle");
         nRows = 128;
         nColumns = 32;
         for i in range(nRows):
@@ -53,6 +55,7 @@ if __name__ == '__main__':
     # -------------------------------------------------    
     # testing disable road
     if options.testB:
+        if not os.path.isdir("testDisableBit"): os.system("mkdir testDisableBit");
         tmpInput_disabled = inputBuilder( "testDisableBit/testDisableBit.root" );
         tmpInput_disabled.initializeLoadPhase();
         tmpInput_disabled.loadUniformPatterns(0, 0, 2, 0); # row, col, input value, disable road
@@ -67,6 +70,7 @@ if __name__ == '__main__':
     # -------------------------------------------------    
     # testing walking
     if options.testC:
+        if not os.path.isdir("testWalking"): os.system("mkdir testWalking");
         nRows = 128;
         nColumns = 32;
         tmpWalking = inputBuilder( "testWalking/testWalking.root" );
@@ -95,6 +99,7 @@ if __name__ == '__main__':
     # -------------------------------------------------    
     # testing majority logic
     if options.testD:
+        if not os.path.isdir("testMajorityLogic"): os.system("mkdir testMajorityLogic");
         tmpInput_miss0 = inputBuilder( "testMajorityLogic/tmpInput_miss0.root" );
         tmpInput_miss0.initializeLoadPhase();
         tmpInput_miss0.loadSinglePattern(0, 0, [2,2,2,2]); # row, col, input value
