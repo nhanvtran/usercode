@@ -1,8 +1,9 @@
+
 # A class which takes histograms and plots them in a versatile way
 # inputs are file names which can be "data" or "MC"
 
 import ROOT
-ROOT.gROOT.ProcessLine(".L ~/tdrstyle.C")
+ROOT.gROOT.ProcessLine(".L ./tdrstyle.C")
 from ROOT import setTDRStyle
 from ROOT import TTree
 from ROOT import gROOT
@@ -46,7 +47,7 @@ def getListMean(list):
 class sampleWrapperClass:
 
     ### ------------------------------------------------
-    def __init__(self, label, file, channel, sampleEffLumi, lumi, treename, isData):
+    def __init__(self, label, file, channel, sampleEffLumi, lumi, treename, isData,outputfiledirectory):
 
         
         self.IsData_ = isData;
@@ -59,7 +60,7 @@ class sampleWrapperClass:
         self.JetPrefix_ = "GroomedJet_CA8";
         self.Label_ = label;
         self.Channel_ = channel
-        self.OFileName_ = "trainingtrees_"+channel+"/ofile_"+label+".root";
+        self.OFileName_ = outputfiledirectory+"trainingtrees_"+channel+"/ofile_"+label+".root";
     
         # initialization for doing BSM reweighting
         self.SignalMass_ = -1;
@@ -203,12 +204,13 @@ class sampleWrapperClass:
         jet_rcore7_ = array( 'f', [ 0. ] );
         
         # n bjets
-#        nbjets_ = array( 'f', [ 0. ] );
+        nbjets_ = array( 'f', [ 0. ] );
         nbjets_cvsl_ = array( 'f', [ 0. ] );
         nbjets_cvsm_ = array( 'f', [ 0. ] );
         nbjets_ssvhem_ = array( 'f', [ 0. ] );
         nbjets_csvl_veto_ = array( 'f', [ 0. ] );
         nbjets_csvm_veto_ = array( 'f', [ 0. ] );
+        nbjets_csvt_veto_ = array( 'f', [ 0. ] );
         nbjets_ssvhem_veto_ = array( 'f', [ 0. ] );
         
         nbjetsCSV_ = array( 'f', [ 0. ] );
@@ -280,12 +282,13 @@ class sampleWrapperClass:
         otree.Branch("jet_rcore6", jet_rcore6_ , "jet_rcore6/F");
         otree.Branch("jet_rcore7", jet_rcore7_ , "jet_rcore7/F");
 
-#        otree.Branch("nbjets", nbjets_ , "nbjets/F");
+        otree.Branch("nbjets", nbjets_ , "nbjets/F");
         otree.Branch("nbjets_cvsl", nbjets_cvsl_ , "nbjets_cvsl/F");
         otree.Branch("nbjets_cvsm", nbjets_cvsm_ , "nbjets_cvsm/F");
         otree.Branch("nbjets_ssvhem", nbjets_ssvhem_ , "nbjets_ssvhem/F");
         otree.Branch("nbjets_csvl_veto", nbjets_csvl_veto_ , "nbjets_csvl_veto/F");
         otree.Branch("nbjets_csvm_veto", nbjets_csvm_veto_ , "nbjets_csvm_veto/F");        
+        otree.Branch("nbjets_csvt_veto", nbjets_csvt_veto_ , "nbjets_csvt_veto/F");        
         otree.Branch("nbjets_ssvhem_veto", nbjets_ssvhem_veto_ , "nbjets_ssvhem_veto/F");                
         otree.Branch("nbjetsCSV", nbjetsCSV_ , "nbjetsCSV_/F");
         otree.Branch("nbjetsCSVM", nbjetsCSVM_ , "nbjetsCSVM/F");
@@ -317,12 +320,15 @@ class sampleWrapperClass:
         ttb_nak5_same_       = array( 'f', [ 0. ] );        
         ttb_nak5_same_csvl_  = array( 'f', [ 0. ] );        
         ttb_nak5_same_csvm_  = array( 'f', [ 0. ] );        
+        ttb_nak5_same_csvt_  = array( 'f', [ 0. ] );        
         ttb_nak5_oppo_       = array( 'f', [ 0. ] );        
         ttb_nak5_oppo_csvl_  = array( 'f', [ 0. ] );        
         ttb_nak5_oppo_csvm_  = array( 'f', [ 0. ] );        
+        ttb_nak5_oppo_csvt_  = array( 'f', [ 0. ] );        
         ttb_nak5_oppoveto_       = array( 'f', [ 0. ] );        
         ttb_nak5_oppoveto_csvl_  = array( 'f', [ 0. ] );        
         ttb_nak5_oppoveto_csvm_  = array( 'f', [ 0. ] );        
+        ttb_nak5_oppoveto_csvt_  = array( 'f', [ 0. ] );        
         ttb_ht_  = array( 'f', [ 0. ] );                
         ttb_ca8_mass_pr_  = array( 'f', [ 0. ] );                        
 
@@ -341,12 +347,15 @@ class sampleWrapperClass:
         otree.Branch("ttb_nak5_same", ttb_nak5_same_ , "ttb_nak5_same/F");        
         otree.Branch("ttb_nak5_same_csvl", ttb_nak5_same_csvl_ , "ttb_nak5_same_csvl/F");        
         otree.Branch("ttb_nak5_same_csvm", ttb_nak5_same_csvm_ , "ttb_nak5_same_csvm/F");        
+        otree.Branch("ttb_nak5_same_csvt", ttb_nak5_same_csvt_ , "ttb_nak5_same_csvt/F");        
         otree.Branch("ttb_nak5_oppo", ttb_nak5_oppo_ , "ttb_nak5_oppo/F");                
         otree.Branch("ttb_nak5_oppo_csvl", ttb_nak5_oppo_csvl_ , "ttb_nak5_oppo_csvl/F");                
         otree.Branch("ttb_nak5_oppo_csvm", ttb_nak5_oppo_csvm_ , "ttb_nak5_oppo_csvm/F");        
+        otree.Branch("ttb_nak5_oppo_csvt", ttb_nak5_oppo_csvt_ , "ttb_nak5_oppo_csvt/F");        
         otree.Branch("ttb_nak5_oppoveto", ttb_nak5_oppoveto_ , "ttb_nak5_oppoveto/F");        
         otree.Branch("ttb_nak5_oppoveto_csvl", ttb_nak5_oppoveto_csvl_ , "ttb_nak5_oppoveto_csvl/F");        
         otree.Branch("ttb_nak5_oppoveto_csvm", ttb_nak5_oppoveto_csvm_ , "ttb_nak5_oppoveto_csvm/F");        
+        otree.Branch("ttb_nak5_oppoveto_csvt", ttb_nak5_oppoveto_csvt_ , "ttb_nak5_oppoveto_csvt/F");        
         
         otree.Branch("ttb_ht", ttb_ht_ , "ttb_ht_/F");                
         otree.Branch("ttb_ca8_mass_pr", ttb_ca8_mass_pr_ , "ttb_ca8_mass_pr/F");                
@@ -522,6 +531,9 @@ class sampleWrapperClass:
             index_ak5_in_sameHemi_csvm = [];
             index_ak5_in_oppoHemi_csvm = [];
             index_ak5_in_oppoHemi_vetoca8_csvm = [];
+            index_ak5_in_sameHemi_csvt = [];
+            index_ak5_in_oppoHemi_csvt = [];
+            index_ak5_in_oppoHemi_vetoca8_csvt = [];
             ttb_ht = getattr( self.InputTree_, "W_"+lepLabel+"_pt" );
             ttb_ht += getattr( self.InputTree_, "event_met_pfmet" ); 
         
@@ -544,27 +556,33 @@ class sampleWrapperClass:
                             index_ak5_in_sameHemi.append( i );
                             if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.244: index_ak5_in_sameHemi_csvl.append(i);
                             if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.679: index_ak5_in_sameHemi_csvm.append(i);                        
+                            if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.898: index_ak5_in_sameHemi_csvt.append(i);                        
                         else: 
                             index_ak5_in_oppoHemi.append( i );    
                             if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.244: index_ak5_in_oppoHemi_csvl.append(i);
                             if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.679: index_ak5_in_oppoHemi_csvm.append(i);                                            
+                            if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.898: index_ak5_in_oppoHemi_csvt.append(i);                                            
                         if dR_lj > ROOT.TMath.Pi()/2. and dR_jj > 0.8: 
                             index_ak5_in_oppoHemi_vetoca8.append( i );
                             if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.244: index_ak5_in_oppoHemi_vetoca8_csvl.append(i);
-                            if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.679: index_ak5_in_oppoHemi_vetoca8_csvm.append(i);                                                        
-                
+                            if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.679: index_ak5_in_oppoHemi_vetoca8_csvm.append(i);
+                            if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.898: index_ak5_in_oppoHemi_vetoca8_csvt.append(i);
+                            
 #                print "n ca8s: ", len(index_ca8_in_oppoHemi), " and minMass: ", minMass;                
 #                print "  --- n ak5s: same = ", len(index_ak5_in_sameHemi), ", and oppo = ", len(index_ak5_in_oppoHemi), ", and oppo veto: ",len(index_ak5_in_oppoHemi_vetoca8);
 
                 ttb_nak5_same_[0] = len(index_ak5_in_sameHemi);
                 ttb_nak5_same_csvl_[0] = len(index_ak5_in_sameHemi_csvl);
                 ttb_nak5_same_csvm_[0] = len(index_ak5_in_sameHemi_csvm);
+                ttb_nak5_same_csvt_[0] = len(index_ak5_in_sameHemi_csvt);
                 ttb_nak5_oppo_[0] = len(index_ak5_in_oppoHemi);
                 ttb_nak5_oppo_csvl_[0] = len(index_ak5_in_oppoHemi_csvl);
                 ttb_nak5_oppo_csvm_[0] = len(index_ak5_in_oppoHemi_csvm);
+                ttb_nak5_oppo_csvt_[0] = len(index_ak5_in_oppoHemi_csvt);
                 ttb_nak5_oppoveto_[0] = len(index_ak5_in_oppoHemi_vetoca8);
                 ttb_nak5_oppoveto_csvl_[0] = len(index_ak5_in_oppoHemi_vetoca8_csvl);
                 ttb_nak5_oppoveto_csvm_[0] = len(index_ak5_in_oppoHemi_vetoca8_csvm);
+                ttb_nak5_oppoveto_csvt_[0] = len(index_ak5_in_oppoHemi_vetoca8_csvt);
                 ttb_ht_[0] = ttb_ht;
                 ttb_ca8_mass_pr_[0] = getattr( self.InputTree_, "GroomedJet_CA8_mass_pr" )[theca8Index];
                 ttb_ca8_ungroomed_pt_[0] = getattr( self.InputTree_, "GroomedJet_CA8_pt" )[theca8Index];
@@ -597,12 +615,15 @@ class sampleWrapperClass:
                 ttb_nak5_same_[0] = -1;
                 ttb_nak5_same_csvl_[0] = -1;
                 ttb_nak5_same_csvm_[0] = -1;
+                ttb_nak5_same_csvt_[0] = -1;
                 ttb_nak5_oppo_[0] = -1;
                 ttb_nak5_oppo_csvl_[0] = -1;
                 ttb_nak5_oppo_csvm_[0] = -1;
+                ttb_nak5_oppo_csvt_[0] = -1;
                 ttb_nak5_oppoveto_[0] = -1;
                 ttb_nak5_oppoveto_csvl_[0] = -1;
                 ttb_nak5_oppoveto_csvm_[0] = -1;
+                ttb_nak5_oppoveto_csvt_[0] = -1;
                 ttb_ht_[0] = -1;
                 ttb_ca8_mass_pr_[0] = -1;
                 ttb_ca8_ungroomed_pt_[0] = -1;
@@ -622,14 +643,14 @@ class sampleWrapperClass:
             # make cuts
             leptonCut = 30;
             leptonCutString = "W_muon_pt";
-            metCut = 50;
+            metCut = 40;
             if self.Channel_ == "el": 
                 leptonCut = 35;    
                 leptonCutString = "W_electron_pt";
-                metCut = 70;
+                metCut = 40;
 
             signallike = 0;
-            if getattr( self.InputTree_, "W_pt" ) > 200 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut and getattr( self.InputTree_, "GroomedJet_CA8_deltaphi_METca8jet") > 2.0 and getattr( self.InputTree_, "GroomedJet_CA8_deltaR_lca8jet") > 1.57 and self.InputTree_.numPFCorJetBTags == 0: signallike = 1;
+            if getattr( self.InputTree_, "W_pt" ) > 200 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200 and self.InputTree_.ggdboostedWevt == 1 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut and getattr( self.InputTree_, "GroomedJet_CA8_deltaphi_METca8jet") > 2.0 and getattr( self.InputTree_, "GroomedJet_CA8_deltaR_lca8jet") > 1.57 :signallike = 1;
 
             ttbarlike = 0;
             if isttbar_[0] == 1 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut:
@@ -788,12 +809,39 @@ class sampleWrapperClass:
                 jet_planarlow07_[0] = getattr( self.InputTree_, prefix + "_planarflow07");
                 
 #                nbjets_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets" );
-#                nbjets_cvsl_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl" );
-#                nbjets_cvsm_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm" );
-#                nbjets_ssvhem_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem" );
-#                nbjets_csvl_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl_veto" );
-#                nbjets_csvm_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm_veto" );
-#                nbjets_ssvhem_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem_veto" );
+                nbjets_cvsl_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl" );
+                nbjets_cvsm_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm" );
+                nbjets_ssvhem_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem" );
+                nbjets_csvl_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl_veto" );
+                nbjets_csvm_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm_veto" );
+                nbjets_ssvhem_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem_veto" );
+
+                index_ak5_cvst = array( 'f', [0.] );
+                nbjets_csvt_veto_[0] = 0. ;
+                dR_lj = 0. ;
+                j_ca8_eta = 0 ; j_ca8_phi = 0;
+                if getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200:
+                    j_ca8_eta = getattr( self.InputTree_, "GroomedJet_CA8_eta" )[0]
+ 
+                    j_ca8_phi = getattr( self.InputTree_, "GroomedJet_CA8_phi" )[0]
+                    l_eta = getattr( self.InputTree_, "W_"+lepLabel+"_eta" )
+                    l_phi = getattr( self.InputTree_, "W_"+lepLabel+"_phi" )
+                    dR_lj = math.sqrt( (l_eta - j_ca8_eta)**2 + (l_phi - j_ca8_phi)**2 );
+
+                l_phi = 0. ; dR_jj = 0. ; dR_lj = 0. ;
+
+                for i in range(6):
+                    if getattr( self.InputTree_, "JetPFCor_Pt" )[i] > 30:
+
+                        l_phi = getattr( self.InputTree_, "W_"+lepLabel+"_phi" )                
+                        dR_jj = math.sqrt( (j_ak5_eta - j_ca8_eta)**2 + (j_ak5_phi - j_ca8_phi)**2 );
+                        dR_lj = math.sqrt( (l_eta - j_ak5_eta)**2 + (l_phi - j_ak5_phi)**2 );
+                        
+                        if dR_jj > 0.8: 
+                            if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.898: index_ak5_cvst.append(i);
+
+               
+                nbjets_csvt_veto_[0] = len(index_ak5_in_oppoHemi_csvt);
 
                 nbjetsCSV_[0] =0 ;
                 nbjetsCSVM_[0] =0 ;
@@ -820,7 +868,7 @@ class sampleWrapperClass:
                 listOfVarArray2[0][0] = jet_qjetvol_[0]
                 listOfVarArray2[1][0] = jet_tau2tau1_[0]
 
-#                gen_parton1_px_fromttbar_[0] =  self.InputTree_.W_tParton_px[0];
+#                genrtonx_fromttbar_[0] =  self.InputTree_.W_tParton_px[0];
 #                gen_parton1_py_fromttbar_[0] =  self.InputTree_.W_tParton_py[0];
 #                gen_parton1_pz_fromttbar_[0] =  self.InputTree_.W_tParton_pz[0];
 #                gen_parton1_e_fromttbar_[0] =   self.InputTree_.W_tParton_E[0]
@@ -920,8 +968,8 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus(prefix + "_rcores",1);
         self.InputTree_.SetBranchStatus(prefix + "_jetconstituents",1);
 
-        self.InputTree_.SetBranchStatus("GroomedJet_numberjets",1);
-        self.InputTree_.SetBranchStatus("GroomedJet_numberbjets",1);
+#        self.InputTree_.SetBranchStatus("GroomedJet_numberjets",1);
+#        self.InputTree_.SetBranchStatus("GroomedJet_numberbjets",1);
 
         self.InputTree_.SetBranchStatus("GroomedJet_numberbjets_csvl",1);
         self.InputTree_.SetBranchStatus("GroomedJet_numberbjets_csvm",1);
