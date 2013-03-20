@@ -39,19 +39,16 @@ if __name__ == '__main__':
         nColumns = 32;
         tmpInput = inputBuilder("testInputSingle/testSingle.root");
         for i in range(nRows):
-            print "row: ",i
             for j in range(nColumns):
                 tmpInput.initializeLoadPhase();
-                tmpInput.loadUniformPatterns(0, 0, 8); # row, col, input value
-                tmpInput.initializeRunPhase( [1,0,0,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
-                tmpInput.checkPattern( [8,8,8,8] ); # run mode, look for a single pattern
+                tmpInput.loadUniformPatterns(i, j, 8); # row, col, input value
                 #tmpInput.doRowChecker( i ); # cheat mode, look at a particular row
-
+                
+        tmpInput.initializeRunPhase( [1,0,0,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
+        tmpInput.checkPattern( [8,8,8,8] ); # run mode, look for a single pattern
         tmpInput.close();
 
         tmpVisualizer = inputVisualizer( tmpInput.getFilename() );
-        #tmpVisualizer.textVisualizer();
-        #tmpVisualizer.visualize("test.eps");
         tmpVisualizer.writeToText( "testInputSingle/testSingle.txt" );
 
     # -------------------------------------------------    
@@ -64,9 +61,11 @@ if __name__ == '__main__':
         tmpInput_disabled.initializeRunPhase( [1,0,0,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
         tmpInput_disabled.checkPattern( [2,2,2,2] ); # run mode, look for a single pattern
         #tmpInput_disabled.doRowChecker( 0 ); # cheat mode, look at a particular row
+        tmpInput_disabled.readOutMode();
         tmpInput_disabled.close();
             
         tmpVisualizer_disabled = inputVisualizer( tmpInput_disabled.getFilename() );
+        tmpVisualizer_disabled.textVisualizer();
         tmpVisualizer_disabled.writeToText( "testDisableBit/testDisableBit.txt" );
     
     # -------------------------------------------------    
@@ -77,60 +76,24 @@ if __name__ == '__main__':
         nColumns = 32;
         tmpWalking = inputBuilder( "testWalking/testWalking.root" );
         tmpWalking.initializeLoadPhase();
-        print "Loading..."
+        # load
         ctr = 0;
         for i in range(nRows):
-            print "row: ",i
             for j in range(nColumns):
                 tmpWalking.loadUniformPatterns(i, j, ctr); # row, col, input value, disable road
                 ctr += 1;
         tmpWalking.initializeRunPhase( [1,0,0,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
-
-        print "Running..."
+        # run
         ctr = 0;
         for i in range(nRows):
-            print "row: ",i
             for j in range(nColumns):
                 tmpWalking.checkPattern( [ctr,ctr,ctr,ctr] ); # run mode, look for a single pattern
-                #tmpWalking.printInternalPatterns( i );
-                #tmpWalking.doRowChecker( i ); # cheat mode, look at a particular row
                 ctr += 1;
         tmpWalking.close();
             
         tmpWalkingVisualizer = inputVisualizer( tmpWalking.getFilename() );
         tmpWalkingVisualizer.textVisualizer();
         tmpWalkingVisualizer.writeToText( "testWalking/testWalking.txt" );
-
-
-        tmpWalking2 = inputBuilder( "testWalking/testWalking.root" );
-        tmpWalking2.initializeLoadPhase();
-        print "Loading..."
-        ctr = 0;
-        for i in range(nRows):
-            print "row: ",i
-            for j in range(nColumns):
-                tmpWalking2.loadUniformPatterns(i, j, ctr); # row, col, input value, disable road
-                ctr += 1;
-        tmpWalking2.initializeRunPhase( [1,0,0,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
-
-        print "Running..."
-        ctr = 0;
-        for i in range(nRows):
-            print "row: ",i
-            for j in range(nColumns):
-                if j % 2 == 0: tmpWalking2.checkPattern( [ctr,ctr,ctr,ctr] ); # run mode, look for a single pattern
-                #tmpWalking2.printInternalPatterns( i );
-                #tmpWalking2.doRowChecker( i ); # cheat mode, look at a particular row
-                ctr += 1;
-#        print "Cheating..."
-#        for i in range(nRows):
-#            print "row: ",i
-#            tmpWalking2.doRowChecker( i ); # cheat mode, look at a particular row
-        tmpWalking2.close();
-
-        tmpWalking2Visualizer = inputVisualizer( tmpWalking2.getFilename() );
-        tmpWalking2Visualizer.textVisualizer();
-        tmpWalking2Visualizer.writeToText( "testWalking/testWalking2.txt" );
             
     # -------------------------------------------------    
     # testing majority logic
@@ -149,7 +112,7 @@ if __name__ == '__main__':
         tmpInput_miss1 = inputBuilder( "testMajorityLogic/tmpInput_miss1.root" );
         tmpInput_miss1.initializeLoadPhase();
         tmpInput_miss1.loadSinglePattern(0, 0, [2,99,2,2]); # row, col, input value
-        tmpInput_miss1.initializeRunPhase( [0,1,0,0] ); # choose majority logic (miss1, miss1, miss2, layerA)
+        tmpInput_miss1.initializeRunPhase( [0,1,0,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
         tmpInput_miss1.checkPattern( [2,0,2,2] ); # run mode, look for a single pattern
         #tmpInput_miss1.doRowChecker( 0 ); # cheat mode, look at a particular row
         tmpInput_miss1.close();
@@ -159,7 +122,7 @@ if __name__ == '__main__':
         tmpInput_miss2 = inputBuilder( "testMajorityLogic/tmpInput_miss2.root" );
         tmpInput_miss2.initializeLoadPhase();
         tmpInput_miss2.loadSinglePattern(0, 0, [2,99,99,2]); # row, col, input value
-        tmpInput_miss2.initializeRunPhase( [0,0,1,0] ); # choose majority logic (miss2, miss1, miss2, layerA)
+        tmpInput_miss2.initializeRunPhase( [0,0,1,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
         tmpInput_miss2.checkPattern( [2,999,999,2] ); # run mode, look for a single pattern
         #tmpInput_miss2.doRowChecker( 0 ); # cheat mode, look at a particular row
         tmpInput_miss2.close();
@@ -169,13 +132,41 @@ if __name__ == '__main__':
         tmpInput_layerA = inputBuilder( "testMajorityLogic/tmpInput_layerA.root" );
         tmpInput_layerA.initializeLoadPhase();
         tmpInput_layerA.loadSinglePattern(0, 0, [2,99,99,99]); # row, col, input value
-        tmpInput_layerA.initializeRunPhase( [0,0,0,1] ); # choose majority logic (layerA, miss1, miss2, layerA)
+        tmpInput_layerA.initializeRunPhase( [0,0,0,1] ); # choose majority logic (miss0, miss1, miss2, layerA)
         tmpInput_layerA.checkPattern( [2,0,0,0] ); # run mode, look for a single pattern
         #tmpInput_layerA.doRowChecker( 0 ); # cheat mode, look at a particular row
+        tmpInput_layerA.readOutMode();
         tmpInput_layerA.close();
         tmpVisualizer_layerA = inputVisualizer( tmpInput_layerA.getFilename() );
+        tmpVisualizer_layerA.textVisualizer();
         tmpVisualizer_layerA.writeToText( "testMajorityLogic/tmpInput_layerA.txt" );
 
+
+    ##### some extras, ignore
+##         tmpWalking2 = inputBuilder( "testWalking/testWalking.root" );
+##         tmpWalking2.initializeLoadPhase();
+##         print "Loading..."
+##         ctr = 0;
+##         for i in range(nRows):
+##             print "row: ",i
+##             for j in range(nColumns):
+##                 tmpWalking2.loadUniformPatterns(i, j, ctr); # row, col, input value, disable road
+##                 ctr += 1;
+##         tmpWalking2.initializeRunPhase( [1,0,0,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
+
+##         print "Running..."
+##         ctr = 0;
+##         for i in range(nRows):
+##             print "row: ",i
+##             for j in range(nColumns):
+##                 if j % 2 == 0: tmpWalking2.checkPattern( [ctr,ctr,ctr,ctr] ); # run mode, look for a single pattern
+##                 ctr += 1;
+##         tmpWalking2.close();
+
+##         tmpWalking2Visualizer = inputVisualizer( tmpWalking2.getFilename() );
+##         tmpWalking2Visualizer.textVisualizer();
+##         tmpWalking2Visualizer.writeToText( "testWalking/testWalking2.txt" );       
+        
 
 
 

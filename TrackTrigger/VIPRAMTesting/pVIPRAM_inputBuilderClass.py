@@ -398,9 +398,37 @@ class inputBuilder:
 
     ##################################################
     # -------------------
-    # initializeReadPhase
-    def initializeReadPhase(self):
-        print "initializing read phase..."
+    # readOutMode
+    def readOutMode(self):
+
+        self.CheckData[0] = 1;
+        self.ColAdr[0] = 0; #cols 0-31
+        self.RunMode[0] = 0;
+        self.LatchData[0] = 0;
+        self.Primary[0] = 0;
+        self.EventReset[0] = 0;
+        self.InputA[0] = 0;
+        self.InputB[0] = 0;
+        self.InputC[0] = 0;
+        self.InputD[0] = 0;
+        self.InputA_bit0[0] = 1;
+        self.InputB_bit0[0] = 1;
+        self.InputC_bit0[0] = 1;
+        self.InputD_bit0[0] = 1;
+        
+        self.Miss0[0] = 1;
+        self.Miss1[0] = 1;
+        self.Miss2[0] = 1;
+        self.RequireLayerA[0] = 1;
+
+        for row in range(128):
+            self.RowAdr[0] = row;
+            for i in range(32): self.DataOut[i] = self.iDataOut[row][i];
+            self.counter[0] = self.cycleCtr;
+            self.cycleCtr += 1;
+            self.tree.Fill();
+            
+            
 
     ##################################################
     # -------------------
