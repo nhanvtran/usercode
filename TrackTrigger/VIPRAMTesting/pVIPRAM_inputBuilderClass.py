@@ -114,7 +114,7 @@ class inputBuilder:
 
         self.CheckData[0] = 0;
         self.CompareNow[0] = 0;        
-        for i in range(32): self.DataOut[i] = 0;
+        for i in range(32): self.DataOut[i] = 1;
         
         #print self.DataOut
         
@@ -135,7 +135,8 @@ class inputBuilder:
         self.counter[0] = self.cycleCtr;
         self.RowAdr[0] = row;
         self.ColAdr[0] = col;
-
+        self.Primary[0] = 1;
+        
         self.InputA[0] = iVal;
         self.InputB[0] = iVal;
         self.InputC[0] = iVal;
@@ -165,6 +166,12 @@ class inputBuilder:
 
         ternary_iVal = self.flipTernaryBits(iVal);
         
+        #print "----------"
+        #print "iVal  = ", iVal
+        #print "binary  = ", '{0:015b}'.format(iVal)
+        #print "binaryt = ", '{0:015b}'.format(ternary_iVal)
+        #print "iValt = ", ternary_iVal
+        
         self.InputA[0] = ternary_iVal;
         self.InputB[0] = ternary_iVal;
         self.InputC[0] = ternary_iVal;
@@ -191,6 +198,7 @@ class inputBuilder:
         self.counter[0] = self.cycleCtr;
         self.RowAdr[0] = row;
         self.ColAdr[0] = col;
+        self.Primary[0] = 1;
         
         self.InputA[0] = iVal[0];
         self.InputB[0] = iVal[1];
@@ -248,11 +256,12 @@ class inputBuilder:
         #print "len(binaryVal) = ", len(binaryVal)
         #print binaryVal
         if binaryVal[14] == "1": binaryVal[14] = "0";
+        else: binaryVal[14] = "1";
         if binaryVal[9] == "1": binaryVal[9] = "0";
+        else: binaryVal[9] = "1";
         if binaryVal[4] == "1": binaryVal[4] = "0";
-        if binaryVal[14] == "0": binaryVal[14] = "1";
-        if binaryVal[9] == "0": binaryVal[9] = "1";
-        if binaryVal[4] == "0": binaryVal[4] = "1";
+        else: binaryVal[4] = "1";
+
         #print binaryVal
         binValString = "".join(binaryVal);
         #print binValString
@@ -328,10 +337,10 @@ class inputBuilder:
             self.cycleCtr += 1;
             self.tree.Fill();
         
-            self.MLpreCh[0] = 0;
-            self.counter[0] = self.cycleCtr;
-            self.cycleCtr += 1;
-            self.tree.Fill();
+            #self.MLpreCh[0] = 0;
+            #self.counter[0] = self.cycleCtr;
+            #self.cycleCtr += 1;
+            #self.tree.Fill();
                 
             self.checkPatternInternally( pattern );
 
@@ -362,7 +371,6 @@ class inputBuilder:
         self.tree.Fill();
 
         #print self.DataOut
-        
         
         self.CompareNow[0] = 0;                    
         for i in range(32): self.DataOut[i] = 0;
