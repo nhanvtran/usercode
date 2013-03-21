@@ -126,7 +126,6 @@ class doFit_wj_and_wlvj:
 
         #prepare the data and mc files
         if options.fitwtagger or options.fitwtaggersim:
-            #self.file_Directory="trainingtrees_19_Jan24/trainingtrees_%s/"%(self.channel);
             self.file_Directory="trainingtrees_%s/"%(self.channel);
         else: 
             self.file_Directory="trainingtrees_%s/"%(self.channel);
@@ -153,7 +152,7 @@ class doFit_wj_and_wlvj:
             self.file_WJets0_mc=("ofile_WJets_Herwig.root");
             self.file_WJets1_mc=("ofile_WJets_Pythia.root");
         self.file_VV_mc=("ofile_VV.root");# WW+WZ 
-        self.file_TTbar_mc=("ofile_TTbar.root");
+        self.file_TTbar_mc=("ofile_TTbar_Powheg.root");
         self.file_TTbar_matchDn_mc=("ofile_TTbar_matchDn.root");
         self.file_TTbar_matchUp_mc=("ofile_TTbar_matchUp.root");
         self.file_TTbar_scaleDn_mc=("ofile_TTbar_scaleDn.root");
@@ -170,7 +169,6 @@ class doFit_wj_and_wlvj:
         self.file_rlt_root          = self.rlt_DIR+"hwwlvj_%s_%s_%02d_%02d_workspace.root"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
         self.file_datacard_unbin    = self.rlt_DIR+"hwwlvj_%s_%s_%02d_%02d_unbin.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
         self.file_datacard_counting = self.rlt_DIR+"hwwlvj_%s_%s_%02d_%02d_counting.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
-
         
         self.file_out=open(self.file_rlt_txt,"w");
         self.file_out.write("Welcome:\n");
@@ -203,8 +201,8 @@ class doFit_wj_and_wlvj:
             if self.channel=="el":self.wtagger_cut=0.43  ;
             if self.channel=="mu":self.wtagger_cut=0.43  ;
         if self.wtagger_label=="medium":
-            if self.channel=="el":self.wtagger_cut=0.55  ;
-            if self.channel=="mu":self.wtagger_cut=0.55  ;
+            if self.channel=="el":self.wtagger_cut=0.5   ;
+            if self.channel=="mu":self.wtagger_cut=0.5   ;
         if self.wtagger_label=="loose":
             if self.channel=="el":self.wtagger_cut=0.66  ;
             if self.channel=="mu":self.wtagger_cut=0.65  ;
@@ -212,14 +210,14 @@ class doFit_wj_and_wlvj:
 
         #medium wtagger_eff reweight between data and mc
         if self.channel=="mu":
-            self.rrv_wtagger_eff_reweight_forTop=RooRealVar("rrv_wtagger_eff_reweight_forTop","rrv_wtagger_eff_reweight_forTop",0.96); self.rrv_wtagger_eff_reweight_forTop.setError(0.06*self.rrv_wtagger_eff_reweight_forTop.getVal());
+            self.rrv_wtagger_eff_reweight_forT=RooRealVar("rrv_wtagger_eff_reweight_forT","rrv_wtagger_eff_reweight_forT",0.96); self.rrv_wtagger_eff_reweight_forT.setError(0.06*self.rrv_wtagger_eff_reweight_forT.getVal());
             #self.rrv_wtagger_eff_reweight_forV=RooRealVar("rrv_wtagger_eff_reweight_forV","rrv_wtagger_eff_reweight_forV",1.0); self.rrv_wtagger_eff_reweight_forV.setError(0.075*self.rrv_wtagger_eff_reweight_forV.getVal());
             self.rrv_wtagger_eff_reweight_forV=RooRealVar("rrv_wtagger_eff_reweight_forV","rrv_wtagger_eff_reweight_forV",0.95); self.rrv_wtagger_eff_reweight_forV.setError(0.1*self.rrv_wtagger_eff_reweight_forV.getVal());
         if self.channel=="el":
-            self.rrv_wtagger_eff_reweight_forTop=RooRealVar("rrv_wtagger_eff_reweight_forTop","rrv_wtagger_eff_reweight_forTop",0.92); self.rrv_wtagger_eff_reweight_forTop.setError(0.06*self.rrv_wtagger_eff_reweight_forTop.getVal());
+            self.rrv_wtagger_eff_reweight_forT=RooRealVar("rrv_wtagger_eff_reweight_forT","rrv_wtagger_eff_reweight_forT",0.92); self.rrv_wtagger_eff_reweight_forT.setError(0.06*self.rrv_wtagger_eff_reweight_forT.getVal());
             #self.rrv_wtagger_eff_reweight_forV=RooRealVar("rrv_wtagger_eff_reweight_forV","rrv_wtagger_eff_reweight_forV",1.0); self.rrv_wtagger_eff_reweight_forV.setError(0.075*self.rrv_wtagger_eff_reweight_forV.getVal());
             self.rrv_wtagger_eff_reweight_forV=RooRealVar("rrv_wtagger_eff_reweight_forV","rrv_wtagger_eff_reweight_forV",0.84); self.rrv_wtagger_eff_reweight_forV.setError(0.1*self.rrv_wtagger_eff_reweight_forV.getVal());
-        print "wtagger efficiency correction for Top sample: %s +/- %s"%(self.rrv_wtagger_eff_reweight_forTop.getVal(), self.rrv_wtagger_eff_reweight_forTop.getError());
+        print "wtagger efficiency correction for Top sample: %s +/- %s"%(self.rrv_wtagger_eff_reweight_forT.getVal(), self.rrv_wtagger_eff_reweight_forT.getError());
         print "wtagger efficiency correction for V   sample: %s +/- %s"%(self.rrv_wtagger_eff_reweight_forV.getVal(), self.rrv_wtagger_eff_reweight_forV.getError());
 
         self.mean_shift=1.3; self.sigma_scale=1.145; #correct the W-jet mass peak difference between data and MC
@@ -673,6 +671,13 @@ class doFit_wj_and_wlvj:
                 scalesigma_tmp=3.4619e+00;  scalesigma_tmp_err=2.29e-01;
                 frac_tmp      =7.4246e-01;  frac_tmp_err      =2.11e-02; 
 
+            if self.wtagger_cut==0.50:
+                mean1_tmp     =8.3141e+01;  mean1_tmp_err     =1.63e-01;
+                deltamean_tmp =6.9129e+00;  deltamean_tmp_err =1.24e+00;
+                sigma1_tmp    =7.5145e+00;  sigma1_tmp_err    =1.99e-01;
+                scalesigma_tmp=3.6819e+00;  scalesigma_tmp_err=2.11e-01;
+                frac_tmp      =6.7125e-01;  frac_tmp_err      =2.09e-02; 
+
             rrv_mean1_gaus=RooRealVar("rrv_mean1_gaus"+label+"_"+self.channel,"rrv_mean1_gaus"+label+"_"+self.channel,mean1_tmp, mean1_tmp-4, mean1_tmp+4);
             rrv_sigma1_gaus=RooRealVar("rrv_sigma1_gaus"+label+"_"+self.channel,"rrv_sigma1_gaus"+label+"_"+self.channel,sigma1_tmp, sigma1_tmp-4,sigma1_tmp+4 );
             gaus1 = RooGaussian("gaus1"+label+"_"+self.channel,"gaus1"+label+"_"+self.channel, rrv_x,rrv_mean1_gaus,rrv_sigma1_gaus);
@@ -700,6 +705,13 @@ class doFit_wj_and_wlvj:
                 sigma1_tmp    =7.5280e+00;  sigma1_tmp_err    =1.91e-01;
                 scalesigma_tmp=3.4619e+00;  scalesigma_tmp_err=2.29e-01;
                 frac_tmp      =7.4246e-01;  frac_tmp_err      =2.11e-02; 
+
+            if self.wtagger_cut==0.50:
+                mean1_tmp     =8.3141e+01;  mean1_tmp_err     =1.63e-01;
+                deltamean_tmp =6.9129e+00;  deltamean_tmp_err =1.24e+00;
+                sigma1_tmp    =7.5145e+00;  sigma1_tmp_err    =1.99e-01;
+                scalesigma_tmp=3.6819e+00;  scalesigma_tmp_err=2.11e-01;
+                frac_tmp      =6.7125e-01;  frac_tmp_err      =2.09e-02;
 
             rrv_shift=RooRealVar("rrv_shift"+label+"_"+self.channel,"rrv_shift"+label+"_"+self.channel,10.8026)   # Z mass: 91.1876;  shift=91.1876-80.385=10.8026
 
@@ -739,6 +751,12 @@ class doFit_wj_and_wlvj:
                 sigma1_tmp    =7.5280e+00;  sigma1_tmp_err    =1.91e-01;
                 scalesigma_tmp=3.4619e+00;  scalesigma_tmp_err=2.29e-01;
                 frac_tmp      =7.4246e-01;  frac_tmp_err      =2.11e-02; 
+            if self.wtagger_cut==0.50:
+                mean1_tmp     =8.3141e+01;  mean1_tmp_err     =1.63e-01;
+                deltamean_tmp =6.9129e+00;  deltamean_tmp_err =1.24e+00;
+                sigma1_tmp    =7.5145e+00;  sigma1_tmp_err    =1.99e-01;
+                scalesigma_tmp=3.6819e+00;  scalesigma_tmp_err=2.11e-01;
+                frac_tmp      =6.7125e-01;  frac_tmp_err      =2.09e-02;
 
             rrv_mean1_gaus=RooRealVar("rrv_mean1_gaus"+label+"_"+self.channel,"rrv_mean1_gaus"+label+"_"+self.channel,mean1_tmp, mean1_tmp-4, mean1_tmp+4);
             rrv_sigma1_gaus=RooRealVar("rrv_sigma1_gaus"+label+"_"+self.channel,"rrv_sigma1_gaus"+label+"_"+self.channel,sigma1_tmp, sigma1_tmp-4,sigma1_tmp+4 );
@@ -760,6 +778,11 @@ class doFit_wj_and_wlvj:
                 c0_tmp    =   -3.0807e-02 ; c0_tmp_err     = 8.16e-03;
                 offset_tmp=    8.2863e+01 ; offset_tmp_err = 9.66e+00;
                 width_tmp =    3.1119e+01 ; width_tmp_err  = 2.80e+00; 
+
+            if self.wtagger_cut==0.50:
+                c0_tmp    =   -2.9893e-02 ; c0_tmp_err     = 6.83e-03;
+                offset_tmp=    7.9350e+01 ; offset_tmp_err = 9.35e+00;
+                width_tmp =    3.3083e+01 ; width_tmp_err  = 2.97e+00; 
 
             #rrv_c_ErfExp     = RooRealVar("rrv_c_ErfExp"+label+"_"+self.channel,"rrv_c_ErfExp"+label+"_"+self.channel,c0_tmp, c0_tmp-c0_tmp_err*4, c0_tmp+c0_tmp_err*4  );
             rrv_c_ErfExp     = RooRealVar("rrv_c_ErfExp"+label+"_"+self.channel,"rrv_c_ErfExp"+label+"_"+self.channel,c0_tmp, c0_tmp-4e-2, c0_tmp+4e-2  );
@@ -785,6 +808,13 @@ class doFit_wj_and_wlvj:
                 sigma1_tmp    =7.5280e+00;  sigma1_tmp_err    =1.91e-01;
                 scalesigma_tmp=3.4619e+00;  scalesigma_tmp_err=2.29e-01;
                 frac_tmp      =7.4246e-01;  frac_tmp_err      =2.11e-02; 
+                
+            if self.wtagger_cut==0.50:
+                mean1_tmp     =8.3141e+01;  mean1_tmp_err     =1.63e-01;
+                deltamean_tmp =6.9129e+00;  deltamean_tmp_err =1.24e+00;
+                sigma1_tmp    =7.5145e+00;  sigma1_tmp_err    =1.99e-01;
+                scalesigma_tmp=3.6819e+00;  scalesigma_tmp_err=2.11e-01;
+                frac_tmp      =6.7125e-01;  frac_tmp_err      =2.09e-02;
 
             if self.channel=="el":
                 if self.workspace4fit_.var("rrv_mean1_gaus%s_mu"%(label)) and self.workspace4fit_.var("rrv_sigma1_gaus%s_mu"%(label)):
@@ -824,6 +854,11 @@ class doFit_wj_and_wlvj:
                 p0_tmp  =-2.3067e-01;  p0_tmp_err  =4.12e-02;
                 p1_tmp  =-2.6924e-01;  p1_tmp_err  =5.69e-02;
                 frac_tmp= 3.2004e-01;  frac_tmp_err=2.04e-02; 
+
+            if self.wtagger_cut==0.50:
+                p0_tmp  =-3.5459e-01;  p0_tmp_err  =5.04e-02;
+                p1_tmp  =-1.2790e-01;  p1_tmp_err  =6.74e-02;
+                frac_tmp= 2.7324e-01;  frac_tmp_err=2.48e-02; 
 
             if TString(label).Contains("data"):
                 gaus = self.workspace4fit_.pdf("gaus1_ttbar_data_"+self.channel);
@@ -891,6 +926,11 @@ class doFit_wj_and_wlvj:
                 offset_tmp=    8.2863e+01 ; offset_tmp_err = 9.66e+00;
                 width_tmp =    3.1119e+01 ; width_tmp_err  = 2.80e+00; 
 
+            if self.wtagger_cut==0.50:
+                c0_tmp    =   -2.9893e-02 ; c0_tmp_err     = 6.83e-03;
+                offset_tmp=    7.9350e+01 ; offset_tmp_err = 9.35e+00;
+                width_tmp =    3.3083e+01 ; width_tmp_err  = 2.97e+00; 
+
             #rrv_c_ErfExp     = RooRealVar("rrv_c_ErfExp"+label+"_"+self.channel,"rrv_c_ErfExp"+label+"_"+self.channel,c0_tmp, c0_tmp-c0_tmp_err*4, c0_tmp+c0_tmp_err*4  );
             rrv_c_ErfExp     = RooRealVar("rrv_c_ErfExp"+label+"_"+self.channel,"rrv_c_ErfExp"+label+"_"+self.channel,c0_tmp, c0_tmp-4e-2, c0_tmp+4e-2  );
             rrv_offset_ErfExp= RooRealVar("rrv_offset_ErfExp"+label+"_"+self.channel,"rrv_offset_ErfExp"+label+"_"+self.channel, offset_tmp, offset_tmp-offset_tmp_err*4,offset_tmp+offset_tmp_err*4);
@@ -910,6 +950,10 @@ class doFit_wj_and_wlvj:
                c0_tmp    =   -5.0476e-02 ; c0_tmp_err     = 6.92e-03; 
                offset_tmp=    1.1323e+02 ; offset_tmp_err = 1.94e+01;
                width_tmp =    5.8616e+01 ; width_tmp_err  = 4.00e+00;
+            if self.wtagger_cut==0.50:
+               c0_tmp    =   -1.0143e-01 ; c0_tmp_err     = 1.46e-02; 
+               offset_tmp=    2.7718e+02 ; offset_tmp_err = 4.92e+01;
+               width_tmp =    7.1891e+01 ; width_tmp_err  = 4.69e+00;
 
             rrv_c_ErfExp     = RooRealVar("rrv_c_ErfExp"+label+"_"+self.channel,"rrv_c_ErfExp"+label+"_"+self.channel,c0_tmp, c0_tmp-4e-2, c0_tmp+4e-2 );
             rrv_offset_ErfExp= RooRealVar("rrv_offset_ErfExp"+label+"_"+self.channel,"rrv_offset_ErfExp"+label+"_"+self.channel, offset_tmp);#, offset_tmp-offset_tmp_err*4,offset_tmp+offset_tmp_err*4);
@@ -2312,7 +2356,7 @@ class doFit_wj_and_wlvj:
             tmp_jet_mass=getattr(treeIn, jet_mass);
 
             #if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE < 1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.v_pt > self.vpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.l_pt > self.lpt_cut:
-            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjets_csvm_veto < 1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.v_pt > self.vpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.l_pt > self.lpt_cut:
+            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjets_csvm_veto < 1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.v_pt > self.vpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.l_pt > self.lpt_cut and treeIn.issignal==1:
                 #print tmp_jet_mass_dn, tmp_jet_mass, tmp_jet_mass_up;
                 tmp_event_weight= treeIn.totalEventWeight;
                 tmp_event_weight4fit= treeIn.eff_and_pu_Weight;
@@ -2375,8 +2419,8 @@ class doFit_wj_and_wlvj:
                 #wtagger_eff_reweight
                 if not label=="_data": 
                     if TString(label).Contains("_TTbar") or TString(label).Contains("_STop") :
-                        #print label+" SF %s"%(self.rrv_wtagger_eff_reweight_forTop.getVal()) ;
-                        tmp_event_weight=tmp_event_weight*self.rrv_wtagger_eff_reweight_forTop.getVal();
+                        #print label+" SF %s"%(self.rrv_wtagger_eff_reweight_forT.getVal()) ;
+                        tmp_event_weight=tmp_event_weight*self.rrv_wtagger_eff_reweight_forT.getVal();
                     else:
                         #print label+" SF %s"%(self.rrv_wtagger_eff_reweight_forV.getVal()) ;
                         tmp_event_weight=tmp_event_weight*self.rrv_wtagger_eff_reweight_forV.getVal();
@@ -2411,7 +2455,7 @@ class doFit_wj_and_wlvj:
 
         if not label=="_data": 
             if TString(label).Contains("_TTbar") or TString(label).Contains("_STop") :
-                tmp_scale_to_lumi=tmp_scale_to_lumi*self.rrv_wtagger_eff_reweight_forTop.getVal();
+                tmp_scale_to_lumi=tmp_scale_to_lumi*self.rrv_wtagger_eff_reweight_forT.getVal();
             else:
                 tmp_scale_to_lumi=tmp_scale_to_lumi*self.rrv_wtagger_eff_reweight_forV.getVal();
             tmp_scale_to_lumi=tmp_scale_to_lumi*self.btag_scale;
@@ -2748,9 +2792,9 @@ class doFit_wj_and_wlvj:
         #cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && nbjets<1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#before_cut
         #self.Make_Controlplots(cut,"bf_cut");
 
-        cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#signal region
+        cut="ungroomed_jet_pt>200 && jet_tau2tau1<%s && jet_mass_pr>=65 && jet_mass_pr<=105 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s && v_pt>%s && pfMET> %s && l_pt>%s && issignal"%(self.wtagger_cut, self.nPV_min,self.nPV_max, self.vpt_cut, self.pfMET_cut, self.lpt_cut);
         self.Make_Controlplots(cut,"before_nbjet");
-        cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=70 && jet_mass_pr<=100 && njets<2 && nbjetsSSVHE <1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#signal region
+        cut="ungroomed_jet_pt>200 && jet_tau2tau1<%s && jet_mass_pr>=65 && jet_mass_pr<=105 && nbjets_csvm_veto <1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s && v_pt>%s && pfMET> %s && l_pt>%s  && issignal"%(self.wtagger_cut, self.nPV_min,self.nPV_max, self.vpt_cut, self.pfMET_cut, self.lpt_cut);
         self.Make_Controlplots(cut,"signal_region");
 
         #cut="ungroomed_jet_pt>200 && jet_tau2tau1<0.525 && jet_mass_pr>=30 && jet_mass_pr<=70 && njets <1 && mass_lvj>400 && mass_lvj <1400 && nPV>=%s && nPV<=%s"%(self.nPV_min,self.nPV_max);#sb_lo
@@ -2772,19 +2816,27 @@ class doFit_wj_and_wlvj:
         self.make_controlplot("mvaMET",cut,tag,25,0,500,xtitle="mvaMET",ytitle="Events",logy=0 );
         self.make_controlplot("nPV",cut,tag,40,0,40,xtitle="nPV",ytitle="Events",logy=0 );
         self.make_controlplot("jet_tau2tau1",cut,tag,50,0,1,xtitle="jet_tau2tau1",ytitle="Events",logy=0 );
-        self.make_controlplot("nbjets",cut,tag,5,-0.5,4.5,xtitle="number of b-jets",ytitle="Events",logy=0 );
+        #self.make_controlplot("nbjets",cut,tag,5,-0.5,4.5,xtitle="number of b-jets",ytitle="Events",logy=0 );
         self.make_controlplot("nbjetsCSV",cut,tag,5,-0.5,4.5,xtitle="number of b-jets(CSV)",ytitle="Events",logy=0 );
+        self.make_controlplot("nbjets_csvm_veto",cut,tag,5,-0.5,4.5,xtitle="number of b-jets(CSVM)",ytitle="Events",logy=0 );
+        self.make_controlplot("nbjets_csvm_veto_clean",cut,tag,5,-0.5,4.5,xtitle="number of b-jets(CSVM+DR)",ytitle="Events",logy=0 );
+        self.make_controlplot("nbjets_ssvhem_veto_clean",cut,tag,5,-0.5,4.5,xtitle="number of b-jets(SSVHEM+DR)",ytitle="Events",logy=0 );
         self.make_controlplot("nbjetsSSVHE",cut,tag,5,-0.5,4.5,xtitle="number of b-jets(SSVHE)",ytitle="Events",logy=0 );
         self.make_controlplot("njets",cut,tag,5,-0.5,4.5,xtitle="number of jets",ytitle="Events",logy=0 );
  
     ######## ++++++++++++++
     def make_controlplot(self,variable,cut,tag,nbin,min,max,xtitle="",ytitle="",logy=0 ):
-        #weight_mc="totalEventWeight";
-        weight_mc="totalEventWeight*%s"%(self.rrv_wtagger_eff_reweight_forV.getVal());#little error rrv_wtagger_eff_reweight_forTop
+        weight_mc_forV="totalEventWeight*%s"%(self.rrv_wtagger_eff_reweight_forV.getVal());#little error rrv_wtagger_eff_reweight_forV
+        weight_mc_forT="totalEventWeight*%s"%(self.rrv_wtagger_eff_reweight_forT.getVal());#little error rrv_wtagger_eff_reweight_forT
+        weight_mc_forG="totalEventWeight"; #General
 
-        weightcut_mc="(%s)*(%s)"%(weight_mc,cut);
+        weightcut_mc_forV="(%s)*(%s)"%(weight_mc_forV,cut);
+        weightcut_mc_forT="(%s)*(%s)"%(weight_mc_forT,cut);
+        weightcut_mc_forG="(%s)*(%s)"%(weight_mc_forG,cut);
         weightcut_data="%s"%(cut);
-        print "weightcut_mc="+weightcut_mc;
+        print "weightcut_mc_forV="+weightcut_mc_forV;
+        print "weightcut_mc_forT="+weightcut_mc_forT;
+        print "weightcut_mc_forG="+weightcut_mc_forG;
         hist_data =TH1D("hist_data","hist_data"+";%s;%s"%(xtitle,ytitle),nbin,min,max);
         hist_Signal =TH1D("hist_Signal","hist_Signal"+";%s;%s"%(xtitle,ytitle),nbin,min,max);
         hist_WJets=TH1D("hist_WJets","hist_WJets"+";%s;%s"%(xtitle,ytitle),nbin,min,max);
@@ -2814,15 +2866,15 @@ class doFit_wj_and_wlvj:
         tree_VV =TChain("otree");      tree_VV.Add(self.file_Directory+self.file_VV_mc);
 
         tree_data.Draw("%s >> hist_data"%(variable), weightcut_data);
-        tree_Signal.Draw("%s >> hist_Signal"%(variable), weightcut_mc);
-        tree_WJets.Draw("%s >> hist_WJets"%(variable), weightcut_mc);
-        tree_TTbar.Draw("%s >> hist_TTbar"%(variable), weightcut_mc);
-        tree_STop.Draw("%s >> hist_STop"%(variable), weightcut_mc);
-        tree_VV.Draw("%s >> hist_VV"%(variable), weightcut_mc);
+        tree_Signal.Draw("%s >> hist_Signal"%(variable), weightcut_mc_forV);
+        tree_WJets.Draw("%s >> hist_WJets"%(variable), weightcut_mc_forG);
+        tree_TTbar.Draw("%s >> hist_TTbar"%(variable), weightcut_mc_forT);
+        tree_STop.Draw("%s >> hist_STop"%(variable), weightcut_mc_forT);
+        tree_VV.Draw("%s >> hist_VV"%(variable), weightcut_mc_forV);
 
         hist_TotalMC.Add(hist_WJets); hist_TotalMC.Add(hist_TTbar); hist_TotalMC.Add(hist_STop); hist_TotalMC.Add(hist_VV);
 
-        canvas_controlplot = TCanvas("canvas_controlplot","canvas_controlplot",1000,800);
+        canvas_controlplot = TCanvas("canvas_controlplot"+variable,"canvas_controlplot"+variable,1000,800);
         canvas_controlplot.cd();
         hist_data.GetYaxis().SetRangeUser(1e-2,TMath.Max(hist_data.GetMaximum(),hist_TotalMC.GetMaximum())*1.2);
         hist_data.Draw("e");
@@ -3330,7 +3382,7 @@ class doFit_wj_and_wlvj:
             datacard_out.write( "\nWJ_norm gmN %0.3f     -  %0.3f           -      -        -"%(self.number_WJets_insideband, getattr(self, "datadriven_alpha_WJets_%s"%(mode)) ) )
         else:
             datacard_out.write( "\nWJ_norm_%s lnN     -         -             %0.3f    -       -       -"%(self.channel, 1+ self.workspace4limit_.var("rate_WJets_for_unbin").getError()/self.workspace4limit_.var("rate_WJets_for_unbin").getVal() ) );
-        datacard_out.write( "\nTop_norm_%s lnN    -         -             -        %0.3f   %0.3f   -"%(self.channel, 1+self.rrv_wtagger_eff_reweight_forTop.getError()/self.rrv_wtagger_eff_reweight_forTop.getVal(), 1+self.rrv_wtagger_eff_reweight_forTop.getError()/self.rrv_wtagger_eff_reweight_forTop.getVal() ) );
+        datacard_out.write( "\nTop_norm_%s lnN    -         -             -        %0.3f   %0.3f   -"%(self.channel, 1+self.rrv_wtagger_eff_reweight_forT.getError()/self.rrv_wtagger_eff_reweight_forT.getVal(), 1+self.rrv_wtagger_eff_reweight_forT.getError()/self.rrv_wtagger_eff_reweight_forT.getVal() ) );
         datacard_out.write( "\nwtagger_%s lnN     %0.3f     %0.3f         -        -       -       %0.3f"%(self.channel, 1+self.rrv_wtagger_eff_reweight_forV.getError()/self.rrv_wtagger_eff_reweight_forV.getVal(), 1+self.rrv_wtagger_eff_reweight_forV.getError()/self.rrv_wtagger_eff_reweight_forV.getVal(), 1+self.rrv_wtagger_eff_reweight_forV.getError()/self.rrv_wtagger_eff_reweight_forV.getVal() ) );
         datacard_out.write( "\nbtagger_%s lnN     %0.3f     %0.3f         -        %0.3f   %0.3f   %0.3f"%(self.channel, 1+self.btag_scale_uncertainty, 1+self.btag_scale_uncertainty, 1+self.btag_scale_uncertainty, 1+self.btag_scale_uncertainty, 1+self.btag_scale_uncertainty ) );
         datacard_out.write( "\n#JetMass_%s lnN     -         -             %0.3f    %0.3f   %0.3f   %0.3f"%(self.channel, 1+self.WJets_normlization_uncertainty_from_jet_mass, 1+self.TTbar_normlization_uncertainty_from_jet_mass, 1+self.STop_normlization_uncertainty_from_jet_mass, 1+self.VV_normlization_uncertainty_from_jet_mass ) )
@@ -3339,7 +3391,7 @@ class doFit_wj_and_wlvj:
         if mode == "unbin":
             for i in range(len(params_list)):
                 if TString(params_list[i].GetName()).Contains("Deco_TTbar_signal_region"):
-                    datacard_out.write( "\n%s param  %0.1f  %0.1f "%( params_list[i].GetName(), params_list[i].getVal(), params_list[i].getError() ) ) 
+                    datacard_out.write( "\n#%s param  %0.1f  %0.1f "%( params_list[i].GetName(), params_list[i].getVal(), params_list[i].getError() ) ) 
                 else:
                     datacard_out.write( "\n%s param  %0.1f  %0.1f "%( params_list[i].GetName(), params_list[i].getVal(), params_list[i].getError() ) ) 
         if mode == "counting":
@@ -3363,8 +3415,8 @@ class doFit_wj_and_wlvj:
         getattr(self.workspace4limit_,"import")(self.workspace4fit_.var("rrv_number_TTbar_signal_region_%s_mlvj"%(self.channel)).clone("rate_TTbar_for_unbin"));
         getattr(self.workspace4limit_,"import")(self.workspace4fit_.var("rrv_number_STop_signal_region_%s_mlvj"%(self.channel)).clone("rate_STop_for_unbin"));
         self.workspace4limit_.var("rate_VV_for_unbin").setError(self.workspace4limit_.var("rate_VV_for_unbin").getVal()*TMath.Sqrt( self.lumi_uncertainty*self.lumi_uncertainty  + self.rrv_wtagger_eff_reweight_forV.getError()/self.rrv_wtagger_eff_reweight_forV.getVal()*self.rrv_wtagger_eff_reweight_forV.getError()/self.rrv_wtagger_eff_reweight_forV.getVal() +self.XS_VV_uncertainty*self.XS_VV_uncertainty )    );
-        self.workspace4limit_.var("rate_STop_for_unbin").setError(self.workspace4limit_.var("rate_STop_for_unbin").getVal()*TMath.Sqrt( self.lumi_uncertainty*self.lumi_uncertainty  + self.rrv_wtagger_eff_reweight_forTop.getError()/self.rrv_wtagger_eff_reweight_forTop.getVal()*self.rrv_wtagger_eff_reweight_forTop.getError()/self.rrv_wtagger_eff_reweight_forTop.getVal() +self.XS_STop_uncertainty*self.XS_STop_uncertainty )    );
-        self.workspace4limit_.var("rate_TTbar_for_unbin").setError(self.workspace4limit_.var("rate_TTbar_for_unbin").getVal()*TMath.Sqrt( self.lumi_uncertainty*self.lumi_uncertainty  + self.rrv_wtagger_eff_reweight_forTop.getError()/self.rrv_wtagger_eff_reweight_forTop.getVal()*self.rrv_wtagger_eff_reweight_forTop.getError()/self.rrv_wtagger_eff_reweight_forTop.getVal() )) #+self.XS_TTbar_uncertainty*self.XS_TTbar_uncertainty )    );
+        self.workspace4limit_.var("rate_STop_for_unbin").setError(self.workspace4limit_.var("rate_STop_for_unbin").getVal()*TMath.Sqrt( self.lumi_uncertainty*self.lumi_uncertainty  + self.rrv_wtagger_eff_reweight_forT.getError()/self.rrv_wtagger_eff_reweight_forT.getVal()*self.rrv_wtagger_eff_reweight_forT.getError()/self.rrv_wtagger_eff_reweight_forT.getVal() +self.XS_STop_uncertainty*self.XS_STop_uncertainty )    );
+        self.workspace4limit_.var("rate_TTbar_for_unbin").setError(self.workspace4limit_.var("rate_TTbar_for_unbin").getVal()*TMath.Sqrt( self.lumi_uncertainty*self.lumi_uncertainty  + self.rrv_wtagger_eff_reweight_forT.getError()/self.rrv_wtagger_eff_reweight_forT.getVal()*self.rrv_wtagger_eff_reweight_forT.getError()/self.rrv_wtagger_eff_reweight_forT.getVal() )) #+self.XS_TTbar_uncertainty*self.XS_TTbar_uncertainty )    );
  
         getattr(self.workspace4limit_,"import")(self.workspace4fit_.data("rdataset_data_signal_region_%s_mlvj"%(self.channel)).Clone("data_obs_%s"%(self.channel)))
         if mode=="sideband_correction_method1":
