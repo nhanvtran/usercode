@@ -25,20 +25,22 @@ methods:
 initializeLoadPhase() 
 	-- initializes chip for load mode
 loadUniformPatterns(row, col, iVal, disableInputs = 1)
-	-- puts the value iVal into all 4 layers of row/co; disableInputs are 1 by default which means the road is ON, user can set to 0 to disable that road
+	-- puts the value iVal into all 4 layers of row/co; disableInputs are 1 by default 
+        which means the road is ON, user can set to 0 to disable that road
 loadSinglePattern(row, col, iVal, disableInputs = 1)
-	-- same as 'loadUniformPatterns', but 'iVal' is a python list of length 4 and different values can be input per layer
-
+	-- same as 'loadUniformPatterns', but 'iVal' is a python list of length 4 and different 
+        values can be input per layer
 initializeRunPhase(logic = [1,1,1,1])
-	-- initializes chip for run mode, by default the logic is [1,1,1,1] which means miss0, miss1, miss2, requireLayerA are all enabled, user can change the chip majority logic
+	-- initializes chip for run mode, by default the logic is [1,1,1,1] which means 
+        miss0, miss1, miss2, requireLayerA are all enabled, user can change the chip majority logic
 checkPattern(pattern)
-	-- in run mode, searches for 'pattern' where 'pattern' is a python list of length 4
-
-readOutMode()
-	-- reads out chip, creates 128 cycles reading out each row
+	-- in run mode, searches for 'pattern' where 'pattern' is a python list of length 4,
+        if 'iVal[i]' is less than 0, the input is disabled
+readOutMode(logic = [-99,-99,-99,-99])
+	-- reads out chip, creates 128 cycles reading out each row; 
+        default logic is the same set when initializing run phase, but can be changed
 close()
 	-- closes the ROOT file
-
 getFilename()
 	-- gets the name of the ROOT file
 

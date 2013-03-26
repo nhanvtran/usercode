@@ -14,13 +14,21 @@ class inputBuilder:
         self.iInputA = [];
         self.iInputC = [];
         self.iInputB = [];
-        self.iInputD = [];        
+        self.iInputD = [];   
+        self.iCamStateA = [];
+        self.iCamStateB = [];
+        self.iCamStateC = [];
+        self.iCamStateD = [];           
         self.iDataOut = [];                
         for i in range(128):
             self.iInputA.append( [0]*32 );
             self.iInputB.append( [0]*32 );                
             self.iInputC.append( [0]*32 );                
             self.iInputD.append( [0]*32 );   
+            self.iCamStateA.append( [0]*32 );
+            self.iCamStateB.append( [0]*32 );                
+            self.iCamStateC.append( [0]*32 );                
+            self.iCamStateD.append( [0]*32 );   
             self.iDataOut.append( [0]*32 );                        
 
         # branches
@@ -189,7 +197,7 @@ class inputBuilder:
         #print self.DataOut
 
     # -------------------
-    # loadUniformPatterns
+    # loadSinglePattern
     def loadSinglePattern(self, row, col, iVal, disableInputs = 1):
         #print "loading random patterns..."
         
@@ -285,15 +293,21 @@ class inputBuilder:
         self.LatchData[0] = 0;
         self.Primary[0] = 1;
         self.EventReset[0] = 1;
-        
+        for i in range(128):
+            for j in range(32):
+                self.iCamStateA[i][j] = 0;
+                self.iCamStateB[i][j] = 0;
+                self.iCamStateC[i][j] = 0;
+                self.iCamStateD[i][j] = 0;
+
         self.InputA[0] = 0;
         self.InputB[0] = 0;
         self.InputC[0] = 0;
         self.InputD[0] = 0;
-        #self.InputA_bit0[0] = 1;
-        #self.InputB_bit0[0] = 1;
-        #self.InputC_bit0[0] = 1;
-        #self.InputD_bit0[0] = 1;
+        self.InputA_bit0[0] = 1;
+        self.InputB_bit0[0] = 1;
+        self.InputC_bit0[0] = 1;
+        self.InputD_bit0[0] = 1;
         
         self.Miss0[0] = logic[0];
         self.Miss1[0] = logic[1];
@@ -328,7 +342,15 @@ class inputBuilder:
             self.InputB[0] = pattern[1];
             self.InputC[0] = pattern[2];
             self.InputD[0] = pattern[3];
-
+            if pattern[0] >= 0: self.InputA_bit0[0] = 1;
+            else: self.InputA_bit0[0] = 0;
+            if pattern[1] >= 0: self.InputB_bit0[0] = 1;
+            else: self.InputB_bit0[0] = 0;
+            if pattern[2] >= 0: self.InputC_bit0[0] = 1;
+            else: self.InputC_bit0[0] = 0;
+            if pattern[3] >= 0: self.InputD_bit0[0] = 1;
+            else: self.InputD_bit0[0] = 0;
+            
             self.CheckData[0] = 0;
             self.CompareNow[0] = 0;                    
             for i in range(32): self.DataOut[i] = 0;
@@ -341,23 +363,62 @@ class inputBuilder:
             #self.counter[0] = self.cycleCtr;
             #self.cycleCtr += 1;
             #self.tree.Fill();
-                
-            self.checkPatternInternally( pattern );
+            self.setInternalCams( pattern );
+            self.checkLogicInternally();
 
             #print self.DataOut
 
-                
+    # setInternalCams
+    def setInternalCams(self, pattern):
+        
+        for i in range(128):
+            for j in range(32):
+                if self.iInputA[i][j] == pattern[0]: self.iCamStateA[i][j] = 1;
+                if self.iInputB[i][j] == pattern[1]: self.iCamStateB[i][j] = 1;
+                if self.iInputC[i][j] == pattern[2]: self.iCamStateC[i][j] = 1;
+                if self.iInputD[i][j] == pattern[3]: self.iCamStateD[i][j] = 1;
+
     # checkPatternInternally
-    def checkPatternInternally(self, pattern):
+    def checkLogicInternally(self):
                 
         for i in range(128):
             for j in range(32):
-                if not self.iDataOut[i][j] == 1: #already matched
-                    iA = self.iInputA[i][j];
-                    iB = self.iInputB[i][j];
-                    iC = self.iInputC[i][j];
-                    iD = self.iInputD[i][j];
-                    self.iDataOut[i][j] = self.checkLogic( pattern, iA, iB, iC, iD ); 
+                
+                missCtr = 0;
+                missCtrA = 0;                
+                if self.iCamStateA[i][j] == 1: 
+                    missCtr += 1;
+                    missCtrA += 1;                
+                if self.iCamStateB[i][j] == 1: missCtr += 1;
+                if self.iCamStateC[i][j] == 1: missCtr += 1;
+                if self.iCamStateD[i][j] == 1: missCtr += 1;                
+                
+                bLogic = False;    
+                if (missCtr == 4 and self.majorityLogic[0] == 1) or (missCtr == 3 and self.majorityLogic[1] == 1) or (missCtr == 2 and self.majorityLogic[2] == 1) or (missCtrA == 1 and self.majorityLogic[3] == 1): bLogic = True;
+
+                if bLogic: self.iDataOut[i][j] = 1;
+
+    # checkPatternInternally
+    #    def checkLogic(self, pattern, iA, iB, iC, iD):
+    #        
+    #        logic = 0;
+    #        
+    #        
+    #        
+    #        missCtr = 0;
+    #        missCtrA = 0;
+    #        if pattern[0] == iA: 
+    #            missCtr += 1;
+    #            missCtrA += 1;
+    #        if pattern[1] == iB: missCtr += 1;
+    #        if pattern[2] == iC: missCtr += 1;
+    #        if pattern[3] == iD: missCtr += 1;
+    #        
+    #        bLogic = False;    
+    #        if (missCtr == 4 and self.majorityLogic[0] == 1) or (missCtr == 3 and self.majorityLogic[1] == 1) or (missCtr == 2 and self.majorityLogic[2] == 1) or (missCtrA == 1 and self.majorityLogic[3] == 1): bLogic = True;
+    #        
+    #        if bLogic: logic = 1;
+    #        return logic;
 
     # loadRowChecker
     def doRowChecker( self, row ):
@@ -375,35 +436,22 @@ class inputBuilder:
         self.CompareNow[0] = 0;                    
         for i in range(32): self.DataOut[i] = 0;
 
-
-    # checkPatternInternally
-    def checkLogic(self, pattern, iA, iB, iC, iD):
-        
-        logic = 0;
-
-        missCtr = 0;
-        missCtrA = 0;
-        if pattern[0] == iA: 
-            missCtr += 1;
-            missCtrA += 1;
-        if pattern[1] == iB: missCtr += 1;
-        if pattern[2] == iC: missCtr += 1;
-        if pattern[3] == iD: missCtr += 1;
-
-        bLogic = False;    
-        if (missCtr == 4 and self.majorityLogic[0] == 1) or (missCtr == 3 and self.majorityLogic[1] == 1) or (missCtr == 2 and self.majorityLogic[2] == 1) or (missCtrA == 1 and self.majorityLogic[3] == 1): bLogic = True;
-        
-        if bLogic: logic = 1;
-        return logic;
-
     ##################################################
     # -------------------
     # readOutMode
-    def readOutMode(self):
+    def readOutMode(self, logic = [-99,-99,-99,-99]):
 
+        # logic doesn't change unless inputted
+        if logic[0] >= 0 and logic[1] >= 0 and logic[2] >= 0 and logic[3] >= 0:
+            self.Miss0[0] = logic[0];
+            self.Miss1[0] = logic[1];
+            self.Miss2[0] = logic[2];
+            self.RequireLayerA[0] = logic[3];
+            self.majorityLogic = logic;        
+        
         self.CheckData[0] = 1;
         self.ColAdr[0] = 0; #cols 0-31
-        self.RunMode[0] = 0;
+        self.RunMode[0] = 1
         self.LatchData[0] = 0;
         self.Primary[0] = 0;
         self.EventReset[0] = 0;
@@ -416,19 +464,19 @@ class inputBuilder:
         self.InputC_bit0[0] = 1;
         self.InputD_bit0[0] = 1;
         
-        self.Miss0[0] = 1;
-        self.Miss1[0] = 1;
-        self.Miss2[0] = 1;
-        self.RequireLayerA[0] = 1;
+        self.Miss0[0] = self.majorityLogic[0];
+        self.Miss1[0] = self.majorityLogic[1];
+        self.Miss2[0] = self.majorityLogic[2];
+        self.RequireLayerA[0] = self.majorityLogic[3];
 
+        self.checkLogicInternally();
+        
         for row in range(128):
             self.RowAdr[0] = row;
             for i in range(32): self.DataOut[i] = self.iDataOut[row][i];
             self.counter[0] = self.cycleCtr;
             self.cycleCtr += 1;
             self.tree.Fill();
-            
-            
 
     ##################################################
     # -------------------

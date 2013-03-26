@@ -38,14 +38,13 @@ if __name__ == '__main__':
         nRows = 128;
         nColumns = 32;
         tmpInput = inputBuilder("testInputSingle/testSingle.root");
+        tmpInput.initializeLoadPhase();
         for i in range(nRows):
             for j in range(nColumns):
-                tmpInput.initializeLoadPhase();
-                tmpInput.loadUniformPatterns(i, j, 8); # row, col, input value
-                #tmpInput.doRowChecker( i ); # cheat mode, look at a particular row
-                
+                tmpInput.loadUniformPatterns(i, j, 8); # row, col, input value                
         tmpInput.initializeRunPhase( [1,0,0,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
         tmpInput.checkPattern( [8,8,8,8] ); # run mode, look for a single pattern
+        tmpInput.readOutMode();        
         tmpInput.close();
 
         tmpVisualizer = inputVisualizer( tmpInput.getFilename() );
@@ -60,7 +59,6 @@ if __name__ == '__main__':
         tmpInput_disabled.loadUniformPatterns(0, 0, 2, 0); # row, col, input value, disable road
         tmpInput_disabled.initializeRunPhase( [1,0,0,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
         tmpInput_disabled.checkPattern( [2,2,2,2] ); # run mode, look for a single pattern
-        #tmpInput_disabled.doRowChecker( 0 ); # cheat mode, look at a particular row
         tmpInput_disabled.readOutMode();
         tmpInput_disabled.close();
             
@@ -89,6 +87,7 @@ if __name__ == '__main__':
             for j in range(nColumns):
                 tmpWalking.checkPattern( [ctr,ctr,ctr,ctr] ); # run mode, look for a single pattern
                 ctr += 1;
+        tmpWalking.readOutMode();
         tmpWalking.close();
             
         tmpWalkingVisualizer = inputVisualizer( tmpWalking.getFilename() );
@@ -105,6 +104,7 @@ if __name__ == '__main__':
         tmpInput_miss0.initializeRunPhase( [1,0,0,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
         tmpInput_miss0.checkPattern( [2,2,2,2] ); # run mode, look for a single pattern
         #tmpInput_miss0.doRowChecker( 0 ); # cheat mode, look at a particular row
+        tmpInput_miss0.readOutMode();                
         tmpInput_miss0.close();
         tmpVisualizer_miss0 = inputVisualizer( tmpInput_miss0.getFilename() );
         tmpVisualizer_miss0.writeToText( "testMajorityLogic/tmpInput_miss0.txt" );
@@ -113,8 +113,9 @@ if __name__ == '__main__':
         tmpInput_miss1.initializeLoadPhase();
         tmpInput_miss1.loadSinglePattern(0, 0, [2,99,2,2]); # row, col, input value
         tmpInput_miss1.initializeRunPhase( [0,1,0,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
-        tmpInput_miss1.checkPattern( [2,0,2,2] ); # run mode, look for a single pattern
+        tmpInput_miss1.checkPattern( [2,999,2,2] ); # run mode, look for a single pattern
         #tmpInput_miss1.doRowChecker( 0 ); # cheat mode, look at a particular row
+        tmpInput_miss1.readOutMode();                
         tmpInput_miss1.close();
         tmpVisualizer_miss1 = inputVisualizer( tmpInput_miss1.getFilename() );
         tmpVisualizer_miss1.writeToText( "testMajorityLogic/tmpInput_miss1.txt" );
@@ -125,6 +126,7 @@ if __name__ == '__main__':
         tmpInput_miss2.initializeRunPhase( [0,0,1,0] ); # choose majority logic (miss0, miss1, miss2, layerA)
         tmpInput_miss2.checkPattern( [2,999,999,2] ); # run mode, look for a single pattern
         #tmpInput_miss2.doRowChecker( 0 ); # cheat mode, look at a particular row
+        tmpInput_miss2.readOutMode();        
         tmpInput_miss2.close();
         tmpVisualizer_miss2 = inputVisualizer( tmpInput_miss2.getFilename() );
         tmpVisualizer_miss2.writeToText( "testMajorityLogic/tmpInput_miss2.txt" );
@@ -133,7 +135,7 @@ if __name__ == '__main__':
         tmpInput_layerA.initializeLoadPhase();
         tmpInput_layerA.loadSinglePattern(0, 0, [2,99,99,99]); # row, col, input value
         tmpInput_layerA.initializeRunPhase( [0,0,0,1] ); # choose majority logic (miss0, miss1, miss2, layerA)
-        tmpInput_layerA.checkPattern( [2,0,0,0] ); # run mode, look for a single pattern
+        tmpInput_layerA.checkPattern( [2,999,999,999] ); # run mode, look for a single pattern
         #tmpInput_layerA.doRowChecker( 0 ); # cheat mode, look at a particular row
         tmpInput_layerA.readOutMode();
         tmpInput_layerA.close();
