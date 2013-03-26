@@ -69,7 +69,6 @@ class sampleWrapperClass:
         if file.find("HWW") > 0 and file.find("800") > 0: self.SignalMass_ = 800;
         if file.find("HWW") > 0 and file.find("900") > 0: self.SignalMass_ = 900;    
         if file.find("HWW") > 0 and file.find("1000") > 0: self.SignalMass_ = 1000;   
-        self.SignalMass_ = -1;
         self.FitSMSignal = False;
         self.FitSMSignal_mean = -1;
         self.FitSMSignal_gamma = -1;
@@ -208,13 +207,18 @@ class sampleWrapperClass:
         nbjets_cvsl_ = array( 'f', [ 0. ] );
         nbjets_cvsm_ = array( 'f', [ 0. ] );
         nbjets_ssvhem_ = array( 'f', [ 0. ] );
+
         nbjets_csvl_veto_ = array( 'f', [ 0. ] );
         nbjets_csvm_veto_ = array( 'f', [ 0. ] );
         nbjets_csvt_veto_ = array( 'f', [ 0. ] );
         nbjets_ssvhem_veto_ = array( 'f', [ 0. ] );
-        
+
+        nbjets_csvl_veto_cleaned_ = array( 'f', [ 0. ] );
+        nbjets_csvm_veto_cleaned_ = array( 'f', [ 0. ] );
+        nbjets_csvt_veto_cleaned_ = array( 'f', [ 0. ] );
+        nbjets_ssvhem_veto_cleaned_ = array( 'f', [ 0. ] );
+
         nbjetsCSV_ = array( 'f', [ 0. ] );
-        nbjetsCSVM_ = array( 'f', [ 0. ] );
         nbjetsSSVHE_ = array( 'f', [ 0. ] );        
         njets_ = array( 'f', [ 0. ] );        
         jet_pt1frac_ = array( 'f', [ 0. ] );
@@ -271,7 +275,7 @@ class sampleWrapperClass:
         otree.Branch("cps_Weight_H900", cps_Weight_H900_ , "cps_Weight_H900/F");
         otree.Branch("cps_Weight_H1000", cps_Weight_H1000_ , "cps_Weight_H1000/F");
 
-        otree.Branch("jet_grsens_ft", jet_grsens_ft_ , "jet_grsens_ft/F");
+       otree.Branch("jet_grsens_ft", jet_grsens_ft_ , "jet_grsens_ft/F");
         otree.Branch("jet_grsens_tr", jet_grsens_tr_ , "jet_grsens_tr/F");
         otree.Branch("jet_massdrop_pr", jet_massdrop_pr_ , "jet_massdrop_pr/F");
         otree.Branch("jet_qjetvol", jet_qjetvol_ , "jet_qjetvol/F");
@@ -286,12 +290,18 @@ class sampleWrapperClass:
         otree.Branch("nbjets_cvsl", nbjets_cvsl_ , "nbjets_cvsl/F");
         otree.Branch("nbjets_cvsm", nbjets_cvsm_ , "nbjets_cvsm/F");
         otree.Branch("nbjets_ssvhem", nbjets_ssvhem_ , "nbjets_ssvhem/F");
+
         otree.Branch("nbjets_csvl_veto", nbjets_csvl_veto_ , "nbjets_csvl_veto/F");
         otree.Branch("nbjets_csvm_veto", nbjets_csvm_veto_ , "nbjets_csvm_veto/F");        
         otree.Branch("nbjets_csvt_veto", nbjets_csvt_veto_ , "nbjets_csvt_veto/F");        
         otree.Branch("nbjets_ssvhem_veto", nbjets_ssvhem_veto_ , "nbjets_ssvhem_veto/F");                
+
+        otree.Branch("nbjets_csvl_veto_cleaned",nbjets_csvl_veto_cleaned_, "nbjets_csvl_veto_cleaned/F");
+        otree.Branch("nbjets_csvm_veto_cleaned", nbjets_csvm_veto_cleaned_ , "nbjets_csvm_veto_cleaned/F");        
+        otree.Branch("nbjets_csvt_veto_cleaned", nbjets_csvt_veto_cleaned_ , "nbjets_csvt_veto_cleaned/F");        
+        otree.Branch("nbjets_ssvhem_veto_cleaned", nbjets_ssvhem_veto_cleaned_ , "nbjets_ssvhem_veto_cleaned/F");                
+
         otree.Branch("nbjetsCSV", nbjetsCSV_ , "nbjetsCSV_/F");
-        otree.Branch("nbjetsCSVM", nbjetsCSVM_ , "nbjetsCSVM/F");
         otree.Branch("nbjetsSSVHE", nbjetsSSVHE_ , "nbjetsSSVHE_/F");        
         otree.Branch("njets", njets_ , "njets/F");
         otree.Branch("jet_pt1frac", jet_pt1frac_ , "jet_pt1frac/F");
@@ -809,17 +819,21 @@ class sampleWrapperClass:
                 jet_planarlow07_[0] = getattr( self.InputTree_, prefix + "_planarflow07");
                 
 #                nbjets_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets" );
-                nbjets_cvsl_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl" );
-                nbjets_cvsm_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm" );
+
+                nbjets_cvsl_[0]   = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl" );
+                nbjets_cvsm_[0]   = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm" );
                 nbjets_ssvhem_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem" );
-                nbjets_csvl_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl_veto" );
-                nbjets_csvm_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm_veto" );
-                nbjets_ssvhem_veto_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem_veto" );
+
+                nbjets_csvl_veto_cleaned_[0]   = getattr( self.InputTree_, "GroomedJet_numberbjets_csvl_veto" );
+                nbjets_csvm_veto_cleaned_[0]   = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm_veto" );
+                nbjets_ssvhem_veto_cleaned_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem_veto" );
 
                 index_ak5_cvst = array( 'f', [0.] );
-                nbjets_csvt_veto_[0] = 0. ;
+
+                nbjets_csvt_veto_cleaned_[0] = 0. ;
                 dR_lj = 0. ;
                 j_ca8_eta = 0 ; j_ca8_phi = 0;
+
                 if getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200:
                     j_ca8_eta = getattr( self.InputTree_, "GroomedJet_CA8_eta" )[0]
  
@@ -841,15 +855,24 @@ class sampleWrapperClass:
                             if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] > 0.898: index_ak5_cvst.append(i);
 
                
-                nbjets_csvt_veto_[0] = len(index_ak5_in_oppoHemi_csvt);
+                nbjets_csvt_veto_cleaned_[0] = len(index_ak5_in_oppoHemi_csvt);
+
 
                 nbjetsCSV_[0] =0 ;
-                nbjetsCSVM_[0] =0 ;
+                nbjets_csvl_veto_[0] = 0 ;
+                nbjets_csvm_veto_[0] = 0 ;
+                nbjets_csvt_veto_[0] = 0 ;
+
                 for i in range(0,6):
-                    if  getattr(self.InputTree_, "JetPFCor_bDiscriminatorCSV")[i] >=0.244 :nbjetsCSV_[0]=nbjetsCSV_[0]+1;
-                    if  getattr(self.InputTree_, "JetPFCor_bDiscriminatorCSV")[i] >=0.679 :nbjetsCSVM_[0]=nbjetsCSVM_[0]+1;
-                    #print i, getattr(self.InputTree_, "JetPFCor_bDiscriminatorCSV")[i], nbjetsCSV_[0];
-                nbjetsSSVHE_[0] = getattr( self.InputTree_, "numPFCorJetBTags");
+                    if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] >=0.244: nbjetsCSV_[0]=nbjetsCSV_[0]+1;
+                    if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] >=0.244: nbjets_csvl_veto_[0]=nbjets_csvl_veto_[0]+1;
+                    if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] >=0.679: nbjets_csvm_veto_[0]=nbjets_csvm_veto_[0]+1;
+                    if getattr( self.InputTree_, "JetPFCor_bDiscriminatorCSV" )[i] >=0.898: nbjets_csvt_veto_[0]=nbjets_csvt_veto_[0]+1;
+
+                    
+                nbjetsSSVHE_[0]      = getattr( self.InputTree_, "numPFCorJetBTags");
+                nbjets_ssvhem_veto_  = getattr( self.InputTree_, "numPFCorJetBTags");
+
                 
                 njets_[0] = getattr( self.InputTree_, "GroomedJet_numberjets" );
                 pt1FracVal = max( getattr( self.InputTree_, prefix + "_prsubjet1ptoverjetpt" ), getattr( self.InputTree_, prefix + "_prsubjet2ptoverjetpt" ) );
