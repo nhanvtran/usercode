@@ -6,7 +6,7 @@ import array
 import ROOT
 import ntpath
 
-from ROOT import gROOT, gStyle, gSystem, TLatex, TString, TF1,TFile,TLine, TLegend, TH1D,TH2D,THStack,TChain, TCanvas, TMatrixDSym, TMath, TText, TPad, RooFit, RooArgSet, RooArgList, RooArgSet, RooAbsData, RooAbsPdf, RooAddPdf, RooWorkspace, RooExtendPdf,RooCBShape, RooLandau, RooFFTConvPdf, RooGaussian, RooBifurGauss, RooArgusBG, RooDataSet, RooExponential,RooBreitWigner, RooVoigtian, RooNovosibirsk, RooRealVar,RooFormulaVar, RooDataHist, RooHistPdf,RooCategory, RooChebychev, RooSimultaneous, RooGenericPdf,RooConstVar, RooKeysPdf, RooHistPdf, RooEffProd, RooProdPdf, TIter, kTRUE, kFALSE, kGray, kRed, kDashed, kGreen,kAzure, kOrange, kBlack,kBlue,kYellow,kCyan, kMagenta, kWhite
+from ROOT import gROOT, gStyle, gSystem, TStyle, TLatex, TString, TF1,TFile,TLine, TLegend, TH1D,TH2D,THStack,TChain, TCanvas, TMatrixDSym, TMath, TText, TPad, RooFit, RooArgSet, RooArgList, RooArgSet, RooAbsData, RooAbsPdf, RooAddPdf, RooWorkspace, RooExtendPdf,RooCBShape, RooLandau, RooFFTConvPdf, RooGaussian, RooBifurGauss, RooArgusBG, RooDataSet, RooExponential,RooBreitWigner, RooVoigtian, RooNovosibirsk, RooRealVar,RooFormulaVar, RooDataHist, RooHistPdf,RooCategory, RooChebychev, RooSimultaneous, RooGenericPdf,RooConstVar, RooKeysPdf, RooHistPdf, RooEffProd, RooProdPdf, TIter, kTRUE, kFALSE, kGray, kRed, kDashed, kGreen,kAzure, kOrange, kBlack,kBlue,kYellow,kCyan, kMagenta, kWhite
 import subprocess
 from subprocess import Popen
 from optparse import OptionParser
@@ -18,10 +18,10 @@ from optparse import OptionParser
 
 import sys
 
-if os.path.isfile('tdrstyle.C'):
-   gROOT.ProcessLine('.L tdrstyle.C')
-   ROOT.setTDRStyle()
-   print "Found tdrstyle.C file, using this style."
+#if os.path.isfile('tdrstyle.C'):
+#   gROOT.ProcessLine('.L tdrstyle.C')
+#   ROOT.setTDRStyle()
+#   print "Found tdrstyle.C file, using this style."
 #   if os.path.isfile('CMSTopStyle.cc'):
 #      gROOT.ProcessLine('.L CMSTopStyle.cc')
 #      style = ROOT.CMSTopStyle()
@@ -64,6 +64,7 @@ from ROOT import draw_error_band, draw_error_band_extendPdf, draw_error_band_Dec
 
 class doFit_wj_and_wlvj:
     def __init__(self, in_channel="mu",in_higgs_sample="ggH600", in_mlvj_signal_region_min=500, in_mlvj_signal_region_max=700, in_mj_min=30, in_mj_max=140, in_mlvj_min=400., in_mlvj_max=1400., fit_model="ErfExp_v1", fit_model_alter="ErfPow_v1", input_workspace=None):
+        self.setTDRStyle();#set plots style
         print "Begin to fit"
 
         RooAbsPdf.defaultIntegratorConfig().setEpsRel(1e-9) ;
@@ -216,7 +217,7 @@ class doFit_wj_and_wlvj:
         if self.channel=="el":
             self.rrv_wtagger_eff_reweight_forT=RooRealVar("rrv_wtagger_eff_reweight_forT","rrv_wtagger_eff_reweight_forT",0.92); self.rrv_wtagger_eff_reweight_forT.setError(0.06*self.rrv_wtagger_eff_reweight_forT.getVal());
             #self.rrv_wtagger_eff_reweight_forV=RooRealVar("rrv_wtagger_eff_reweight_forV","rrv_wtagger_eff_reweight_forV",1.0); self.rrv_wtagger_eff_reweight_forV.setError(0.075*self.rrv_wtagger_eff_reweight_forV.getVal());
-            self.rrv_wtagger_eff_reweight_forV=RooRealVar("rrv_wtagger_eff_reweight_forV","rrv_wtagger_eff_reweight_forV",0.87); self.rrv_wtagger_eff_reweight_forV.setError(0.1*self.rrv_wtagger_eff_reweight_forV.getVal());
+            self.rrv_wtagger_eff_reweight_forV=RooRealVar("rrv_wtagger_eff_reweight_forV","rrv_wtagger_eff_reweight_forV",0.87); self.rrv_wtagger_eff_reweight_forV.setError(0.12*self.rrv_wtagger_eff_reweight_forV.getVal());
         print "wtagger efficiency correction for Top sample: %s +/- %s"%(self.rrv_wtagger_eff_reweight_forT.getVal(), self.rrv_wtagger_eff_reweight_forT.getError());
         print "wtagger efficiency correction for V   sample: %s +/- %s"%(self.rrv_wtagger_eff_reweight_forV.getVal(), self.rrv_wtagger_eff_reweight_forV.getError());
 
@@ -256,7 +257,7 @@ class doFit_wj_and_wlvj:
         self.QCDscale_ggH    =0.10; self.QCDscale_vbfH    =0.01;
         self.pdf_gg           =0.0; self.pdf_vbf          =0.0;
         self.hwwlnJ_pdfAcc_gg=0.03; self.hwwlnJ_pdfAcc_vbf=0.01;
-        # from twiki https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt8TeV,  
+        # from twiki https:#twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageAt8TeV,  
         if self.higgs_sample=="ggH600": 
             self.QCDscale_ggH =0.059;   self.QCDscale_vbfH=0.007
             self.pdf_gg       =0.095;   self.pdf_vbf      =0.036
@@ -296,6 +297,144 @@ class doFit_wj_and_wlvj:
         # shape parameter uncertainty
         self.FloatingParams=RooArgList("floatpara_list");
 
+    ##################### ---------------------------------------------------
+    def setTDRStyle(self):
+        tdrStyle =TStyle("tdrStyle","Style for P-TDR");
+        #For the canvas:
+        tdrStyle.SetCanvasBorderMode(0);
+        tdrStyle.SetCanvasColor(kWhite);
+        tdrStyle.SetCanvasDefH(600); #Height of canvas
+        tdrStyle.SetCanvasDefW(600); #Width of canvas
+        tdrStyle.SetCanvasDefX(0);   #POsition on screen
+        tdrStyle.SetCanvasDefY(0);
+      
+        #For the Pad:
+        tdrStyle.SetPadBorderMode(0);
+        #tdrStyle.SetPadBorderSize(Width_t size = 1);
+        tdrStyle.SetPadColor(kWhite);
+        tdrStyle.SetPadGridX(False);
+        tdrStyle.SetPadGridY(False);
+        tdrStyle.SetGridColor(0);
+        tdrStyle.SetGridStyle(3);
+        tdrStyle.SetGridWidth(1);
+      
+        #For the frame:
+        tdrStyle.SetFrameBorderMode(0);
+        tdrStyle.SetFrameBorderSize(1);
+        tdrStyle.SetFrameFillColor(0);
+        tdrStyle.SetFrameFillStyle(0);
+        tdrStyle.SetFrameLineColor(1);
+        tdrStyle.SetFrameLineStyle(1);
+        tdrStyle.SetFrameLineWidth(1);
+      
+        #For the histo:
+        #tdrStyle.SetHistFillColor(1);
+        #tdrStyle.SetHistFillStyle(0);
+        tdrStyle.SetHistLineColor(1);
+        tdrStyle.SetHistLineStyle(0);
+        tdrStyle.SetHistLineWidth(1);
+        #tdrStyle.SetLegoInnerR(Float_t rad = 0.5);
+        #tdrStyle.SetNumberContours(Int_t number = 20);
+      
+        tdrStyle.SetEndErrorSize(2);
+        # tdrStyle.SetErrorMarker(20);
+        tdrStyle.SetErrorX(0.);
+        
+        tdrStyle.SetMarkerStyle(20);
+      
+        #For the fit/function:
+        tdrStyle.SetOptFit(1);
+        tdrStyle.SetFitFormat("5.4g");
+        tdrStyle.SetFuncColor(2);
+        tdrStyle.SetFuncStyle(1);
+        tdrStyle.SetFuncWidth(1);
+      
+        #For the date:
+        tdrStyle.SetOptDate(0);
+        #tdrStyle.SetDateX(Float_t x = 0.01);
+        #tdrStyle.SetDateY(Float_t y = 0.01);
+      
+        #For the statistics box:
+        tdrStyle.SetOptFile(0);
+        tdrStyle.SetOptStat(0); #To display the mean and RMS:   SetOptStat("mr");
+        tdrStyle.SetStatColor(kWhite);
+        tdrStyle.SetStatFont(42);
+        tdrStyle.SetStatFontSize(0.025);
+        tdrStyle.SetStatTextColor(1);
+        tdrStyle.SetStatFormat("6.4g");
+        tdrStyle.SetStatBorderSize(1);
+        tdrStyle.SetStatH(0.1);
+        tdrStyle.SetStatW(0.15);
+        #tdrStyle.SetStatStyle(Style_t style = 1001);
+        #tdrStyle.SetStatX(Float_t x = 0);
+        #tdrStyle.SetStatY(Float_t y = 0);
+      
+        #Margins:
+        tdrStyle.SetPadTopMargin(0.05);
+        tdrStyle.SetPadBottomMargin(0.13);
+        tdrStyle.SetPadLeftMargin(0.18);
+        tdrStyle.SetPadRightMargin(0.06);
+      
+        #For the Global title:
+      
+        tdrStyle.SetOptTitle(0);
+        tdrStyle.SetTitleFont(42);
+        tdrStyle.SetTitleColor(1);
+        tdrStyle.SetTitleTextColor(1);
+        tdrStyle.SetTitleFillColor(10);
+        tdrStyle.SetTitleFontSize(0.05);
+        #tdrStyle.SetTitleH(0); #Set the height of the title box
+        #tdrStyle.SetTitleW(0); #Set the width of the title box
+        #tdrStyle.SetTitleX(0); #Set the position of the title box
+        #tdrStyle.SetTitleY(0.985); #Set the position of the title box
+        #tdrStyle.SetTitleStyle(Style_t style = 1001);
+        #tdrStyle.SetTitleBorderSize(2);
+      
+        #For the axis titles:      
+        tdrStyle.SetTitleColor(1, "XYZ");
+        tdrStyle.SetTitleFont(42, "XYZ");
+        tdrStyle.SetTitleSize(0.06, "XYZ");
+        #tdrStyle.SetTitleXSize(Float_t size = 0.02); #Another way to set the size?
+        #tdrStyle.SetTitleYSize(Float_t size = 0.02);
+        tdrStyle.SetTitleXOffset(0.9);
+        tdrStyle.SetTitleYOffset(1.5);
+        #tdrStyle.SetTitleOffset(1.1, "Y"); #Another way to set the Offset
+      
+        #For the axis labels:     
+        tdrStyle.SetLabelColor(1, "XYZ");
+        tdrStyle.SetLabelFont(42, "XYZ");
+        tdrStyle.SetLabelOffset(0.007, "XYZ");
+        tdrStyle.SetLabelSize(0.05, "XYZ");
+      
+        #For the axis:        
+        tdrStyle.SetAxisColor(1, "XYZ");
+        tdrStyle.SetStripDecimals(kTRUE);
+        tdrStyle.SetTickLength(0.03, "XYZ");
+        tdrStyle.SetNdivisions(510, "XYZ");
+        tdrStyle.SetPadTickX(1);  #To get tick marks on the opposite side of the frame
+        tdrStyle.SetPadTickY(1);
+      
+        #Change for log plots:
+        tdrStyle.SetOptLogx(0);
+        tdrStyle.SetOptLogy(0);
+        tdrStyle.SetOptLogz(0);
+      
+        #Postscript options:
+        tdrStyle.SetPaperSize(20.,20.);
+        #tdrStyle.SetLineScalePS(Float_t scale = 3);
+        #tdrStyle.SetLineStyleString(Int_t i, const char* text);
+        #tdrStyle.SetHeaderPS(const char* header);
+        #tdrStyle.SetTitlePS(const char* pstitle);
+      
+        #tdrStyle.SetBarOffset(Float_t baroff = 0.5);
+        #tdrStyle.SetBarWidth(Float_t barwidth = 0.5);
+        #tdrStyle.SetPaintTextFormat(const char* format = "g");
+        #tdrStyle.SetPalette(Int_t ncolors = 0, Int_t* colors = 0);
+        #tdrStyle.SetTimeOffset(Double_t toffset);
+        #tdrStyle.SetHistMinimumZero(kTRUE);
+      
+        tdrStyle.cd();
+      
     ##################### ---------------------------------------------------
     def make_Pdf(self, label, in_model_name, mass_spectrum="_mj", ConstraintsList=[]):
         if TString(mass_spectrum).Contains("_mj"): rrv_x = self.workspace4fit_.var("rrv_mass_j"); 
