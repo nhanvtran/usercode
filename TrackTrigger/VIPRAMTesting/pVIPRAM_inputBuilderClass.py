@@ -338,10 +338,15 @@ class inputBuilder:
             self.MLpreCh[0] = 1;
             self.EventReset[0] = 0;
 
-            self.InputA[0] = pattern[0];
-            self.InputB[0] = pattern[1];
-            self.InputC[0] = pattern[2];
-            self.InputD[0] = pattern[3];
+            if pattern[0] >= 0: self.InputA[0] = pattern[0];
+            else: self.InputA[0] = 0;
+            if pattern[1] >= 0: self.InputB[0] = pattern[1];
+            else: self.InputB[0] = 0;
+            if pattern[2] >= 0: self.InputC[0] = pattern[2];
+            else: self.InputC[0] = 0;
+            if pattern[3] >= 0: self.InputD[0] = pattern[3];
+            else: self.InputD[0] = 0;
+
             if pattern[0] >= 0: self.InputA_bit0[0] = 1;
             else: self.InputA_bit0[0] = 0;
             if pattern[1] >= 0: self.InputB_bit0[0] = 1;

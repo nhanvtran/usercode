@@ -42,6 +42,7 @@ if __name__ == '__main__':
     testA.readOutMode(); # keep same logic 'miss0' when reading out
     testA.close();
     visuA = inputVisualizer( testA.getFilename() );
+    visuA.textVisualizer();
     visuA.writeToText( "test_v2/testA.txt" ); # write outputs to test_v2/testA.txt
 
     # -------------------------------------------------
@@ -101,37 +102,38 @@ if __name__ == '__main__':
             ctr += 1;
 
     #### read out mode
-    testB.readOutMode( [1,0,0,0] ); # read out only miss0 logics
-    testB.readOutMode( [0,1,0,0] ); # read out only miss1 logics
-    testB.readOutMode( [0,0,1,0] ); # read out only miss2 logics
-    testB.readOutMode( [0,0,0,1] ); # read out only layerA logics
+    testB.readOutMode( [1,0,0,1] ); # read out only miss0 logics
+    testB.readOutMode( [0,1,0,1] ); # read out only miss1 logics
+    testB.readOutMode( [0,0,1,1] ); # read out only miss2 logics
+    #testB.readOutMode( [0,0,0,1] ); # read out only layerA logics
     testB.readOutMode( [1,1,1,0] ); # read out only miss0,miss1,miss2 logics
 
     testB.close();
     visuB = inputVisualizer( testB.getFilename() );
+    visuB.textVisualizer();
     visuB.writeToText( "test_v2/testB.txt" ); # write outputs to test_v2/testB.txt
 
 
-    # -------------------------------------------------
-    # Realistic test (10 events), one load mode, 10 run modes with event reset in middle
-    testC = inputBuilder("test_v2/testC.root");
-
-    #### load phase
-    testC.initializeLoadPhase();
-    for i in range(128):
-        for j in range(32):
-            if j % 2 == 0: testC.loadSinglePattern(i, j, [8,8,8,8]); # fill even cols with [8,8,8,8]                
-            if j % 2 == 1: testC.loadSinglePattern(i, j, [5,5,5,5]); # fill odd cols with [5,5,5,5]                
-
-    #### run/readout phase
-    for event in range(10):
-        testC.initializeRunPhase();
-        testC.checkPattern([event,event,event,event]); # should only find something on the 6th and 9th event
-        testC.readOutMode( [1,0,0,0] ); # read out only miss0 logics
-
-    testC.close();
-    visuC = inputVisualizer( testC.getFilename() );
-    visuC.writeToText( "test_v2/testC.txt" ); # write outputs to test_v2/testC.txt
+#    # -------------------------------------------------
+#    # Realistic test (10 events), one load mode, 10 run modes with event reset in middle
+#    testC = inputBuilder("test_v2/testC.root");
+#
+#    #### load phase
+#    testC.initializeLoadPhase();
+#    for i in range(128):
+#        for j in range(32):
+#            if j % 2 == 0: testC.loadSinglePattern(i, j, [8,8,8,8]); # fill even cols with [8,8,8,8]                
+#            if j % 2 == 1: testC.loadSinglePattern(i, j, [5,5,5,5]); # fill odd cols with [5,5,5,5]                
+#
+#    #### run/readout phase
+#    for event in range(10):
+#        testC.initializeRunPhase();
+#        testC.checkPattern([event,event,event,event]); # should only find something on the 6th and 9th event
+#        testC.readOutMode( [1,0,0,0] ); # read out only miss0 logics
+#
+#    testC.close();
+#    visuC = inputVisualizer( testC.getFilename() );
+#    visuC.writeToText( "test_v2/testC.txt" ); # write outputs to test_v2/testC.txt
 
 
 
