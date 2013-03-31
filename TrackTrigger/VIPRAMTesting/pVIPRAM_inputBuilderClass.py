@@ -263,6 +263,7 @@ class inputBuilder:
         binaryVal = list('{0:015b}'.format(iVal))
         #print "len(binaryVal) = ", len(binaryVal)
         #print binaryVal
+        
         if binaryVal[14] == "1": binaryVal[14] = "0";
         else: binaryVal[14] = "1";
         if binaryVal[9] == "1": binaryVal[9] = "0";
@@ -270,6 +271,14 @@ class inputBuilder:
         if binaryVal[4] == "1": binaryVal[4] = "0";
         else: binaryVal[4] = "1";
 
+#        if binaryVal[10] == "1": binaryVal[10] = "0";
+#        else: binaryVal[10] = "1";
+#        if binaryVal[5] == "1": binaryVal[5] = "0";
+#        else: binaryVal[5] = "1";
+#        if binaryVal[0] == "1": binaryVal[0] = "0";
+#        else: binaryVal[0] = "1";
+        
+        
         #print binaryVal
         binValString = "".join(binaryVal);
         #print binValString
