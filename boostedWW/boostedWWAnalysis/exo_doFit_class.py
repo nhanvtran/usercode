@@ -3714,8 +3714,8 @@ class doFit_wj_and_wlvj:
         theLeg.SetFillStyle(0);
         theLeg.SetLineWidth(0);
         theLeg.SetLineStyle(0);
-        theLeg.SetTextFont(36);
-        theLeg.SetTextSize(.04);
+        theLeg.SetTextFont(42);
+        theLeg.SetTextSize(.03);
         #theLeg.SetTextSize(.045);
         
         entryCnt = 0;
