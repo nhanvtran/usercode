@@ -222,6 +222,7 @@ class doFit_wj_and_wlvj:
         print "wtagger efficiency correction for V   sample: %s +/- %s"%(self.rrv_wtagger_eff_reweight_forV.getVal(), self.rrv_wtagger_eff_reweight_forV.getError());
 
         self.mean_shift=1.1; self.sigma_scale=1.167; #correct the W-jet mass peak difference between data and MC
+        #self.mean_shift=0; self.sigma_scale=1.; #correct the W-jet mass peak difference between data and MC
 
         #PU study: 0-11,11-15,15-100
         self.nPV_min=  0;
@@ -1427,6 +1428,7 @@ class doFit_wj_and_wlvj:
         while (param):
             #param.Print();
             if not param.isConstant():
+                param.Print();
                 if (param.getVal()-param.getMin())< param.getError()*1 or (param.getMax()- param.getVal())< param.getError()*1: 
                     #print param.getVal()-param.getMin(), param.getError()*2, (param.getMax()- param.getVal()); 
                     param.Print();
@@ -2172,7 +2174,13 @@ class doFit_wj_and_wlvj:
             rfresult_data.covarianceMatrix().Print();
             rfresult_TotalMC.Print();
             rfresult_data.Print();
+        self.ShowParam_Pdf(simPdf_data,RooArgSet(rrv_mass_j,category_p_f));
 
+        #test eff uncertainty is stat. uncer.
+        #raw_input("before test_uncertainty");
+        #test_uncertainty(simPdf_data, RooArgSet( rrv_mass_j,category_p_f ) , 3000*1)
+        #self.ShowParam_Pdf(simPdf_data,RooArgSet(rrv_mass_j,category_p_f));
+        #raw_input("after test_uncertainty 300000");
  
     ############# ---------------------------------------------------
     def draw_ScaleFactor_forPureWJet_TTbar_controlsample(self,in_file_name, fit_or_not=1):#stateoftau2tau1cut="", or "failtau2tau1cut_"
@@ -4261,6 +4269,12 @@ class doFit_wj_and_wlvj:
         #self.saveHist("_data");
 
         rrv_mass_j = self.workspace4fit_.var("rrv_mass_j");
+
+        self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_ggH,"_%s"%(self.higgs_sample))# to get the shape of m_lvj
+        self.fit_mj_single_MC(self.file_ggH,"_%s"%(self.higgs_sample),"2Gaus","_TTbar_controlsample");
+        self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_TTbar_mc,"_TTbar")
+        self.fit_mj_single_MC(self.file_TTbar_mc,"_TTbar","2Gaus_ErfExp","_TTbar_controlsample");
+
         self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_STop_mc,"_STop");  
         self.fit_mj_single_MC(self.file_STop_mc,"_STop","ErfExpGaus_sp","_TTbar_controlsample");
         self.fit_mj_single_MC(self.file_STop_mc,"_STop_failtau2tau1cut","Exp","_TTbar_controlsample");
@@ -4380,6 +4394,16 @@ class doFit_wj_and_wlvj_simultaneous:
         rfresult_TotalMC.Print();
         rfresult_data.Print();
 
+######## ++++++++++++++
+def test_uncertainty( model, argset_rrv_x,eventnumber):#Test stat. uncertainty; when relative error will decrease by 1/sqrt(N) with events number increasing N times, this unce. is stat. uncer.
+        data=model.generate(argset_rrv_x, eventnumber);
+        data_16=model.generate(argset_rrv_x, eventnumber*16);
+        rf_16=model.fitTo(data_16, RooFit.Save());
+        rf=model.fitTo(data, RooFit.Save());
+        rf_16.Print();
+        rf.Print();
+        #raw_input("ENTER over test_uncertainty");
+        
 def control_sample(channel="mu"):
     print "control sample "+channel;
     #boostedW_fitter=doFit_wj_and_wlvj(channel,"ggH600",500,700,0,220) #(channel,"ggH600",500,700,40,140)
