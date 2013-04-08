@@ -30,7 +30,7 @@ parser.add_option('--computeLimits', action='store_true', dest='computeLimits', 
 parser.add_option('--plotLimits', action='store_true', dest='plotLimits', default=False,
                   help='no X11 windows')
 
-parser.add_option('--channel',action="store",type="string",dest="channel",default="mu")
+parser.add_option('--channel',action="store",type="string",dest="channel",default="el")
 parser.add_option('--massPoint',action="store",type="int",dest="massPoint",default=-1)
 parser.add_option('--cPrime',action="store",type="int",dest="cPrime",default=-1)
 
@@ -75,16 +75,26 @@ if __name__ == '__main__':
     
     CHAN = options.channel;
     DIR = "cards_"+CHAN;
-    
-    mass  = [ 600,1000,1200,1500,1600]
-    ccmlo = [ 500, 900,1100,1400,1500]  
-    ccmhi = [ 700,1100,1300,1600,1700]  
-    mjlo  = [  40,  40,  40,  40,  40]  
-    mjhi  = [ 130, 130, 130, 130, 130]  
-    mlo   = [ 400, 800, 800, 800, 800]      
-    mhi   = [1400,2500,2500,2500,2500]          
-    shape    = ["ExpPowExp_v1","Exp","Exp","Exp","Exp"]
-    shapeAlt = ["ExpPow2_v1"  ,"Pow","Pow","Pow","Pow"]
+
+    #mass  = [ 600,1000,1200,1500,1600]
+    #ccmlo = [ 500, 900,1100,1400,1500]  
+    #ccmhi = [ 700,1100,1300,1600,1700]  
+    #mjlo  = [  40,  40,  40,  40,  40]  
+    #mjhi  = [ 130, 130, 130, 130, 130]  
+    #mlo   = [ 400, 800, 800, 800, 800]      
+    #mhi   = [1400,2500,2500,2500,2500]          
+    #shape    = ["ExpPowExp_v1","Exp","Exp","Exp","Exp"]
+    #shapeAlt = ["ExpPow2_v1"  ,"Pow","Pow","Pow","Pow"]
+
+    mass  = [1000,1200,1500,1600]
+    ccmlo = [ 900,1100,1400,1500]  
+    ccmhi = [1100,1300,1600,1700]  
+    mjlo  = [  40,  40,  40,  40]  
+    mjhi  = [ 130, 130, 130, 130]  
+    mlo   = [ 800, 800, 800, 800]      
+    mhi   = [2500,2500,2500,2500]          
+    shape    = ["Exp","Exp","Exp","Exp"]
+    shapeAlt = ["Pow","Pow","Pow","Pow"]
 
     BRnew = 00;
     #cprime = [10,07,05,04,03,02,01];
