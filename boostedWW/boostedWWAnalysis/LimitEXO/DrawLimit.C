@@ -3,6 +3,7 @@ Bool_t same(Float_t a1, Float_t a2){
     else return 0;
 }
 
+//https://twiki.cern.ch/twiki/bin/viewauth/CMS/ExoDiBosonResonancesSamples
 Double_t XS4Graviton(char* theory_model, Double_t m, Double_t c){//"BulkG"
 	Double_t tmp_xs=-1.;
 	if(theory_model=="BulkG"){
