@@ -3519,7 +3519,7 @@ class doFit_wj_and_wlvj:
         datacard_out=open(getattr(self,"file_datacard_%s"%(mode)),"w");
 
         datacard_out.write( "imax 1" )
-        datacard_out.write( "\njmax 5" )
+        datacard_out.write( "\njmax 4" )
         datacard_out.write( "\nkmax *" )
         datacard_out.write( "\n--------------- ")
         if mode == "unbin":
@@ -4271,7 +4271,7 @@ class doFit_wj_and_wlvj:
         self.fit_mlvj_in_Mj_sideband("_WJets1","_sb_lo", self.MODEL_4_mlvj)
         self.fit_mlvj_in_Mj_sideband("_WJets01","_sb_lo", self.MODEL_4_mlvj_alter)
         self.fit_mlvj_in_Mj_sideband("_WJets0","_sb_lo", self.MODEL_4_mlvj)
-        self.fit_mlvj_in_Mj_signalregion("_WJets0","_signal_region", self.MODEL_4_mlvj) 
+        #self.fit_mlvj_in_Mj_signalregion("_WJets0","_signal_region", self.MODEL_4_mlvj) 
         self.prepare_limit("sideband_correction_method1")
         self.read_workspace()
 
@@ -4281,7 +4281,7 @@ class doFit_wj_and_wlvj:
         self.get_data()
         self.fit_WJetsNormalization_in_Mj_signal_region("_WJets0");
         self.fit_mlvj_in_Mj_sideband("_WJets0","_sb_lo", self.MODEL_4_mlvj)
-        self.fit_mlvj_in_Mj_signalregion("_WJets0","_signal_region", self.MODEL_4_mlvj) #raw_input("ENTER");
+        #self.fit_mlvj_in_Mj_signalregion("_WJets0","_signal_region", self.MODEL_4_mlvj) #raw_input("ENTER");
         self.prepare_limit("sideband_correction_method1")
         self.read_workspace()
 
