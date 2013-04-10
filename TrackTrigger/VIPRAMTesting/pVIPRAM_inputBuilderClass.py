@@ -166,6 +166,11 @@ class inputBuilder:
         self.cycleCtr += 1;            
         self.tree.Fill();
 
+        self.counter[0] = self.cycleCtr;            
+        self.LatchData[0] = 0;
+        self.cycleCtr += 1;            
+        self.tree.Fill();
+
         # secondary
         # set ternary bits
         
@@ -191,6 +196,11 @@ class inputBuilder:
         
         self.counter[0] = self.cycleCtr;            
         self.LatchData[0] = 1;
+        self.cycleCtr += 1;            
+        self.tree.Fill();
+
+        self.counter[0] = self.cycleCtr;            
+        self.LatchData[0] = 0;
         self.cycleCtr += 1;            
         self.tree.Fill();
 
@@ -228,6 +238,11 @@ class inputBuilder:
         self.LatchData[0] = 1;
         self.cycleCtr += 1;            
         self.tree.Fill();
+
+        self.counter[0] = self.cycleCtr;            
+        self.LatchData[0] = 0;
+        self.cycleCtr += 1;            
+        self.tree.Fill();        
         
         # secondary
         # set ternary bits
@@ -253,6 +268,11 @@ class inputBuilder:
         self.LatchData[0] = 1;
         self.cycleCtr += 1;            
         self.tree.Fill();
+
+        self.counter[0] = self.cycleCtr;            
+        self.LatchData[0] = 0;
+        self.cycleCtr += 1;            
+        self.tree.Fill();        
         
         #print self.DataOut
 
@@ -313,10 +333,10 @@ class inputBuilder:
         self.InputB[0] = 0;
         self.InputC[0] = 0;
         self.InputD[0] = 0;
-        self.InputA_bit0[0] = 1;
-        self.InputB_bit0[0] = 1;
-        self.InputC_bit0[0] = 1;
-        self.InputD_bit0[0] = 1;
+        self.InputA_bit0[0] = 0;
+        self.InputB_bit0[0] = 0;
+        self.InputC_bit0[0] = 0;
+        self.InputD_bit0[0] = 0;
         
         self.Miss0[0] = logic[0];
         self.Miss1[0] = logic[1];
@@ -473,10 +493,10 @@ class inputBuilder:
         self.InputB[0] = 0;
         self.InputC[0] = 0;
         self.InputD[0] = 0;
-        self.InputA_bit0[0] = 1;
-        self.InputB_bit0[0] = 1;
-        self.InputC_bit0[0] = 1;
-        self.InputD_bit0[0] = 1;
+        self.InputA_bit0[0] = 0;
+        self.InputB_bit0[0] = 0;
+        self.InputC_bit0[0] = 0;
+        self.InputD_bit0[0] = 0;
         
         self.Miss0[0] = self.majorityLogic[0];
         self.Miss1[0] = self.majorityLogic[1];

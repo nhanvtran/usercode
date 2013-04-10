@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 import ROOT
 import os
+import random
 
 from pVIPRAM_inputBuilderClass import *
 from pVIPRAM_inputVisualizerClass import *
@@ -54,7 +55,7 @@ if __name__ == '__main__':
         testA.readOutMode( [0,0,1,1] ); # read out only miss2 + layerA logics
         testA.readOutMode( [0,1,1,1] ); # read out only miss1 + miss2 + layerA logics
         testA.readOutMode( [1,1,0,1] ); # read out only miss0 + miss1 + layerA logics
-        testA.readOutMode( [1,1,0,1] ); # read out only miss0 + miss2 + layerA logics
+        testA.readOutMode( [1,0,1,1] ); # read out only miss0 + miss2 + layerA logics
         testA.readOutMode( [1,1,1,1] ); # read out only miss0 + miss1 + miss2 + layerA logics
     
         testA.close();
@@ -136,7 +137,7 @@ if __name__ == '__main__':
         testB.readOutMode( [0,0,1,1] ); # read out only miss2 + layerA logics
         testB.readOutMode( [0,1,1,1] ); # read out only miss1 + miss2 + layerA logics
         testB.readOutMode( [1,1,0,1] ); # read out only miss0 + miss1 + layerA logics
-        testB.readOutMode( [1,1,0,1] ); # read out only miss0 + miss2 + layerA logics
+        testB.readOutMode( [1,0,1,1] ); # read out only miss0 + miss2 + layerA logics
         testB.readOutMode( [1,1,1,1] ); # read out only miss0 + miss1 + miss2 + layerA logics
 
         testB.close();
@@ -153,15 +154,19 @@ if __name__ == '__main__':
 
         #### load phase
         testC.initializeLoadPhase();
+        ctr = 0;
         for i in range(128):
             for j in range(32):
-                if j % 2 == 0: testC.loadSinglePattern(i, j, [8,8,8,8]); # fill even cols with [8,8,8,8]                
-                if j % 2 == 1: testC.loadSinglePattern(i, j, [5,5,5,5]); # fill odd cols with [5,5,5,5]                
+                testC.loadSinglePattern(i, j, [ctr,ctr,ctr,ctr]);   
+                ctr += 1;
 
         #### run/readout phase
-        for event in range(10):
+        for event in range(20):
             testC.initializeRunPhase();
-            testC.checkPattern([event,event,event,event]); # should only find something on the 6th and 9th event
+            #generate a random number between 0 - 128*32
+            searchVal = int( random.uniform(0, 128*32 - 1) ); 
+            print "searchVal = ",searchVal
+            testC.checkPattern([searchVal,searchVal,searchVal,searchVal]);
             testC.readOutMode( [1,0,0,0] ); # read out only miss0 logics
 
         testC.close();
