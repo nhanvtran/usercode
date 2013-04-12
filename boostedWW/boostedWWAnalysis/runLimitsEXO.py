@@ -86,15 +86,15 @@ if __name__ == '__main__':
     #shape    = ["ExpPowExp_v1","Exp","Exp","Exp","Exp"]
     #shapeAlt = ["ExpPow2_v1"  ,"Pow","Pow","Pow","Pow"]
 
-    mass  = [1000,1200,1500,1600]
-    ccmlo = [ 900,1100,1400,1500]  
-    ccmhi = [1100,1300,1600,1700]  
-    mjlo  = [  40,  40,  40,  40]  
-    mjhi  = [ 130, 130, 130, 130]  
-    mlo   = [ 800, 800, 800, 800]      
-    mhi   = [2500,2500,2500,2500]          
-    shape    = ["Exp","Exp","Exp","Exp"]
-    shapeAlt = ["Pow","Pow","Pow","Pow"]
+    mass  = [1000,1200,1500,1600,2000]
+    ccmlo = [ 900,1100,1400,1500,1900]  
+    ccmhi = [1100,1300,1600,1700,2100]  
+    mjlo  = [  40,  40,  40,  40,  40]  
+    mjhi  = [ 130, 130, 130, 130, 130]  
+    mlo   = [ 800, 800, 800, 800, 800]      
+    mhi   = [2500,2500,2500,2500,2500]          
+    shape    = ["Exp","Exp","Exp","Exp","Exp"]
+    shapeAlt = ["Pow","Pow","Pow","Pow","Pow"]
 
     BRnew = 00;
     #cprime = [10,07,05,04,03,02,01];
