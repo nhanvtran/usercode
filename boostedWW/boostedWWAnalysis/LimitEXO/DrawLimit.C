@@ -33,7 +33,7 @@ Double_t XS4Graviton(char* theory_model, Double_t m, Double_t c){//"BulkG"
 	return tmp_xs*1e3;//fb
 }
 
-void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu_lumi=19.3, bool showobs=1, char* theory_model="BulkG")//"SM"
+void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu_lumi=19.3, bool showobs=0, char* theory_model="BulkG")//"SM"
 {
 	TFile inFile(Form("higgisCombin_%s_%s.root",channel,model)) ;
     TTree* tree_limit=inFile.Get("limit");
@@ -136,17 +136,18 @@ void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu
     //Double_t y_max_h2=TMath::Max(P2S[nmass-1]+Median[nmass-1]+1, Observed[nmass-1]+1);
 	y_max_h2=100;
     cout<<y_max_h2<<" : "<<P2S[nmass-1]+Median[nmass-1]+1<<","<<Observed[nmass-1]+1<<" y_max_h2="<<y_max_h2<<endl;;
+	y_min_h2=1e-2;
 
     TH2D *h2;
 	cout<<Mass[0]-30<<" "<<Mass[nmass-1]+30<<" "<< y_max_h2<<endl;
     if(channel=="el"){
-	    TH2F *h2=new TH2F("h2",Form("CMS preliminary   #int^{}_{}L dt=%gfb^{-1}(el)   #sqrt{s}=8TeV;m_{Bulk} [GeV]; 95\% CL limit on #sigma#times B",el_lumi),100,Mass[0]-30,Mass[nmass-1]+30,20,1e-1, y_max_h2);
+	    TH2F *h2=new TH2F("h2",Form("CMS preliminary   #int^{}_{}L dt=%gfb^{-1}(el)   #sqrt{s}=8TeV;m_{Bulk} [GeV]; 95\% CL limit on #sigma#times B",el_lumi),100,Mass[0]-30,Mass[nmass-1]+30,20,y_min_h2, y_max_h2);
     }
     if(channel=="mu"){
-	    TH2F *h2=new TH2F("h2",Form("CMS preliminary   #int^{}_{}L dt=%gfb^{-1}(mu)   #sqrt{s}=8TeV;m_{Bulk} [GeV]; 95\% CL limit on #sigma#times B",mu_lumi),100,Mass[0]-30,Mass[nmass-1]+30,20,1e-1, y_max_h2);
+	    TH2F *h2=new TH2F("h2",Form("CMS preliminary   #int^{}_{}L dt=%gfb^{-1}(mu)   #sqrt{s}=8TeV;m_{Bulk} [GeV]; 95\% CL limit on #sigma#times B",mu_lumi),100,Mass[0]-30,Mass[nmass-1]+30,20,y_min_h2, y_max_h2);
     }
     if(channel=="em"){
-	    TH2F *h2=new TH2F("h2",Form("CMS preliminary   #int^{}_{}L dt=%gfb^{-1}(el)+%gfb^{-1}(mu)   #sqrt{s}=8TeV;m_{Bulk} [GeV]; 95\% CL limit on #sigma#times B",el_lumi,mu_lumi),100,Mass[0]-30,Mass[nmass-1]+30,20,1e-1, y_max_h2);
+	    TH2F *h2=new TH2F("h2",Form("CMS preliminary   #int^{}_{}L dt=%gfb^{-1}(el)+%gfb^{-1}(mu)   #sqrt{s}=8TeV;m_{Bulk} [GeV]; 95\% CL limit on #sigma#times B",el_lumi,mu_lumi),100,Mass[0]-30,Mass[nmass-1]+30,20,y_min_h2, y_max_h2);
     }
     h2->GetYaxis()->SetTitle("95% CL limit on #sigma#times B(fb)");
 	//h2->GetYaxis()->SetMoreLogLabels();
@@ -165,7 +166,8 @@ void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu
 	line->Draw();*/
 
 	//Draw a smooth XS_theory: 600-2500;
-	double xs_theory_scale=10;
+	//double xs_theory_scale=10.;
+	double xs_theory_scale=1.;
 	double mass_smooth[20];
 	double xs_theory_smooth[20];
 	for(Int_t i=0;i<20;i++){
@@ -179,18 +181,29 @@ void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu
 	gr_xs_theory->SetLineWidth(2);
 	gr_xs_theory->Draw("");
 
-
-
-	for(int i=2;i<=y_max_h2;i++){
+	/*for(int i=2;i<=y_max_h2;i++){
 		if (i%10==0){
 			TLine *line=new TLine(min,i,max,i);
 			line->SetLineColor(kGray+3);line->SetLineStyle(3);
 			line->Draw("same");
 		}
+	}*/
+	double lines_y[8]={1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3, 1e4};
+	for(int i=0;i<8;i++){
+		if( lines_y[i]> y_min_h2 &&  lines_y[i]< y_max_h2 ){
+			TLine *line=new TLine(min, lines_y[i], max, lines_y[i]);
+			line->SetLineColor(kGray+3);line->SetLineStyle(3);
+			line->Draw("same");
+		}
 	}
 
+
 	TLegend * leg = new TLegend (0.6, 0.65, 0.9, 0.87, NULL, "brNDC") ;
-	leg->AddEntry(gr_xs_theory, Form("BulkG->WW #times %g",xs_theory_scale),"l");
+	if(xs_theory_scale==1.){
+		leg->AddEntry(gr_xs_theory, Form("BulkG->WW"),"l");
+	}else{
+		leg->AddEntry(gr_xs_theory, Form("BulkG->WW #times %g",xs_theory_scale),"l");
+	}
 	leg->AddEntry(likelihd_limit_d, "95% C.L.Observed Limit","l");
 	leg->AddEntry(likelihd_limit_c, "95% C.L.Expected Limit","l");
 	leg->AddEntry(likelihd_limit_1sigma, "#pm1 #sigma Expected Limit","f");
