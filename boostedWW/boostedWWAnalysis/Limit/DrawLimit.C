@@ -1,12 +1,170 @@
+// tdrGrid: Turns the grid lines on (true) or off (false)
+
+// void tdrGrid(bool gridOn) {
+//   tdrStyle->SetPadGridX(gridOn);
+//   tdrStyle->SetPadGridY(gridOn);
+// }
+
+// fixOverlay: Redraws the axis
+
+void fixOverlay() {
+  gPad->RedrawAxis();
+}
+
+void setTDRStyle() {
+  TStyle *tdrStyle = new TStyle("tdrStyle","Style for P-TDR");
+
+// For the canvas:
+  tdrStyle->SetCanvasBorderMode(0);
+  tdrStyle->SetCanvasColor(kWhite);
+  tdrStyle->SetCanvasDefH(600); //Height of canvas
+  tdrStyle->SetCanvasDefW(600); //Width of canvas
+  tdrStyle->SetCanvasDefX(0);   //POsition on screen
+  tdrStyle->SetCanvasDefY(0);
+
+// For the Pad:
+  tdrStyle->SetPadBorderMode(0);
+  // tdrStyle->SetPadBorderSize(Width_t size = 1);
+  tdrStyle->SetPadColor(kWhite);
+  tdrStyle->SetPadGridX(false);
+  tdrStyle->SetPadGridY(false);
+  tdrStyle->SetGridColor(0);
+  tdrStyle->SetGridStyle(3);
+  tdrStyle->SetGridWidth(1);
+
+// For the frame:
+  tdrStyle->SetFrameBorderMode(0);
+  tdrStyle->SetFrameBorderSize(1);
+  tdrStyle->SetFrameFillColor(0);
+  tdrStyle->SetFrameFillStyle(0);
+  tdrStyle->SetFrameLineColor(1);
+  tdrStyle->SetFrameLineStyle(1);
+  tdrStyle->SetFrameLineWidth(1);
+
+// For the histo:
+  // tdrStyle->SetHistFillColor(1);
+  // tdrStyle->SetHistFillStyle(0);
+  tdrStyle->SetHistLineColor(1);
+  tdrStyle->SetHistLineStyle(0);
+  tdrStyle->SetHistLineWidth(1);
+  // tdrStyle->SetLegoInnerR(Float_t rad = 0.5);
+  // tdrStyle->SetNumberContours(Int_t number = 20);
+
+  tdrStyle->SetEndErrorSize(2);
+//  tdrStyle->SetErrorMarker(20);
+  tdrStyle->SetErrorX(0.);
+  
+  tdrStyle->SetMarkerStyle(20);
+
+//For the fit/function:
+  tdrStyle->SetOptFit(1);
+  tdrStyle->SetFitFormat("5.4g");
+  tdrStyle->SetFuncColor(2);
+  tdrStyle->SetFuncStyle(1);
+  tdrStyle->SetFuncWidth(1);
+
+//For the date:
+  tdrStyle->SetOptDate(0);
+  // tdrStyle->SetDateX(Float_t x = 0.01);
+  // tdrStyle->SetDateY(Float_t y = 0.01);
+
+// For the statistics box:
+  tdrStyle->SetOptFile(0);
+  tdrStyle->SetOptStat(0); // To display the mean and RMS:   SetOptStat("mr");
+  tdrStyle->SetStatColor(kWhite);
+  tdrStyle->SetStatFont(42);
+  tdrStyle->SetStatFontSize(0.025);
+  tdrStyle->SetStatTextColor(1);
+  tdrStyle->SetStatFormat("6.4g");
+  tdrStyle->SetStatBorderSize(1);
+  tdrStyle->SetStatH(0.1);
+  tdrStyle->SetStatW(0.15);
+  // tdrStyle->SetStatStyle(Style_t style = 1001);
+  // tdrStyle->SetStatX(Float_t x = 0);
+  // tdrStyle->SetStatY(Float_t y = 0);
+
+// Margins:
+  tdrStyle->SetPadTopMargin(0.05);
+  tdrStyle->SetPadBottomMargin(0.13);
+  tdrStyle->SetPadLeftMargin(0.18);
+  tdrStyle->SetPadRightMargin(0.06);
+
+// For the Global title:
+
+  tdrStyle->SetOptTitle(0);
+  tdrStyle->SetTitleFont(42);
+  tdrStyle->SetTitleColor(1);
+  tdrStyle->SetTitleTextColor(1);
+  tdrStyle->SetTitleFillColor(10);
+  tdrStyle->SetTitleFontSize(0.05);
+  // tdrStyle->SetTitleH(0); // Set the height of the title box
+  // tdrStyle->SetTitleW(0); // Set the width of the title box
+  // tdrStyle->SetTitleX(0); // Set the position of the title box
+  // tdrStyle->SetTitleY(0.985); // Set the position of the title box
+  // tdrStyle->SetTitleStyle(Style_t style = 1001);
+  // tdrStyle->SetTitleBorderSize(2);
+
+// For the axis titles:
+
+  tdrStyle->SetTitleColor(1, "XYZ");
+  tdrStyle->SetTitleFont(42, "XYZ");
+  tdrStyle->SetTitleSize(0.045, "XYZ");
+  // tdrStyle->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
+  // tdrStyle->SetTitleYSize(Float_t size = 0.02);
+  tdrStyle->SetTitleXOffset(1.1);
+  tdrStyle->SetTitleYOffset(1.0);
+  // tdrStyle->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
+
+// For the axis labels:
+
+  tdrStyle->SetLabelColor(1, "XYZ");
+  tdrStyle->SetLabelFont(42, "XYZ");
+  tdrStyle->SetLabelOffset(0.007, "XYZ");
+  tdrStyle->SetLabelSize(0.05, "XYZ");
+
+// For the axis:
+
+  tdrStyle->SetAxisColor(1, "XYZ");
+  tdrStyle->SetStripDecimals(kTRUE);
+  tdrStyle->SetTickLength(0.03, "XYZ");
+  tdrStyle->SetNdivisions(510, "XYZ");
+  tdrStyle->SetPadTickX(1);  // To get tick marks on the opposite side of the frame
+  tdrStyle->SetPadTickY(1);
+
+// Change for log plots:
+  tdrStyle->SetOptLogx(0);
+  tdrStyle->SetOptLogy(0);
+  tdrStyle->SetOptLogz(0);
+
+// Postscript options:
+  tdrStyle->SetPaperSize(20.,20.);
+  // tdrStyle->SetLineScalePS(Float_t scale = 3);
+  // tdrStyle->SetLineStyleString(Int_t i, const char* text);
+  // tdrStyle->SetHeaderPS(const char* header);
+  // tdrStyle->SetTitlePS(const char* pstitle);
+
+  // tdrStyle->SetBarOffset(Float_t baroff = 0.5);
+  // tdrStyle->SetBarWidth(Float_t barwidth = 0.5);
+  // tdrStyle->SetPaintTextFormat(const char* format = "g");
+  // tdrStyle->SetPalette(Int_t ncolors = 0, Int_t* colors = 0);
+  // tdrStyle->SetTimeOffset(Double_t toffset);
+  // tdrStyle->SetHistMinimumZero(kTRUE);
+
+  tdrStyle->cd();
+
+}
+
+
+
 Bool_t same(Float_t a1, Float_t a2){
     if(TMath::Abs(a1-a2) < 0.001)return 1;
     else return 0;
 }
 
-void DrawLimit(char*channel, char* model="unbin")
-//void DrawLimit_unbin(char*channel, char* model="unbin")
-//void DrawLimit_counting(char* channel, char* model="counting")
+
+void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu_lumi=19.3, bool showobs=1)
 {
+	setTDRStyle();
 	TFile inFile(Form("higgisCombin_%s_%s.root",channel,model)) ;
     TTree* tree_limit=inFile.Get("limit");
 
@@ -34,11 +192,8 @@ void DrawLimit(char*channel, char* model="unbin")
 	int masspoint=-1;
     for(Int_t i=0;i<nmass*6;i++){
         masspoint=i/6;
-        //cout<<"masspoint="<<masspoint<<endl;
         tree_limit->GetEntry(i);
 
-       // cout<<"tmp_quantileExpected="<<tmp_quantileExpected;
-       // cout<<"   tmp_limit="<<tmp_limit<<endl;
         if( same(tmp_quantileExpected,0.025)) N2S[masspoint]=tmp_limit;
         if( same(tmp_quantileExpected,0.16 )) N1S[masspoint]=tmp_limit;
         if( same(tmp_quantileExpected,0.5  )) Median[masspoint]=tmp_limit;
@@ -48,24 +203,12 @@ void DrawLimit(char*channel, char* model="unbin")
         Mass[masspoint]=tmp_mh;
     }
 
-	for (int i=0 ;i<nmass ;i++ )
-	{
-
-       // cout<<"Observed="<<Observed[i]<<endl;
-       // cout<<"N2S="<<N2S[i]<<endl;
-       // cout<<"N1S="<<N1S[i]<<endl;
-       // cout<<"mid="<<Median[i]<<endl;
-       // cout<<"P1S="<<P1S[i]<<endl;
-       // cout<<"P2S="<<P2S[i]<<endl;
+	for (int i=0 ;i<nmass ;i++ ) {
 		N1S [i] = Median[i] - N1S [i];
 		P1S [i] = P1S [i]   - Median[i];
-
 		N2S [i] = Median[i] - N2S [i];
 		P2S [i] = P2S [i]   - Median[i];
-
 	}
-
-
 
 	TGraph *likelihd_limit_d = new TGraph(nmass,Mass,Observed);                                                                                              
 	likelihd_limit_d->SetLineColor(kBlack);                                                                                                                  
@@ -73,90 +216,81 @@ void DrawLimit(char*channel, char* model="unbin")
 	likelihd_limit_d->SetLineStyle(1);
     likelihd_limit_d->SetMarkerStyle(20);
 
-
 	TGraph *likelihd_limit_c = new TGraph(nmass,Mass,Median);                                                                                                
 	likelihd_limit_c->SetLineColor(kBlack);                                                                                                                  
 	likelihd_limit_c->SetLineWidth(2);                                                                                                                       
 	likelihd_limit_c->SetLineStyle(2);
 
-
 	TGraphAsymmErrors *likelihd_limit_1sigma = new TGraphAsymmErrors(nmass,Mass,Median,Zero,Zero,N1S,P1S);                                                                                                  
 	likelihd_limit_1sigma->SetFillColor(kGreen);
-
 
 	TGraphAsymmErrors *likelihd_limit_2sigma = new TGraphAsymmErrors(nmass,Mass,Median,Zero,Zero,N2S,P2S);                                                                                                  
 	likelihd_limit_2sigma->SetFillColor(kYellow);   
 
-
-	//  TMultiGraph *likelihd_limit = new TMultiGraph("exclusionlimit_p","CL_{S} Exclusion Limits ;m_{H} [GeV]; 95% CL limit on #sigma/#sigma_{SM}");
 	TMultiGraph *likelihd_limit = new TMultiGraph("exclusionlimit_p",";m_{H} [GeV]; 95% CL limit on #sigma/#sigma_{SM}");  
 	likelihd_limit->Add(likelihd_limit_2sigma,"E3");                                                                                                         
 	likelihd_limit->Add(likelihd_limit_1sigma,"E3");                                                                                                         
 	likelihd_limit->Add(likelihd_limit_c, "L");                                                                                                              
-	likelihd_limit->Add(likelihd_limit_d, "LP");
+    if(showobs){ likelihd_limit->Add(likelihd_limit_d, "LP"); }
 
-	TCanvas *c1 = new TCanvas();
+	TCanvas *c1 = new TCanvas("Limits_Canvas","Limits Canvas",800,600);
 	gStyle->SetOptStat(0);
-	//gStyle->SetOptTitle(0);
+	//c1->SetLogy () ;
+	c1->SetGridy(1);
+	c1->SetGrid(1);
 
-	TLegend * leg = new TLegend (0.1, 0.65, 0.4, 0.87, NULL, "brNDC") ;
-	leg->AddEntry(likelihd_limit_d, "95% C.L.Observed Limit","l");
-	leg->AddEntry(likelihd_limit_c, "95% C.L.Expected Limit","l");
-	leg->AddEntry(likelihd_limit_1sigma, "#pm1 #sigma Expected Limit","f");
-	leg->AddEntry(likelihd_limit_2sigma, "#pm2 #sigma Expected Limit","f");
+	Double_t y_max_h2=TMath::Max(P2S[nmass-1]+Median[nmass-1]+1, Observed[nmass-1]+1);
+	y_max_h2=10;
+	cout<<P2S[nmass-1]+Median[nmass-1]+1<<","<<Observed[nmass-1]+1<<endl;
 
-	leg->SetBorderSize (2.3) ;
-
-
-	TLegend * title = new TLegend (0.7, 0.92, 0.93, 1, "channel e+mu", "brNDC") ;
-	title->SetTextFont (42) ;
-	title->SetTextSize (0.04) ;
-	title->SetBorderSize (2.3) ;
-
-	//	c1->DrawFrame (225, 0.5, 625, 25) ;
-	c1->SetLogy () ;
-	//c1->SetGridy(1);
-
-
-    Double_t y_max_h2=TMath::Max(P2S[nmass-1]+Median[nmass-1]+1, Observed[nmass-1]+1);
-    cout<<P2S[nmass-1]+Median[nmass-1]+1<<","<<Observed[nmass-1]+1<<endl;
-
-	//TH2F *h2=new TH2F("h2","CMS preliminary   #int^{}_{}L dt=11.5fb^{-1}(mu)   #sqrt{s}=8TeV;m_{H} [GeV]; 95% CL limit on #sigma/#sigma_{SM}",100,Mass[0]-30,Mass[nmass-1]+30,20,0, y_max_h2);
-	TH2F *h2=new TH2F("h2","CMS preliminary   #int^{}_{}L dt=5.3fb^{-1}(mu)   #sqrt{s}=8TeV;m_{H} [GeV]; 95% CL limit on #sigma/#sigma_{SM}",100,Mass[0]-30,Mass[nmass-1]+30,20,0, y_max_h2);
+	TH2F *h2=new TH2F("h2",";m_{H} (GeV/c^{2});95% CL limit on #sigma/#sigma_{SM}",100,Mass[0]-30,Mass[nmass-1]+30,20,0, y_max_h2);
 	h2->Draw();
-
-
 
 	likelihd_limit->Draw("");	
 
-	//double min = likelihd_limit->GetXaxis ()->GetXmin () ;
-	//double max = likelihd_limit->GetXaxis ()->GetXmax () ;
-	double min = h2->GetXaxis ()->GetXmin () ;
-	double max = h2->GetXaxis ()->GetXmax () ;
-    double min_y=Mass[0]-30;
-    double max_y=P2S[nmass-1]+Median[nmass-1]+1;
+	double min_x = h2->GetXaxis ()->GetXmin () ;
+	double max_x = h2->GetXaxis ()->GetXmax () ;
+	double min_y = h2->GetYaxis ()->GetXmin () ; 
+	double max_y = h2->GetYaxis ()->GetXmax () ; 
 
-
-	TLine *line = new TLine(min,1,max,1);
+	TLine *line = new TLine(min_x,1,max_x,1);
 	line->SetLineColor(kRed); line->SetLineWidth(2);
 	line->Draw();
-    
-    for(int i=2;i<max_y;i++){
-        TLine *line=new TLine(min,i,max,i);
-        line->SetLineColor(kGray+3);line->SetLineStyle(3);
-        line->Draw("same");
-    }
 
-	//	title->Draw();
-    //h2->Draw();
-	leg->Draw();
-	c1->Update();
-	//c1->Print(Form("CL_%s_log.eps",model),"eps");
-	//c1->Print(Form("CL_%s_log.png",model),"png");
+	//draw grid on top of limits
+	TH1D* postGrid=new TH1D("postGrid","postGrid",1,600,1000);
+	postGrid->GetYaxis()->SetRangeUser(0.,10);
+	postGrid->Draw("AXIGSAME");
 
-	c1->SetLogy(0);
-	//c1->SetGridy(1);
+	TLegend * theLeg = new TLegend(0.22, 0.57, 0.57, 0.87, "", "NDC");
+	theLeg.SetName("theLegend");
+	theLeg.SetBorderSize(0);
+	theLeg.SetLineColor(0);
+	theLeg.SetFillColor(0);
+	theLeg.SetFillStyle(1001);
+	theLeg.SetLineWidth(0);
+	theLeg.SetLineStyle(0);
+	theLeg.SetTextFont(42);
+	theLeg.SetTextSize(.035);
+
+	theLeg->AddEntry(likelihd_limit_d, "95% C.L.Observed Limit","l");
+	theLeg->AddEntry(likelihd_limit_c, "95% C.L.Expected Limit","l");
+	theLeg->AddEntry(likelihd_limit_1sigma, "#pm1 #sigma Expected Limit","f");
+	theLeg->AddEntry(likelihd_limit_2sigma, "#pm2 #sigma Expected Limit","f");
+	theLeg->Draw();
+
+	//banner = TLatex(0.18,0.96,("CMS Preliminary, %.1f fb^{-1} at #sqrt{s}=8TeV %s+jets"%(self.GetLumi(),self.channel)));
+	double tmp_lumi=0.;
+	TString tmp_channel;
+	if(channel=="mu"){ tmp_lumi=mu_lumi; tmp_channel="W#rightarrow #mu #nu";}
+	if(channel=="em"){ tmp_lumi=(mu_lumi+el_lumi)/2.; tmp_channel="W#rightarrow e #nu and W#rightarrow #mu #nu";}
+	if(channel=="el"){ tmp_lumi=el_lumi; tmp_channel="W#rightarrow e #nu";}
+	banner = TLatex(0.18,0.96,Form("CMS Preliminary, %i fb^{-1} at #sqrt{s} = 8 TeV, %s", Int_t(tmp_lumi), tmp_channel.Data() ) );
+	banner.SetNDC(); banner.SetTextSize(0.028);
+	banner.Draw();
+
+	//c1->SetLogy(0);
 	c1->Update();
-	c1->Print(Form("CL_%s_%s.eps",channel,model),"eps");
+	c1->Print(Form("CL_%s_%s.pdf",channel,model),"pdf");
 	c1->Print(Form("CL_%s_%s.png",channel,model),"png");
 }
