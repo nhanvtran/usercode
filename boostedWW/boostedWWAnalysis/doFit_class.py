@@ -6,7 +6,7 @@ import array
 import ROOT
 import ntpath
 
-from ROOT import gROOT, gStyle, gSystem, TStyle, TLatex, TString, TF1,TFile,TLine, TLegend, TH1D,TH2D,THStack,TChain, TCanvas, TMatrixDSym, TMath, TText, TPad, RooFit, RooArgSet, RooArgList, RooArgSet, RooAbsData, RooAbsPdf, RooAddPdf, RooWorkspace, RooExtendPdf,RooCBShape, RooLandau, RooFFTConvPdf, RooGaussian, RooBifurGauss, RooArgusBG, RooDataSet, RooExponential,RooBreitWigner, RooVoigtian, RooNovosibirsk, RooRealVar,RooFormulaVar, RooDataHist, RooHistPdf,RooCategory, RooChebychev, RooSimultaneous, RooGenericPdf,RooConstVar, RooKeysPdf, RooHistPdf, RooEffProd, RooProdPdf, TIter, kTRUE, kFALSE, kGray, kRed, kDashed, kGreen,kAzure, kOrange, kBlack,kBlue,kYellow,kCyan, kMagenta, kWhite
+from ROOT import gROOT, gStyle, gSystem, TGaxis, TStyle, TLatex, TString, TF1,TFile,TLine, TLegend, TH1D,TH2D,THStack,TChain, TCanvas, TMatrixDSym, TMath, TText, TPad, RooFit, RooArgSet, RooArgList, RooArgSet, RooAbsData, RooAbsPdf, RooAddPdf, RooWorkspace, RooExtendPdf,RooCBShape, RooLandau, RooFFTConvPdf, RooGaussian, RooBifurGauss, RooArgusBG, RooDataSet, RooExponential,RooBreitWigner, RooVoigtian, RooNovosibirsk, RooRealVar,RooFormulaVar, RooDataHist, RooHistPdf,RooCategory, RooChebychev, RooSimultaneous, RooGenericPdf,RooConstVar, RooKeysPdf, RooHistPdf, RooEffProd, RooProdPdf, TIter, kTRUE, kFALSE, kGray, kRed, kDashed, kGreen,kAzure, kOrange, kBlack,kBlue,kYellow,kCyan, kMagenta, kWhite
 import subprocess
 from subprocess import Popen
 from optparse import OptionParser
@@ -46,6 +46,7 @@ parser.add_option('--fitwtaggersim', action='store_true', dest='fitwtaggersim', 
 parser.add_option('--check', action='store_true', dest='check', default=False, help='check the workspace for limit setting')
 parser.add_option('--control', action='store_true', dest='control', default=False, help='control plot')
 parser.add_option('--fitsignal', action='store_true', dest='fitsignal', default=False, help='fit signal')
+parser.add_option('--closuretest', action='store',type="int", dest='closuretest', default=0, help='closure test; 0: no test; 1: A1->A2; 2: A->B')
 parser.add_option('--cprime', action="store",type="int",dest="cprime",default=10)
 parser.add_option('--BRnew', action="store",type="int",dest="BRnew",default=0)
 parser.add_option('--inPath', action="store",type="string",dest="inPath",default="./")
@@ -87,9 +88,9 @@ class doFit_wj_and_wlvj:
         nbins_mj=int((in_mj_max-in_mj_min)/self.BinWidth_mj);
         in_mj_max=in_mj_min+nbins_mj*self.BinWidth_mj;
 
-        rrv_mass_j  = RooRealVar("rrv_mass_j","mass(j)",(in_mj_min+in_mj_max)/2.,in_mj_min,in_mj_max,"GeV/c^{2}");
+        rrv_mass_j  = RooRealVar("rrv_mass_j","Pruned jet mass",(in_mj_min+in_mj_max)/2.,in_mj_min,in_mj_max,"GeV/c^{2}");
         rrv_mass_j.setBins(nbins_mj);
-        rrv_mass_lvj= RooRealVar("rrv_mass_lvj","mass(lvj)",(in_mlvj_min+in_mlvj_max)/2.,in_mlvj_min,in_mlvj_max,"GeV/c^{2}");
+        rrv_mass_lvj= RooRealVar("rrv_mass_lvj","m_{WW}",(in_mlvj_min+in_mlvj_max)/2.,in_mlvj_min,in_mlvj_max,"GeV/c^{2}");
         rrv_mass_lvj.setBins(nbins_mlvj);
 
         if input_workspace is None:
@@ -102,19 +103,28 @@ class doFit_wj_and_wlvj:
         #prepare workspace for unbin-Limit
         self.workspace4limit_ = RooWorkspace("workspace4limit_","workspace4limit_");
 
-        self.mj_sideband_lo_min=in_mj_min;
-        self.mj_sideband_lo_max=65;
-        self.mj_signal_min=65;
-        self.mj_signal_max=105;
-        self.mj_sideband_hi_min=105;
-        self.mj_sideband_hi_max=in_mj_max;
-        # test
-        #self.mj_sideband_lo_min=30;
-        #self.mj_sideband_lo_max=52;
-        #self.mj_signal_min=52;
-        #self.mj_signal_max=67;
-        #self.mj_sideband_hi_min=100;
-        #self.mj_sideband_hi_max=125;
+        if options.closuretest ==0:
+            self.mj_sideband_lo_min=in_mj_min;
+            self.mj_sideband_lo_max=65;
+            self.mj_signal_min=65;
+            self.mj_signal_max=105;
+            self.mj_sideband_hi_min=105;
+            self.mj_sideband_hi_max=in_mj_max;
+        if options.closuretest ==1: ##closure test A1->A2
+            self.mj_sideband_lo_min=in_mj_min;
+            self.mj_sideband_lo_max=55;
+            self.mj_signal_min=55;
+            self.mj_signal_max= 65;
+            self.mj_sideband_hi_min=105;
+            self.mj_sideband_hi_max=in_mj_max;
+        if options.closuretest ==2: #closure test A->B
+            self.mj_sideband_lo_min=in_mj_min;
+            self.mj_sideband_lo_max=65;
+            self.mj_signal_min=100;
+            self.mj_signal_max=115;
+            self.mj_sideband_hi_min=115;
+            self.mj_sideband_hi_max=in_mj_max;
+
         rrv_mass_j.setRange("sb_lo",self.mj_sideband_lo_min,self.mj_sideband_lo_max);
         rrv_mass_j.setRange("signal_region",self.mj_signal_min,self.mj_signal_max); 
         rrv_mass_j.setRange("sb_hi",self.mj_sideband_hi_min,self.mj_sideband_hi_max);
@@ -137,12 +147,7 @@ class doFit_wj_and_wlvj:
         #self.file_data=("ofile_data_sub.root");#keep blind!!!!
         self.file_data=("ofile_data.root");#keep blind!!!!
         #self.file_data=("ofile_pseudodata.root");#keep blind!!!!
-        #self.file_data=("ofile_pseudodata_with_ggH600.root");#keep blind!!!!
-        #self.file_data=("ofile_pseudodata_with_ggH700.root");#keep blind!!!!
-        #self.file_data=("ofile_pseudodata_with_ggH800.root");#keep blind!!!!
-        #self.file_data=("ofile_pseudodata_with_ggH900.root");#keep blind!!!!
-        #self.file_data=("ofile_pseudodata_with_ggH1000.root");#keep blind!!!!
-        self.file_pseudodata=("ofile_pseudodata.root");#fake data
+        self.file_pseudodata=("ofile_pseudodata4higgs.root");#fake data
         self.file_ggH=("ofile_%s.root"%(self.higgs_sample));
         self.file_vbfH=("ofile_%s.root"%(self.vbfhiggs_sample));
         #WJets0 is the default PS model, WJets1 is the alternative PS model
@@ -179,19 +184,16 @@ class doFit_wj_and_wlvj:
         self.higgs_xs_scale=1.0; #higgs XS scale
         
         self.color_palet={ #color palet
-            #'WJets' : style.WJetsColor,
-            #'VV'    : style.DibosonsColor,
-            #'TTbar' : style.TtbarColor,
-            #'STop'  : style.SingleTopColor,
             'data'  : kBlack,
             'WJets' : kRed,
             'VV'    : kAzure+8,
             'TTbar' : kGreen,
             'STop'  : kYellow,
-            'Signal': kBlack,
-            'vbfSignal': kGray+2,
+            'ggH': kBlue,
+            'vbfH': kMagenta,
             'Uncertainty' : kBlack,
-            'Other_Backgrounds'  : kBlue
+            'Other_Backgrounds'  : kBlue,
+            'Signal'  : kBlue
         }
 
         #self.wtagger_label="tight";#50%
@@ -300,141 +302,141 @@ class doFit_wj_and_wlvj:
 
     ##################### ---------------------------------------------------
     def setTDRStyle(self):
-        tdrStyle =TStyle("tdrStyle","Style for P-TDR");
+        self.tdrStyle =TStyle("tdrStyle","Style for P-TDR");
         #For the canvas:
-        tdrStyle.SetCanvasBorderMode(0);
-        tdrStyle.SetCanvasColor(kWhite);
-        tdrStyle.SetCanvasDefH(600); #Height of canvas
-        tdrStyle.SetCanvasDefW(600); #Width of canvas
-        tdrStyle.SetCanvasDefX(0);   #POsition on screen
-        tdrStyle.SetCanvasDefY(0);
+        self.tdrStyle.SetCanvasBorderMode(0);
+        self.tdrStyle.SetCanvasColor(kWhite);
+        self.tdrStyle.SetCanvasDefH(600); #Height of canvas
+        self.tdrStyle.SetCanvasDefW(600); #Width of canvas
+        self.tdrStyle.SetCanvasDefX(0);   #POsition on screen
+        self.tdrStyle.SetCanvasDefY(0);
       
         #For the Pad:
-        tdrStyle.SetPadBorderMode(0);
-        #tdrStyle.SetPadBorderSize(Width_t size = 1);
-        tdrStyle.SetPadColor(kWhite);
-        tdrStyle.SetPadGridX(False);
-        tdrStyle.SetPadGridY(False);
-        tdrStyle.SetGridColor(0);
-        tdrStyle.SetGridStyle(3);
-        tdrStyle.SetGridWidth(1);
+        self.tdrStyle.SetPadBorderMode(0);
+        #self.tdrStyle.SetPadBorderSize(Width_t size = 1);
+        self.tdrStyle.SetPadColor(kWhite);
+        self.tdrStyle.SetPadGridX(False);
+        self.tdrStyle.SetPadGridY(False);
+        self.tdrStyle.SetGridColor(0);
+        self.tdrStyle.SetGridStyle(3);
+        self.tdrStyle.SetGridWidth(1);
       
         #For the frame:
-        tdrStyle.SetFrameBorderMode(0);
-        tdrStyle.SetFrameBorderSize(1);
-        tdrStyle.SetFrameFillColor(0);
-        tdrStyle.SetFrameFillStyle(0);
-        tdrStyle.SetFrameLineColor(1);
-        tdrStyle.SetFrameLineStyle(1);
-        tdrStyle.SetFrameLineWidth(1);
+        self.tdrStyle.SetFrameBorderMode(0);
+        self.tdrStyle.SetFrameBorderSize(1);
+        self.tdrStyle.SetFrameFillColor(0);
+        self.tdrStyle.SetFrameFillStyle(0);
+        self.tdrStyle.SetFrameLineColor(1);
+        self.tdrStyle.SetFrameLineStyle(1);
+        self.tdrStyle.SetFrameLineWidth(1);
       
         #For the histo:
-        #tdrStyle.SetHistFillColor(1);
-        #tdrStyle.SetHistFillStyle(0);
-        tdrStyle.SetHistLineColor(1);
-        tdrStyle.SetHistLineStyle(0);
-        tdrStyle.SetHistLineWidth(1);
-        #tdrStyle.SetLegoInnerR(Float_t rad = 0.5);
-        #tdrStyle.SetNumberContours(Int_t number = 20);
+        #self.tdrStyle.SetHistFillColor(1);
+        #self.tdrStyle.SetHistFillStyle(0);
+        self.tdrStyle.SetHistLineColor(1);
+        self.tdrStyle.SetHistLineStyle(0);
+        self.tdrStyle.SetHistLineWidth(1);
+        #self.tdrStyle.SetLegoInnerR(Float_t rad = 0.5);
+        #self.tdrStyle.SetNumberContours(Int_t number = 20);
       
-        tdrStyle.SetEndErrorSize(2);
-        # tdrStyle.SetErrorMarker(20);
-        tdrStyle.SetErrorX(0.);
+        self.tdrStyle.SetEndErrorSize(2);
+        # self.tdrStyle.SetErrorMarker(20);
+        self.tdrStyle.SetErrorX(0.);
         
-        tdrStyle.SetMarkerStyle(20);
+        self.tdrStyle.SetMarkerStyle(20);
       
         #For the fit/function:
-        tdrStyle.SetOptFit(1);
-        tdrStyle.SetFitFormat("5.4g");
-        tdrStyle.SetFuncColor(2);
-        tdrStyle.SetFuncStyle(1);
-        tdrStyle.SetFuncWidth(1);
+        self.tdrStyle.SetOptFit(1);
+        self.tdrStyle.SetFitFormat("5.4g");
+        self.tdrStyle.SetFuncColor(2);
+        self.tdrStyle.SetFuncStyle(1);
+        self.tdrStyle.SetFuncWidth(1);
       
         #For the date:
-        tdrStyle.SetOptDate(0);
-        #tdrStyle.SetDateX(Float_t x = 0.01);
-        #tdrStyle.SetDateY(Float_t y = 0.01);
+        self.tdrStyle.SetOptDate(0);
+        #self.tdrStyle.SetDateX(Float_t x = 0.01);
+        #self.tdrStyle.SetDateY(Float_t y = 0.01);
       
         #For the statistics box:
-        tdrStyle.SetOptFile(0);
-        tdrStyle.SetOptStat(0); #To display the mean and RMS:   SetOptStat("mr");
-        tdrStyle.SetStatColor(kWhite);
-        tdrStyle.SetStatFont(42);
-        tdrStyle.SetStatFontSize(0.025);
-        tdrStyle.SetStatTextColor(1);
-        tdrStyle.SetStatFormat("6.4g");
-        tdrStyle.SetStatBorderSize(1);
-        tdrStyle.SetStatH(0.1);
-        tdrStyle.SetStatW(0.15);
-        #tdrStyle.SetStatStyle(Style_t style = 1001);
-        #tdrStyle.SetStatX(Float_t x = 0);
-        #tdrStyle.SetStatY(Float_t y = 0);
+        self.tdrStyle.SetOptFile(0);
+        self.tdrStyle.SetOptStat(0); #To display the mean and RMS:   SetOptStat("mr");
+        self.tdrStyle.SetStatColor(kWhite);
+        self.tdrStyle.SetStatFont(42);
+        self.tdrStyle.SetStatFontSize(0.025);
+        self.tdrStyle.SetStatTextColor(1);
+        self.tdrStyle.SetStatFormat("6.4g");
+        self.tdrStyle.SetStatBorderSize(1);
+        self.tdrStyle.SetStatH(0.1);
+        self.tdrStyle.SetStatW(0.15);
+        #self.tdrStyle.SetStatStyle(Style_t style = 1001);
+        #self.tdrStyle.SetStatX(Float_t x = 0);
+        #self.tdrStyle.SetStatY(Float_t y = 0);
       
         #Margins:
-        tdrStyle.SetPadTopMargin(0.05);
-        tdrStyle.SetPadBottomMargin(0.13);
-        tdrStyle.SetPadLeftMargin(0.18);
-        tdrStyle.SetPadRightMargin(0.06);
+        self.tdrStyle.SetPadTopMargin(0.05);
+        self.tdrStyle.SetPadBottomMargin(0.13);
+        self.tdrStyle.SetPadLeftMargin(0.18);
+        self.tdrStyle.SetPadRightMargin(0.06);
       
         #For the Global title:
       
-        tdrStyle.SetOptTitle(0);
-        tdrStyle.SetTitleFont(42);
-        tdrStyle.SetTitleColor(1);
-        tdrStyle.SetTitleTextColor(1);
-        tdrStyle.SetTitleFillColor(10);
-        tdrStyle.SetTitleFontSize(0.05);
-        #tdrStyle.SetTitleH(0); #Set the height of the title box
-        #tdrStyle.SetTitleW(0); #Set the width of the title box
-        #tdrStyle.SetTitleX(0); #Set the position of the title box
-        #tdrStyle.SetTitleY(0.985); #Set the position of the title box
-        #tdrStyle.SetTitleStyle(Style_t style = 1001);
-        #tdrStyle.SetTitleBorderSize(2);
+        self.tdrStyle.SetOptTitle(0);
+        self.tdrStyle.SetTitleFont(42);
+        self.tdrStyle.SetTitleColor(1);
+        self.tdrStyle.SetTitleTextColor(1);
+        self.tdrStyle.SetTitleFillColor(10);
+        self.tdrStyle.SetTitleFontSize(0.05);
+        #self.tdrStyle.SetTitleH(0); #Set the height of the title box
+        #self.tdrStyle.SetTitleW(0); #Set the width of the title box
+        #self.tdrStyle.SetTitleX(0); #Set the position of the title box
+        #self.tdrStyle.SetTitleY(0.985); #Set the position of the title box
+        #self.tdrStyle.SetTitleStyle(Style_t style = 1001);
+        #self.tdrStyle.SetTitleBorderSize(2);
       
         #For the axis titles:      
-        tdrStyle.SetTitleColor(1, "XYZ");
-        tdrStyle.SetTitleFont(42, "XYZ");
-        tdrStyle.SetTitleSize(0.06, "XYZ");
-        #tdrStyle.SetTitleXSize(Float_t size = 0.02); #Another way to set the size?
-        #tdrStyle.SetTitleYSize(Float_t size = 0.02);
-        tdrStyle.SetTitleXOffset(0.9);
-        tdrStyle.SetTitleYOffset(1.5);
-        #tdrStyle.SetTitleOffset(1.1, "Y"); #Another way to set the Offset
+        self.tdrStyle.SetTitleColor(1, "XYZ");
+        self.tdrStyle.SetTitleFont(42, "XYZ");
+        self.tdrStyle.SetTitleSize(0.06, "XYZ");
+        #self.tdrStyle.SetTitleXSize(Float_t size = 0.02); #Another way to set the size?
+        #self.tdrStyle.SetTitleYSize(Float_t size = 0.02);
+        self.tdrStyle.SetTitleXOffset(0.9);
+        self.tdrStyle.SetTitleYOffset(1.5);
+        #self.tdrStyle.SetTitleOffset(1.1, "Y"); #Another way to set the Offset
       
         #For the axis labels:     
-        tdrStyle.SetLabelColor(1, "XYZ");
-        tdrStyle.SetLabelFont(42, "XYZ");
-        tdrStyle.SetLabelOffset(0.007, "XYZ");
-        tdrStyle.SetLabelSize(0.05, "XYZ");
+        self.tdrStyle.SetLabelColor(1, "XYZ");
+        self.tdrStyle.SetLabelFont(42, "XYZ");
+        self.tdrStyle.SetLabelOffset(0.007, "XYZ");
+        self.tdrStyle.SetLabelSize(0.05, "XYZ");
       
         #For the axis:        
-        tdrStyle.SetAxisColor(1, "XYZ");
-        tdrStyle.SetStripDecimals(kTRUE);
-        tdrStyle.SetTickLength(0.03, "XYZ");
-        tdrStyle.SetNdivisions(510, "XYZ");
-        tdrStyle.SetPadTickX(1);  #To get tick marks on the opposite side of the frame
-        tdrStyle.SetPadTickY(1);
+        self.tdrStyle.SetAxisColor(1, "XYZ");
+        self.tdrStyle.SetStripDecimals(kTRUE);
+        self.tdrStyle.SetTickLength(0.03, "XYZ");
+        self.tdrStyle.SetNdivisions(510, "XYZ");
+        self.tdrStyle.SetPadTickX(1);  #To get tick marks on the opposite side of the frame
+        self.tdrStyle.SetPadTickY(1);
       
         #Change for log plots:
-        tdrStyle.SetOptLogx(0);
-        tdrStyle.SetOptLogy(0);
-        tdrStyle.SetOptLogz(0);
+        self.tdrStyle.SetOptLogx(0);
+        self.tdrStyle.SetOptLogy(0);
+        self.tdrStyle.SetOptLogz(0);
       
         #Postscript options:
-        tdrStyle.SetPaperSize(20.,20.);
-        #tdrStyle.SetLineScalePS(Float_t scale = 3);
-        #tdrStyle.SetLineStyleString(Int_t i, const char* text);
-        #tdrStyle.SetHeaderPS(const char* header);
-        #tdrStyle.SetTitlePS(const char* pstitle);
+        self.tdrStyle.SetPaperSize(20.,20.);
+        #self.tdrStyle.SetLineScalePS(Float_t scale = 3);
+        #self.tdrStyle.SetLineStyleString(Int_t i, const char* text);
+        #self.tdrStyle.SetHeaderPS(const char* header);
+        #self.tdrStyle.SetTitlePS(const char* pstitle);
       
-        #tdrStyle.SetBarOffset(Float_t baroff = 0.5);
-        #tdrStyle.SetBarWidth(Float_t barwidth = 0.5);
-        #tdrStyle.SetPaintTextFormat(const char* format = "g");
-        #tdrStyle.SetPalette(Int_t ncolors = 0, Int_t* colors = 0);
-        #tdrStyle.SetTimeOffset(Double_t toffset);
-        #tdrStyle.SetHistMinimumZero(kTRUE);
+        #self.tdrStyle.SetBarOffset(Float_t baroff = 0.5);
+        #self.tdrStyle.SetBarWidth(Float_t barwidth = 0.5);
+        #self.tdrStyle.SetPaintTextFormat(const char* format = "g");
+        #self.tdrStyle.SetPalette(Int_t ncolors = 0, Int_t* colors = 0);
+        #self.tdrStyle.SetTimeOffset(Double_t toffset);
+        #self.tdrStyle.SetHistMinimumZero(kTRUE);
       
-        tdrStyle.cd();
+        self.tdrStyle.cd();
       
     ##################### ---------------------------------------------------
     def make_Pdf(self, label, in_model_name, mass_spectrum="_mj", ConstraintsList=[]):
@@ -1437,11 +1439,15 @@ class doFit_wj_and_wlvj:
 
 
     def get_WJets_mlvj_correction_sb_lo_to_signal_region(self,label, mlvj_model):#exo-vv method: extract M_lvj shape of signal_region from sb_lo
+        tmp_Style=self.tdrStyle.Clone("tmp_Style");
+        tmp_Style.SetPadRightMargin(0.08); 
+        tmp_Style.SetPadTickY(0);
+        tmp_Style.cd();
         print "get_WJets_mlvj_correction_sb_lo_to_signal_region"
         rrv_x = self.workspace4fit_.var("rrv_mass_lvj"); 
         rdataset_WJets_sb_lo_mlvj=self.workspace4fit_.data("rdataset4fit%s_sb_lo_%s_mlvj"%(label,self.channel))
         rdataset_WJets_signal_region_mlvj=self.workspace4fit_.data("rdataset4fit%s_signal_region_%s_mlvj"%(label,self.channel))
-        mplot = rrv_x.frame(RooFit.Title("correlation_pdf")); mplot.GetYaxis().SetTitle("alpha");
+        mplot = rrv_x.frame(RooFit.Title("correlation_pdf")); mplot.GetYaxis().SetTitle("PDF");
 
         if mlvj_model=="ErfExp_v1":
             rrv_c_sb     =self.workspace4fit_.var("rrv_c_ErfExp%s_sb_lo_%s"%(label,self.channel));
@@ -1555,7 +1561,7 @@ class doFit_wj_and_wlvj:
         getattr(self.workspace4fit_,"import")(correct_factor_pdf_deco);
         if label=="_WJets0":
             mplot_sb_lo = rrv_x.frame(RooFit.Title("WJets sb low"));
-            rdataset_WJets_sb_lo_mlvj.plotOn(mplot_sb_lo);
+            rdataset_WJets_sb_lo_mlvj.plotOn(mplot_sb_lo, RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
             model_pdf_sb_lo_WJets.plotOn(mplot_sb_lo);
             hpull=mplot_sb_lo.pullHist();
             mplot_pull_sideband = rrv_x.frame(RooFit.Title("Pull Distribution"));
@@ -1566,7 +1572,7 @@ class doFit_wj_and_wlvj:
             self.draw_canvas( mplot_sb_lo, mplot_pull_sideband,parameters_list,"plots_%s_%s/other/"%(self.channel,self.PS_model), "m_lvj%s_sb_lo_sim"%(label),"",1,0)
 
             mplot_signal_region = rrv_x.frame(RooFit.Title("WJets sr"));
-            rdataset_WJets_signal_region_mlvj.plotOn(mplot_signal_region);
+            rdataset_WJets_signal_region_mlvj.plotOn(mplot_signal_region, RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
             model_pdf_signal_region_WJets.plotOn(mplot_signal_region);
             hpull=mplot_signal_region.pullHist();
             mplot_pull_signal_region = rrv_x.frame(RooFit.Title("Pull Distribution"));
@@ -1579,6 +1585,9 @@ class doFit_wj_and_wlvj:
         model_pdf_sb_lo_WJets.plotOn(mplot,RooFit.Name("Sideband"));
         model_pdf_signal_region_WJets.plotOn(mplot, RooFit.LineColor(kRed) ,RooFit.Name("Signal Region"));
         correct_factor_pdf_deco.plotOn(mplot, RooFit.LineColor(kBlack),RooFit.Name("#alpha") );
+
+        
+
         if label=="_WJets0":
             if self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets1_sim_%s_mlvj"%(self.channel)):
                 self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets1_sim_%s_mlvj"%(self.channel)).plotOn(mplot, RooFit.LineColor(kMagenta), RooFit.LineStyle(3),RooFit.Name("#alpha: Alter PS") ); 
@@ -1616,11 +1625,26 @@ class doFit_wj_and_wlvj:
         leg=self.legend4Plot(mplot,0);mplot.addObject(leg);
 
         #mplot.GetYaxis().SetRangeUser(0,mplot.GetMaximum()*1.1);
-        if self.higgs_sample=="ggH600" or self.higgs_sample=="ggH700":
-            mplot.GetYaxis().SetRangeUser(0,0.25);
-        else: 
-            mplot.GetYaxis().SetRangeUser(0,0.28);
- 
+        if self.higgs_sample=="ggH600" or self.higgs_sample=="ggH700": tmp_y_max=0.25
+        else: tmp_y_max=0.28
+        mplot.GetYaxis().SetRangeUser(0,tmp_y_max);
+
+        # pdf_sb, pdf_sr, pdf_alpha
+        model_pdf_sb_lo_WJets.getVal(RooArgSet(rrv_x)),
+        model_pdf_signal_region_WJets.getVal(RooArgSet(rrv_x)),
+        correct_factor_pdf_deco.getVal(RooArgSet(rrv_x)),
+        tmp_alpha_ratio=( model_pdf_signal_region_WJets.getVal(RooArgSet(rrv_x))/model_pdf_sb_lo_WJets.getVal(RooArgSet(rrv_x)) );
+        tmp_alpha_pdf= correct_factor_pdf_deco.getVal(RooArgSet(rrv_x)) * rrv_x.getBinWidth(0);
+        tmp_alpha_scale=tmp_alpha_ratio/tmp_alpha_pdf;
+
+        #add alpha scale axis
+        axis_alpha=TGaxis( rrv_x.getMax(), 0, rrv_x.getMax(), tmp_y_max, 0, tmp_y_max*tmp_alpha_scale, 510, "+L");
+        axis_alpha.SetTitle("alpha");
+        mplot.addObject(axis_alpha); 
+
+
+
+
         self.draw_canvas1(mplot,"plots_%s_%s/other/"%(self.channel,self.PS_model),"correction_pdf%s_%s_%s_M_lvj_signal_region_to_sideband"%(label,self.PS_model,self.MODEL_4_mlvj),0,0);
 
         correct_factor_pdf_deco.getParameters(rdataset_WJets_sb_lo_mlvj).Print("v");
@@ -1653,11 +1677,11 @@ class doFit_wj_and_wlvj:
         rfresult = model.fitTo(rdataset_mj,RooFit.Save(1), RooFit.SumW2Error(kTRUE) ,RooFit.Extended(kTRUE) );
 
         mplot = rrv_mass_j.frame(RooFit.Title(label+" fitted by "+in_model_name));
-        rdataset_mj.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2));
+        rdataset_mj.plotOn( mplot, RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
         #model.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines());
         #draw_error_band(rdataset_mj, model,self.workspace4fit_.var("rrv_number"+label+"_"+self.channel+"_mj") ,rfresult,mplot,6,"L");
         draw_error_band_extendPdf(rdataset_mj, model, rfresult,mplot,6,"L");
-        rdataset_mj.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) );
+        rdataset_mj.plotOn( mplot , RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
         model.plotOn( mplot , RooFit.VLines());
 
         #pull
@@ -1716,14 +1740,14 @@ class doFit_wj_and_wlvj:
         rfresult = model.fitTo(rdataset_mj,RooFit.Save(1), RooFit.SumW2Error(kTRUE) ,RooFit.Extended(kTRUE), RooFit.Range("controlsample_fitting_range") );
         
         mplot = rrv_mass_j.frame(RooFit.Title(label+" fitted by "+in_model_name));
-        rdataset_mj.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) );
+        rdataset_mj.plotOn( mplot , RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0)  );
         model.plotOn( mplot, RooFit.VisualizeError(rfresult,1),RooFit.FillColor(kOrange) , RooFit.VLines(),RooFit.NormRange("controlsample_fitting_range"));
         #model.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines(),RooFit.NormRange("controlsample_fitting_range"));
         model.plotOn( mplot , RooFit.VLines(),RooFit.NormRange("controlsample_fitting_range"));
         model.plotOn( mplot, RooFit.Components("erfExp"+label+"_"+self.channel), RooFit.LineStyle(kDashed),RooFit.LineColor(kGreen) , RooFit.VLines(),RooFit.NormRange("controlsample_fitting_range"));
         model.plotOn( mplot, RooFit.Components("gaus"+label+"_"+self.channel), RooFit.LineStyle(kDashed),RooFit.LineColor(kRed) , RooFit.VLines(),RooFit.NormRange("controlsample_fitting_range"));
         model.plotOn( mplot , RooFit.VLines(),RooFit.NormRange("controlsample_fitting_range"));
-        rdataset_mj.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) );
+        rdataset_mj.plotOn( mplot, RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0)  );
         #pull
         hpull=mplot.pullHist();
         mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"));
@@ -1811,24 +1835,31 @@ class doFit_wj_and_wlvj:
         
         mplot = rrv_mass_j.frame();
 
-        rdataset_data_mj.plotOn( mplot, RooFit.Invisible() );
+        rdataset_data_mj.plotOn( mplot, RooFit.Invisible(), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0)  );
 
         model_pdf_WJets.plotOn(mplot,RooFit.Normalization(scale_number_WJets),RooFit.Name("WJets_invisible"),RooFit.Invisible(), RooFit.VLines())
         model_pdf_VV.plotOn(mplot,RooFit.Normalization(scale_number_VV),RooFit.Name("VV_invisible"), RooFit.AddTo("WJets_invisible"),RooFit.Invisible(), RooFit.VLines())
         model_pdf_STop.plotOn(mplot,RooFit.Normalization(scale_number_STop),RooFit.Name("STop_invisible"), RooFit.AddTo("VV_invisible"),RooFit.Invisible(), RooFit.VLines())
         model_pdf_TTbar.plotOn(mplot,RooFit.Normalization(scale_number_TTbar),RooFit.Name("TTbar_invisible"), RooFit.AddTo("STop_invisible"),RooFit.Invisible(), RooFit.VLines())
-        model_pdf_TTbar.plotOn(mplot,RooFit.Normalization(scale_number_TTbar),RooFit.Name("TTbar"), RooFit.AddTo("STop_invisible"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(self.color_palet["TTbar"]), RooFit.VLines())
-        model_pdf_STop.plotOn(mplot,RooFit.Normalization(scale_number_STop),RooFit.Name("STop"), RooFit.AddTo("VV_invisible"), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(self.color_palet["STop"]), RooFit.VLines())
-        model_pdf_VV.plotOn(mplot,RooFit.Normalization(scale_number_VV),RooFit.Name("VV"), RooFit.AddTo("WJets_invisible"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(self.color_palet["VV"]), RooFit.VLines())
-        model_pdf_WJets.plotOn(mplot,RooFit.Normalization(scale_number_WJets),RooFit.Name("WJets"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(self.color_palet["WJets"]), RooFit.VLines())
+        model_pdf_TTbar.plotOn(mplot,RooFit.Normalization(scale_number_TTbar),RooFit.Name("TTbar"), RooFit.AddTo("STop_invisible"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_pdf_STop.plotOn(mplot,RooFit.Normalization(scale_number_STop),RooFit.Name("STop"), RooFit.AddTo("VV_invisible"), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_pdf_VV.plotOn(mplot,RooFit.Normalization(scale_number_VV),RooFit.Name("VV"), RooFit.AddTo("WJets_invisible"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_pdf_WJets.plotOn(mplot,RooFit.Normalization(scale_number_WJets),RooFit.Name("WJets"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(kBlack), RooFit.VLines())
 
-        rdataset_data_mj.plotOn( mplot,RooFit.Name("data") );
+        rdataset_data_mj.plotOn( mplot,RooFit.Name("data"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0)  );
         if self.wtagger_cut<10:
             model_TotalMC.plotOn( mplot,RooFit.Normalization(scale_number_TotalMC) ,RooFit.Name("MC fit") ,RooFit.NormRange("controlsample_fitting_range") , RooFit.LineStyle(kDashed));
-            model_TotalMC.plotOn( mplot,RooFit.Normalization(scale_number_TotalMC) ,RooFit.Name("MC fit comp") ,RooFit.NormRange("controlsample_fitting_range") , RooFit.Components("model_pdf_bkg_TotalMC_%s_mj"%(self.channel)),  RooFit.LineStyle(kDashed), RooFit.LineColor(kRed) );
+            #model_TotalMC.plotOn( mplot,RooFit.Normalization(scale_number_TotalMC) ,RooFit.Name("MC fit comp") ,RooFit.NormRange("controlsample_fitting_range") , RooFit.Components("model_pdf_bkg_TotalMC_%s_mj"%(self.channel)),  RooFit.LineStyle(kDashed), RooFit.LineColor(kRed) );
             model_data.plotOn( mplot,RooFit.Name("data fit"), RooFit.NormRange("controlsample_fitting_range") );
-            model_data.plotOn( mplot,RooFit.Name("data fit comp"), RooFit.NormRange("controlsample_fitting_range"), RooFit.Components("model_pdf_bkg_data_%s_mj"%(self.channel)), RooFit.LineColor(kRed) );
+            #model_data.plotOn( mplot,RooFit.Name("data fit comp"), RooFit.NormRange("controlsample_fitting_range"), RooFit.Components("model_pdf_bkg_data_%s_mj"%(self.channel)), RooFit.LineColor(kRed) );
             model_data.plotOn( mplot,RooFit.Name("data fit invisi"), RooFit.NormRange("controlsample_fitting_range") );
+      
+        #signal window
+        lowerLine = TLine(self.mj_signal_min,0.,self.mj_signal_min,mplot.GetMaximum()); lowerLine.SetLineWidth(2); lowerLine.SetLineColor(kGray+2); lowerLine.SetLineStyle(9);
+        upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,mplot.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
+        mplot.addObject(lowerLine);
+        mplot.addObject(upperLine);
+        #legend
         leg=self.legend4Plot(mplot,0)
         mplot.addObject(leg)
 
@@ -1849,17 +1880,12 @@ class doFit_wj_and_wlvj:
         tl_data_sigma.SetTextSize(0.03)
         tl_MC_mean.SetTextSize(0.03)
         tl_MC_sigma.SetTextSize(0.03)
-        if self.wtagger_cut<10:
-            mplot.addObject(tl_data_mean);
-            mplot.addObject(tl_data_sigma);
-            mplot.addObject(tl_MC_mean);
-            mplot.addObject(tl_MC_sigma);
-      
-        #signal window
-        lowerLine = TLine(self.mj_signal_min,0.,self.mj_signal_min,mplot.GetMaximum()); lowerLine.SetLineWidth(2); lowerLine.SetLineColor(kGray+2); lowerLine.SetLineStyle(9);
-        upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,mplot.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
-        mplot.addObject(lowerLine);
-        mplot.addObject(upperLine);
+        #if self.wtagger_cut<10:
+            #mplot.addObject(tl_data_mean);
+            #mplot.addObject(tl_data_sigma);
+            #mplot.addObject(tl_MC_mean);
+            #mplot.addObject(tl_MC_sigma);
+
         #pull
         hpull=mplot.pullHist();
         mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"));
@@ -2082,22 +2108,22 @@ class doFit_wj_and_wlvj:
         xframe_data=rrv_mass_j.frame();
         xframe_data_fail=rrv_mass_j.frame();
 
-        combData_p_f_data.plotOn(xframe_data,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel,self.channel)));
-        combData_p_f_data.plotOn(xframe_data_fail,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel,self.channel)));
+        combData_p_f_data.plotOn(xframe_data,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel,self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
+        combData_p_f_data.plotOn(xframe_data_fail,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel,self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
         
-        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("TTbar"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(self.color_palet["TTbar"]), RooFit.VLines())
-        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("STop"),RooFit.Components("%s,%s,%s"%(model_histpdf_STop.GetName(), model_histpdf_VV.GetName(), model_histpdf_WJets.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(self.color_palet["STop"]), RooFit.VLines())
-        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("VV"),RooFit.Components("%s,%s"%(model_histpdf_VV.GetName(), model_histpdf_WJets.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(self.color_palet["VV"]), RooFit.VLines())
-        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("WJets"),RooFit.Components("%s"%(model_histpdf_WJets.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(self.color_palet["WJets"]), RooFit.VLines())
+        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("TTbar"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("STop"),RooFit.Components("%s,%s,%s"%(model_histpdf_STop.GetName(), model_histpdf_VV.GetName(), model_histpdf_WJets.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("VV"),RooFit.Components("%s,%s"%(model_histpdf_VV.GetName(), model_histpdf_WJets.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("WJets"),RooFit.Components("%s"%(model_histpdf_WJets.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(kBlack), RooFit.VLines())
 
-        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("TTbar"), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(self.color_palet["TTbar"]), RooFit.VLines())
-        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("STop"),RooFit.Components("%s,%s,%s"%(model_histpdf_STop_fail.GetName(), model_histpdf_VV_fail.GetName(), model_histpdf_WJets_fail.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(self.color_palet["STop"]), RooFit.VLines())
-        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("VV"),RooFit.Components("%s,%s"%(model_histpdf_VV_fail.GetName(), model_histpdf_WJets_fail.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(self.color_palet["VV"]), RooFit.VLines())
-        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("WJets"),RooFit.Components("%s"%( model_histpdf_WJets_fail.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(self.color_palet["WJets"]), RooFit.VLines())
+        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("TTbar"), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("STop"),RooFit.Components("%s,%s,%s"%(model_histpdf_STop_fail.GetName(), model_histpdf_VV_fail.GetName(), model_histpdf_WJets_fail.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("VV"),RooFit.Components("%s,%s"%(model_histpdf_VV_fail.GetName(), model_histpdf_WJets_fail.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("WJets"),RooFit.Components("%s"%( model_histpdf_WJets_fail.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(kBlack), RooFit.VLines())
 
 
-        combData_p_f_data.plotOn(xframe_data,RooFit.Name("data"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel,self.channel)));
-        combData_p_f_data.plotOn(xframe_data_fail,RooFit.Name("data"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel,self.channel)));
+        combData_p_f_data.plotOn(xframe_data,RooFit.Name("data"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel,self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
+        combData_p_f_data.plotOn(xframe_data_fail,RooFit.Name("data"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel,self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
 
         if self.wtagger_cut<10:
             simPdf_TotalMC.plotOn(xframe_data,RooFit.Name("MC fit"),RooFit.Slice(category_p_f,"pass"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_TotalMC),RooFit.NormRange("controlsample_fitting_range"), RooFit.LineStyle(kDashed))
@@ -2117,6 +2143,15 @@ class doFit_wj_and_wlvj:
             #simPdf_data.plotOn(xframe_data_fail,RooFit.Name("data fit comp"),RooFit.Slice(category_p_f,"fail"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_data),RooFit.NormRange("controlsample_fitting_range"), RooFit.Components("model_bkg_data_failtau2tau1cut_%s_mj"%(self.channel)), RooFit.LineColor(kRed))
             simPdf_data.plotOn(xframe_data_fail,RooFit.Name("data fit comp"),RooFit.Slice(category_p_f,"fail"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_data),RooFit.NormRange("controlsample_fitting_range"), RooFit.Components("%s,%s,%s,%s"%(model_bkg_data_fail.GetName(),model_STop_fail.GetName(),model_VV_fail.GetName(),model_WJets_fail.GetName())), RooFit.LineColor(kRed))
             simPdf_data.plotOn(xframe_data_fail,RooFit.Name("data fit invisi"),RooFit.Slice(category_p_f,"fail"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_data),RooFit.NormRange("controlsample_fitting_range"))
+
+        #signal window
+        lowerLine = TLine(self.mj_signal_min,0.,self.mj_signal_min,xframe_data.GetMaximum()); lowerLine.SetLineWidth(2); lowerLine.SetLineColor(kGray+2); lowerLine.SetLineStyle(9);
+        upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,xframe_data.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
+        xframe_data.addObject(lowerLine); xframe_data.addObject(upperLine);
+        lowerLine = TLine(self.mj_signal_min,0.,self.mj_signal_min,xframe_data_fail.GetMaximum()); lowerLine.SetLineWidth(2); lowerLine.SetLineColor(kGray+2); lowerLine.SetLineStyle(9);
+        upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,xframe_data_fail.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
+        xframe_data_fail.addObject(lowerLine); xframe_data_fail.addObject(upperLine);
+        #legend
         leg_data=self.legend4Plot(xframe_data,0)
         xframe_data.addObject(leg_data)
         leg_data_fail=self.legend4Plot(xframe_data_fail,0)
@@ -2133,25 +2168,20 @@ class doFit_wj_and_wlvj:
             tl_MC_mean.SetNDC(); tl_MC_sigma.SetNDC();
             tl_MC_mean.SetTextSize(0.03)
             tl_MC_sigma.SetTextSize(0.03)
-            if self.wtagger_cut<10:
-                xframe_data.addObject(tl_MC_mean);
-                xframe_data.addObject(tl_MC_sigma);
+            #if self.wtagger_cut<10:
+                #xframe_data.addObject(tl_MC_mean);
+                #xframe_data.addObject(tl_MC_sigma);
         if rrv_mean_gaus_data: 
             tl_data_mean =TLatex(0.25 ,0.52, ("Mean_{data} = %3.1f #pm %2.1f")%(rrv_mean_gaus_data.getVal(), rrv_mean_gaus_data.getError()) );
             tl_data_sigma=TLatex(0.25 ,0.47, ("Sigma_{data}= %2.1f #pm %2.1f")%(rrv_sigma_gaus_data.getVal(), rrv_sigma_gaus_data.getError()) );
             tl_data_mean.SetNDC(); tl_data_sigma.SetNDC();
             tl_data_mean.SetTextSize(0.03)
             tl_data_sigma.SetTextSize(0.03)
-            if self.wtagger_cut<10:
-                xframe_data.addObject(tl_data_mean);
-                xframe_data.addObject(tl_data_sigma);
-        #signal window
-        lowerLine = TLine(self.mj_signal_min,0.,self.mj_signal_min,xframe_data.GetMaximum()); lowerLine.SetLineWidth(2); lowerLine.SetLineColor(kGray+2); lowerLine.SetLineStyle(9);
-        upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,xframe_data.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
-        xframe_data.addObject(lowerLine); xframe_data.addObject(upperLine);
-        lowerLine = TLine(self.mj_signal_min,0.,self.mj_signal_min,xframe_data_fail.GetMaximum()); lowerLine.SetLineWidth(2); lowerLine.SetLineColor(kGray+2); lowerLine.SetLineStyle(9);
-        upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,xframe_data_fail.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
-        xframe_data_fail.addObject(lowerLine); xframe_data_fail.addObject(upperLine);
+            #if self.wtagger_cut<10:
+                #xframe_data.addObject(tl_data_mean);
+                #xframe_data.addObject(tl_data_sigma);
+
+
         ##pull
         #hpull=xframe_data.pullHist();
         #mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"));
@@ -2264,44 +2294,65 @@ class doFit_wj_and_wlvj:
         xframe_data=rrv_mass_j.frame();
         xframe_data_fail=rrv_mass_j.frame();
 
-        combData_p_f_data.plotOn(xframe_data,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel, self.channel)));
-        combData_p_f_data.plotOn(xframe_data_fail,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel, self.channel)));
+        combData_p_f_data.plotOn(xframe_data,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel, self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
+        combData_p_f_data.plotOn(xframe_data_fail,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel, self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
         #combData_p_f_TotalMC.plotOn(xframe_data,RooFit.Name("TotalMC invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel,self.channel)), RooFit.MarkerColor(kWhite), RooFit.LineColor(kWhite) );
         #combData_p_f_TotalMC.plotOn(xframe_data_fail,RooFit.Name("TotalMC invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel,self.channel)), RooFit.MarkerColor(kWhite), RooFit.LineColor(kWhite) );
         
-        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("TTbar"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(self.color_palet["TTbar"]), RooFit.VLines())
-        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("STop"),RooFit.Components("%s,%s,%s"%(model_histpdf_STop.GetName(), model_histpdf_VV.GetName(), model_histpdf_WJets.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(self.color_palet["STop"]), RooFit.VLines())
-        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("VV"),RooFit.Components("%s,%s"%(model_histpdf_VV.GetName(), model_histpdf_WJets.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(self.color_palet["VV"]), RooFit.VLines())
-        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("WJets"),RooFit.Components("%s"%(model_histpdf_WJets.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(self.color_palet["WJets"]), RooFit.VLines())
+        #pass plot
+        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("TTbar"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("STop"),RooFit.Components("%s,%s,%s"%(model_histpdf_STop.GetName(), model_histpdf_VV.GetName(), model_histpdf_WJets.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("VV"),RooFit.Components("%s,%s"%(model_histpdf_VV.GetName(), model_histpdf_WJets.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("WJets"),RooFit.Components("%s"%(model_histpdf_WJets.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        #solid line
+        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("TTbar_line_invisible"), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines())
+        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("STop_line_invisible"),RooFit.Components("%s,%s,%s"%(model_histpdf_STop.GetName(), model_histpdf_VV.GetName(), model_histpdf_WJets.GetName()) ), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines())
+        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("VV_line_invisible"),RooFit.Components("%s,%s"%(model_histpdf_VV.GetName(), model_histpdf_WJets.GetName()) ), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines())
+        model_TTbar_STop_VV_WJets.plotOn(xframe_data,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets),RooFit.Name("WJets_line_invisible"),RooFit.Components("%s"%(model_histpdf_WJets.GetName()) ), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines())
 
-        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("TTbar"), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(self.color_palet["TTbar"]), RooFit.VLines())
-        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("STop"),RooFit.Components("%s,%s,%s"%(model_histpdf_STop_fail.GetName(), model_histpdf_VV_fail.GetName(), model_histpdf_WJets_fail.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(self.color_palet["STop"]), RooFit.VLines())
-        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("VV"),RooFit.Components("%s,%s"%(model_histpdf_VV_fail.GetName(), model_histpdf_WJets_fail.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(self.color_palet["VV"]), RooFit.VLines())
-        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("WJets"),RooFit.Components("%s"%( model_histpdf_WJets_fail.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(self.color_palet["WJets"]), RooFit.VLines())
+        #fail plot
+        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("TTbar"), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("STop"),RooFit.Components("%s,%s,%s"%(model_histpdf_STop_fail.GetName(), model_histpdf_VV_fail.GetName(), model_histpdf_WJets_fail.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("VV"),RooFit.Components("%s,%s"%(model_histpdf_VV_fail.GetName(), model_histpdf_WJets_fail.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("WJets"),RooFit.Components("%s"%( model_histpdf_WJets_fail.GetName()) ), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(kBlack), RooFit.VLines())
+        #solid line
+        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("TTbar_line_invisible"), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines())
+        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("STop_line_invisible"),RooFit.Components("%s,%s,%s"%(model_histpdf_STop_fail.GetName(), model_histpdf_VV_fail.GetName(), model_histpdf_WJets_fail.GetName()) ), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines())
+        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("VV_line_invisible"),RooFit.Components("%s,%s"%(model_histpdf_VV_fail.GetName(), model_histpdf_WJets_fail.GetName()) ), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines())
+        model_TTbar_STop_VV_WJets_fail.plotOn(xframe_data_fail,RooFit.Normalization(scale_number_TTbar_STop_VV_WJets_fail),RooFit.Name("WJets_line_invisible"),RooFit.Components("%s"%( model_histpdf_WJets_fail.GetName()) ), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines())
 
 
-        combData_p_f_data.plotOn(xframe_data,RooFit.Name("data"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel,self.channel)));
-        combData_p_f_data.plotOn(xframe_data_fail,RooFit.Name("data"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel,self.channel)));
+        combData_p_f_data.plotOn(xframe_data,RooFit.Name("data"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel,self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
+        combData_p_f_data.plotOn(xframe_data_fail,RooFit.Name("data"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel,self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
 
         if self.wtagger_cut<10:
-            combData_p_f_TotalMC.plotOn(xframe_data,RooFit.Name("TotalMC invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel,self.channel)), RooFit.MarkerColor(kWhite), RooFit.LineColor(kWhite), RooFit.Invisible() );
+            combData_p_f_TotalMC.plotOn(xframe_data,RooFit.Name("TotalMC invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel,self.channel)), RooFit.MarkerColor(kWhite), RooFit.LineColor(kWhite), RooFit.Invisible() , RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
             simPdf_TotalMC.plotOn(xframe_data,RooFit.Name("MC fit"),RooFit.Slice(category_p_f,"pass"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_TotalMC),RooFit.NormRange("controlsample_fitting_range"), RooFit.LineStyle(kDashed))
-            simPdf_TotalMC.plotOn(xframe_data,RooFit.Name("MC fit comp"),RooFit.Slice(category_p_f,"pass"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_TotalMC), RooFit.NormRange("controlsample_fitting_range"), RooFit.Components("%s,%s,%s,%s"%("model_bkg_TotalMC_%s_mj"%(self.channel),"model_STop_%s_mj"%(self.channel),"model_VV_%s_mj"%(self.channel),"model_WJets0_%s_mj"%(self.channel)) ), RooFit.LineColor(kRed), RooFit.LineStyle(kDashed))
+            #simPdf_TotalMC.plotOn(xframe_data,RooFit.Name("MC fit comp"),RooFit.Slice(category_p_f,"pass"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_TotalMC), RooFit.NormRange("controlsample_fitting_range"), RooFit.Components("%s,%s,%s,%s"%("model_bkg_TotalMC_%s_mj"%(self.channel),"model_STop_%s_mj"%(self.channel),"model_VV_%s_mj"%(self.channel),"model_WJets0_%s_mj"%(self.channel)) ), RooFit.LineColor(kRed), RooFit.LineStyle(kDashed))
 
-            combData_p_f_data.plotOn(xframe_data,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel,self.channel))); 
+            combData_p_f_data.plotOn(xframe_data,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel,self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) ); 
             simPdf_data.plotOn(xframe_data,RooFit.Name("data fit"),RooFit.Slice(category_p_f,"pass"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_data),RooFit.NormRange("controlsample_fitting_range"))
-            simPdf_data.plotOn(xframe_data,RooFit.Name("data fit comp"),RooFit.Slice(category_p_f,"pass"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_data),RooFit.NormRange("controlsample_fitting_range"), RooFit.Components("%s,%s,%s,%s"%("model_bkg_data_%s_mj"%(self.channel),"model_STop_%s_mj"%(self.channel),"model_VV_%s_mj"%(self.channel),"model_WJets0_%s_mj"%(self.channel))), RooFit.LineColor(kRed))
+            #simPdf_data.plotOn(xframe_data,RooFit.Name("data fit comp"),RooFit.Slice(category_p_f,"pass"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_data),RooFit.NormRange("controlsample_fitting_range"), RooFit.Components("%s,%s,%s,%s"%("model_bkg_data_%s_mj"%(self.channel),"model_STop_%s_mj"%(self.channel),"model_VV_%s_mj"%(self.channel),"model_WJets0_%s_mj"%(self.channel))), RooFit.LineColor(kRed))
             simPdf_data.plotOn(xframe_data,RooFit.Name("data fit invisi"),RooFit.Slice(category_p_f,"pass"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_data),RooFit.NormRange("controlsample_fitting_range"))
 
 
-            combData_p_f_TotalMC.plotOn(xframe_data_fail,RooFit.Name("TotalMC invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel,self.channel)), RooFit.MarkerColor(kWhite), RooFit.LineColor(kWhite), RooFit.Invisible() );
+            combData_p_f_TotalMC.plotOn(xframe_data_fail,RooFit.Name("TotalMC invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel,self.channel)), RooFit.MarkerColor(kWhite), RooFit.LineColor(kWhite), RooFit.Invisible(), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0)  );
             simPdf_TotalMC.plotOn(xframe_data_fail,RooFit.Name("MC fit"),RooFit.Slice(category_p_f,"fail"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_TotalMC),RooFit.NormRange("controlsample_fitting_range"), RooFit.LineStyle(kDashed))
-            simPdf_TotalMC.plotOn(xframe_data_fail,RooFit.Name("MC fit comp"),RooFit.Slice(category_p_f,"fail"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_TotalMC),RooFit.NormRange("controlsample_fitting_range"), RooFit.Components("%s,%s,%s,%s"%("model_bkg_TotalMC_failtau2tau1cut_%s_mj"%(self.channel),"model_STop_failtau2tau1cut_%s_mj"%(self.channel),"model_VV_failtau2tau1cut_%s_mj"%(self.channel),"model_WJets0_failtau2tau1cut_%s_mj"%(self.channel))), RooFit.LineColor(kRed), RooFit.LineStyle(kDashed))
+            #simPdf_TotalMC.plotOn(xframe_data_fail,RooFit.Name("MC fit comp"),RooFit.Slice(category_p_f,"fail"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_TotalMC),RooFit.NormRange("controlsample_fitting_range"), RooFit.Components("%s,%s,%s,%s"%("model_bkg_TotalMC_failtau2tau1cut_%s_mj"%(self.channel),"model_STop_failtau2tau1cut_%s_mj"%(self.channel),"model_VV_failtau2tau1cut_%s_mj"%(self.channel),"model_WJets0_failtau2tau1cut_%s_mj"%(self.channel))), RooFit.LineColor(kRed), RooFit.LineStyle(kDashed))
 
-            combData_p_f_data.plotOn(xframe_data_fail,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel,self.channel)));
+            combData_p_f_data.plotOn(xframe_data_fail,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel,self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
             simPdf_data.plotOn(xframe_data_fail,RooFit.Name("data fit"),RooFit.Slice(category_p_f,"fail"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_data),RooFit.NormRange("controlsample_fitting_range"))
-            simPdf_data.plotOn(xframe_data_fail,RooFit.Name("data fit comp"),RooFit.Slice(category_p_f,"fail"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_data),RooFit.NormRange("controlsample_fitting_range"), RooFit.Components("%s,%s,%s,%s"%("model_bkg_data_failtau2tau1cut_%s_mj"%(self.channel),"model_STop_failtau2tau1cut_%s_mj"%(self.channel),"model_VV_failtau2tau1cut_%s_mj"%(self.channel),"model_WJets0_failtau2tau1cut_%s_mj"%(self.channel))), RooFit.LineColor(kRed))
+            #simPdf_data.plotOn(xframe_data_fail,RooFit.Name("data fit comp"),RooFit.Slice(category_p_f,"fail"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_data),RooFit.NormRange("controlsample_fitting_range"), RooFit.Components("%s,%s,%s,%s"%("model_bkg_data_failtau2tau1cut_%s_mj"%(self.channel),"model_STop_failtau2tau1cut_%s_mj"%(self.channel),"model_VV_failtau2tau1cut_%s_mj"%(self.channel),"model_WJets0_failtau2tau1cut_%s_mj"%(self.channel))), RooFit.LineColor(kRed))
             simPdf_data.plotOn(xframe_data_fail,RooFit.Name("data fit invisi"),RooFit.Slice(category_p_f,"fail"),RooFit.ProjWData(RooArgSet(category_p_f),combData_p_f_data),RooFit.NormRange("controlsample_fitting_range"))
+
+        #signal window
+        lowerLine = TLine(self.mj_signal_min,0.,self.mj_signal_min,xframe_data.GetMaximum()); lowerLine.SetLineWidth(2); lowerLine.SetLineColor(kGray+2); lowerLine.SetLineStyle(9);
+        upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,xframe_data.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
+        xframe_data.addObject(lowerLine); xframe_data.addObject(upperLine);
+        lowerLine = TLine(self.mj_signal_min,0.,self.mj_signal_min,xframe_data_fail.GetMaximum()); lowerLine.SetLineWidth(2); lowerLine.SetLineColor(kGray+2); lowerLine.SetLineStyle(9);
+        upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,xframe_data_fail.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
+        xframe_data_fail.addObject(lowerLine); xframe_data_fail.addObject(upperLine);
+        #legend
         leg_data=self.legend4Plot(xframe_data,0)
         xframe_data.addObject(leg_data)
         leg_data_fail=self.legend4Plot(xframe_data_fail,0)
@@ -2322,9 +2373,9 @@ class doFit_wj_and_wlvj:
             tl_MC_mean.SetNDC(); tl_MC_sigma.SetNDC();
             tl_MC_mean.SetTextSize(0.03)
             tl_MC_sigma.SetTextSize(0.03)
-            if self.wtagger_cut<10:
-                xframe_data.addObject(tl_MC_mean);
-                xframe_data.addObject(tl_MC_sigma);
+            #if self.wtagger_cut<10:
+            #    xframe_data.addObject(tl_MC_mean);
+            #    xframe_data.addObject(tl_MC_sigma);
 
         if rrv_mean_gaus_data: 
             tl_data_mean =TLatex(0.25 ,0.52, ("Mean_{data} = %3.1f #pm %2.1f")%(rrv_mean_gaus_data.getVal(), rrv_mean_gaus_data.getError()) );
@@ -2332,16 +2383,10 @@ class doFit_wj_and_wlvj:
             tl_data_mean.SetNDC(); tl_data_sigma.SetNDC();
             tl_data_mean.SetTextSize(0.03)
             tl_data_sigma.SetTextSize(0.03)
-            if self.wtagger_cut<10:
-                xframe_data.addObject(tl_data_mean);
-                xframe_data.addObject(tl_data_sigma);
-        #signal window
-        lowerLine = TLine(self.mj_signal_min,0.,self.mj_signal_min,xframe_data.GetMaximum()); lowerLine.SetLineWidth(2); lowerLine.SetLineColor(kGray+2); lowerLine.SetLineStyle(9);
-        upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,xframe_data.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
-        xframe_data.addObject(lowerLine); xframe_data.addObject(upperLine);
-        lowerLine = TLine(self.mj_signal_min,0.,self.mj_signal_min,xframe_data_fail.GetMaximum()); lowerLine.SetLineWidth(2); lowerLine.SetLineColor(kGray+2); lowerLine.SetLineStyle(9);
-        upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,xframe_data_fail.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
-        xframe_data_fail.addObject(lowerLine); xframe_data_fail.addObject(upperLine);
+            #if self.wtagger_cut<10:
+            #    xframe_data.addObject(tl_data_mean);
+            #    xframe_data.addObject(tl_data_sigma);
+
         ##pull
         #hpull=xframe_data.pullHist();
         #mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"));
@@ -3021,7 +3066,7 @@ class doFit_wj_and_wlvj:
 
         hist_TotalMC.Add(hist_WJets); hist_TotalMC.Add(hist_TTbar); hist_TotalMC.Add(hist_STop); hist_TotalMC.Add(hist_VV);
 
-        canvas_controlplot = TCanvas("canvas_controlplot"+variable,"canvas_controlplot"+variable,1000,800);
+        canvas_controlplot = TCanvas("canvas_controlplot"+variable,"canvas_controlplot"+variable, 800,600);
         canvas_controlplot.cd();
         hist_data.GetYaxis().SetRangeUser(1e-2,TMath.Max(hist_data.GetMaximum(),hist_TotalMC.GetMaximum())*1.2);
         hist_data.Draw("e");
@@ -3036,9 +3081,7 @@ class doFit_wj_and_wlvj:
         hist_data.GetXaxis().SetLabelSize(0.04);
         hist_data.GetYaxis().SetLabelSize(0.04);
 
-        banner = TLatex(0.18,0.96,("CMS Preliminary, %.1f fb^{-1} at #sqrt{s}=8TeV %s+jets"%(self.GetLumi(),self.channel)));
-        banner.SetNDC(); banner.SetTextSize(0.028);
-        banner.Draw();
+        banner = self.banner4Plot(); banner.Draw();
 
         theLeg = TLegend(0.65, 0.57, 0.92, 0.87, "", "NDC");
         theLeg.SetName("theLegend"); theLeg.SetBorderSize(0); theLeg.SetLineColor(0); theLeg.SetFillColor(0);
@@ -3061,15 +3104,15 @@ class doFit_wj_and_wlvj:
 
         rlt_file=TString(Directory.Data()+"controlplot_"+variable+"_"+tag+".png");
         canvas_controlplot.SaveAs(rlt_file.Data());
-        rlt_file.ReplaceAll(".png",".eps"); 
+        rlt_file.ReplaceAll(".png",".pdf"); 
         canvas_controlplot.SaveAs(rlt_file.Data());
 
         if logy:
             canvas_controlplot.SetLogy() ;
             canvas_controlplot.Update();
-            rlt_file.ReplaceAll(".eps","_log.eps"); 
+            rlt_file.ReplaceAll(".pdf","_log.pdf"); 
             canvas_controlplot.SaveAs(rlt_file.Data());
-            rlt_file.ReplaceAll(".eps",".png"); 
+            rlt_file.ReplaceAll(".pdf",".png"); 
             canvas_controlplot.SaveAs(rlt_file.Data());
 
     ######## ++++++++++++++
@@ -3085,12 +3128,12 @@ class doFit_wj_and_wlvj:
         
         mplot = rrv_mass_lvj.frame(RooFit.Title("M_{lvj"+in_range+"} fitted by "+mlvj_model));
         #if label=="_WJets0": mplot.GetYaxis().SetRangeUser(1e-2,310);
-        rdataset.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) );
+        rdataset.plotOn( mplot , RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0)  );
         #model.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines());
         #model.plotOn(mplot,RooFit.VisualizeError(rfresult,1),RooFit.FillColor(kOrange), RooFit.VLines());
         if not (TString(label).Contains("ggH") or  TString(label).Contains("vbfH") ): draw_error_band_extendPdf(rdataset, model, rfresult,mplot,6,"L")
         #draw_error_band_extendPdf(rdataset, model, rfresult,mplot,6,"L")
-        rdataset.plotOn( mplot ,RooFit.DataError(RooAbsData.SumW2) );
+        rdataset.plotOn( mplot , RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0)  );
         model.plotOn( mplot , RooFit.VLines());
 
         if deco :
@@ -3108,12 +3151,12 @@ class doFit_wj_and_wlvj:
             model_pdf_deco.Print();
             rfresult_pdf.covarianceMatrix().Print();# raw_input("ENTER");
             mplot_deco=rrv_mass_lvj.frame();
-            rdataset.plotOn(mplot_deco, RooFit.Name("TTbar MC"));
-            model_pdf_deco.plotOn(mplot_deco,RooFit.Name("TTbar"),RooFit.LineColor(kBlack));
-            rrv_number_dataset=RooRealVar("rrv_number_dataset","rrv_number_dataset",rdataset.sumEntries());
-            rrv_number_dataset.setError(0.)#(rdataset.sumEntries())**0.5);
-            draw_error_band(rdataset, model_pdf,rrv_number_dataset,rfresult_pdf,mplot_deco,self.color_palet["Uncertainty"],"F");
-            if label=="_TTbar" and in_range=="_signal_region":
+            if label=="_TTbar" and in_range=="_signal_region": 
+                rdataset.plotOn(mplot_deco, RooFit.Name("Powheg Sample"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
+                model_pdf_deco.plotOn(mplot_deco,RooFit.Name("TTbar_Powheg"),RooFit.LineColor(kBlack));
+                rrv_number_dataset=RooRealVar("rrv_number_dataset","rrv_number_dataset",rdataset.sumEntries());
+                rrv_number_dataset.setError(0.)#(rdataset.sumEntries())**0.5);
+                draw_error_band(rdataset, model_pdf,rrv_number_dataset,rfresult_pdf,mplot_deco,self.color_palet["Uncertainty"],"F");
                 #self.workspace4fit_.pdf("model_TTbar_Powheg_signal_region_%s_mlvj"%(self.channel)).plotOn(mplot_deco,RooFit.Name("TTbar_Powheg"), RooFit.LineStyle(kDashed),RooFit.LineColor(kBlack));
                 self.workspace4fit_.pdf("model_TTbar_MG_signal_region_%s_mlvj"%(self.channel)).plotOn(mplot_deco,RooFit.Name("TTbar_MG"), RooFit.LineStyle(kDashed),RooFit.LineColor(kBlack));
                 self.workspace4fit_.pdf("model_TTbar_scaleUp_signal_region_%s_mlvj"%(self.channel)).plotOn(mplot_deco,RooFit.Name("TTbar_scaleUp"), RooFit.LineColor(kRed));
@@ -3127,6 +3170,13 @@ class doFit_wj_and_wlvj:
                 #self.workspace4fit_.var("rrv_number_TTbar_Powheg_signal_region_%s_mlvj"%(self.channel)).Print();
                 self.workspace4fit_.var("rrv_number_TTbar_MG_signal_region_%s_mlvj"%(self.channel)).Print();
                 self.workspace4fit_.var("rrv_number_TTbar_signal_region_%s_mlvj"%(self.channel)).Print();
+            else:
+                rdataset.plotOn(mplot_deco, RooFit.Name("Data"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
+                model_pdf_deco.plotOn(mplot_deco,RooFit.Name(label),RooFit.LineColor(kBlack));
+                rrv_number_dataset=RooRealVar("rrv_number_dataset","rrv_number_dataset",rdataset.sumEntries());
+                rrv_number_dataset.setError(0.)#(rdataset.sumEntries())**0.5);
+                draw_error_band(rdataset, model_pdf,rrv_number_dataset,rfresult_pdf,mplot_deco,self.color_palet["Uncertainty"],"F");
+
             leg=self.legend4Plot(mplot_deco,0);
             mplot_deco.addObject(leg);
             self.draw_canvas1( mplot_deco, "plots_%s_%s/other/"%(self.channel,self.PS_model), "m_lvj"+label+in_range+in_range+mlvj_model+"_deco")
@@ -3153,6 +3203,7 @@ class doFit_wj_and_wlvj:
         self.workspace4fit_.var("rrv_number"+label+in_range+"_"+self.channel+"_mlvj").setError(self.workspace4fit_.var("rrv_number"+label+in_range+"_"+self.channel+"_mlvj").getError()*self.workspace4fit_.var("rrv_scale_to_lumi"+label+"_"+self.channel).getVal()  )
 
         self.workspace4fit_.var("rrv_number"+label+in_range+"_"+self.channel+"_mlvj").Print(); #raw_input("ENTER");
+        #raw_input("ENTER");
 
     ######## ++++++++++++++
     def fit_WJetsNorm(self): # to  get the normalization of WJets in signal_region
@@ -3233,42 +3284,47 @@ class doFit_wj_and_wlvj:
         
         if label=="_WJets0":
             mplot = rrv_mass_j.frame(RooFit.Title(""));
-            rdataset_data_mj.plotOn(mplot, RooFit.Name("data_invisible"));
+            rdataset_data_mj.plotOn(mplot, RooFit.Name("data_invisible"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
     
-            model_data.plotOn(mplot,RooFit.Name("VV"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj,model_VV_%s_mj"%(label,self.channel,self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(self.color_palet["VV"]),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
-            model_data.plotOn(mplot,RooFit.Name("TTbar"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj"%(label,self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(self.color_palet["TTbar"]),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
-            model_data.plotOn(mplot,RooFit.Name("STop"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj"%(label,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(self.color_palet["STop"]),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
-            model_data.plotOn(mplot,RooFit.Name("WJets"), RooFit.Components("model%s_%s_mj"%(label,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(self.color_palet["WJets"]),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn(mplot,RooFit.Name("VV"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj,model_VV_%s_mj"%(label,self.channel,self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(kBlack),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn(mplot,RooFit.Name("TTbar"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj"%(label,self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(kBlack),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn(mplot,RooFit.Name("STop"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj"%(label,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(kBlack),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn(mplot,RooFit.Name("WJets"), RooFit.Components("model%s_%s_mj"%(label,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(kBlack),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
     
-            model_data.plotOn(mplot,RooFit.Name("VV_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj,model_VV_%s_mj"%(label,self.channel,self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(self.color_palet["VV"]),RooFit.FillStyle(3003),RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
-            model_data.plotOn(mplot,RooFit.Name("TTbar_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj"%(label,self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(self.color_palet["TTbar"]),RooFit.FillStyle(3003),RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
-            model_data.plotOn(mplot,RooFit.Name("STop_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj"%(label,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(self.color_palet["STop"]),RooFit.FillStyle(3003),RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
-            model_data.plotOn(mplot,RooFit.Name("WJets_invisible"), RooFit.Components("model%s_%s_mj"%(label,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]),RooFit.FillStyle(3003),RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()), RooFit.LineColor(self.color_palet["WJets"]),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn(mplot,RooFit.Name("VV_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj,model_VV_%s_mj"%(label,self.channel,self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(kBlack),RooFit.FillStyle(3003),RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn(mplot,RooFit.Name("TTbar_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj"%(label,self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(kBlack),RooFit.FillStyle(3003),RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn(mplot,RooFit.Name("STop_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj"%(label,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(kBlack),RooFit.FillStyle(3003),RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn(mplot,RooFit.Name("WJets_invisible"), RooFit.Components("model%s_%s_mj"%(label,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]),RooFit.FillStyle(3003),RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()), RooFit.LineColor(kBlack),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
     
-            #model_data.plotOn(mplot,RooFit.Name("_invisible"),RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(self.color_palet["Uncertainty"]),RooFit.FillStyle(3013),RooFit.LineColor(self.color_palet["Uncertainty"]),RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
-            #draw_error_band(rdataset_data_mj, model_data, rrv_number_data_mj,rfresult,mplot,6,"L");
-            model_data.plotOn( mplot,RooFit.Name("_invisible"), RooFit.Components("model%s_%s_mj"%(label,self.channel)), RooFit.LineColor(self.color_palet["WJets"]), RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.LineStyle(kDashed) ,RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
-            model_data.plotOn( mplot,RooFit.Name("_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj"%(label,self.channel,self.channel)), RooFit.LineColor(self.color_palet["STop"]), RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.LineStyle(kDashed) ,RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
-            model_data.plotOn( mplot,RooFit.Name("_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj"%(label,self.channel,self.channel,self.channel)), RooFit.LineColor(self.color_palet["TTbar"]), RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.LineStyle(kDashed) ,RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
-            model_data.plotOn( mplot,RooFit.Name("_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj,model_VV_%s_mj"%(label,self.channel,self.channel,self.channel,self.channel)),RooFit.LineColor(self.color_palet["VV"]), RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.LineStyle(kDashed) ,RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            #solid line
+            model_data.plotOn( mplot,RooFit.Name("_invisible"), RooFit.Components("model%s_%s_mj"%(label,self.channel)), RooFit.LineColor(kBlack), RooFit.LineWidth(2) ,RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn( mplot,RooFit.Name("_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj"%(label,self.channel,self.channel)), RooFit.LineColor(kBlack), RooFit.LineWidth(2),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn( mplot,RooFit.Name("_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj"%(label,self.channel,self.channel,self.channel)), RooFit.LineColor(kBlack), RooFit.LineWidth(2) ,RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn( mplot,RooFit.Name("_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj,model_VV_%s_mj"%(label,self.channel,self.channel,self.channel,self.channel)),RooFit.LineColor(kBlack), RooFit.LineWidth(2) ,RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            #dash line
+            model_data.plotOn( mplot,RooFit.Name("_invisible"), RooFit.Components("model%s_%s_mj"%(label,self.channel)), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.LineStyle(kDashed) ,RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn( mplot,RooFit.Name("_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj"%(label,self.channel,self.channel)), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.LineStyle(kDashed) ,RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn( mplot,RooFit.Name("_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj"%(label,self.channel,self.channel,self.channel)), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.LineStyle(kDashed) ,RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
+            model_data.plotOn( mplot,RooFit.Name("_invisible"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj,model_VV_%s_mj"%(label,self.channel,self.channel,self.channel,self.channel)),RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.Range(rrv_mass_j.getMin(),rrv_mass_j.getMax()),RooFit.LineStyle(kDashed) ,RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
             draw_error_band(rdataset_data_mj, model_data, rrv_number_data_mj,rfresult,mplot,self.color_palet["Uncertainty"],"F");
-    
-            rdataset_data_mj.plotOn(mplot, RooFit.Name("data"));
-    
-            leg=self.legend4Plot(mplot,0);
-            mplot.addObject(leg);
-    
+            rdataset_data_mj.plotOn(mplot, RooFit.Name("data"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
             #pull
             hpull=mplot.pullHist();
             mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"));
             mplot_pull.addPlotable(hpull,"P");
             mplot_pull.SetTitle("PULL");
             mplot_pull.GetYaxis().SetRangeUser(-5,5);
+
             #signal window
             lowerLine = TLine(self.mj_signal_min,0.,self.mj_signal_min,mplot.GetMaximum()); lowerLine.SetLineWidth(2); lowerLine.SetLineColor(kGray+2); lowerLine.SetLineStyle(9);
             upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,mplot.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
             mplot.addObject(lowerLine); mplot.addObject(upperLine);
-            
+            #legend
+            leg=self.legend4Plot(mplot,0);
+            mplot.addObject(leg);
+
+
+             
             parameters_list=model_data.getParameters(rdataset_data_mj);
             mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
             self.draw_canvas( mplot, mplot_pull,parameters_list,"plots_%s_%s/m_j_fitting_wtaggercut%s_nPV%sto%s/"%(self.channel,self.PS_model, self.wtagger_label, self.nPV_min, self.nPV_max), "m_j_sideband%s"%(label),"",1)
@@ -3336,16 +3392,22 @@ class doFit_wj_and_wlvj:
 
         if label=="_WJets0":
             mplot = rrv_mass_lvj.frame(RooFit.Title("M_lvj fitted in M_j sideband "));
-            rdataset_data_mlvj.plotOn( mplot , RooFit.Invisible());
-            model_data.plotOn(mplot, RooFit.Components("model%s_sb_lo_from_fitting_%s_mlvj,model_TTbar_sb_lo_%s_mlvj,model_STop_sb_lo_%s_mlvj,model_VV_sb_lo_%s_mlvj"%(label,self.channel,self.channel,self.channel,self.channel)), RooFit.Name("WJets"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(self.color_palet["WJets"]), RooFit.VLines()) ;
-            model_data.plotOn(mplot, RooFit.Components("model_TTbar_sb_lo_%s_mlvj,model_STop_sb_lo_%s_mlvj,model_VV_sb_lo_%s_mlvj"%(self.channel,self.channel,self.channel)), RooFit.Name("TTbar"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(self.color_palet["TTbar"]), RooFit.VLines());
-            model_data.plotOn(mplot, RooFit.Components("model_STop_sb_lo_%s_mlvj,model_VV_sb_lo_%s_mlvj"%(self.channel,self.channel)), RooFit.Name("STop"), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(self.color_palet["STop"]), RooFit.VLines());
-            model_data.plotOn(mplot, RooFit.Components("model_VV_sb_lo_%s_mlvj"%(self.channel)),RooFit.Name("VV"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(self.color_palet["VV"]), RooFit.VLines()) ;
-            rdataset_data_mlvj.plotOn(mplot,RooFit.Name("data"));
-            #model_data.plotOn(mplot,RooFit.VisualizeError(rfresult,1), RooFit.Name("Uncertainty"),RooFit.FillColor(self.color_palet["Uncertainty"]),RooFit.FillStyle(3013),RooFit.LineColor(self.color_palet["Uncertainty"]), RooFit.VLines(), RooFit.Invisible());#use draw_error_band to replace the roofit default algorithm
+            rdataset_data_mlvj.plotOn( mplot , RooFit.Invisible(), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
+            model_data.plotOn(mplot, RooFit.Components("model%s_sb_lo_from_fitting_%s_mlvj,model_TTbar_sb_lo_%s_mlvj,model_STop_sb_lo_%s_mlvj,model_VV_sb_lo_%s_mlvj"%(label,self.channel,self.channel,self.channel,self.channel)), RooFit.Name("WJets"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(kBlack), RooFit.VLines()) ;
+            model_data.plotOn(mplot, RooFit.Components("model_TTbar_sb_lo_%s_mlvj,model_STop_sb_lo_%s_mlvj,model_VV_sb_lo_%s_mlvj"%(self.channel,self.channel,self.channel)), RooFit.Name("TTbar"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(kBlack), RooFit.VLines());
+            model_data.plotOn(mplot, RooFit.Components("model_STop_sb_lo_%s_mlvj,model_VV_sb_lo_%s_mlvj"%(self.channel,self.channel)), RooFit.Name("STop"), RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(kBlack), RooFit.VLines());
+            model_data.plotOn(mplot, RooFit.Components("model_VV_sb_lo_%s_mlvj"%(self.channel)),RooFit.Name("VV"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(kBlack), RooFit.VLines()) ;
+            #solid line
+            model_data.plotOn(mplot, RooFit.Components("model%s_sb_lo_from_fitting_%s_mlvj,model_TTbar_sb_lo_%s_mlvj,model_STop_sb_lo_%s_mlvj,model_VV_sb_lo_%s_mlvj"%(label,self.channel,self.channel,self.channel,self.channel)), RooFit.Name("WJets_line_invisible"), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines()) ;
+            model_data.plotOn(mplot, RooFit.Components("model_TTbar_sb_lo_%s_mlvj,model_STop_sb_lo_%s_mlvj,model_VV_sb_lo_%s_mlvj"%(self.channel,self.channel,self.channel)), RooFit.Name("TTbar_line_invisible"), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines());
+            model_data.plotOn(mplot, RooFit.Components("model_STop_sb_lo_%s_mlvj,model_VV_sb_lo_%s_mlvj"%(self.channel,self.channel)), RooFit.Name("STop_line_invisible"), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines());
+            model_data.plotOn(mplot, RooFit.Components("model_VV_sb_lo_%s_mlvj"%(self.channel)),RooFit.Name("VV_line_invisible"), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines()) ;
+ 
+
+            rdataset_data_mlvj.plotOn(mplot,RooFit.Name("data"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
             draw_error_band(rdataset_data_mlvj, model_data,self.workspace4fit_.var("rrv_number_data_sb_lo_%s_mlvj"%(self.channel)) ,rfresult,mplot,self.color_palet["Uncertainty"],"F");
             model_data.plotOn( mplot , RooFit.VLines(), RooFit.Invisible());
-            rdataset_data_mlvj.plotOn(mplot,RooFit.Name("data_invisible1"));
+            rdataset_data_mlvj.plotOn(mplot,RooFit.Name("data_invisible1"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
 
             leg=self.legend4Plot(mplot,0);#add legend
             mplot.addObject(leg)
@@ -3624,9 +3686,10 @@ class doFit_wj_and_wlvj:
                 params_list.append(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel)));
                 params_list.append(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig1"%(self.channel)));
                 params_list.append(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig2"%(self.channel)));
-                self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel))); 
-                self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig1"%(self.channel))); 
-                self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig2"%(self.channel))); 
+                if options.closuretest==0:
+                    self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel))); 
+                    self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig1"%(self.channel))); 
+                    self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig2"%(self.channel))); 
 
             if self.MODEL_4_mlvj=="ErfPow2_v1" or self.MODEL_4_mlvj=="ErfPowExp_v1" :
                 self.workspace4limit_.var("Deco_WJets0_sb_lo_from_fitting_%s_mlvj_eig0"%(self.channel)).setError(shape_para_error_WJets0);
@@ -3669,10 +3732,11 @@ class doFit_wj_and_wlvj:
                 params_list.append(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig1"%(self.channel)));
                 params_list.append(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig2"%(self.channel)));
                 params_list.append(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig3"%(self.channel)));
-                self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel))); 
-                self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig1"%(self.channel))); 
-                self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig2"%(self.channel))); 
-                self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig3"%(self.channel))); 
+                if options.closuretest==0:
+                    self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel))); 
+                    self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig1"%(self.channel))); 
+                    self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig2"%(self.channel))); 
+                    self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig3"%(self.channel))); 
 
             if self.MODEL_4_mlvj=="Exp" or self.MODEL_4_mlvj=="Pow" :
                 self.workspace4limit_.var("Deco_WJets0_sb_lo_from_fitting_%s_mlvj_eig0"%(self.channel)).setError(shape_para_error_WJets0);
@@ -3688,7 +3752,8 @@ class doFit_wj_and_wlvj:
 
                 self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel)).setError(shape_para_error_TTbar);
                 params_list.append(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel)));
-                self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel))); 
+                if options.closuretest==0:
+                    self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel))); 
             if self.MODEL_4_mlvj=="Pow2" :
                 self.workspace4limit_.var("Deco_WJets0_sb_lo_from_fitting_%s_mlvj_eig0"%(self.channel)).setError(shape_para_error_WJets0);
                 self.workspace4limit_.var("Deco_WJets0_sb_lo_from_fitting_%s_mlvj_eig1"%(self.channel)).setError(shape_para_error_WJets0);
@@ -3712,8 +3777,9 @@ class doFit_wj_and_wlvj:
                 self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig1"%(self.channel)).setError(shape_para_error_TTbar);
                 params_list.append(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel)));
                 params_list.append(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig1"%(self.channel))); 
-                self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel))); 
-                self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig1"%(self.channel))); 
+                if options.closuretest==0:
+                    self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel))); 
+                    self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig1"%(self.channel))); 
 
         getattr(self.workspace4limit_,"import")(self.FloatingParams);
  
@@ -3802,24 +3868,32 @@ class doFit_wj_and_wlvj:
 
         mplot=rrv_x.frame(RooFit.Title("check_workspace"));
         #data_obs.plotOn(mplot ,RooFit.DataError(RooAbsData.SumW2), RooFit.Name("data_invisible"),RooFit.Invisible());
-        data_obs.plotOn(mplot , RooFit.Name("data_invisible"));
+        data_obs.plotOn(mplot , RooFit.Name("data_invisible"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
 
-        model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Name("WJets"), RooFit.Components("WJets_%s,VV_%s,TTbar_%s,STop_%s"%(self.channel,self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(self.color_palet["WJets"]), RooFit.VLines());
-        model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Name("VV"), RooFit.Components("VV_%s,TTbar_%s,STop_%s"%(self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(self.color_palet["VV"]), RooFit.VLines());
-        model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Name("TTbar"), RooFit.Components("TTbar_%s,STop_%s"%(self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(self.color_palet["TTbar"]), RooFit.VLines());
-        model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Name("STop"), RooFit.Components("STop_%s"%(self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(self.color_palet["STop"]), RooFit.VLines());
+        model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Name("WJets"), RooFit.Components("WJets_%s,VV_%s,TTbar_%s,STop_%s"%(self.channel,self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(kBlack), RooFit.VLines());
+        model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Name("VV"), RooFit.Components("VV_%s,TTbar_%s,STop_%s"%(self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(kBlack), RooFit.VLines());
+        model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Name("TTbar"), RooFit.Components("TTbar_%s,STop_%s"%(self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(kBlack), RooFit.VLines());
+        model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Name("STop"), RooFit.Components("STop_%s"%(self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["STop"]), RooFit.LineColor(kBlack), RooFit.VLines());
+        #solid line
+        model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Name("WJets_line_invisible"), RooFit.Components("WJets_%s,VV_%s,TTbar_%s,STop_%s"%(self.channel,self.channel,self.channel,self.channel)), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines());
+        model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Name("VV_line_invisible"), RooFit.Components("VV_%s,TTbar_%s,STop_%s"%(self.channel,self.channel,self.channel)), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines());
+        model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Name("TTbar_line_invisible"), RooFit.Components("TTbar_%s,STop_%s"%(self.channel,self.channel)), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines());
+        model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Name("STop_line_invisible"), RooFit.Components("STop_%s"%(self.channel)), RooFit.LineColor(kBlack), RooFit.LineWidth(2), RooFit.VLines());
         if self.higgs_sample=="ggH600" or self.higgs_sample=="ggH700":
             signal_scale=5;
         else: signal_scale=10;
-        model_pdf_ggH.plotOn(mplot,RooFit.Normalization(scale_number_ggH*signal_scale),RooFit.Name("%s #times %s"%(self.higgs_sample, signal_scale)),RooFit.DrawOption("L"), RooFit.LineColor(self.color_palet["Signal"]), RooFit.VLines());
-        model_pdf_vbfH.plotOn(mplot,RooFit.Normalization(scale_number_vbfH*signal_scale),RooFit.Name("%s #times %s"%(self.vbfhiggs_sample,signal_scale)),RooFit.DrawOption("L"), RooFit.LineColor(self.color_palet["vbfSignal"]), RooFit.VLines());
-        data_obs.plotOn(mplot, RooFit.Name("data"));
+        model_pdf_ggH.plotOn(mplot,RooFit.Normalization(scale_number_ggH*signal_scale),RooFit.Name("%s #times %s"%(self.higgs_sample, signal_scale)),RooFit.DrawOption("L"), RooFit.LineColor(self.color_palet["ggH"]), RooFit.LineStyle(2), RooFit.VLines());
+        model_pdf_vbfH.plotOn(mplot,RooFit.Normalization(scale_number_vbfH*signal_scale),RooFit.Name("%s #times %s"%(self.vbfhiggs_sample,signal_scale)),RooFit.DrawOption("L"), RooFit.LineColor(self.color_palet["vbfH"]), RooFit.LineStyle( 9), RooFit.VLines());
+        data_obs.plotOn(mplot, RooFit.Name("data"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
         model_Total_background_MC.plotOn(mplot,RooFit.Normalization(scale_number_Total_background_MC),RooFit.Invisible());
         hpull=mplot.pullHist();
         
         #floatpara_list=workspace.FindObject("floatpara_list");
         self.FloatingParams.Print("v");
-        draw_error_band(model_Total_background_MC, rrv_x.GetName(), rrv_number_Total_background_MC,self.FloatingParams,workspace ,mplot,self.color_palet["Uncertainty"],"F");
+        if options.closuretest==0:
+            draw_error_band(model_Total_background_MC, rrv_x.GetName(), rrv_number_Total_background_MC,self.FloatingParams,workspace ,mplot,self.color_palet["Uncertainty"],"F");
+        else: 
+            draw_error_band(model_Total_background_MC, rrv_x.GetName(), rrv_number_Total_background_MC,self.FloatingParams,workspace ,mplot,self.color_palet["Uncertainty"],"F");
 
         mplot.Print();
         leg=self.legend4Plot(mplot,0);
@@ -3844,6 +3918,16 @@ class doFit_wj_and_wlvj:
         self.file_out.close()
 
     ######## ++++++++++++++
+    def banner4Plot(self):
+        if self.channel=="el":
+            banner = TLatex(0.18,0.96,("CMS Preliminary, %.0f fb^{-1} at #sqrt{s} = 8 TeV, W#rightarrow e #nu"%(self.GetLumi())));
+        if self.channel=="mu":
+            banner = TLatex(0.18,0.96,("CMS Preliminary, %.0f fb^{-1} at #sqrt{s} = 8 TeV, W#rightarrow #mu #nu"%(self.GetLumi())));
+        banner.SetNDC(); banner.SetTextSize(0.028);
+        return banner;
+
+ 
+    ######## ++++++++++++++
     def legend4Plot(self, plot, left=1):
         if left: 
             theLeg = TLegend(0.2, 0.62, 0.55, 0.92, "", "NDC");
@@ -3853,7 +3937,8 @@ class doFit_wj_and_wlvj:
         theLeg.SetBorderSize(0);
         theLeg.SetLineColor(0);
         theLeg.SetFillColor(0);
-        theLeg.SetFillStyle(0);
+        #theLeg.SetFillStyle(0);
+        theLeg.SetFillStyle(1001);
         theLeg.SetLineWidth(0);
         theLeg.SetLineStyle(0);
         theLeg.SetTextFont(42);
@@ -3865,7 +3950,7 @@ class doFit_wj_and_wlvj:
         for obj in range(int(plot.numItems()) ):
             objName = plot.nameOf(obj);
             print objName;
-            if not ( ( (plot.getInvisible(objName)) and (not TString(objName).Contains("Uncertainty")) ) or TString(objName).Contains("invisi") or objName==objName_before  ): 
+            if not ( ( (plot.getInvisible(objName)) and (not TString(objName).Contains("Uncertainty")) ) or TString(objName).Contains("invisi") or TString(objName).Contains("TLine") or objName==objName_before  ): 
                 theObj = plot.getObject(obj);
                 objTitle = objName;
                 drawoption= plot.getDrawOptions(objName).Data()
@@ -3876,7 +3961,15 @@ class doFit_wj_and_wlvj:
                 elif TString(objName).Contains("Graph") :
                     if  not (objName_before=="Graph" or objName_before=="Uncertainty"): theLeg.AddEntry(theObj, "Uncertainty","F");
                 else: 
-                    if TString(objName).Contains("STop"): theLeg.AddEntry(theObj, "Single-Top","F");
+                    #if TString(objName).Contains("STop"): theLeg.AddEntry(theObj, "Single Top","F");
+                    #elif TString(objName).Contains("TTbar"): theLeg.AddEntry(theObj, "t#bar{t}","F");
+                    #elif TString(objName).Contains("VV"): theLeg.AddEntry(theObj, "WW/WZ/ZZ","F");
+                    #elif TString(objName).Contains("WJets"): theLeg.AddEntry(theObj, "W+jets","F");
+                    if TString(objName).Data()=="STop"    : theLeg.AddEntry(theObj, "Single Top","F");
+                    elif TString(objName).Data()=="TTbar" : theLeg.AddEntry(theObj, "t#bar{t}","F");
+                    elif TString(objName).Data()=="VV"    : theLeg.AddEntry(theObj, "WW/WZ/ZZ","F");
+                    elif TString(objName).Data()=="WJets" : theLeg.AddEntry(theObj, "W+jets","F");
+                    elif TString(objName).Contains("vbfH"): theLeg.AddEntry(theObj, (TString(objName).ReplaceAll("vbfH","qqH")).Data() ,"L");
                     else : theLeg.AddEntry(theObj, objTitle,drawoption);
                 entryCnt=entryCnt+1;
             objName_before=objName;
@@ -3903,7 +3996,7 @@ class doFit_wj_and_wlvj:
         mplot_pull.GetYaxis().SetTitleOffset(0.50);
         mplot_pull.GetYaxis().SetTitleSize(0.08);
         mplot_pull.GetYaxis().SetRangeUser(-5,5);
-        cMassFit = TCanvas("cMassFit","cMassFit",1000,800);
+        cMassFit = TCanvas("cMassFit","cMassFit", 800,600);
         # if parameters_list is empty, don't draw pad3
         par_first=parameters_list.createIterator();
         par_first.Reset();
@@ -3923,9 +4016,7 @@ class doFit_wj_and_wlvj:
 
         pad2.cd();
         mplot.Draw();
-        banner = TLatex(0.18,0.96,("CMS Preliminary, %.1f fb^{-1} at #sqrt{s}=8TeV %s+jets"%(self.GetLumi(),self.channel)));
-        banner.SetNDC(); banner.SetTextSize(0.028);
-        banner.Draw();
+        banner = self.banner4Plot(); banner.Draw();
 
         pad1.cd();
         mplot_pull.Draw();
@@ -3959,7 +4050,7 @@ class doFit_wj_and_wlvj:
         else:
             rlt_file=rlt_file.Append("_"+in_model_name+"_rlt.png");
         cMassFit.SaveAs(rlt_file.Data());
-        rlt_file.ReplaceAll(".png",".eps"); 
+        rlt_file.ReplaceAll(".png",".pdf"); 
         cMassFit.SaveAs(rlt_file.Data());
 
         string_file_name=TString(in_file_name);
@@ -3978,7 +4069,7 @@ class doFit_wj_and_wlvj:
         mplot.GetYaxis().SetLabelSize(0.04);
         mplot_addition.GetYaxis().SetTitleOffset(1.0);
 
-        cMassFit = TCanvas("cMassFit","cMassFit",1000,800);
+        cMassFit = TCanvas("cMassFit","cMassFit", 800,600);
         pad1=TPad("pad1","pad1",0.00,0.25,1.00,0.97);
         pad2=TPad("pad2","pad2",0.00,0.00,1.00,0.25);
         pad1.Draw();
@@ -3986,9 +4077,7 @@ class doFit_wj_and_wlvj:
 
         pad1.cd();
         mplot.Draw();
-        banner = TLatex(0.18,0.96,("CMS Preliminary, %.1f fb^{-1} at #sqrt{s}=8TeV %s+jets"%(self.GetLumi(),self.channel)));
-        banner.SetNDC(); banner.SetTextSize(0.028);
-        banner.Draw();
+        banner = self.banner4Plot(); banner.Draw();
 
         pad2.cd();
         mplot_addition.Draw();
@@ -4003,7 +4092,7 @@ class doFit_wj_and_wlvj:
         else:
             rlt_file=rlt_file.Append("_"+in_model_name+"_rlt.png");
         cMassFit.SaveAs(rlt_file.Data());
-        rlt_file.ReplaceAll(".png",".eps"); 
+        rlt_file.ReplaceAll(".png",".pdf"); 
         cMassFit.SaveAs(rlt_file.Data());
 
         string_file_name=TString(in_file_name);
@@ -4013,7 +4102,7 @@ class doFit_wj_and_wlvj:
         
     ######## ++++++++++++++
     def draw_canvas1(self, in_obj,in_directory, in_file_name, is_range=0, log=0):
-        cMassFit = TCanvas("cMassFit","cMassFit",1000,800);
+        cMassFit = TCanvas("cMassFit","cMassFit", 800,600);
         if is_range:
             h2=TH2D("h2","",100,400,1400,4,0.00001,4); h2.Draw(); in_obj.Draw("same")
         else : 
@@ -4026,9 +4115,7 @@ class doFit_wj_and_wlvj:
         in_obj.GetXaxis().SetLabelSize(0.04);
         in_obj.GetYaxis().SetLabelSize(0.04);
 
-        banner = TLatex(0.18,0.96,("CMS Preliminary, %.1f fb^{-1} at #sqrt{s}=8TeV %s+jets"%(self.GetLumi(),self.channel)));
-        banner.SetNDC(); banner.SetTextSize(0.028);
-        banner.Draw();
+        banner = self.banner4Plot(); banner.Draw();
 
         Directory=TString(in_directory+self.higgs_sample+"_%02d_%02d/"%(options.cprime,options.BRnew));
         if not Directory.EndsWith("/"):Directory=Directory.Append("/");
@@ -4041,15 +4128,15 @@ class doFit_wj_and_wlvj:
             #rlt_file=rlt_file.Append("_rlt_without_pull_and_paramters.png");
             rlt_file=rlt_file.Append(".png");
         cMassFit.SaveAs(rlt_file.Data());
-        rlt_file.ReplaceAll(".png",".eps"); 
+        rlt_file.ReplaceAll(".png",".pdf"); 
         cMassFit.SaveAs(rlt_file.Data());
 
         if log:
             cMassFit.SetLogy() ;
             cMassFit.Update();
-            rlt_file.ReplaceAll(".eps","_log.eps"); 
+            rlt_file.ReplaceAll(".pdf","_log.pdf"); 
             cMassFit.SaveAs(rlt_file.Data());
-            rlt_file.ReplaceAll(".eps",".png"); 
+            rlt_file.ReplaceAll(".pdf",".png"); 
             cMassFit.SaveAs(rlt_file.Data());
 
     ######## ++++++++++++++
@@ -4235,10 +4322,10 @@ class doFit_wj_and_wlvj:
     def fit_AllSamples_Mj_and_Mlvj(self):
         print "fit_AllSamples_Mj_and_Mlvj"
         self.fit_Signal()
-        self.fit_WJets()
         self.fit_TTbar()
         self.fit_VV()
         self.fit_STop()
+        self.fit_WJets()
         print "________________________________________________________________________" 
 
     ####### +++++++++++++++
@@ -4265,26 +4352,26 @@ class doFit_wj_and_wlvj:
     ####### +++++++++++++++
     def fit_TTbar_controlsample(self):
         print "fit_TTbar_controlsample"
-        #self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_data,"_data"); #self.fit_mj_singlebackground_MC_TTbar_controlsample(self.file_data,"_data","ErfExpGaus");
-        #self.saveHist("_data");
-
         rrv_mass_j = self.workspace4fit_.var("rrv_mass_j");
-
-        self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_ggH,"_%s"%(self.higgs_sample))# to get the shape of m_lvj
-        self.fit_mj_single_MC(self.file_ggH,"_%s"%(self.higgs_sample),"2Gaus","_TTbar_controlsample");
+        ##higgs
+        #self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_ggH,"_%s"%(self.higgs_sample))# to get the shape of m_lvj
+        #self.fit_mj_single_MC(self.file_ggH,"_%s"%(self.higgs_sample),"2Gaus","_TTbar_controlsample");
+        #ttbar 
         self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_TTbar_mc,"_TTbar")
         self.fit_mj_single_MC(self.file_TTbar_mc,"_TTbar","2Gaus_ErfExp","_TTbar_controlsample");
-
+        #STop
         self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_STop_mc,"_STop");  
         self.fit_mj_single_MC(self.file_STop_mc,"_STop","ErfExpGaus_sp","_TTbar_controlsample");
         self.fit_mj_single_MC(self.file_STop_mc,"_STop_failtau2tau1cut","Exp","_TTbar_controlsample");
+        #WJets
         self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_WJets0_mc,"_WJets0");
         self.fit_mj_single_MC(self.file_WJets0_mc,"_WJets0","ErfExp","_TTbar_controlsample");
         self.fit_mj_single_MC(self.file_WJets0_mc,"_WJets0_failtau2tau1cut","Exp","_TTbar_controlsample");
+        #VV
         self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_VV_mc,"_VV");     
         self.fit_mj_single_MC(self.file_VV_mc,"_VV","ErfExpGaus_sp","_TTbar_controlsample");
         self.fit_mj_single_MC(self.file_VV_mc,"_VV_failtau2tau1cut","Exp","_TTbar_controlsample");
-        self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_TTbar_mc,"_TTbar"); #self.fit_mj_singlebackground_MC_TTbar_controlsample(self.file_TTbar_mc,"_TTbar","ErfExpGaus");
+
         self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_pseudodata,"_TotalMC");#self.fit_mj_singlebackground_MC_TTbar_controlsample(self.file_pseudodata,"_pseudodata","ErfExpGaus");
         self.get_mj_and_mlvj_dataset_TTbar_controlsample(self.file_data,"_data"); #self.fit_mj_singlebackground_MC_TTbar_controlsample(self.file_data,"_data","ErfExpGaus");
 
@@ -4443,13 +4530,13 @@ def control_single_sb_correction(method, channel, higgs_sample="ggH600", in_mlvj
 
 def pre_limit_simple(channel):
     print "pre_limit_simple for %s sampel"%(channel)
-    pre_limit_sb_correction_without_systermatic(channel, "ggH600",550,700,40,130,400,1000,"ErfPowExp_v1","ErfPow2_v1");
-    #pre_limit_sb_correction_without_systermatic(channel, "ggH700",550,700,40,130,400,1000,"ErfPowExp_v1","ErfPow2_v1");
-    #pre_limit_sb_correction_without_systermatic(channel,"ggH800",550,1000,40,130,600,1400,"Exp","Pow")
-    #pre_limit_sb_correction_without_systermatic(channel,"ggH900",800,1150,40,130,600,1400,"Exp","Pow")
-    #pre_limit_sb_correction_without_systermatic(channel,"ggH1000",800,1150,40,130,600,1400,"Exp","Pow")
-    #pre_limit_sb_correction_without_systermatic(channel,"ggH1500",1200,1800,40,130,1000,2000,"Exp","Pow")
-    #pre_limit_sb_correction_without_systermatic(channel,"ggH2000",1500,2500,40,130,1200,2800,"Exp","Pow")
+    pre_limit_sb_correction_without_systermatic(channel, "ggH600",550, 700,40,130,400,1000,"ErfPowExp_v1","ErfPow2_v1");
+    #pre_limit_sb_correction_without_systermatic(channel, "ggH700",600, 850,40,130,400,1000,"ErfPowExp_v1","ErfPow2_v1");
+    #pre_limit_sb_correction_without_systermatic(channel, "ggH800",700, 950,40,130,600,1400,"Exp","Pow")
+    #pre_limit_sb_correction_without_systermatic(channel, "ggH900",750,1100,40,130,600,1400,"Exp","Pow")
+    #pre_limit_sb_correction_without_systermatic(channel,"ggH1000",800,1200,40,130,600,1400,"Exp","Pow")
+
+    #pre_limit_sb_correction_without_systermatic(channel, "ggH600",550, 700,40,130,400,1000,"ErfExp_v1","ErfPow_v1");
   
 def Fit_Signal(channel):
     fit_signal("method1",channel, "ggH600",500,700,30,140,200,1400,"ErfExp_v1")
