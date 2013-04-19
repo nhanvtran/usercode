@@ -22,6 +22,8 @@ void calculateAngles(TLorentzVector p4H, TLorentzVector p4Z1, TLorentzVector p4M
 
 const float Zmass = 91.19;
 
+enum Flavors {electron, muon, tau, mixedFlavor, NumFlavors};
+
 void readOutAngles_LMH(std::string filename, bool applyRes=false){
   
     ifstream fin;
@@ -91,8 +93,8 @@ void readOutAngles_LMH(std::string filename, bool applyRes=false){
 	}
 	fin >> vtimup[a] >> spinup[a];
       }
-      
-      if( ( fabs(idup[0])==11&&fabs(idup[1])==11&&fabs(idup[2])==11&&fabs(idup[3])==11 ) || (fabs(idup[0])==13&&fabs(idup[1])==13&&fabs(idup[2])==13&&fabs(idup[3])==13 ) ) interf=1;  
+      // electron = 11, muon = 13, tau = 15
+      if( ( fabs(idup[0])==11&&fabs(idup[1])==11&&fabs(idup[2])==11&&fabs(idup[3])==11 ) || (fabs(idup[0])==13&&fabs(idup[1])==13&&fabs(idup[2])==13&&fabs(idup[3])==13 ) || (fabs(idup[0])==15&&fabs(idup[1])==15&&fabs(idup[2])==15&&fabs(idup[3])==15 ) ) interf=1;  
       else interf=0;
       
       if(interf==1) FourlCount++;
@@ -101,23 +103,27 @@ void readOutAngles_LMH(std::string filename, bool applyRes=false){
       TLorentzVector pZ1; TLorentzVector pl1_m; TLorentzVector pl1_p;
       TLorentzVector pZ2; TLorentzVector pl2_m; TLorentzVector pl2_p;
       
-      //Distinguish the flavor type: 1 4mu, 2 4e, 3 2mu2e
+      //Distinguish the flavor type: 0 = mixed leptons, 1 4mu, 2 4e, 3 = tau
       if(abs(idup[0])==abs(idup[1]) && abs(idup[0])==abs(idup[2]) && abs(idup[0])==abs(idup[3]) ){
 	if(abs(idup[0])==13){
-	  flatype=1; 
+	  flatype = muon; 
 	}
 	else if(abs(idup[0])==11){
-	  flatype=2;}
+	  flatype = electron;
+        }
+        else if(abs(idup[0])==15){    
+          flatype = tau;
+        }
 	else{
 	  cout<<"not 4l process"<<endl;
 	  break;}
       }
-      else flatype=3;
+      else flatype = mixedFlavor;      
       
       int l1p,l1m,l2p,l2m; // record the reading order of each lepton in the lhe file, for debug use. 
       
-      //For flavor type 3, treat as uninterferenced
-      if(flatype==3){	
+      //For flavor type mixed, treat as uninterferenced
+      if(flatype==mixedFlavor){	     
 	
 	if (mothup[0][0] == mothup[1][0]){
 	  l1_minus.SetPxPyPzE(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
@@ -182,7 +188,7 @@ void readOutAngles_LMH(std::string filename, bool applyRes=false){
       }
       
       
-      //type 1 and 2: interference
+      //type electron, muon, or tau: interference
       else{
 	if(idup[0]>0){
 	  l1_minus.SetPxPyPzE(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
@@ -275,9 +281,9 @@ void readOutAngles_LMH(std::string filename, bool applyRes=false){
       double angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2;
       calculateAngles( Graviton, pZ1, pl1_m, pl1_p, pZ2, pl2_m, pl2_p, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2);
       
-      Y4l = 0; //Graviton.Rapidity();
-      eta4l = 0; //BGraviton.Eta();
-      pT4l = 0; //Graviton.Pt();
+      Y4l = Graviton.Rapidity();//0; //
+      eta4l = Graviton.Rapidity();//0; //
+      pT4l = Graviton.Rapidity();//0; //
       
       m_costheta1 = float(angle_costheta1);
       m_costheta2 = float(angle_costheta2);
