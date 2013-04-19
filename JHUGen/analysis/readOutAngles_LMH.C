@@ -22,7 +22,7 @@ void calculateAngles(TLorentzVector p4H, TLorentzVector p4Z1, TLorentzVector p4M
 
 const float Zmass = 91.19;
 
-enum Flavors {electron, muon, tau, mixedFlavor, NumFlavors};
+enum Flavors {electron, muon, tau, e2mu2, e2tau2, mu2tau2, NumFlavors};
 
 void readOutAngles_LMH(std::string filename, bool applyRes=false){
   
@@ -118,12 +118,34 @@ void readOutAngles_LMH(std::string filename, bool applyRes=false){
 	  cout<<"not 4l process"<<endl;
 	  break;}
       }
-      else flatype = mixedFlavor;      
+      //else flatype = mixedFlavor;
+      else { // find the final state
+        int num_e=0, num_mu=0, num_tau=0;
+        for (int lep = 0; lep<4; lep++) { // count the number of each particle
+          if (idup[lep] == 11) {
+            num_e++;
+          } else if (idup[lep] == 13) {
+            num_mu++;
+          } else if (idup[lep] == 15) {
+            num_tau++;
+          } 
+        }
+        if (num_e == num_mu) {
+          flatype = e2mu2;
+        } else if (num_e == num_tau) {
+          flatype = e2tau2;
+        } else if (num_mu == num_tau) {
+          flatype = mu2tau2;  
+        } else {
+          cout<<"could not determine 2l2l final state"<<endl;
+        }
+      }
+      
       
       int l1p,l1m,l2p,l2m; // record the reading order of each lepton in the lhe file, for debug use. 
       
       //For flavor type mixed, treat as uninterferenced
-      if(flatype==mixedFlavor){	     
+      if( (flatype== e2mu2) || (flatype == e2tau2) || (flatype == mu2tau2) ){	     
 	
 	if (mothup[0][0] == mothup[1][0]){
 	  l1_minus.SetPxPyPzE(pup[0][0], pup[0][1], pup[0][2], pup[0][3]);
