@@ -83,6 +83,10 @@ class doFit_wj_and_wlvj:
 
         self.BinWidth_mlvj=50.;
         self.BinWidth_mj=5;
+        #narrow the BinWidth_mj and BinWidth_mlvj by a factor of 5. Because Higgs-Combination-Tools will generate a binned sample, so need the bin width narrow. So, as a easy selution, we will increase the bin-width by a factor of 5 when ploting m_j m_WW
+        self.narrow_factor= 5.;
+        self.BinWidth_mlvj=self.BinWidth_mlvj/self.narrow_factor;
+        self.BinWidth_mj=self.BinWidth_mj/self.narrow_factor;
         nbins_mlvj=int((in_mlvj_max-in_mlvj_min)/self.BinWidth_mlvj);
         in_mlvj_max=in_mlvj_min+nbins_mlvj*self.BinWidth_mlvj;
         nbins_mj=int((in_mj_max-in_mj_min)/self.BinWidth_mj);
@@ -1447,7 +1451,7 @@ class doFit_wj_and_wlvj:
         rrv_x = self.workspace4fit_.var("rrv_mass_lvj"); 
         rdataset_WJets_sb_lo_mlvj=self.workspace4fit_.data("rdataset4fit%s_sb_lo_%s_mlvj"%(label,self.channel))
         rdataset_WJets_signal_region_mlvj=self.workspace4fit_.data("rdataset4fit%s_signal_region_%s_mlvj"%(label,self.channel))
-        mplot = rrv_x.frame(RooFit.Title("correlation_pdf")); mplot.GetYaxis().SetTitle("PDF");
+        mplot = rrv_x.frame(RooFit.Title("correlation_pdf"), RooFit.Bins(int(rrv_x.getBins()/self.narrow_factor))) ; mplot.GetYaxis().SetTitle("PDF");
 
         if mlvj_model=="ErfExp_v1":
             rrv_c_sb     =self.workspace4fit_.var("rrv_c_ErfExp%s_sb_lo_%s"%(label,self.channel));
@@ -1560,22 +1564,22 @@ class doFit_wj_and_wlvj:
         correct_factor_pdf_deco.getParameters(rdataset_WJets_signal_region_mlvj).Print("v");
         getattr(self.workspace4fit_,"import")(correct_factor_pdf_deco);
         if label=="_WJets0":
-            mplot_sb_lo = rrv_x.frame(RooFit.Title("WJets sb low"));
+            mplot_sb_lo = rrv_x.frame(RooFit.Title("WJets sb low"), RooFit.Bins(int(rrv_x.getBins()/self.narrow_factor)));
             rdataset_WJets_sb_lo_mlvj.plotOn(mplot_sb_lo, RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
             model_pdf_sb_lo_WJets.plotOn(mplot_sb_lo);
             hpull=mplot_sb_lo.pullHist();
-            mplot_pull_sideband = rrv_x.frame(RooFit.Title("Pull Distribution"));
+            mplot_pull_sideband = rrv_x.frame(RooFit.Title("Pull Distribution"), RooFit.Bins(int(rrv_x.getBins()/self.narrow_factor)));
             mplot_pull_sideband.addPlotable(hpull,"P");
             mplot_pull_sideband.SetTitle("PULL");
             mplot_pull_sideband.GetYaxis().SetRangeUser(-5,5);
             parameters_list=model_pdf_sb_lo_WJets.getParameters(rdataset_WJets_sb_lo_mlvj);
             self.draw_canvas( mplot_sb_lo, mplot_pull_sideband,parameters_list,"plots_%s_%s/other/"%(self.channel,self.PS_model), "m_lvj%s_sb_lo_sim"%(label),"",1,0)
 
-            mplot_signal_region = rrv_x.frame(RooFit.Title("WJets sr"));
+            mplot_signal_region = rrv_x.frame(RooFit.Title("WJets sr"), RooFit.Bins(int(rrv_x.getBins()/self.narrow_factor)));
             rdataset_WJets_signal_region_mlvj.plotOn(mplot_signal_region, RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
             model_pdf_signal_region_WJets.plotOn(mplot_signal_region);
             hpull=mplot_signal_region.pullHist();
-            mplot_pull_signal_region = rrv_x.frame(RooFit.Title("Pull Distribution"));
+            mplot_pull_signal_region = rrv_x.frame(RooFit.Title("Pull Distribution"), RooFit.Bins(int(rrv_x.getBins()/self.narrow_factor)));
             mplot_pull_signal_region.addPlotable(hpull,"P");
             mplot_pull_signal_region.SetTitle("PULL");
             mplot_pull_signal_region.GetYaxis().SetRangeUser(-5,5);
@@ -1590,9 +1594,9 @@ class doFit_wj_and_wlvj:
 
         if label=="_WJets0":
             if self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets1_sim_%s_mlvj"%(self.channel)):
-                self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets1_sim_%s_mlvj"%(self.channel)).plotOn(mplot, RooFit.LineColor(kMagenta), RooFit.LineStyle(3),RooFit.Name("#alpha: Alter PS") ); 
+                self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets1_sim_%s_mlvj"%(self.channel)).plotOn(mplot, RooFit.LineColor(kMagenta), RooFit.LineStyle(3),RooFit.Name("#alpha: Alternate Parton Shower") ); 
             if self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets01_sim_%s_mlvj"%(self.channel)):
-                self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets01_sim_%s_mlvj"%(self.channel)).plotOn(mplot, RooFit.LineColor(kOrange), RooFit.LineStyle(7),RooFit.Name("#alpha: Alter Function") ); 
+                self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets01_sim_%s_mlvj"%(self.channel)).plotOn(mplot, RooFit.LineColor(kOrange), RooFit.LineStyle(7),RooFit.Name("#alpha: Alternate Function") ); 
 
         paras=RooArgList();
         if mlvj_model=="ErfExp_v1" or mlvj_model=="ErfPow_v1" :
@@ -1622,7 +1626,7 @@ class doFit_wj_and_wlvj:
         if label=="_WJets0":
             draw_error_band_shape_Decor("correct_factor_pdf_Deco%s_sim_%s_mlvj"%(label,self.channel),"rrv_mass_lvj", paras, self.workspace4fit_,1 ,mplot,6,"F","#alpha #pm",20,400);
             draw_error_band_shape_Decor("correct_factor_pdf_Deco%s_sim_%s_mlvj"%(label,self.channel),"rrv_mass_lvj", paras, self.workspace4fit_,2 ,mplot,6,"F","#alpha #pm",20,400);
-        leg=self.legend4Plot(mplot,0);mplot.addObject(leg);
+        leg=self.legend4Plot(mplot,0,0, -0.15, 0);mplot.addObject(leg);
 
         #mplot.GetYaxis().SetRangeUser(0,mplot.GetMaximum()*1.1);
         if self.higgs_sample=="ggH600" or self.higgs_sample=="ggH700": tmp_y_max=0.25
@@ -1634,7 +1638,8 @@ class doFit_wj_and_wlvj:
         model_pdf_signal_region_WJets.getVal(RooArgSet(rrv_x)),
         correct_factor_pdf_deco.getVal(RooArgSet(rrv_x)),
         tmp_alpha_ratio=( model_pdf_signal_region_WJets.getVal(RooArgSet(rrv_x))/model_pdf_sb_lo_WJets.getVal(RooArgSet(rrv_x)) );
-        tmp_alpha_pdf= correct_factor_pdf_deco.getVal(RooArgSet(rrv_x)) * rrv_x.getBinWidth(0);
+        #tmp_alpha_pdf= correct_factor_pdf_deco.getVal(RooArgSet(rrv_x)) * rrv_x.getBinWidth(0);
+        tmp_alpha_pdf= correct_factor_pdf_deco.getVal(RooArgSet(rrv_x)) * mplot.getFitRangeBinW();
         tmp_alpha_scale=tmp_alpha_ratio/tmp_alpha_pdf;
 
         #add alpha scale axis
@@ -1676,7 +1681,7 @@ class doFit_wj_and_wlvj:
         rfresult = model.fitTo(rdataset_mj,RooFit.Save(1), RooFit.SumW2Error(kTRUE) ,RooFit.Extended(kTRUE) );
         rfresult = model.fitTo(rdataset_mj,RooFit.Save(1), RooFit.SumW2Error(kTRUE) ,RooFit.Extended(kTRUE) );
 
-        mplot = rrv_mass_j.frame(RooFit.Title(label+" fitted by "+in_model_name));
+        mplot = rrv_mass_j.frame(RooFit.Title(label+" fitted by "+in_model_name), RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)) );
         rdataset_mj.plotOn( mplot, RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
         #model.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines());
         #draw_error_band(rdataset_mj, model,self.workspace4fit_.var("rrv_number"+label+"_"+self.channel+"_mj") ,rfresult,mplot,6,"L");
@@ -1686,7 +1691,7 @@ class doFit_wj_and_wlvj:
 
         #pull
         hpull=mplot.pullHist();
-        mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"));
+        mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"), RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
         mplot_pull.addPlotable(hpull,"P");
         mplot_pull.SetTitle("PULL");
         mplot_pull.GetYaxis().SetRangeUser(-5,5);
@@ -1739,7 +1744,7 @@ class doFit_wj_and_wlvj:
         rfresult = model.fitTo(rdataset_mj,RooFit.Save(1), RooFit.SumW2Error(kTRUE) ,RooFit.Extended(kTRUE), RooFit.Range("controlsample_fitting_range") );
         rfresult = model.fitTo(rdataset_mj,RooFit.Save(1), RooFit.SumW2Error(kTRUE) ,RooFit.Extended(kTRUE), RooFit.Range("controlsample_fitting_range") );
         
-        mplot = rrv_mass_j.frame(RooFit.Title(label+" fitted by "+in_model_name));
+        mplot = rrv_mass_j.frame(RooFit.Title(label+" fitted by "+in_model_name), RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
         rdataset_mj.plotOn( mplot , RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0)  );
         model.plotOn( mplot, RooFit.VisualizeError(rfresult,1),RooFit.FillColor(kOrange) , RooFit.VLines(),RooFit.NormRange("controlsample_fitting_range"));
         #model.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines(),RooFit.NormRange("controlsample_fitting_range"));
@@ -1750,7 +1755,7 @@ class doFit_wj_and_wlvj:
         rdataset_mj.plotOn( mplot, RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0)  );
         #pull
         hpull=mplot.pullHist();
-        mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"));
+        mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"), RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
         mplot_pull.addPlotable(hpull,"P");
         mplot_pull.SetTitle("PULL");
         mplot_pull.GetYaxis().SetRangeUser(-5,5);
@@ -1833,7 +1838,7 @@ class doFit_wj_and_wlvj:
         rfresult_TotalMC =model_TotalMC.fitTo(rdataset_TotalMC_mj,RooFit.Save(1), RooFit.Extended(kTRUE), RooFit.Range("controlsample_fitting_range") );
         scale_number_TotalMC=rdataset_TotalMC_mj.sumEntries()/rdataset_data_mj.sumEntries()
         
-        mplot = rrv_mass_j.frame();
+        mplot = rrv_mass_j.frame( RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
 
         rdataset_data_mj.plotOn( mplot, RooFit.Invisible(), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0)  );
 
@@ -1888,7 +1893,7 @@ class doFit_wj_and_wlvj:
 
         #pull
         hpull=mplot.pullHist();
-        mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"));
+        mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"), RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
         mplot_pull.addPlotable(hpull,"P");
         mplot_pull.SetTitle("PULL");
         mplot_pull.GetYaxis().SetRangeUser(-5,5);
@@ -2105,8 +2110,8 @@ class doFit_wj_and_wlvj:
             rfresult_TotalMC=simPdf_TotalMC.fitTo(combData_p_f_TotalMC,RooFit.Save(kTRUE), RooFit.Range("controlsample_fitting_range"),RooFit.ExternalConstraints(pdfconstrainslist_TotalMC));
             rfresult_TotalMC.Print();
 
-        xframe_data=rrv_mass_j.frame();
-        xframe_data_fail=rrv_mass_j.frame();
+        xframe_data=rrv_mass_j.frame( RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
+        xframe_data_fail=rrv_mass_j.frame( RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
 
         combData_p_f_data.plotOn(xframe_data,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel,self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
         combData_p_f_data.plotOn(xframe_data_fail,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel,self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
@@ -2184,7 +2189,7 @@ class doFit_wj_and_wlvj:
 
         ##pull
         #hpull=xframe_data.pullHist();
-        #mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"));
+        #mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"), RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
         #mplot_pull.addPlotable(hpull,"P");
         #mplot_pull.SetTitle("PULL");
         #mplot_pull.GetYaxis().SetRangeUser(-5,5);
@@ -2291,8 +2296,8 @@ class doFit_wj_and_wlvj:
         combData_p_f_TotalMC=self.workspace4fit_.data("combData_p_f_TotalMC_"+self.channel);
 
 
-        xframe_data=rrv_mass_j.frame();
-        xframe_data_fail=rrv_mass_j.frame();
+        xframe_data=rrv_mass_j.frame( RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
+        xframe_data_fail=rrv_mass_j.frame( RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
 
         combData_p_f_data.plotOn(xframe_data,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::pass"%(self.channel, self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
         combData_p_f_data.plotOn(xframe_data_fail,RooFit.Name("data invisi"), RooFit.Cut("category_p_f_%s==category_p_f_%s::fail"%(self.channel, self.channel)), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
@@ -2389,7 +2394,7 @@ class doFit_wj_and_wlvj:
 
         ##pull
         #hpull=xframe_data.pullHist();
-        #mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"));
+        #mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"), RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
         #mplot_pull.addPlotable(hpull,"P");
         #mplot_pull.SetTitle("PULL");
         #mplot_pull.GetYaxis().SetRangeUser(-5,5);
@@ -3126,7 +3131,7 @@ class doFit_wj_and_wlvj:
         rfresult.SetName("rfresult"+label+in_range+"_"+self.channel+"_mlvj")
         getattr(self.workspace4fit_,"import")(rfresult)
         
-        mplot = rrv_mass_lvj.frame(RooFit.Title("M_{lvj"+in_range+"} fitted by "+mlvj_model));
+        mplot = rrv_mass_lvj.frame(RooFit.Title("M_{lvj"+in_range+"} fitted by "+mlvj_model), RooFit.Bins(int(rrv_mass_lvj.getBins()/self.narrow_factor)));
         #if label=="_WJets0": mplot.GetYaxis().SetRangeUser(1e-2,310);
         rdataset.plotOn( mplot , RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0)  );
         #model.plotOn(mplot,RooFit.VisualizeError(rfresult,1,kFALSE),RooFit.DrawOption("F"),RooFit.FillColor(kOrange), RooFit.VLines());
@@ -3150,7 +3155,7 @@ class doFit_wj_and_wlvj:
             model_pdf.Print();
             model_pdf_deco.Print();
             rfresult_pdf.covarianceMatrix().Print();# raw_input("ENTER");
-            mplot_deco=rrv_mass_lvj.frame();
+            mplot_deco=rrv_mass_lvj.frame( RooFit.Bins(int(rrv_mass_lvj.getBins()/self.narrow_factor)));
             if label=="_TTbar" and in_range=="_signal_region": 
                 rdataset.plotOn(mplot_deco, RooFit.Name("Powheg Sample"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
                 model_pdf_deco.plotOn(mplot_deco,RooFit.Name("TTbar_Powheg"),RooFit.LineColor(kBlack));
@@ -3183,7 +3188,7 @@ class doFit_wj_and_wlvj:
 
         #pull
         hpull=mplot.pullHist();
-        mplot_pull = rrv_mass_lvj.frame(RooFit.Title("Pull Distribution"));
+        mplot_pull = rrv_mass_lvj.frame(RooFit.Title("Pull Distribution"), RooFit.Bins(int(rrv_mass_lvj.getBins()/self.narrow_factor)));
         mplot_pull.addPlotable(hpull,"P");
         mplot_pull.SetTitle("PULL");
         mplot_pull.GetYaxis().SetRangeUser(-5,5);
@@ -3283,7 +3288,7 @@ class doFit_wj_and_wlvj:
         scale_model_to_data=1;#rrv_number_data_mj.getVal()/rdataset_data_mj.sumEntries();
         
         if label=="_WJets0":
-            mplot = rrv_mass_j.frame(RooFit.Title(""));
+            mplot = rrv_mass_j.frame(RooFit.Title(""), RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
             rdataset_data_mj.plotOn(mplot, RooFit.Name("data_invisible"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
     
             model_data.plotOn(mplot,RooFit.Name("VV"), RooFit.Components("model%s_%s_mj,model_STop_%s_mj,model_TTbar_%s_mj,model_VV_%s_mj"%(label,self.channel,self.channel,self.channel,self.channel)),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["VV"]), RooFit.LineColor(kBlack),RooFit.NormRange("sb_lo,sb_hi"), RooFit.VLines());
@@ -3310,7 +3315,7 @@ class doFit_wj_and_wlvj:
             rdataset_data_mj.plotOn(mplot, RooFit.Name("data"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
             #pull
             hpull=mplot.pullHist();
-            mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"));
+            mplot_pull = rrv_mass_j.frame(RooFit.Title("Pull Distribution"), RooFit.Bins(int(rrv_mass_j.getBins()/self.narrow_factor)));
             mplot_pull.addPlotable(hpull,"P");
             mplot_pull.SetTitle("PULL");
             mplot_pull.GetYaxis().SetRangeUser(-5,5);
@@ -3320,7 +3325,7 @@ class doFit_wj_and_wlvj:
             upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,mplot.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
             mplot.addObject(lowerLine); mplot.addObject(upperLine);
             #legend
-            leg=self.legend4Plot(mplot,0);
+            leg=self.legend4Plot(mplot,0,0, 0.05, 0);
             mplot.addObject(leg);
 
 
@@ -3391,7 +3396,7 @@ class doFit_wj_and_wlvj:
         #raw_input("ENTER");
 
         if label=="_WJets0":
-            mplot = rrv_mass_lvj.frame(RooFit.Title("M_lvj fitted in M_j sideband "));
+            mplot = rrv_mass_lvj.frame(RooFit.Title("M_lvj fitted in M_j sideband "), RooFit.Bins(int(rrv_mass_lvj.getBins()/self.narrow_factor)));
             rdataset_data_mlvj.plotOn( mplot , RooFit.Invisible(), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
             model_data.plotOn(mplot, RooFit.Components("model%s_sb_lo_from_fitting_%s_mlvj,model_TTbar_sb_lo_%s_mlvj,model_STop_sb_lo_%s_mlvj,model_VV_sb_lo_%s_mlvj"%(label,self.channel,self.channel,self.channel,self.channel)), RooFit.Name("WJets"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["WJets"]), RooFit.LineColor(kBlack), RooFit.VLines()) ;
             model_data.plotOn(mplot, RooFit.Components("model_TTbar_sb_lo_%s_mlvj,model_STop_sb_lo_%s_mlvj,model_VV_sb_lo_%s_mlvj"%(self.channel,self.channel,self.channel)), RooFit.Name("TTbar"),RooFit.DrawOption("F"), RooFit.FillColor(self.color_palet["TTbar"]), RooFit.LineColor(kBlack), RooFit.VLines());
@@ -3422,7 +3427,7 @@ class doFit_wj_and_wlvj:
     
             #pull
             hpull=mplot.pullHist();
-            mplot_pull = rrv_mass_lvj.frame(RooFit.Title("Pull Distribution"));
+            mplot_pull = rrv_mass_lvj.frame(RooFit.Title("Pull Distribution"), RooFit.Bins(int(rrv_mass_lvj.getBins()/self.narrow_factor)));
             mplot_pull.addPlotable(hpull,"P");
             mplot_pull.SetTitle("PULL");
             mplot_pull.GetYaxis().SetRangeUser(-5,5);
@@ -3783,6 +3788,9 @@ class doFit_wj_and_wlvj:
 
         getattr(self.workspace4limit_,"import")(self.FloatingParams);
  
+        #binning: narrow bin width
+        #self.workspace4limit_.var("rrv_mass_lvj").setBins( self.workspace4limit_.var("rrv_mass_lvj").getBins()*10  );
+        #workspace4limit save to root file
         self.save_workspace_to_file();
         #calculate the shape uncertainty for cut-and-countingd
         self.rrv_counting_uncertainty_from_shape_uncertainty=RooRealVar("rrv_counting_uncertainty_from_shape_uncertainty_%s"%(self.channel),"rrv_counting_uncertainty_from_shape_uncertainty_%s"%(self.channel),0);
@@ -3866,7 +3874,7 @@ class doFit_wj_and_wlvj:
         scale_number_vbfH=rrv_number_vbfH.getVal()/data_obs.sumEntries()
         scale_number_Total_background_MC=rrv_number_Total_background_MC.getVal()/data_obs.sumEntries()
 
-        mplot=rrv_x.frame(RooFit.Title("check_workspace"));
+        mplot=rrv_x.frame(RooFit.Title("check_workspace"), RooFit.Bins(int(rrv_x.getBins()/self.narrow_factor)));
         #data_obs.plotOn(mplot ,RooFit.DataError(RooAbsData.SumW2), RooFit.Name("data_invisible"),RooFit.Invisible());
         data_obs.plotOn(mplot , RooFit.Name("data_invisible"), RooFit.MarkerSize(1.5), RooFit.DataError(RooAbsData.SumW2), RooFit.XErrorSize(0) );
 
@@ -3900,7 +3908,7 @@ class doFit_wj_and_wlvj:
         mplot.addObject(leg);
         mplot.GetYaxis().SetRangeUser(1e-2,mplot.GetMaximum()*1.1);
 
-        mplot_pull = rrv_x.frame(RooFit.Title("Pull Distribution"));
+        mplot_pull = rrv_x.frame(RooFit.Title("Pull Distribution"), RooFit.Bins(int(rrv_x.getBins()/self.narrow_factor)));
         mplot_pull.addPlotable(hpull,"P");
         mplot_pull.SetTitle("PULL");
         parameters_list=RooArgList();
@@ -3928,17 +3936,19 @@ class doFit_wj_and_wlvj:
 
  
     ######## ++++++++++++++
-    def legend4Plot(self, plot, left=1):
+    def legend4Plot(self, plot, left=1, isFill=1, xoffset=0., yoffset=0.):
         if left: 
-            theLeg = TLegend(0.2, 0.62, 0.55, 0.92, "", "NDC");
+            theLeg = TLegend(0.2+xoffset, 0.62+yoffset, 0.55+xoffset, 0.92+yoffset, "", "NDC");
         else:
-            theLeg = TLegend(0.65, 0.57, 0.92, 0.87, "", "NDC");
+            theLeg = TLegend(0.65+xoffset, 0.57+yoffset, 0.92+xoffset, 0.87+yoffset, "", "NDC");
         theLeg.SetName("theLegend");
         theLeg.SetBorderSize(0);
         theLeg.SetLineColor(0);
         theLeg.SetFillColor(0);
-        #theLeg.SetFillStyle(0);
-        theLeg.SetFillStyle(1001);
+        if isFill:
+            theLeg.SetFillStyle(1001);
+        else:
+            theLeg.SetFillStyle(0);
         theLeg.SetLineWidth(0);
         theLeg.SetLineStyle(0);
         theLeg.SetTextFont(42);
