@@ -3325,7 +3325,7 @@ class doFit_wj_and_wlvj:
             upperLine = TLine(self.mj_signal_max,0.,self.mj_signal_max,mplot.GetMaximum()); upperLine.SetLineWidth(2); upperLine.SetLineColor(kGray+2); upperLine.SetLineStyle(9);
             mplot.addObject(lowerLine); mplot.addObject(upperLine);
             #legend
-            leg=self.legend4Plot(mplot,0,0, 0.05, 0);
+            leg=self.legend4Plot(mplot,0,1, 0.05, 0);
             mplot.addObject(leg);
 
 
