@@ -1,4 +1,4 @@
-#include <string>
+  #include <string>
 #include <sstream>
 #include <iostream>
 #include <fstream>
@@ -118,7 +118,6 @@ void readOutAngles_LMH(std::string filename, bool applyRes=false){
 	  cout<<"not 4l process"<<endl;
 	  break;}
       }
-      //else flatype = mixedFlavor;
       else { // find the final state
         int num_e=0, num_mu=0, num_tau=0;
         for (int lep = 0; lep<4; lep++) { // count the number of each particle
@@ -138,6 +137,7 @@ void readOutAngles_LMH(std::string filename, bool applyRes=false){
           flatype = mu2tau2;  
         } else {
           cout<<"could not determine 2l2l final state"<<endl;
+          break;
         }
       }
       
@@ -304,8 +304,8 @@ void readOutAngles_LMH(std::string filename, bool applyRes=false){
       calculateAngles( Graviton, pZ1, pl1_m, pl1_p, pZ2, pl2_m, pl2_p, angle_costheta1, angle_costheta2, angle_phi, angle_costhetastar, angle_phistar1, angle_phistar2, angle_phistar12, angle_phi1, angle_phi2);
       
       Y4l = Graviton.Rapidity();//0; //
-      eta4l = Graviton.Rapidity();//0; //
-      pT4l = Graviton.Rapidity();//0; //
+      eta4l = Graviton.Eta();//0; //
+      pT4l = Graviton.Pt();//0; //
       
       m_costheta1 = float(angle_costheta1);
       m_costheta2 = float(angle_costheta2);
