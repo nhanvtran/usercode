@@ -85,6 +85,7 @@ class doFit_wj_and_wlvj:
         self.BinWidth_mj=5;
         #narrow the BinWidth_mj and BinWidth_mlvj by a factor of 5. Because Higgs-Combination-Tools will generate a binned sample, so need the bin width narrow. So, as a easy selution, we will increase the bin-width by a factor of 5 when ploting m_j m_WW
         self.narrow_factor= 5.;
+        if options.fitwtaggersim or options.fitwtagger: self.narrow_factor=1.;
         self.BinWidth_mlvj=self.BinWidth_mlvj/self.narrow_factor;
         self.BinWidth_mj=self.BinWidth_mj/self.narrow_factor;
         nbins_mlvj=int((in_mlvj_max-in_mlvj_min)/self.BinWidth_mlvj);
@@ -3928,9 +3929,11 @@ class doFit_wj_and_wlvj:
     ######## ++++++++++++++
     def banner4Plot(self):
         if self.channel=="el":
-            banner = TLatex(0.18,0.96,("CMS Preliminary, %.0f fb^{-1} at #sqrt{s} = 8 TeV, W#rightarrow e #nu"%(self.GetLumi())));
+            #banner = TLatex(0.18,0.96,("CMS Preliminary, %.0f fb^{-1} at #sqrt{s} = 8 TeV, W#rightarrow e #nu"%(self.GetLumi())));
+            banner = TLatex(0.5,0.96,("CMS Preliminary, %.1f fb^{-1} at #sqrt{s} = 8 TeV, W#rightarrow e #nu"%(self.GetLumi())));
         if self.channel=="mu":
-            banner = TLatex(0.18,0.96,("CMS Preliminary, %.0f fb^{-1} at #sqrt{s} = 8 TeV, W#rightarrow #mu #nu"%(self.GetLumi())));
+            #banner = TLatex(0.18,0.96,("CMS Preliminary, %.0f fb^{-1} at #sqrt{s} = 8 TeV, W#rightarrow #mu #nu"%(self.GetLumi())));
+            banner = TLatex(0.5,0.96,("CMS Preliminary, %.1f fb^{-1} at #sqrt{s} = 8 TeV, W#rightarrow #mu #nu"%(self.GetLumi())));
         banner.SetNDC(); banner.SetTextSize(0.028);
         return banner;
 
@@ -3978,7 +3981,7 @@ class doFit_wj_and_wlvj:
                     if TString(objName).Data()=="STop"    : theLeg.AddEntry(theObj, "Single Top","F");
                     elif TString(objName).Data()=="TTbar" : theLeg.AddEntry(theObj, "t#bar{t}","F");
                     elif TString(objName).Data()=="VV"    : theLeg.AddEntry(theObj, "WW/WZ/ZZ","F");
-                    elif TString(objName).Data()=="WJets" : theLeg.AddEntry(theObj, "W+jets","F");
+                    elif TString(objName).Data()=="WJets" : theLeg.AddEntry(theObj, "W+Jets","F");
                     elif TString(objName).Contains("vbfH"): theLeg.AddEntry(theObj, (TString(objName).ReplaceAll("vbfH","qqH")).Data() ,"L");
                     else : theLeg.AddEntry(theObj, objTitle,drawoption);
                 entryCnt=entryCnt+1;
@@ -4152,10 +4155,10 @@ class doFit_wj_and_wlvj:
     ######## ++++++++++++++
     def GetLumi(self):
         if options.fitwtagger or options.fitwtaggersim:
-            if self.channel=="el": return 19.2#13.9;
+            if self.channel=="el": return 19.3#19.2#13.9;
             if self.channel=="mu": return 19.3#14.0;
 
-        if self.channel=="el": return 19.2#5.1#19.2#13.9;
+        if self.channel=="el": return 19.3#19.2#5.1#19.2#13.9;
         if self.channel=="mu": return 19.3#5.3#19.3#14.0;
 
 
