@@ -38,7 +38,7 @@
 !---- full prefactor; 3 is  the color factor
       prefactor = 3d0*(Lambda_inv**2)**2*(one/two*M_V*Ga_V)**2*gZ_sq**2
 
-         if( DecayMode1.le.3 ) then!  Z decay
+         if( IsAZDecay(DecayMode1) ) then!  Z decay
               if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
                     aL1=aL_lep
                     aR1=aR_lep
@@ -55,16 +55,16 @@
                     aL1=0d0
                     aR1=0d0
               endif
-         elseif( DecayMode1.ge.4 .and. DecayMode1.le.6 ) then !  W decay
+         elseif( IsAWDecay(DecayMode1) ) then !  W decay
               aL1 = bL
               aR1 = bR
-         elseif( DecayMode1.eq.7 ) then !  photon decay
+         elseif( IsAPhoton(DecayMode1) ) then !  photon decay
          else
               aL1=0d0
               aR1=0d0            
          endif
 
-         if( DecayMode2.le.3 ) then!  Z decay
+         if( IsAZDecay(DecayMode2) ) then!  Z decay
               if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
                     aL2=aL_lep
                     aR2=aR_lep
@@ -81,10 +81,10 @@
                     aL2=0d0
                     aR2=0d0
               endif
-         elseif( DecayMode2.ge.4 .and. DecayMode2.le.6 ) then !  W decay
+         elseif( IsAWDecay(DecayMode2) ) then !  W decay
               aL2 = bL
               aR2 = bR
-         elseif( DecayMode2.eq.7 ) then !  photon decay
+         elseif( IsAPhoton(DecayMode2) ) then !  photon decay
          else
               aL2=0d0
               aR2=0d0  
@@ -607,6 +607,7 @@ enddo
 
 
 
+
       function pol_mass(p,m,i)
       implicit none
       integer, intent(in) :: i
@@ -623,9 +624,11 @@ enddo
           pz=dreal(p(4))
 
           pv= dsqrt(dabs(p0**2 - m**2))
+
           if(pv/m.lt.1d-8) then
                 if(i.eq.0) then
-                    pol_mass(1:4)=(0d0,0d0)
+                    pol_mass(1:3)=(0d0,0d0)
+                    pol_mass( 4 )=(1d0,0d0)
                     return
                 endif
                 ct = 1d0; st=0d0
@@ -669,6 +672,7 @@ enddo
           endif
 
         end function pol_mass
+
 
 
 

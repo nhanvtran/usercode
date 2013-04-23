@@ -7,7 +7,7 @@
 
 
 !----- notation for subroutines
-      public :: EvalAmp_gg_H_VV
+      public :: EvalAmp_gg_H_VV,EvalAmp_H_VV
 
       contains
 
@@ -37,7 +37,7 @@
       prefactor = 8d0*(Lambda_inv**2)**2*gZ_sq**2
 
 
-         if( DecayMode1.le.3 ) then!  Z decay
+         if( IsAZDecay(DecayMode1) ) then!  Z decay
               if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
                     aL1=aL_lep
                     aR1=aR_lep
@@ -55,11 +55,11 @@
                     aR1=0d0
               endif
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
-         elseif( DecayMode1.ge.4 .and. DecayMode1.le.6 ) then !  W decay
+         elseif( IsAWDecay(DecayMode1) ) then !  W decay
               aL1 = bL
               aR1 = bR
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
-         elseif( DecayMode1.eq.7 ) then !  photon "decay"
+         elseif( IsAPhoton(DecayMode1) ) then !  photon "decay"
               aL1=1d0
               aR1=1d0
               prefactor = prefactor/gZ_sq**2! cancel the overall z coupling
@@ -68,7 +68,7 @@
               aR1=0d0            
          endif
 
-         if( DecayMode2.le.3 ) then!  Z decay
+         if( IsAZDecay(DecayMode2) ) then!  Z decay
               if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
                     aL2=aL_lep
                     aR2=aR_lep
@@ -85,10 +85,10 @@
                     aL2=0d0
                     aR2=0d0
               endif
-         elseif( DecayMode2.ge.4 .and. DecayMode2.le.6 ) then !  W decay
+         elseif( IsAWDecay(DecayMode2) ) then !  W decay
               aL2 = bL
               aR2 = bR
-         elseif( DecayMode2.eq.7 ) then !  photon "decay"
+         elseif( IsAPhoton(DecayMode2) ) then !  photon "decay"
               aL2=1d0
               aR2=1d0 
          else
@@ -96,6 +96,21 @@
               aR2=0d0  
          endif
 
+
+
+! ! MADGRAPH CHECK
+! sum=0d0
+! if (MY_IDUP(6).ne.MY_IDUP(8) ) return
+! if (MY_IDUP(7).ne.MY_IDUP(9) ) return
+! if (MY_IDUP(6).eq.MY_IDUP(8) ) return
+! if (MY_IDUP(7).eq.MY_IDUP(9) ) return
+! print *, "MY COUPL",al1*dsqrt(gZ_sq),ar1*dsqrt(gZ_sq)
+! ar1=-0.158480099490745d0! this is MadGraphs gzl(R)  , the MG couplings differ by a global minus sign, relative differences are because of different input parameters
+! al1=+0.210150647402957d0! this is MadGraphs gzl(L) 
+! al2=al1
+! ar2=ar1
+! print *, "MG COUPL",al1,ar1
+! pause
 
 sum = zero
 do i1 = 1,2
@@ -135,7 +150,30 @@ enddo
 enddo
 enddo
 
+
+! MADGRAPH CHECK
+! call coupsm(0)
+! if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+!       call SH_EMEPEMEP((/-P(1:4,1)-P(1:4,2),P(1:4,3),P(1:4,4),P(1:4,5),P(1:4,6)/)*100d0,sum2)
+! else
+!       call SH_EMEPEMEP_NOINT((/-P(1:4,1)-P(1:4,2),P(1:4,3),P(1:4,4),P(1:4,5),P(1:4,6)/)*100d0,sum2)
+! endif
+! sum2=sum2* cdabs( (0d0,1d0)/dcmplx(2d0*scr(p(:,1),p(:,2))-M_Reso**2,M_Reso*Ga_Reso) *  dconjg((0d0,1d0)/dcmplx(2d0*scr(p(:,1),p(:,2))-M_Reso**2,M_Reso*Ga_Reso)) ) 
+! sum2=sum2/100d0**2/100d0**2
+! pause
+! SUM=SUM2; RETURN
+
+! sum= sum*prefactor/(Lambda_inv**2)**2
+! print *, "checker 1",sum
+! print *, "checker 2",sum2
+! print *, "checker 1/2",sum/sum2
+! pause
+
+
+
+
       sum = sum*prefactor
+
 
       end subroutine
 
@@ -170,7 +208,7 @@ enddo
 
 
 !-------- -1 == left, 1 == right
-         if( DecayMode1.ne.7 ) then 
+         if( .not.IsAPhoton(DecayMode1) ) then 
             pin(3,:) = p(:,l1)+p(:,l2)
             pin(4,:) = p(:,l3)+p(:,l4)
             sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
@@ -185,7 +223,7 @@ enddo
             propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
             s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
             propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-         elseif( DecayMode1.eq.7 ) then 
+         elseif( IsAPhoton(DecayMode1) ) then 
             pin(3,:) = p(:,l1)
             pin(4,:) = p(:,l3)
             sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
@@ -291,7 +329,7 @@ enddo
 
 
 !---- data that defines couplings
-  if( DecayMode1.le.3 .or. ((DecayMode1.ge.4) .and. (DecayMode1.le.6)) ) then! decay into Z's or W's
+  if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) ) then! decay into Z's or W's
 
     if( generate_as ) then 
       xxx1 = ahg1
@@ -317,7 +355,7 @@ enddo
           + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
 
 
-  elseif( DecayMode1.eq.7 ) then! decay into photons
+  elseif( IsAPhoton(DecayMode1) ) then! decay into photons
 
     if( generate_as ) then 
       xxx1 = ahg1
@@ -430,7 +468,7 @@ enddo
 
 
 !---- data that defines couplings
-  if( DecayMode1.le.6 ) then! decay into Z's or W's
+  if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) ) then! decay into Z's or W's
 
     if( generate_as ) then 
       xxx1 = ahg1
@@ -456,7 +494,7 @@ enddo
          + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
 
 
-  elseif( DecayMode1.eq.7 ) then! decay into photons
+  elseif( IsAPhoton(DecayMode1) ) then! decay into photons
 
 
     if( generate_as ) then 
@@ -486,6 +524,417 @@ enddo
 
 
       end subroutine ggOffHZZampl
+
+
+
+
+
+!----- a subroutinefor H -> ZZ/WW/gammagamma
+!----- all outgoing convention and the following momentum assignment
+!-----  0 -> Higgs(p1) + e-(p3) + e+(p4) +mu-(p5) +mu+(p6)
+      subroutine EvalAmp_H_VV(p,MY_IDUP,sum)
+      use ModMisc
+      implicit none
+      real(dp), intent(out) ::  sum
+      real(dp), intent(in) :: p(4,6)
+      integer, intent(in) :: MY_IDUP(6:9)
+      complex(dp) :: A(1:4)
+      integer :: i1,i2,i3,i4,ordering(1:4)
+      real(dp) :: aL1,aR1,aL2,aR2
+      real(dp) :: gZ_sq
+      real(dp) :: prefactor, Lambda_inv
+      real(dp), parameter :: symmFact=1d0/2d0
+
+      gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
+
+!---- the 1/Lambda coupling
+      Lambda_inv = 1.0d0/Lambda
+
+!---- full prefactor; 8 is  the color factor
+!       prefactor = 8d0*(Lambda_inv**2)**2*gZ_sq**2
+      prefactor = (Lambda_inv**2)**2*gZ_sq**2
+
+
+         if( IsAZDecay(DecayMode1) ) then!  Z decay
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                    aL1=aL_lep
+                    aR1=aR_lep
+              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
+                    aL1=aL_neu
+                    aR1=aR_neu
+              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
+                    aL1=aL_QUp
+                    aR1=aR_QUp
+              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
+                    aL1=aL_QDn
+                    aR1=aR_QDn
+              else
+                    aL1=0d0
+                    aR1=0d0
+              endif
+              prefactor = prefactor *(one/two*M_V*Ga_V)**2
+         elseif( IsAWDecay(DecayMode1) ) then !  W decay
+              aL1 = bL
+              aR1 = bR
+              prefactor = prefactor *(one/two*M_V*Ga_V)**2
+         elseif( IsAPhoton(DecayMode1) ) then !  photon "decay"
+              aL1=1d0
+              aR1=1d0
+              prefactor = prefactor/gZ_sq**2! cancel the overall z coupling
+         else
+              aL1=0d0
+              aR1=0d0            
+         endif
+
+         if( IsAZDecay(DecayMode2) ) then!  Z decay
+              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+                    aL2=aL_lep
+                    aR2=aR_lep
+              elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
+                    aL2=aL_neu
+                    aR2=aR_neu
+              elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
+                    aL2=aL_QUp
+                    aR2=aR_QUp
+              elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
+                    aL2=aL_QDn
+                    aR2=aR_QDn
+              else
+                    aL2=0d0
+                    aR2=0d0
+              endif
+         elseif( IsAWDecay(DecayMode2) ) then !  W decay
+              aL2 = bL
+              aR2 = bR
+         elseif( IsAPhoton(DecayMode2) ) then !  photon "decay"
+              aL2=1d0
+              aR2=1d0 
+         else
+              aL2=0d0
+              aR2=0d0  
+         endif
+
+
+! ! MADGRAPH CHECK
+! sum=0d0
+! if (MY_IDUP(6).ne.MY_IDUP(8) ) return
+! if (MY_IDUP(7).ne.MY_IDUP(9) ) return
+! if (MY_IDUP(6).eq.MY_IDUP(8) ) return
+! if (MY_IDUP(7).eq.MY_IDUP(9) ) return
+! print *, "MY COUPL",al1*dsqrt(gZ_sq),ar1*dsqrt(gZ_sq)
+! ar1=-0.158480099490745d0! this is MadGraphs gzl(R)  , the MG couplings differ by a global minus sign, relative differences are because of different input parameters
+! al1=+0.210150647402957d0! this is MadGraphs gzl(L) 
+! al2=al1
+! ar2=ar1
+! print *, "MG COUPL",al1,ar1
+! pause
+
+
+
+sum = zero
+do i3 = 1,2
+do i4 = 1,2
+   
+         ordering = (/3,4,5,6/)
+         call calcHelAmp2(ordering,p(1:4,1:6),i3,i4,A(1))
+         if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+             ordering = (/5,4,3,6/)
+             call calcHelAmp2(ordering,p(1:4,1:6),i3,i4,A(2))
+             A(2) = -A(2) ! minus comes from fermi statistics
+         endif
+
+
+         if (i3.eq.1) then
+            A(:) = aL1*A(:)
+         elseif(i3.eq.2) then
+            A(:) = aR1*A(:)
+         endif
+         if (i4.eq.1) then
+            A(:) = aL2*A(:)
+         elseif(i4.eq.2) then
+            A(:) = aR2*A(:)
+         endif
+
+         if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+             sum = sum + symmFact * (cdabs( A(1)*dconjg(A(1)) ) + cdabs( A(2)*dconjg(A(2)) ))
+             if( i3.eq.i4 ) sum = sum + symmFact * 2d0*dreal(A(1)*dconjg(A(2)))  
+         else
+             sum = sum + cdabs( A(1)*dconjg(A(1)) )
+         endif
+enddo
+enddo
+
+
+! MADGRAPH CHECK
+! call coupsm(0)
+! if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+!       call SH_EMEPEMEP((/-P(1:4,1)-P(1:4,2),P(1:4,3),P(1:4,4),P(1:4,5),P(1:4,6)/)*100d0,sum2)
+! else
+!       call SH_EMEPEMEP_NOINT((/-P(1:4,1)-P(1:4,2),P(1:4,3),P(1:4,4),P(1:4,5),P(1:4,6)/)*100d0,sum2)
+! endif
+! sum2=sum2* cdabs( (0d0,1d0)/dcmplx(2d0*scr(p(:,1),p(:,2))-M_Reso**2,M_Reso*Ga_Reso) *  dconjg((0d0,1d0)/dcmplx(2d0*scr(p(:,1),p(:,2))-M_Reso**2,M_Reso*Ga_Reso)) ) 
+! sum2=sum2/100d0**2/100d0**2
+! pause
+! SUM=SUM2; RETURN
+
+! sum= sum*prefactor/(Lambda_inv**2)**2
+! print *, "checker 1",sum
+! print *, "checker 2",sum2
+! print *, "checker 1/2",sum/sum2
+! pause
+
+
+
+      sum = sum*prefactor
+
+      end subroutine
+
+
+
+
+
+     subroutine calcHelAmp2(ordering,p,i3,i4,A)
+     implicit none
+     integer :: ordering(1:4),i3,i4,l1,l2,l3,l4
+     real(dp) :: p(1:4,1:6)
+     complex(dp) :: propZ1, propZ2
+     real(dp) :: s, pin(4,4)
+     complex(dp) :: A(1:1), sp(3:4,4)
+
+
+      l1=ordering(1)
+      l2=ordering(2)
+      l3=ordering(3)
+      l4=ordering(4)
+
+         pin(1,:) = p(:,1)
+
+!-------- -1 == left, 1 == right
+         if( .not.IsAPhoton(DecayMode1) ) then 
+            pin(3,:) = p(:,l1)+p(:,l2)
+            pin(4,:) = p(:,l3)+p(:,l4)
+            sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
+            sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
+            sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
+            sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
+            s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
+            propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+            s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
+            propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+         elseif( IsAPhoton(DecayMode1) ) then 
+            pin(3,:) = p(:,l1)
+            pin(4,:) = p(:,l3)
+            sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
+            sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
+!             sp(3,1:4)=pin(3,1:4)! this checks gauge invariance
+!             sp(4,1:4)=pin(4,1:4)
+            propz1=1d0
+            propz2=1d0
+         endif
+
+         if( OffShellReson ) then
+              call OffHZZampl(pin,sp,A(1))
+         else
+              call HZZampl(pin,sp,A(1))
+         endif
+
+         A(1) = A(1) * propZ1*propZ2
+
+     end subroutine
+
+
+
+
+
+      subroutine HZZampl(p,sp,res)
+      implicit none
+      real(dp), intent(in) :: p(4,4)
+      complex(dp), intent(in) :: sp(3:4,4)
+      complex(dp), intent(out) :: res
+      complex(dp) :: e3_e4
+      complex(dp) :: q_q
+      complex(dp) :: q3_q4
+      complex(dp) :: e3_q4,e4_q3
+      complex(dp) :: q1(4),q3(4),q4(4),q(4)
+      complex(dp) :: e3(4),e4(4)
+      complex(dp) :: yyy1,yyy2,yyy3,yyy4
+      real(dp) :: q34
+      real(dp) :: MG, MZ3, MZ4, q3_q3, q4_q4
+
+
+
+      res = 0d0
+
+      q1 = dcmplx(p(1,:),0d0)
+      q3 = dcmplx(p(3,:),0d0)
+      q4 = dcmplx(p(4,:),0d0)
+
+
+      e3 = sp(3,:)
+      e4 = sp(4,:)
+
+      q = -q1
+
+      q_q =sc(q,q)
+      q3_q3 = sc(q3,q3)
+      q4_q4 = sc(q4,q4)
+
+      q3_q4 = sc(q3,q4)
+      e3_e4 = sc(e3,e4)
+      e3_q4 = sc(e3,q4)
+      e4_q3 = sc(e4,q3)
+
+
+      if (cdabs(q_q).lt.-0.1d0.or.(q3_q3).lt.-0.1d0.or.(q4_q4).lt.-0.1d0) return  ! if negative invariant masses return zero
+      MG =dsqrt(cdabs(q_q))
+      MZ3=dsqrt(dabs(q3_q3))
+      MZ4=dsqrt(dabs(q4_q4))
+
+
+!---- data that defines couplings
+  if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) ) then! decay into Z's or W's
+
+      if( generate_as ) then 
+        yyy1 = ahz1
+        yyy2 = ahz2
+        yyy3 = ahz3
+      else
+        yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
+             + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+             + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+        yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+        yyy3 = -2d0*ghz4
+      endif
+
+      res = e3_e4*M_Reso**2*yyy1       &
+          + e3_q4*e4_q3*yyy2           &
+          + et1(e3,e4,q3,q4)*yyy3 
+
+
+  elseif( IsAPhoton(DecayMode1) ) then! decay into photons
+
+      if( generate_as ) then 
+        yyy1 = ahz1
+        yyy2 = -2*ahz1 !ahz2  ! gauge invariance fixes ahz2 in this case
+        yyy3 = ahz3
+      else
+        yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
+            + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+            + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+        yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+        yyy3 = -2d0*ghz4
+      endif
+
+      res = e3_e4*M_Reso**2*yyy1       &
+          + e3_q4*e4_q3*yyy2           &
+          + et1(e3,e4,q3,q4)*yyy3 
+
+
+
+  endif
+
+
+      end subroutine HZZampl
+
+
+
+
+
+
+
+      subroutine OffHZZampl(p,sp,res)
+      implicit none
+      real(dp), intent(in) :: p(4,4)
+      complex(dp), intent(in) :: sp(3:4,4)
+      complex(dp), intent(out) :: res
+      complex(dp) :: e3_e4
+      complex(dp) :: q_q
+      complex(dp) :: q3_q4
+      complex(dp) :: e3_q4,e4_q3
+      complex(dp) :: q1(4),q3(4),q4(4),q(4)
+      complex(dp) :: e3(4),e4(4)
+      complex(dp) :: yyy1,yyy2,yyy3,yyy4
+      real(dp) :: q34
+      real(dp) :: MG, MZ3, MZ4, q3_q3, q4_q4
+
+      res = 0d0
+
+      q1 = dcmplx(p(1,:),0d0)
+      q3 = dcmplx(p(3,:),0d0)
+      q4 = dcmplx(p(4,:),0d0)
+
+
+      e3 = sp(3,:)
+      e4 = sp(4,:)
+
+      q = -q1
+
+      q_q =sc(q,q)
+      q3_q3 = sc(q3,q3)
+      q4_q4 = sc(q4,q4)
+
+
+      if (cdabs(q_q).lt.-0.1d0.or.(q3_q3).lt.-0.1d0.or.(q4_q4).lt.-0.1d0) return  ! if negative invariant masses return zero
+      MG =dsqrt(cdabs(q_q))
+      MZ3=dsqrt(dabs(q3_q3))
+      MZ4=dsqrt(dabs(q4_q4))
+
+      q3_q4 = sc(q3,q4)
+      e3_e4 = sc(e3,e4)
+      e3_q4 = sc(e3,q4)
+      e4_q3 = sc(e4,q3)
+
+
+!---- data that defines couplings
+  if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) ) then! decay into Z's or W's
+
+    if( generate_as ) then 
+      yyy1 = ahz1
+      yyy2 = ahz2
+      yyy3 = ahz3
+    else
+      yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
+           + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+      yyy3 = -2d0*ghz4
+    endif
+
+
+      res = e3_e4*M_Reso**2*yyy1       &
+          + e3_q4*e4_q3*yyy2           &
+          + et1(e3,e4,q3,q4)*yyy3 
+
+
+  elseif( IsAPhoton(DecayMode1) ) then! decay into photons
+
+
+    if( generate_as ) then 
+      yyy1 = ahz1
+      yyy2 = -2*ahz1 !ahz2  ! gauge invariance fixes ahz2 in this case
+      yyy3 = ahz3
+    else
+      yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
+           + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+      yyy3 = -2d0*ghz4
+    endif
+
+
+      res = e3_e4*M_Reso**2*yyy1       &
+          + e3_q4*e4_q3*yyy2           &
+          + et1(e3,e4,q3,q4)*yyy3 
+
+
+  endif
+
+
+      end subroutine OffHZZampl
+
+
+
+
 
 
 

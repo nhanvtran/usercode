@@ -36,6 +36,23 @@ real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
 real(8) :: ntRnd
 character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
 
+
+DebugCounter(0)=DebugCounter(0)+1
+if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) DebugCounter(1)=DebugCounter(1)+1
+if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) DebugCounter(2)=DebugCounter(2)+1
+if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) DebugCounter(3)=DebugCounter(3)+1
+
+if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.muP_ .and. abs(MY_IDUP(9)).eq.muP_ ) DebugCounter(4)=DebugCounter(4)+1
+if( abs(MY_IDUP(6)).eq.muP_ .and. abs(MY_IDUP(7)).eq.muP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) DebugCounter(4)=DebugCounter(4)+1
+
+if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) DebugCounter(5)=DebugCounter(5)+1
+if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) DebugCounter(5)=DebugCounter(5)+1
+
+if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) DebugCounter(6)=DebugCounter(6)+1
+if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) DebugCounter(6)=DebugCounter(6)+1
+
+
+
 do i=1,9
 !        print *, "my_idup(i) ",MY_IDUP(i)
 LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
@@ -112,33 +129,33 @@ XFV(c) = Z1FV(c) + Z2FV(c)
 enddo
 
 tmp = MomDummy(1,1)*MomDummy(1,1)-MomDummy(2,1)*MomDummy(2,1)-MomDummy(3,1)*MomDummy(3,1)-MomDummy(4,1)*MomDummy(4,1)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+if( tmp.lt. -1d-3 ) print *, "Error 1: large negative mass!",tmp
 Part1Mass = dSQRT(dabs(tmp))
 
 tmp = MomDummy(1,2)*MomDummy(1,2)-MomDummy(2,2)*MomDummy(2,2)-MomDummy(3,2)*MomDummy(3,2)-MomDummy(4,2)*MomDummy(4,2)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+if( tmp.lt. -1d-3 ) print *, "Error 2: large negative mass!",tmp
 Part2Mass = dSQRT(dabs(tmp))
 
 tmp = XFV(1)*XFV(1)-XFV(2)*XFV(2)-XFV(3)*XFV(3)-XFV(4)*XFV(4)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+if( tmp.lt. -1d-3 ) print *, "Error 3: large negative mass!",tmp
 XMass = dSQRT(dabs(tmp))
 
 tmp = Z1FV(1)*Z1FV(1)-Z1FV(2)*Z1FV(2)-Z1FV(3)*Z1FV(3)-Z1FV(4)*Z1FV(4)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+if( tmp.lt. -1d-3 ) print *, "Error 4: large negative mass!",tmp
 V1Mass = dSQRT(dabs(tmp))
 if( V1Mass.lt.1d-5 ) then
 V1Mass=0d0
 endif
 
 tmp = Z2FV(1)*Z2FV(1)-Z2FV(2)*Z2FV(2)-Z2FV(3)*Z2FV(3)-Z2FV(4)*Z2FV(4)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+if( tmp.lt. -1d-3 ) print *, "Error 5: large negative mass!",tmp
 V2Mass = dSQRT(dabs(tmp))
 if( V2Mass.lt.1d-5 ) then
 V2Mass=0d0
 endif
 
 tmp = MomDummy(1,3)*MomDummy(1,3)-MomDummy(2,3)*MomDummy(2,3)-MomDummy(3,3)*MomDummy(3,3)-MomDummy(4,3)*MomDummy(4,3)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+if( tmp.lt. -1d-3 ) print *, "Error 6: large negative mass!",tmp
 L12Mass = dSQRT(dABS(tmp))
 if( L12Mass.lt.1d-5 ) then
 L12Mass=0d0
@@ -148,7 +165,7 @@ MomDummy(1,3) = MomDummy(1,3) + 1d-7
 endif
 
 tmp = MomDummy(1,4)*MomDummy(1,4)-MomDummy(2,4)*MomDummy(2,4)-MomDummy(3,4)*MomDummy(3,4)-MomDummy(4,4)*MomDummy(4,4)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+if( tmp.lt. -1d-3 ) print *, "Error 7: large negative mass!",tmp
 L11Mass = dSQRT(dABS(tmp))
 if( L11Mass.lt.1d-5 ) then
 L11Mass=0d0
@@ -158,7 +175,7 @@ MomDummy(1,4) = MomDummy(1,4) + 1d-7
 endif
 
 tmp = MomDummy(1,5)*MomDummy(1,5)-MomDummy(2,5)*MomDummy(2,5)-MomDummy(3,5)*MomDummy(3,5)-MomDummy(4,5)*MomDummy(4,5)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+if( tmp.lt. -1d-3 ) print *, "Error 8: large negative mass!",tmp
 L22Mass = dSQRT(dABS(tmp))
 if( L22Mass.lt.1d-5 ) then
 L22Mass=0d0
@@ -168,7 +185,7 @@ MomDummy(1,5) = MomDummy(1,5) + 1d-7
 endif
 
 tmp = MomDummy(1,6)*MomDummy(1,6)-MomDummy(2,6)*MomDummy(2,6)-MomDummy(3,6)*MomDummy(3,6)-MomDummy(4,6)*MomDummy(4,6)
-if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+if( tmp.lt. -1d-3 ) print *, "Error 9: large negative mass!",tmp
 L21Mass = dSQRT(dABS(tmp))
 if( L21Mass.lt.1d-5 ) then
 L21Mass=0d0
@@ -178,61 +195,66 @@ MomDummy(1,6) = MomDummy(1,6) + 1d-7
 endif
 
 
-write(14,"(A)") "<event>"
-write(14,"(I1,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+write(io_LHEOutFile,"(A)") "<event>"
+write(io_LHEOutFile,"(I1,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 
 
 ! parton_a
 i=1
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,1),MomDummy(1,1),Part1Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,1),MomDummy(1,1),Part1Mass,Lifetime,Spin
 
 ! parton_b
 i=2
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,2),MomDummy(1,2),Part2Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,2),MomDummy(1,2),Part2Mass,Lifetime,Spin
 
 ! X
 i=3
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),XFV(2:4),XFV(1),XMass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),XFV(2:4),XFV(1),XMass,Lifetime,Spin
 
 ! V1
 i=4
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z1FV(2:4),Z1FV(1),V1Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z1FV(2:4),Z1FV(1),V1Mass,Lifetime,Spin
 
 ! V2
 i=5
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,Lifetime,Spin
 
 
 ! decay product 1 (V1): l-, nu or q
 i=7
 if (LHE_IDUP(i).gt.-9000) then
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L12Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L12Mass,Lifetime,Spin
 endif
 
 ! decay product 2 (V1): l+, nubar or qbar
 i=6
 if (LHE_IDUP(i).gt.-9000) then
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L11Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L11Mass,Lifetime,Spin
 endif
 
 ! decay product 1 (V2): l-, nu or q
 i=9
 if (LHE_IDUP(i).gt.-9000) then
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L22Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L22Mass,Lifetime,Spin
 endif
 
 ! decay product 2 (V2): l+, nubar or qbar
 i=8
 if (LHE_IDUP(i).gt.-9000) then
-write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
 endif
 
-write(14,"(A)") "</event>"
+write(io_LHEOutFile,"(A)") "</event>"
 
 ! print * ,"check ", LHE_IDUP(6),MomDummy(1:4,4)
 ! print * ,"check ", LHE_IDUP(7),MomDummy(1:4,3)
 ! print * ,"check ", LHE_IDUP(8),MomDummy(1:4,6)
 ! print * ,"check ", LHE_IDUP(9),MomDummy(1:4,5)
+
+! print * ,"check ", LHE_IDUP(6),L11Mass
+! print * ,"check ", LHE_IDUP(7),L12Mass
+! print * ,"check ", LHE_IDUP(8),L21Mass
+! print * ,"check ", LHE_IDUP(9),L22Mass
 ! pause
 
 END SUBROUTINE
@@ -328,7 +350,7 @@ subroutine AdjustKinematics(eta1,eta2,MomExt,MomDK,xgr,xz2,xz1,MomExt_f,MomDK_f)
     xmax = atan((Collider_Energy**2-M_Reso**2)/M_Reso/Ga_Reso) + atan(M_Reso/Ga_Reso)
     MG=dsqrt(M_Reso**2 + M_Reso*Ga_Reso*tan(xgr*xmax-atan(M_Reso/Ga_Reso)))
 
-    if ((MG/M_Reso*eta1.gt.1).or.(MG/M_Reso*eta2.gt.1)) return
+    if ((MG/M_Reso*eta1.gt.1d0).or.(MG/M_Reso*eta2.gt.1d0)) return
 
     MomExt_f(:,1) =MG/M_Reso*MomExt(:,1)
     MomExt_f(:,2) =MG/M_Reso*MomExt(:,2)
@@ -494,6 +516,8 @@ real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
 
 ! construct cos(theta1): angle between direction of fermion from Z1 and negative direction of opposite Z in Z1 rest frame
 
+! this is not fully correct: first, all momenta should be boosted into the resonance rest frame
+
       MomBoost(1)   = +MomExt(1,3)
       MomBoost(2:4) = -MomExt(2:4,3)
 
@@ -613,33 +637,14 @@ endif
 
       NBin(11) = WhichBin(11,mReso)
 
-return
+
+      NBin(12:18) = 1!  this is for the l+/l- total cross sections
+
+RETURN
 END SUBROUTINE
 
 
-FUNCTION ZQuaBranching(xRnd)
-use ModParameters
-implicit none
-real(8) :: xRnd
-integer :: ZQuaBranching
 
-  if( xRnd .le. Br_Z_up ) then
-      ZQuaBranching = Up_
-  elseif(xRnd .le. Br_Z_up+Br_Z_ch) then
-      ZQuaBranching = Chm_
-  elseif(xRnd .le. Br_Z_up+Br_Z_ch+Br_Z_dn) then
-      ZQuaBranching = Dn_
-  elseif(xRnd .le. Br_Z_up+Br_Z_ch+Br_Z_dn+Br_Z_st) then
-      ZQuaBranching = Str_
-  elseif(xRnd .le. Br_Z_up+Br_Z_ch+Br_Z_dn+Br_Z_st+Br_Z_bo) then
-      ZQuaBranching = Bot_
-  else
-      print *, "error ",xRnd
-      stop
-  endif
-
-RETURN
-END FUNCTION
 
 
 
@@ -649,14 +654,44 @@ implicit none
 real(8) :: xRnd
 integer :: ZLepBranching
 
-  if( xRnd .le. 0.5d0 ) then
+  if( xRnd .le. Brlept_Z_ee/(100d0*percent-Brlept_Z_tt) ) then
       ZLepBranching = ElM_
-  elseif(xRnd .le. 1.0d0) then
+  elseif(xRnd .le. (Brlept_Z_ee+Brlept_Z_mm)/(100d0*percent-Brlept_Z_tt) ) then
       ZLepBranching = MuM_
   else
       print *, "error ",xRnd
       stop
   endif
+
+!print *, "checker 2",(Brlept_Z_ee)/(100d0*percent-Brlept_Z_tt)
+!print *, "checker 2",(Brlept_Z_ee+Brlept_Z_mm)/(100d0*percent-Brlept_Z_tt)
+
+RETURN
+END FUNCTION
+
+
+
+
+FUNCTION ZLepPlusTauBranching(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: ZLepPlusTauBranching
+
+  if( xRnd .le. Brlept_Z_ee ) then
+      ZLepPlusTauBranching = ElM_
+  elseif(xRnd .le. Brlept_Z_ee+Brlept_Z_mm ) then
+      ZLepPlusTauBranching = MuM_
+  elseif(xRnd .le. Brlept_Z_ee+Brlept_Z_mm+Brlept_Z_tt ) then
+      ZLepPlusTauBranching = TaM_
+  else
+      print *, "error ",xRnd
+      stop
+  endif
+
+!print *, "checker 3",Brlept_Z_ee
+!print *, "checker 3",Brlept_Z_ee+Brlept_Z_mm
+!print *, "checker 3",Brlept_Z_ee+Brlept_Z_mm+Brlept_Z_tt
 
 RETURN
 END FUNCTION
@@ -669,19 +704,95 @@ implicit none
 real(8) :: xRnd
 integer :: ZNuBranching
 
-  if( xRnd .le. 1d0/3d0 ) then
+  if( xRnd .le. Brlept_Z_nn ) then
       ZNuBranching = NuE_
-  elseif(xRnd .le. 2.0d0/3d0) then
+  elseif(xRnd .le. Brlept_Z_nn+Brlept_Z_nn ) then
       ZNuBranching = NuM_
-  elseif(xRnd .le. 1.0d0) then
+  elseif(xRnd .le. Brlept_Z_nn+Brlept_Z_nn+Brlept_Z_nn ) then
       ZNuBranching = NuT_
   else
       print *, "error ",xRnd
       stop
   endif
 
+!print *, "checker 4",Brlept_Z_nn
+!print *, "checker 4",Brlept_Z_nn+Brlept_Z_nn
+!print *, "checker 4",Brlept_Z_nn+Brlept_Z_nn+Brlept_Z_nn
+
 RETURN
 END FUNCTION
+
+
+
+
+
+FUNCTION ZQuaBranching(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: ZQuaBranching
+
+  if( xRnd .le. Brhadr_Z_uu ) then
+      ZQuaBranching = Up_
+  elseif(xRnd .le. Brhadr_Z_uu+Brhadr_Z_cc) then
+      ZQuaBranching = Chm_
+  elseif(xRnd .le. Brhadr_Z_uu+Brhadr_Z_cc+Brhadr_Z_dd) then
+      ZQuaBranching = Dn_
+  elseif(xRnd .le. Brhadr_Z_uu+Brhadr_Z_cc+Brhadr_Z_dd+Brhadr_Z_ss) then
+      ZQuaBranching = Str_
+  elseif(xRnd .le. Brhadr_Z_uu+Brhadr_Z_cc+Brhadr_Z_dd+Brhadr_Z_ss+Brhadr_Z_bb) then
+      ZQuaBranching = Bot_
+  else
+      print *, "error ",xRnd
+      stop
+  endif
+
+!print *, "checker 1",Brhadr_Z_uu,Brhadr_Z_dd
+!print *, "checker 1",Brhadr_Z_uu+Brhadr_Z_cc+Brhadr_Z_dd+Brhadr_Z_ss+Brhadr_Z_bb
+
+RETURN
+END FUNCTION
+
+
+
+FUNCTION ZAnyBranching(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: ZAnyBranching
+
+  if( xRnd .le. Br_Z_uu ) then
+      ZAnyBranching = Up_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc) then
+      ZAnyBranching = Chm_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd) then
+      ZAnyBranching = Dn_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss) then
+      ZAnyBranching = Str_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb) then
+      ZAnyBranching = Bot_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee) then
+      ZAnyBranching = ElM_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm) then
+      ZAnyBranching = MuM_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt) then
+      ZAnyBranching = TaM_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn) then
+      ZAnyBranching = NuE_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn) then
+      ZAnyBranching = NuM_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn+Br_Z_nn) then
+      ZAnyBranching = NuT_
+  else
+      print *, "error ",xRnd
+      stop
+  endif
+
+! print *, "checker 5",Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn+Br_Z_nn
+
+RETURN
+END FUNCTION
+
 
 
 
@@ -693,17 +804,48 @@ implicit none
 real(8) :: xRnd
 integer :: WLepBranching
 
-  if( xRnd .le. 0.5d0 ) then
+  if( xRnd .le. Brlept_W_en /(100d0*percent-Brlept_W_tn) ) then
       WLepBranching = ElM_
-  elseif(xRnd .le. 1.0d0) then
+  elseif(xRnd .le. (Brlept_W_en+Brlept_W_mn)/(100d0*percent-Brlept_W_tn) ) then
       WLepBranching = MuM_
   else
       print *, "error ",xRnd
       stop
   endif
 
+!print *, "checker 6",Brlept_W_en /(100d0*percent-Brlept_W_tn)
+!print *, "checker 6",(Brlept_W_en+Brlept_W_mn)/(100d0*percent-Brlept_W_tn)
+
 RETURN
 END FUNCTION
+
+
+
+FUNCTION WLepPlusTauBranching(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: WLepPlusTauBranching
+
+  if( xRnd .le. Brlept_W_en ) then
+      WLepPlusTauBranching = ElM_
+  elseif(xRnd .le. Brlept_W_en+Brlept_W_mn ) then
+      WLepPlusTauBranching = MuM_
+  elseif(xRnd .le. Brlept_W_en+Brlept_W_mn+Brlept_W_tn ) then
+      WLepPlusTauBranching = TaM_
+  else
+      print *, "error ",xRnd
+      stop
+  endif
+
+! print *, "checker 7",Brlept_W_en
+! print *, "checker 7",Brlept_W_en+Brlept_W_mn
+! print *, "checker 7",Brlept_W_en+Brlept_W_mn+Brlept_W_tn
+
+RETURN
+END FUNCTION
+
+
 
 
 FUNCTION WQuaUpBranching(xRnd)
@@ -712,17 +854,57 @@ implicit none
 real(8) :: xRnd
 integer :: WQuaUpBranching
 
-  if( xRnd .le. 0.5d0 ) then
+  if( xRnd .le. Brhadr_W_ud ) then
       WQuaUpBranching = Up_
-  elseif(xRnd .le. 1d0 ) then
+  elseif(xRnd .le. Brhadr_W_ud+Brhadr_W_cs ) then
       WQuaUpBranching = Chm_
   else
       print *, "error ",xRnd
       stop
   endif
 
+
+!print *, "checker 8",Brhadr_W_ud
+!print *, "checker 8",Brhadr_W_ud+Brhadr_W_cs
+
 RETURN
 END FUNCTION
+
+
+
+
+FUNCTION WAnyBranching(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: WAnyBranching
+
+  if( xRnd .le. Br_W_ud ) then
+      WAnyBranching = Up_
+  elseif(xRnd .le. Br_W_ud+Br_W_cs ) then
+      WAnyBranching = Chm_
+  elseif(xRnd .le. Br_W_ud+Br_W_cs+Br_W_en ) then
+      WAnyBranching = ElM_
+  elseif(xRnd .le. Br_W_ud+Br_W_cs+Br_W_en+Br_W_mn ) then
+      WAnyBranching = MuM_
+  elseif(xRnd .le. Br_W_ud+Br_W_cs+Br_W_en+Br_W_mn+Br_W_tn ) then
+      WAnyBranching = TaM_
+  else
+      print *, "error ",xRnd
+      stop
+  endif
+
+
+! print *, "checker 9",Br_W_ud
+! print *, "checker 9",Br_W_ud+Br_W_cs
+! print *, "checker 9",Br_W_ud+Br_W_cs+Br_W_en
+! print *, "checker 9",Br_W_ud+Br_W_cs+Br_W_en+Br_W_mn
+! print *, "checker 9",Br_W_ud+Br_W_cs+Br_W_en+Br_W_mn+Br_W_tn
+
+RETURN
+END FUNCTION
+
+
 
 
 
@@ -739,7 +921,7 @@ real(8) :: DKRnd
 !    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
-!
+
 
 
    if( DecayMode1.eq.0 ) then! Z1->2l
@@ -788,6 +970,41 @@ real(8) :: DKRnd
         MY_IDUP(4) = Pho_
         MY_IDUP(6) = -9999
         MY_IDUP(7) = -9999
+   elseif( DecayMode1.eq.8 ) then! Z1->2l+2tau
+        call random_number(DKRnd)
+        MY_IDUP(4) = Z0_
+        DKFlavor = ZLepPlusTauBranching( DKRnd )!= ElM or MuM or TaM
+        MY_IDUP(6) =-DKFlavor
+        MY_IDUP(7) =+DKFlavor
+   elseif( DecayMode1.eq.9 ) then! Z1-> anything
+        call random_number(DKRnd)
+        MY_IDUP(4) = Z0_
+        DKFlavor = ZAnyBranching( DKRnd )
+        MY_IDUP(6) =-DKFlavor
+        MY_IDUP(7) =+DKFlavor
+        if(IsAQuark(DKFlavor)) then
+           ICOLUP(1:2,6) = (/0,503/)
+           ICOLUP(1:2,7) = (/503,0/)
+        endif
+   elseif( DecayMode1.eq.10 ) then! W1(+)->l+tau  +nu
+        call random_number(DKRnd)
+        MY_IDUP(4) = Wp_
+        DKFlavor = WLepPlusTauBranching( DKRnd )!= ElM or MuM or TaM
+        MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
+        MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
+   elseif( DecayMode1.eq.11 ) then! W1(+)-> anything
+        call random_number(DKRnd)
+        MY_IDUP(4) = Wp_
+        DKFlavor = WAnyBranching( DKRnd )
+        if(IsAQuark(DKFlavor)) then
+           MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor  
+           MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
+           ICOLUP(1:2,6) = (/0,503/)
+           ICOLUP(1:2,7) = (/503,0/)
+        else
+           MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
+           MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
+        endif
    endif
 
 
@@ -837,6 +1054,41 @@ real(8) :: DKRnd
         MY_IDUP(5) = Pho_
         MY_IDUP(8) = -9999
         MY_IDUP(9) = -9999
+   elseif( DecayMode2.eq.8 ) then! Z2->2l+2tau
+        call random_number(DKRnd)
+        MY_IDUP(5) = Z0_
+        DKFlavor = ZLepPlusTauBranching( DKRnd )!= ElM or MuM or TaM
+        MY_IDUP(8) =-DKFlavor
+        MY_IDUP(9) =+DKFlavor
+   elseif( DecayMode2.eq.9 ) then! Z2-> anything
+        call random_number(DKRnd)
+        MY_IDUP(5) = Z0_
+        DKFlavor = ZAnyBranching( DKRnd )
+        MY_IDUP(8) =-DKFlavor
+        MY_IDUP(9) =+DKFlavor
+        if(IsAQuark(DKFlavor)) then
+           ICOLUP(1:2,8) = (/0,504/)
+           ICOLUP(1:2,9) = (/504,0/)
+        endif
+   elseif( DecayMode2.eq.10 ) then! W2(-)->l+tau + nu
+        call random_number(DKRnd)
+        MY_IDUP(5) = Wm_
+        DKFlavor = WLepPlusTauBranching( DKRnd )!= ElM or MuM or TaM
+        MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
+        MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
+   elseif( DecayMode2.eq.11 ) then! W2(-)-> anything
+        call random_number(DKRnd)
+        MY_IDUP(5) = Wm_
+        DKFlavor = WAnyBranching( DKRnd )
+        if(IsAQuark(DKFlavor)) then
+           MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
+           MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
+           ICOLUP(1:2,8) = (/0,504/)
+           ICOLUP(1:2,9) = (/504,0/)
+        else
+           MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
+           MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
+        endif
    endif
 
 

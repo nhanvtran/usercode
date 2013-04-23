@@ -38,7 +38,7 @@
       prefactor = 8d0*(Lambda_inv**2)**2*gZ_sq**2
 
 
-         if( DecayMode1.le.3 ) then!  Z decay
+         if( IsAZDecay(DecayMode1) ) then!  Z decay
               if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
                     aL1=aL_lep
                     aR1=aR_lep
@@ -56,11 +56,11 @@
                     aR1=0d0
               endif
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
-         elseif( DecayMode1.ge.4 .and. DecayMode1.le.6 ) then !  W decay
+         elseif( IsAWDecay(DecayMode1) ) then !  W decay
               aL1 = bL
               aR1 = bR
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
-         elseif( DecayMode1.eq.7 ) then !  photon "decay"
+         elseif( IsAPhoton(DecayMode1) ) then !  photon "decay"
               aL1=1d0
               aR1=1d0
               prefactor = prefactor/gZ_sq**2! cancel the overall z coupling
@@ -69,7 +69,7 @@
               aR1=0d0            
          endif
 
-         if( DecayMode2.le.3 ) then!  Z decay
+         if( IsAZDecay(DecayMode2) ) then!  Z decay
               if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
                     aL2=aL_lep
                     aR2=aR_lep
@@ -86,10 +86,10 @@
                     aL2=0d0
                     aR2=0d0
               endif
-         elseif( DecayMode2.ge.4 .and. DecayMode2.le.6 ) then !  W decay
+         elseif( IsAWDecay(DecayMode2) ) then !  W decay
               aL2 = bL
               aR2 = bR
-         elseif( DecayMode2.eq.7 ) then !  photon "decay"
+         elseif( IsAPhoton(DecayMode2) ) then !  photon "decay"
               aL2=1d0
               aR2=1d0  
          else
@@ -170,7 +170,7 @@ enddo
           !careful: for gluon gauge invariance check the terms ~c3,c4 are needed because e1.q2 is not zero for e1-->q1
 
 !-------- -1 == left, 1 == right
-         if( DecayMode1.ne.7 ) then 
+         if( .not.IsAPhoton(DecayMode1) ) then 
 !             pin(3,:) = p(:,3)+p(:,4)
 !             pin(4,:) = p(:,5)+p(:,6)
 !             sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
@@ -191,7 +191,7 @@ enddo
             s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
             propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
-         elseif( DecayMode1.eq.7 ) then 
+         elseif( IsAPhoton(DecayMode1) ) then 
             pin(3,:) = p(:,l1)
             pin(4,:) = p(:,l3)
             sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
@@ -247,7 +247,7 @@ enddo
       prefactor = 3d0*(Lambda_inv**2)**2*gZ_sq**2
 
 
-         if( DecayMode1.le.3 ) then!  Z decay
+         if( IsAZDecay(DecayMode1) ) then!  Z decay
               if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
                     aL1=aL_lep
                     aR1=aR_lep
@@ -265,11 +265,11 @@ enddo
                     aR1=0d0
               endif
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
-         elseif( DecayMode1.ge.4 .and. DecayMode1.le.6 ) then !  W decay
+         elseif( IsAWDecay(DecayMode1) ) then !  W decay
               aL1 = bL
               aR1 = bR
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
-         elseif( DecayMode1.eq.7 ) then !  photon decay
+         elseif( IsAPhoton(DecayMode1) ) then !  photon decay
               aL1=1d0
               aR1=1d0
               prefactor = prefactor/gZ_sq**2! cancel the overall z coupling
@@ -278,7 +278,7 @@ enddo
               aR1=0d0            
          endif
 
-         if( DecayMode2.le.3 ) then!  Z decay
+         if( IsAZDecay(DecayMode2) ) then!  Z decay
               if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
                     aL2=aL_lep
                     aR2=aR_lep
@@ -295,10 +295,10 @@ enddo
                     aL2=0d0
                     aR2=0d0
               endif
-         elseif( DecayMode2.ge.4 .and. DecayMode2.le.6 ) then !  W decay
+         elseif( IsAWDecay(DecayMode2) ) then !  W decay
               aL2 = bL
               aR2 = bR
-         elseif( DecayMode2.eq.7 ) then !  photon decay
+         elseif( IsAPhoton(DecayMode2) ) then !  photon decay
               aL2=1d0
               aR2=1d0  
          else
@@ -381,7 +381,7 @@ enddo
          sp(2,:) = sp(1,:)  !-- the same, isn't really needed but for uniform bookeeping
 
 !-------- -1 == left, 1 == right
-         if( DecayMode1.ne.7 ) then 
+         if( .not.IsAPhoton(DecayMode1) ) then 
 !             pin(3,:) = p(:,3)+p(:,4)
 !             pin(4,:) = p(:,5)+p(:,6)
 !             sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
@@ -402,7 +402,7 @@ enddo
             s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
             propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
-         elseif( DecayMode1.eq.7 ) then 
+         elseif( IsAPhoton(DecayMode1) ) then 
             pin(3,:) = p(:,l1)
             pin(4,:) = p(:,l3)
             sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
@@ -522,7 +522,7 @@ enddo
           yyy5 = c5
           yyy6 = c6
           yyy7 = c7
-          if( DecayMode1.eq.7 .and. DecayMode2.eq.7 ) then
+          if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
               yyy6=0d0
               yyy7=0d0
           endif
@@ -721,7 +721,7 @@ enddo
           yyy5 = c5
           yyy6 = c6
           yyy7 = c7
-          if( DecayMode1.eq.7 .and. DecayMode2.eq.7 ) then
+          if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
               yyy6=0d0
               yyy7=0d0
           endif

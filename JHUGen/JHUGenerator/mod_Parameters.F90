@@ -1,18 +1,25 @@
 MODULE ModParameters
 implicit none
 save
-
+! 
+! 
+character(len=6),parameter :: JHUGen_Version="v2.2.6"
+! 
+! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
-integer, public :: VegasIt1,VegasNc1,Collider_Energy
-integer, public :: VegasIt1_default,VegasNc1_default
+integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,Collider_Energy
+integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 integer, public :: NumHistograms
-logical, public :: unweighted,OffShellReson,OffShellV1,OffShellV2
+logical, public :: unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
+integer(8), public :: AlertCounter=0
 integer(8), public :: AccepCounter_part(-5:5,-5:5)=0
-real(8) :: time_start,time_end
-character :: DataFile*(20)
+real(8) :: time_start,time_end,time_int
+character(len=100) :: DataFile
+character(len=100) :: LogFile
+character(len=100) :: LHEProdFile
 
 logical, public, parameter :: seed_random = .true.
 
@@ -30,12 +37,13 @@ real(8),public :: PartitionMax(0:NPart,0:NPart)=-1d99
 real(8),public :: minCS=1d10,maxCS=0d0,avgCS=0d0
 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
 real(8), public, parameter :: GeV=1d0/100d0
+real(8), public, parameter :: percent=1d0/100d0
 real(8), public :: M_V,Ga_V
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
-real(8), public, parameter :: M_Reso  = 125d0     *GeV      ! X resonance mass (spin 0, spin 1, spin 2)
+real(8), public            :: M_Reso  = 126d0     *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (carefule: no longer a parameter, can be overwritten by command line argument)
 real(8), public, parameter :: Ga_Reso = 0.1d0     *GeV      ! X resonance width
 real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
                                                             ! overal scale for x-section and in power suppressed
@@ -45,16 +53,52 @@ real(8), public, parameter :: m_tau = 1.8d0  *GeV           ! tau lepton mass
 
 real(8), public, parameter :: alpha_QED = 1d0/128.0d0       ! el.magn. coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
-real(8), public, parameter :: Mu_Fact = M_Reso              ! pdf factorization scale
+real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)
 real(8), public, parameter :: LHC_Energy=8000d0  *GeV       ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
 
 
-real(8), public, parameter :: Br_Z_up = 0.1657d0  ! branching fraction Ga(up)/Ga(hadronic)
-real(8), public, parameter :: Br_Z_ch = 0.1657d0  ! branching fraction Ga(charm)/Ga(hadronic)
-real(8), public, parameter :: Br_Z_dn = 0.2229d0  ! branching fraction Ga(down)/Ga(hadronic)
-real(8), public, parameter :: Br_Z_st = 0.2229d0  ! branching fraction Ga(strange)/Ga(hadronic)
-real(8), public, parameter :: Br_Z_bo = 1d0-Br_Z_up-Br_Z_ch-Br_Z_dn-Br_Z_st  ! branching fraction Ga(bottom)/Ga(hadronic)
+! absolute branching fraction (taken from PDG-2012)
+real(8), public, parameter :: Br_Z_ll   = 10.10d0*percent                             ! leptonic Z branching
+real(8), public, parameter :: Br_Z_hadr = 69.91d0*percent                             ! hadronic Z branching
+real(8), public, parameter :: Br_Z_inv  = 100d0*percent - Br_Z_ll - Br_Z_hadr         ! invisible Z branching
+real(8), public, parameter :: Br_Z_uu   = 11.6d0*percent                              ! up upbar Z branching
+real(8), public, parameter :: Br_Z_cc   = 11.6d0*percent                              ! chm chmbar Z branching
+real(8), public, parameter :: Br_Z_dd   = 15.6d0*percent                              ! dn dnbar Z branching
+real(8), public, parameter :: Br_Z_ss   = 15.6d0*percent                              ! str strbar Z branching
+real(8), public, parameter :: Br_Z_bb   = Br_Z_hadr - Br_Z_uu - Br_Z_dd - Br_Z_cc - Br_Z_ss
+real(8), public, parameter :: Br_W_ll   = 32.40d0*percent                             ! leptonic W branching
+real(8), public, parameter :: Br_W_hadr = 100d0*percent - Br_W_ll                     ! hadronic W branching
+
+
+! derived branching fractions (assuming CKM=1)
+real(8), public, parameter :: Br_Z_ee   = 1d0/3d0*Br_Z_ll                             ! electron Z branching
+real(8), public, parameter :: Br_Z_mm   = 1d0/3d0*Br_Z_ll                             ! muon Z branching
+real(8), public, parameter :: Br_Z_tt   = 1d0/3d0*Br_Z_ll                             ! tau Z branching
+real(8), public, parameter :: Br_Z_nn   = 1d0/3d0*Br_Z_inv                            ! neutrino Z branching
+real(8), public, parameter :: Br_W_en   = 1d0/3d0*Br_W_ll                             ! electron W branching
+real(8), public, parameter :: Br_W_mn   = 1d0/3d0*Br_W_ll                             ! muon W branching
+real(8), public, parameter :: Br_W_tn   = 1d0/3d0*Br_W_ll                             ! electron W branching
+real(8), public, parameter :: Br_W_ud   = 1d0/2d0*Br_W_hadr                           ! u-d W branching
+real(8), public, parameter :: Br_W_cs   = 1d0/2d0*Br_W_hadr                           ! c-s W branching
+
+real(8), public, parameter :: Brlept_Z_ee = Br_Z_ee/Br_Z_ll                           ! Z branching fraction Ga(el)/Ga(leptonic)
+real(8), public, parameter :: Brlept_Z_mm = Br_Z_mm/Br_Z_ll                           ! Z branching fraction Ga(mu)/Ga(leptonic)
+real(8), public, parameter :: Brlept_Z_tt = Br_Z_tt/Br_Z_ll                           ! Z branching fraction Ga(tau)/Ga(leptonic)
+real(8), public, parameter :: Brlept_Z_nn = Br_Z_nn/Br_Z_inv                          ! Z branching fraction Ga(neu)/Ga(invisible)
+real(8), public, parameter :: Brlept_W_en = Br_W_en/Br_W_ll                           ! W branching fraction Ga(el)/Ga(leptonic)
+real(8), public, parameter :: Brlept_W_mn = Br_W_mn/Br_W_ll                           ! W branching fraction Ga(mu)/Ga(leptonic)
+real(8), public, parameter :: Brlept_W_tn = Br_W_tn/Br_W_ll                           ! W branching fraction Ga(tau)/Ga(leptonic)
+
+real(8), public, parameter :: Brhadr_Z_uu = Br_Z_uu/Br_Z_hadr                         ! Z branching fraction Ga(up)/Ga(hadronic)
+real(8), public, parameter :: Brhadr_Z_cc = Br_Z_cc/Br_Z_hadr                         ! Z branching fraction Ga(chm)/Ga(hadronic)
+real(8), public, parameter :: Brhadr_Z_dd = Br_Z_dd/Br_Z_hadr                         ! Z branching fraction Ga(don)/Ga(hadronic)
+real(8), public, parameter :: Brhadr_Z_ss = Br_Z_ss/Br_Z_hadr                         ! Z branching fraction Ga(str)/Ga(hadronic)
+real(8), public, parameter :: Brhadr_Z_bb = Br_Z_bb/Br_Z_hadr                         ! Z branching fraction Ga(bot)/Ga(hadronic)
+real(8), public, parameter :: Brhadr_W_ud = Br_W_ud/Br_W_hadr                         ! W branching fraction Ga(up)/Ga(hadronic)
+real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                         ! W branching fraction Ga(chm)/Ga(hadronic)
+
+
 
 !-- parameters that define on-shell spin 0 coupling to SM fields, see note
    logical, public, parameter :: generate_as = .false.
@@ -186,6 +230,14 @@ complex(8), parameter, public :: cone = 1.0d0
 complex(8), parameter, public :: ci=(0.0d0,1.0d0)
 complex(8), parameter, public :: ne=(0.0d0,1.0d0)
 
+integer,parameter :: io_stdout=6
+integer,parameter :: io_LHEOutFile=14
+integer,parameter :: io_HistoFile=15
+integer,parameter :: io_LHEInFile=16
+integer,parameter :: io_LogFile=17
+
+integer, public :: DebugCounter(0:10) = 0
+
 
 
 contains
@@ -305,8 +357,99 @@ integer :: Part
   elseif( abs(Part).eq.abs(Pho_) ) then
       getMass = 0d0
   else
-     print *, "Error in getMass"
+     print *, "Error in getMass",Part
      stop
+  endif
+
+
+END FUNCTION
+
+
+
+
+
+FUNCTION IsAZDecay(DKMode)
+implicit none
+logical :: IsAZDecay
+integer :: DKMode
+
+
+  if( DKMode.eq.0 ) then
+     IsAZDecay = .true.
+  elseif( DKMode.eq.1 ) then
+     IsAZDecay = .true.
+  elseif( DKMode.eq.2 ) then
+     IsAZDecay = .true.
+  elseif( DKMode.eq.3 ) then
+     IsAZDecay = .true.
+  elseif( DKMode.eq.8 ) then
+     IsAZDecay = .true.
+  elseif( DKMode.eq.9 ) then
+     IsAZDecay = .true.
+  else
+     IsAZDecay=.false.
+  endif
+
+END FUNCTION
+
+
+
+
+FUNCTION IsAWDecay(DKMode)
+implicit none
+logical :: IsAWDecay
+integer :: DKMode
+
+
+  if( DKMode.eq.4 ) then
+     IsAWDecay = .true.
+  elseif( DKMode.eq.5 ) then
+     IsAWDecay = .true.
+  elseif( DKMode.eq.6 ) then
+     IsAWDecay = .true.
+  elseif( DKMode.eq.10 ) then
+     IsAWDecay = .true.
+  elseif( DKMode.eq.11 ) then
+     IsAWDecay = .true.
+  else
+     IsAWDecay=.false.
+  endif
+
+
+END FUNCTION
+
+
+
+FUNCTION IsAPhoton(DKMode)
+implicit none
+logical :: IsAPhoton
+integer :: DKMode
+
+
+  if( DKMode.eq.7 ) then
+     IsAPhoton = .true.
+  else
+     IsAPhoton=.false.
+  endif
+
+
+END FUNCTION
+
+
+
+
+
+
+FUNCTION IsAQuark(PartType)
+implicit none
+logical :: IsAQuark
+integer :: PartType
+
+
+  if( abs(PartType).ge.1 .and. abs(PartType).le.6 ) then
+     IsAQuark = .true.
+  else
+     IsAQuark=.false.
   endif
 
 

@@ -16,7 +16,7 @@ ifeq ($(Comp),gfort)
  else
     OptOpts  = -O0
  endif
- fcomp = f95 $(OptOpts) -ffree-line-length-none -I$(VegasDir) -Dcompiler=2
+ fcomp = f95 $(OptOpts) -ffree-line-length-none -I$(VegasDir) -J$(ModuleDir) -Dcompiler=2
 endif
 
 
@@ -105,10 +105,11 @@ $(PSGenObj): $(PSGenDep)
 
 
 clean:
-	@echo " deleting object and module files"
+	@echo " deleting executable, object and module files"
 	rm -f objects/*.o
 	rm -f modules/*.mod
 	rm -f *.mod
+	rm -f $(Exec)
 
 # supresses command calls
 .SILENT:

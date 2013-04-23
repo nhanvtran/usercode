@@ -18,7 +18,7 @@ contains
  real(8) :: EvalWeighted,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
  real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac,PDFFac1,PDFFac2
  real(8) :: pdf(-6:6,1:2)
- integer :: NBin(1:11),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
+ integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
  real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
  real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4)
  real(8) :: EZ,  EZ1, EZ2, pz, xmax, xx1, xx2
@@ -47,6 +47,30 @@ contains
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
 
     call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
+
+
+! 2e2mu noi+  0.41349913     0.41131461
+! 4e/4mu noi+ 0.41309614     0.45238835
+
+! interference check
+! if(  my_idup(6).eq.my_idup(8)) return! for 2e2mu   ! noi+ 0.92591989,     i+ 0.92775679,   i- 0.14072385,     ix+ 3.2770660  ix-  0.88181581E-02
+! if(  my_idup(6).ne.my_idup(8)) return! for 4mu/4e  ! noi+ 0.92608512,     i+ 1.01761060,   i- 0.12915384,     ix+ 3.5925481  ix-  0.80721147E-02
+!                                                           50/50%              48/52%         52/48%               48%                52%
+
+! print *, abs(MY_IDUP(6:9));pause
+! if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) return! this one selects 2e2mu
+! if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) return! this one selects 2e2mu
+! if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) return! this one selects 2e2mu
+
+
+! if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) return! this one selects 4mu/4e
+! if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) return! this one selects 4mu/4e
+
+! if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) return! this one selects 4mu/4e
+! if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) return! this one selects 4mu/4e
+
+! if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.muP_ .and. abs(MY_IDUP(9)).eq.muP_ ) return! this one selects 4mu/4e
+! if( abs(MY_IDUP(6)).eq.muP_ .and. abs(MY_IDUP(7)).eq.muP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) return! this one selects 4mu/4e
 
 
   yz1 = yRnd(10)
@@ -122,7 +146,7 @@ contains
 
     call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
     call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
-    if( DecayMode1.ne.7 ) then ! don't decay the photon
+    if( .not.IsAPhoton(DecayMode1) ) then ! don't decay the photon
         ML1 = getMass(MY_IDUP(7))
         ML2 = getMass(MY_IDUP(6))
         ML3 = getMass(MY_IDUP(9))
@@ -135,9 +159,9 @@ contains
         call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,ML3,ML4,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
         PSWgt = PSWgt * PSWgt2*PSWgt3
 
-        if( includeInterference.eqv..true.) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MZ2=(p2+p3)^2 and MZ2=(p1+p4)^2
+        if( includeInterference.eqv..true. .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MZ2=(p2+p3)^2 and MZ2=(p1+p4)^2
             if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
-            PSWgt = PSWgt * 2d0
+!             PSWgt = PSWgt * 2d0
         endif
     else
         MomDK(1:4,1) = MomExt(1:4,3)
@@ -147,10 +171,8 @@ contains
     endif
 
 
-    if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
-        if( (includeInterference.eqv..true.) .and. (yrnd(13).gt.0.5d0) ) call swapmom( momdk(1:4,1),momdk(1:4,3) )! swap momenta for MC truth mZ1,mZ2 reconstruction
+    if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
-        if( (includeInterference.eqv..true.) .and. (yrnd(13).gt.0.5d0) ) call swapmom( momdk(1:4,1),momdk(1:4,3) )! swap back
     else
         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
         call Kinematics(4,MomExt_f,MomDK_f,applyPSCut,NBin)
@@ -213,9 +235,22 @@ contains
    endif
 
 
-      do NHisto=1,NumHistograms
+      do NHisto=1,NumHistograms-7
           call intoHisto(NHisto,NBin(NHisto),EvalWeighted*VgsWgt)
       enddo
+      if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(12,NBin(12),EvalWeighted*VgsWgt)
+      if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(13,NBin(13),EvalWeighted*VgsWgt)
+      if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(14,NBin(14),EvalWeighted*VgsWgt)
+
+      if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.muP_ .and. abs(MY_IDUP(9)).eq.muP_ ) call intoHisto(15,NBin(15),EvalWeighted*VgsWgt)
+      if( abs(MY_IDUP(6)).eq.muP_ .and. abs(MY_IDUP(7)).eq.muP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(15,NBin(15),EvalWeighted*VgsWgt)
+
+      if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(16,NBin(16),EvalWeighted*VgsWgt)
+      if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(16,NBin(16),EvalWeighted*VgsWgt)
+
+      if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(17,NBin(17),EvalWeighted*VgsWgt)
+      if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(17,NBin(17),EvalWeighted*VgsWgt)
+      call intoHisto(18,NBin(18),EvalWeighted*VgsWgt)
 
       xBin(1) = WhichXBin(1,yrnd(1))
       xBin(2) = WhichXBin(2,yrnd(2))
@@ -253,7 +288,7 @@ real(8) :: RES(-5:5,-5:5)
 real(8) :: EvalUnWeighted,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
 real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
 real(8) :: pdf(-6:6,1:2)
-integer :: NBin(1:11),NHisto,i
+integer :: NBin(1:NumHistograms),NHisto,i
 real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
 real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomExt_f(1:4,1:4),MomDK_f(1:4,1:4)
 logical :: applyPSCut,genEvt
@@ -264,6 +299,7 @@ real(8)::ntRnd,ZMass(1:2)
 real(8) :: offzchannel
 include 'vegas_common.f'
 include 'csmaxvalue.f'
+
 
 
    parton = 0
@@ -288,6 +324,12 @@ include 'csmaxvalue.f'
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
+
+
+
+! if(  my_idup(6).eq.my_idup(8)) return! for 2e2mu   ! noi+ 0.92591989,     i+ 0.92775679,   i- 0.14072385,     ix+ 3.2770660  ix-  0.88181581E-02
+! if(  my_idup(6).ne.my_idup(8)) return! for 4mu/4e  ! noi+ 0.92608512,     i+ 1.01761060,   i- 0.12915384,     ix+  3.5925481 ix-  0.80721147E-02
+!                                                            50/50%              48/52%         52/48%               48%                52%
 
 
   yz1 = yRnd(10)
@@ -365,10 +407,9 @@ include 'csmaxvalue.f'
 
 
 
-
    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
-   if( DecayMode1.ne.7 ) then ! don't decay the photon
+   if( .not.IsAPhoton(DecayMode1) ) then ! don't decay the photon
       ML1 = getMass(MY_IDUP(7))
       ML2 = getMass(MY_IDUP(6))
       ML3 = getMass(MY_IDUP(9))
@@ -382,9 +423,9 @@ include 'csmaxvalue.f'
       call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,ML3,ML4,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
       PSWgt = PSWgt * PSWgt2*PSWgt3
 
-      if( includeInterference.eqv..true. ) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MZ2=(p2+p3)^2 and MZ2=(p1+p4)^2
+      if( includeInterference.eqv..true. .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9))  ) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MZ2=(p2+p3)^2 and MZ2=(p1+p4)^2
           if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
-          PSWgt = PSWgt * 2d0
+!           PSWgt = PSWgt * 2d0
       endif
     else
         MomDK(1:4,1) = MomExt(1:4,3)
@@ -394,10 +435,8 @@ include 'csmaxvalue.f'
    endif
 
 
-    if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
-        if( (includeInterference.eqv..true.) .and. (yrnd(13).gt.0.5d0) ) call swapmom( momdk(1:4,1),momdk(1:4,3) )! swap momenta for MC truth mZ1,mZ2 reconstruction
+    if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
-        if( (includeInterference.eqv..true.) .and. (yrnd(13).gt.0.5d0) ) call swapmom( momdk(1:4,1),momdk(1:4,3) )! swap back
     else
         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
         call Kinematics(4,MomExt_f,MomDK_f,applyPSCut,NBin)
@@ -413,6 +452,7 @@ include 'csmaxvalue.f'
 
 
 IF( GENEVT ) THEN
+!   csmax(0,0) is rescaled by par_adj
     sumtot = csmax(0,0)+csmax(-5,5)+csmax(-4,4)+csmax(-3,3)+csmax(-2,2)+csmax(-1,1)  &
     +csmax(1,-1)+csmax(2,-2)+csmax(3,-3)+csmax(4,-4)+csmax(5,-5)
 
@@ -428,6 +468,9 @@ IF( GENEVT ) THEN
     bound(10) = bound(9) + csmax(4,-4)/sumtot
     bound(11) = one
 
+
+
+!   yrnd(13) selects the partonic channel according to its relative contribution to the total cross section
     if (yRnd(13).lt.bound(1)) ifound = 1
     do i1=1,10
        if (yRnd(13).gt.bound(i1).and.yRnd(13).lt.bound(i1+1)) ifound = i1+1
@@ -441,7 +484,7 @@ IF( GENEVT ) THEN
 
    if(ifound.eq.1 ) then
       parton(0,0) = 1
-      CS_max = csmax(0,0)*adj_par   ! this is necessary here for the follow up
+      CS_max = csmax(0,0)*adj_par   ! this is necessary here for the follow up = undo rescaling after partonic channel has been chosen
       MY_IDUP(1:2)=(/Glu_,Glu_/)
       ICOLUP(1:2,1) = (/501,502/)
       ICOLUP(1:2,2) = (/502,501/)
@@ -451,6 +494,8 @@ IF( GENEVT ) THEN
             call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
       elseif(Process.eq.2) then
             call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+      else
+            LO_Res_Unpol = 0d0
       endif
       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2 * PDFFac
 
@@ -462,6 +507,9 @@ IF( GENEVT ) THEN
       elseif(Process.eq.2) then
          call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
          call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
+      else
+         LO_Res_Unpol1 = 0d0
+         LO_Res_Unpol2 = 0d0
       endif
 
 
@@ -538,7 +586,6 @@ IF( GENEVT ) THEN
        endif
        parton(i2,-i2) = 1
        CS_max = csmax(i2,-i2)
-
    endif
 
    PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac
@@ -548,16 +595,16 @@ IF( GENEVT ) THEN
 
       if( EvalUnWeighted.gt. CS_max) then
           print *, "CS_max is too small. Adjust CS_max!",EvalUnWeighted, CS_max
-!          stop
-      endif
+          AlertCounter = AlertCounter + 1
+          Res = 0d0
 
-      if( EvalUnWeighted .gt. yRnd(14)*CS_max ) then
+      elseif( EvalUnWeighted .gt. yRnd(14)*CS_max ) then
          do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
          AccepCounter = AccepCounter + 1
          AccepCounter_part = AccepCounter_part  + parton
-         if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
+         if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
               call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
           else
               call WriteOutEvent((/MomExt_f(1:4,1),MomExt_f(1:4,2),MomDK_f(1:4,1),MomDK_f(1:4,2),MomDK_f(1:4,3),MomDK_f(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
@@ -576,6 +623,8 @@ ELSE! NOT GENEVT
          call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
       elseif(Process.eq.2) then
          call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+      else
+         LO_Res_Unpol = 0d0           
       endif
       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
 
@@ -599,6 +648,9 @@ ELSE! NOT GENEVT
       elseif(Process.eq.2) then
          call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
          call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
+      else
+         LO_Res_Unpol1 = 0d0  
+         LO_Res_Unpol2 = 0d0  
       endif
 
       LO_Res_Unpol1 = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2
@@ -678,7 +730,7 @@ real(8) :: RES(-5:5,-5:5)
 real(8) :: EvalUnWeighted_BETA,LO_Res_Unpol,yRnd(1:22),VgsWgt
 real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
 real(8) :: pdf(-6:6,1:2)
-integer :: NBin(1:11),NHisto,i,XBin(1:4)
+integer :: NBin(1:NumHistograms),NHisto,i,XBin(1:4)
 real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
 real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomExt_f(1:4,1:4),MomDK_f(1:4,1:4)
 logical :: applyPSCut,genEvt
@@ -807,7 +859,7 @@ include 'csmaxvalue.f'
 
    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
-   if( DecayMode1.ne.7 ) then ! don't decay the photon
+   if( .not. IsAPhoton(DecayMode1) ) then ! don't decay the photon
       ML1 = getMass(MY_IDUP(7))
       ML2 = getMass(MY_IDUP(6))
       ML3 = getMass(MY_IDUP(9))
@@ -820,12 +872,6 @@ include 'csmaxvalue.f'
       call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,ML1,ML2,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
       call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,ML3,ML4,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
       PSWgt = PSWgt * PSWgt2*PSWgt3
-
-      if( includeInterference.eqv..true.) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MZ2=(p2+p3)^2 and MZ2=(p1+p4)^2
-         if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
-         !             PSWgt = PSWgt * 2d0
-      endif
-
     else
         MomDK(1:4,1) = MomExt(1:4,3)
         MomDK(1:4,2) = 0d0
@@ -833,8 +879,12 @@ include 'csmaxvalue.f'
         MomDK(1:4,4) = 0d0
    endif
 
+    if( includeInterference.eqv..true. .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MZ2=(p2+p3)^2 and MZ2=(p1+p4)^2
+       if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
+       !             PSWgt = PSWgt * 2d0
+    endif
 
-    if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
+    if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
     else
         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
@@ -972,18 +1022,18 @@ include 'csmaxvalue.f'
    if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
    EvalUnWeighted_BETA = LO_Res_Unpol * PreFac
 
-      if( EvalUnWeighted_BETA.gt. globalMax) then
+      if( EvalUnWeighted_BETA .gt. globalMax) then
           print *, "CS_max is too small. Adjust CS_max!",EvalUnWeighted_BETA, globalmax
-!          stop
-      endif
+          AlertCounter = AlertCounter + 1
+          Res = 0d0
 
-      if( EvalUnWeighted_BETA .gt. yRnd(14)*globalMax ) then
+      elseif( EvalUnWeighted_BETA .gt. yRnd(14)*globalMax ) then
          do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
          AccepCounter = AccepCounter + 1
          AccepCounter_part = AccepCounter_part  + parton
-         if( (OffShellV1).or.(OffShellV2).or.(DecayMode1.eq.7) ) then
+         if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
               call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
           else
               call WriteOutEvent((/MomExt_f(1:4,1),MomExt_f(1:4,2),MomDK_f(1:4,1),MomDK_f(1:4,2),MomDK_f(1:4,3),MomDK_f(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
@@ -997,6 +1047,258 @@ include 'csmaxvalue.f'
 
 RETURN
 END FUNCTION
+
+
+
+
+
+
+
+FUNCTION EvalUnWeighted_withoutProduction(yRnd,genEvt,Res,AcceptedEvent,MY_IDUP,ICOLUP)
+use ModKinematics
+use ModParameters
+use ModHiggs
+use ModZprime
+use ModGraviton
+use ModMisc
+#if compiler==1
+use ifport
+#endif
+implicit none
+real(8) :: Res
+real(8) :: EvalUnWeighted_withoutProduction,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
+real(8) :: tau,x1,x2,sHatJacobi,PreFac
+integer :: NBin(1:NumHistograms),NHisto,i
+real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
+real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomExt_f(1:4,1:4),MomDK_f(1:4,1:4)
+logical :: applyPSCut,genEvt
+real(8) :: CS_max,eta1,eta2
+real(8) :: oneovervolume, bound(1:11), sumtot,yz1,yz2,EZ_max,dr,MZ1,MZ2,ML1,ML2,ML3,ML4
+integer :: i1, ifound, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9)
+real(8)::  ntRnd,ZMass(1:2),AcceptedEvent(1:4,1:4)
+real(8) :: offzchannel
+include 'vegas_common.f'
+include 'csmaxvalue.f'
+
+
+   oneovervolume = one
+   ICOLUP(1:2,1:9) = 0
+   EvalUnWeighted_withoutProduction = 0d0
+   Res = 0d0
+   EvalCounter = EvalCounter+1
+
+
+
+   MY_IDUP(3)= 0
+!    particle associations:
+!    
+!    IDUP(6)  -->  MomDK(:,2)  -->     v-spinor
+!    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
+!    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
+!    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
+   call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
+
+
+  Ehat = M_Reso
+  eta1=1d0; eta2=1d0
+  sHatJacobi = 1d0
+
+  yz1 = yRnd(10)
+  yz2 = yRnd(11)
+  offzchannel = yRnd(15) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell
+  if ((OffShellV1.eqv..true.).and.(OffShellV2.eqv..true.)) then
+        if(M_Reso.gt.2d0*M_V) then
+            EZ_max = EHat
+            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
+            MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
+            sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * ( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+
+            EZ_max = EHat - MZ1*0.99d0
+            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
+            MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
+            sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+
+        elseif(M_Reso.lt.2d0*M_V) then
+            if (offzchannel.le.0.5d0) then
+                EZ_max = EHat
+                dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
+                MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
+                MZ2 = abs(EHat - MZ1*0.999999999999999d0)*dsqrt(dabs(dble(yz2)))
+                sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/(  &
+                1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )     &
+                + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
+                sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
+            elseif(offzchannel.gt.0.5d0) then
+                EZ_max = EHat
+                dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
+                MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
+                MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(dabs(dble(yz1)))
+                sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/( &
+                1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )    &
+                + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
+                sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
+            endif
+       endif
+
+  elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..true.)) then
+        MZ1 = M_V
+        if(M_Reso.gt.2d0*M_V) then
+            EZ_max = EHat - MZ1*0.99
+            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
+            MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
+            sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+        else
+            MZ2 = abs(EHat - MZ1*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
+            sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
+        endif
+
+  elseif((OffShellV1.eqv..true.).and.(OffShellV2.eqv..false.)) then
+        MZ2 = M_V
+        if(M_Reso.gt.2d0*M_V) then
+            EZ_max = EHat - MZ2*0.99
+            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
+            MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
+            sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+         else
+            MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
+            sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
+        endif
+
+  elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..false.)) then
+        MZ1 = M_V
+        MZ2 = M_V
+  endif
+
+
+    if( MZ1+MZ2.gt.EHat ) then
+      EvalUnWeighted_withoutProduction = 0d0
+      RejeCounter = RejeCounter + 1
+      return
+    endif
+
+
+
+
+   call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
+   if( .not.IsAPhoton(DecayMode1) ) then ! don't decay the photon
+      ML1 = getMass(MY_IDUP(7))
+      ML2 = getMass(MY_IDUP(6))
+      ML3 = getMass(MY_IDUP(9))
+      ML4 = getMass(MY_IDUP(8))
+      if( (MZ1.lt.ML1+ML2) .or. (MZ2.lt.ML3+ML4) ) then
+          EvalUnWeighted_withoutProduction = 0d0
+          RejeCounter = RejeCounter + 1
+          return
+      endif
+      call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,ML1,ML2,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
+      call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,ML3,ML4,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
+      PSWgt = PSWgt * PSWgt2*PSWgt3
+
+      if( includeInterference.eqv..true. .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MZ2=(p2+p3)^2 and MZ2=(p1+p4)^2
+          if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
+!           PSWgt = PSWgt * 2d0
+      endif
+    else
+        MomDK(1:4,1) = MomExt(1:4,3)
+        MomDK(1:4,2) = 0d0
+        MomDK(1:4,3) = MomExt(1:4,4)
+        MomDK(1:4,4) = 0d0
+   endif
+
+
+    if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
+        call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
+    else
+        call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
+        call Kinematics(4,MomExt_f,MomDK_f,applyPSCut,NBin)
+    endif
+    if( applyPSCut ) then
+      EvalUnWeighted_withoutProduction = 0d0
+      return
+    endif
+
+
+
+IF( GENEVT ) THEN
+
+
+      MY_IDUP(1:2)=(/Glu_,Glu_/)
+      ICOLUP(1:2,1) = (/501,502/)
+      ICOLUP(1:2,2) = (/502,501/)
+
+      if (Process.eq.0) then
+            call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+      endif
+
+
+      PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
+      if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+      EvalUnWeighted_withoutProduction = LO_Res_Unpol * PreFac
+
+      CS_max = csmax(0,0)
+
+      if( EvalUnWeighted_withoutProduction .gt. CS_max) then
+          print *, "CS_max is too small. Adjust CS_max!",EvalUnWeighted_withoutProduction, CS_max
+          AlertCounter = AlertCounter + 1
+          Res = 0d0
+
+      elseif( EvalUnWeighted_withoutProduction .gt. yRnd(14)*CS_max ) then
+         do NHisto=1,NumHistograms
+               call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
+         enddo
+         AccepCounter = AccepCounter + 1
+         if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
+              AcceptedEvent(1:4,1:4) = MomDK(1:4,1:4)
+          else
+              AcceptedEvent(1:4,1:4) = MomDK_f(1:4,1:4)
+         endif
+         Res = 1d0
+
+      else
+          RejeCounter = RejeCounter + 1
+          Res = 0d0
+      endif
+
+
+ELSE! NOT GENEVT
+
+
+      if (Process.eq.0) then
+         MomExt(1:4,1) = (/M_Reso,0d0,0d0,0d0/)
+         MomExt(1:4,2) = (/0d0,0d0,0d0,0d0/)
+         call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+      endif
+
+      PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
+      if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+      EvalUnWeighted_withoutProduction = LO_Res_Unpol * PreFac
+      Res = EvalUnWeighted_withoutProduction
+
+
+      if (EvalUnWeighted_withoutProduction.gt.csmax(0,0)) then
+          csmax(0,0) = EvalUnWeighted_withoutProduction
+      endif
+
+
+ENDIF! genEvt
+
+
+RETURN
+END FUNCTION
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1264,6 +1566,9 @@ END FUNCTION
 ! END subroutine
 
 END MODULE ModCrossSection
+
+
+
 
 
 
