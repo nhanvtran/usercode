@@ -457,6 +457,207 @@ private:
 };
 
 
+////////////////////////////////RooExpNPdf.h
+Double_t ExpN(Double_t x, Double_t c, Double_t n);
+
+class RooExpNPdf : public RooAbsPdf {
+public:
+  RooExpNPdf() {} ; 
+  RooExpNPdf(const char *name, const char *title,
+	      RooAbsReal& _x,
+	      RooAbsReal& _c,
+	      RooAbsReal& _n);
+  RooExpNPdf(const RooExpNPdf& other, const char* name=0) ;
+  virtual TObject* clone(const char* newname) const { return new RooExpNPdf(*this,newname); }
+  inline virtual ~RooExpNPdf() { }
+
+protected:
+
+  RooRealProxy x ;
+  RooRealProxy c ;
+  RooRealProxy n ;
+  
+  Double_t evaluate() const ;
+
+private:
+
+  ClassDef(RooExpNPdf,1) // Your description goes here...
+};
+ 
+class RooAlpha4ExpNPdf : public RooAbsPdf {
+public:
+  RooAlpha4ExpNPdf() {} ; 
+  RooAlpha4ExpNPdf(const char *name, const char *title,
+	      RooAbsReal& _x,
+	      RooAbsReal& _c0,
+	      RooAbsReal& _n0,
+	      RooAbsReal& _c1,
+	      RooAbsReal& _n1);
+  RooAlpha4ExpNPdf(const RooAlpha4ExpNPdf& other, const char* name=0) ;
+  virtual TObject* clone(const char* newname) const { return new RooAlpha4ExpNPdf(*this,newname); }
+  inline virtual ~RooAlpha4ExpNPdf() { }
+
+protected:
+
+  RooRealProxy x ;
+  RooRealProxy c0 ;
+  RooRealProxy n0 ;
+  RooRealProxy c1 ;
+  RooRealProxy n1 ;
+  
+  Double_t evaluate() const ;
+
+private:
+
+  ClassDef(RooAlpha4ExpNPdf,1) // Your description goes here...
+};
+
+////////////////////////////////RooExpTailPdf.h
+Double_t ExpTail(Double_t x, Double_t s, Double_t a);
+
+class RooExpTailPdf : public RooAbsPdf {
+public:
+  RooExpTailPdf() {} ; 
+  RooExpTailPdf(const char *name, const char *title,
+	      RooAbsReal& _x,
+	      RooAbsReal& _s,
+	      RooAbsReal& _a);
+  RooExpTailPdf(const RooExpTailPdf& other, const char* name=0) ;
+  virtual TObject* clone(const char* newname) const { return new RooExpTailPdf(*this,newname); }
+  inline virtual ~RooExpTailPdf() { }
+
+protected:
+
+  RooRealProxy x ;
+  RooRealProxy s ;
+  RooRealProxy a ;
+  
+  Double_t evaluate() const ;
+
+private:
+
+  ClassDef(RooExpTailPdf,1) // Your description goes here...
+};
+
+class RooAlpha4ExpTailPdf : public RooAbsPdf {
+public:
+  RooAlpha4ExpTailPdf() {} ; 
+  RooAlpha4ExpTailPdf(const char *name, const char *title,
+	      RooAbsReal& _x,
+	      RooAbsReal& _s0,
+	      RooAbsReal& _a0,
+	      RooAbsReal& _s1,
+	      RooAbsReal& _a1);
+  RooAlpha4ExpTailPdf(const RooAlpha4ExpTailPdf& other, const char* name=0) ;
+  virtual TObject* clone(const char* newname) const { return new RooAlpha4ExpTailPdf(*this,newname); }
+  inline virtual ~RooAlpha4ExpTailPdf() { }
+
+protected:
+
+  RooRealProxy x ;
+  RooRealProxy s0 ;
+  RooRealProxy a0 ;
+  RooRealProxy s1 ;
+  RooRealProxy a1 ;
+  
+  Double_t evaluate() const ;
+
+private:
+
+  ClassDef(RooAlpha4ExpTailPdf,1) // Your description goes here...
+};
+
+
+////////////////////////////////Roo2ExpPdf.h
+Double_t TwoExp(Double_t x, Double_t c0, Double_t c1, Double_t frac);
+
+class Roo2ExpPdf : public RooAbsPdf {
+public:
+  Roo2ExpPdf() {} ; 
+  Roo2ExpPdf(const char *name, const char *title,
+	      RooAbsReal& _x,
+	      RooAbsReal& _c0,
+	      RooAbsReal& _c1,
+	      RooAbsReal& _frac);
+  Roo2ExpPdf(const Roo2ExpPdf& other, const char* name=0) ;
+  virtual TObject* clone(const char* newname) const { return new Roo2ExpPdf(*this,newname); }
+  inline virtual ~Roo2ExpPdf() { }
+
+protected:
+
+  RooRealProxy x ;
+  RooRealProxy c0 ;
+  RooRealProxy c1 ;
+  RooRealProxy frac ;
+  
+  Double_t evaluate() const ;
+
+private:
+
+  ClassDef(Roo2ExpPdf,1) // Your description goes here...
+};
+
+class RooAlpha42ExpPdf : public RooAbsPdf {
+public:
+  RooAlpha42ExpPdf() {} ; 
+  RooAlpha42ExpPdf(const char *name, const char *title,
+	      RooAbsReal& _x,
+	      RooAbsReal& _c00,
+	      RooAbsReal& _c01,
+	      RooAbsReal& _frac0,
+	      RooAbsReal& _c10,
+	      RooAbsReal& _c11,
+	      RooAbsReal& _frac1);
+  RooAlpha42ExpPdf(const RooAlpha42ExpPdf& other, const char* name=0) ;
+  virtual TObject* clone(const char* newname) const { return new RooAlpha42ExpPdf(*this,newname); }
+  inline virtual ~RooAlpha42ExpPdf() { }
+
+protected:
+
+  RooRealProxy x ;
+  RooRealProxy c00 ;
+  RooRealProxy c01 ;
+  RooRealProxy frac0 ;
+  RooRealProxy c10 ;
+  RooRealProxy c11 ;
+  RooRealProxy frac1 ;
+  
+  Double_t evaluate() const ;
+
+private:
+
+  ClassDef(RooAlpha42ExpPdf,1) // Your description goes here...
+};
+
+
+// RooAnaExpNPdf.h
+class RooAnaExpNPdf : public RooAbsPdf {
+public:
+  RooAnaExpNPdf() {} ; 
+  RooAnaExpNPdf(const char *name, const char *title,
+	      RooAbsReal& _x,
+	      RooAbsReal& _c,
+	      RooAbsReal& _n);
+  RooAnaExpNPdf(const RooAnaExpNPdf& other, const char* name=0) ;
+  virtual TObject* clone(const char* newname) const { return new RooAnaExpNPdf(*this,newname); }
+  inline virtual ~RooAnaExpNPdf() { }
+
+  Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const ;
+  Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const ;
+
+protected:
+
+  RooRealProxy x ;
+  RooRealProxy c ;
+  RooRealProxy n ;
+  
+  Double_t evaluate() const ;
+
+private:
+
+  ClassDef(RooAnaExpNPdf,1) // Your description goes here...
+};
+
 
 
 #endif

@@ -723,6 +723,320 @@ ClassImp(RooUser1Pdf)
 
 
 
+///////////////////////////////////////////////RooExpNPdf.cxx
+Double_t ExpN(Double_t x, Double_t c, Double_t n){
+    return TMath::Exp( c*TMath::Power(x,n) ); 
+}
+
+ClassImp(RooExpNPdf) 
+
+ RooExpNPdf::RooExpNPdf(const char *name, const char *title, 
+                        RooAbsReal& _x,
+                        RooAbsReal& _c,
+                        RooAbsReal& _n) :
+   RooAbsPdf(name,title), 
+   x("x","x",this,_x),
+   c("c","c",this,_c),
+   n("n","n",this,_n)
+ { 
+ } 
+
+
+ RooExpNPdf::RooExpNPdf(const RooExpNPdf& other, const char* name) :  
+   RooAbsPdf(other,name), 
+   x("x",this,other.x),
+   c("c",this,other.c),
+   n("n",this,other.n)
+ { 
+ } 
+
+
+
+ Double_t RooExpNPdf::evaluate() const 
+ { 
+   // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
+   return ExpN(x,c,n); 
+ } 
+
+
+ClassImp(RooAlpha4ExpNPdf) 
+
+ RooAlpha4ExpNPdf::RooAlpha4ExpNPdf(const char *name, const char *title, 
+                        RooAbsReal& _x,
+                        RooAbsReal& _c0,
+                        RooAbsReal& _n0,
+                        RooAbsReal& _c1,
+                        RooAbsReal& _n1) :
+   RooAbsPdf(name,title), 
+   x("x","x",this,_x),
+   c0("c0","c0",this,_c0),
+   n0("n0","n0",this,_n0),
+   c1("c1","c1",this,_c1),
+   n1("n1","n1",this,_n1)
+ { 
+ } 
+
+
+ RooAlpha4ExpNPdf::RooAlpha4ExpNPdf(const RooAlpha4ExpNPdf& other, const char* name) :  
+   RooAbsPdf(other,name), 
+   x("x",this,other.x),
+   c0("c0",this,other.c0),
+   n0("n0",this,other.n0),
+   c1("c1",this,other.c1),
+   n1("n1",this,other.n1)
+ { 
+ } 
+
+
+
+
+ Double_t RooAlpha4ExpNPdf::evaluate() const 
+ { 
+   // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
+   return ExpN(x,c0,n0)/ExpN(x,c1,n1); 
+ } 
+
+
+
+///////////////////////////////////////////////RooExpTailPdf.cxx
+Double_t ExpTail(Double_t x, Double_t s, Double_t a){
+	Double_t offset=600;
+	Double_t t=x-offset;
+	if( a<1e-6){a=1e-6;}
+    return TMath::Exp( -t/(s+a*t) ); 
+}
+ 
+ClassImp(RooExpTailPdf) 
+
+ RooExpTailPdf::RooExpTailPdf(const char *name, const char *title, 
+                        RooAbsReal& _x,
+                        RooAbsReal& _s,
+                        RooAbsReal& _a) :
+   RooAbsPdf(name,title), 
+   x("x","x",this,_x),
+   s("s","s",this,_s),
+   a("a","a",this,_a)
+ { 
+ } 
+
+
+ RooExpTailPdf::RooExpTailPdf(const RooExpTailPdf& other, const char* name) :  
+   RooAbsPdf(other,name), 
+   x("x",this,other.x),
+   s("s",this,other.s),
+   a("a",this,other.a)
+ { 
+ } 
+
+
+
+ Double_t RooExpTailPdf::evaluate() const 
+ { 
+   // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
+   return ExpTail(x, s, a) ; 
+ } 
+
+ClassImp(RooAlpha4ExpTailPdf) 
+
+ RooAlpha4ExpTailPdf::RooAlpha4ExpTailPdf(const char *name, const char *title, 
+                        RooAbsReal& _x,
+                        RooAbsReal& _s0,
+                        RooAbsReal& _a0,
+                        RooAbsReal& _s1,
+                        RooAbsReal& _a1) :
+   RooAbsPdf(name,title), 
+   x("x","x",this,_x),
+   s0("s0","s0",this,_s0),
+   a0("a0","a0",this,_a0),
+   s1("s1","s1",this,_s1),
+   a1("a1","a1",this,_a1)
+ { 
+ } 
+
+
+ RooAlpha4ExpTailPdf::RooAlpha4ExpTailPdf(const RooAlpha4ExpTailPdf& other, const char* name) :  
+   RooAbsPdf(other,name), 
+   x("x",this,other.x),
+   s0("s0",this,other.s0),
+   a0("a0",this,other.a0),
+   s1("s1",this,other.s1),
+   a1("a1",this,other.a1)
+ { 
+ } 
+
+
+
+ Double_t RooAlpha4ExpTailPdf::evaluate() const 
+ { 
+   // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
+   return ExpTail(x, s0, a0)/ExpTail(x, s1, a1) ; 
+ } 
+
+///////////////////////////////////////////////Roo2ExpPdf.cxx
+Double_t TwoExp(Double_t x, Double_t c0, Double_t c1, Double_t frac){
+	if(frac<0){frac=0.;}
+	if(frac>1){frac=1.;}
+	//return frac*TMath::Exp(x*c0)+(1-frac)*TMath::Exp(x*c1);
+	return TMath::Exp(x*c0)+frac*TMath::Exp(x*c1);
+}
+
+ClassImp(Roo2ExpPdf) 
+
+ Roo2ExpPdf::Roo2ExpPdf(const char *name, const char *title, 
+                        RooAbsReal& _x,
+                        RooAbsReal& _c0,
+                        RooAbsReal& _c1,
+                        RooAbsReal& _frac) :
+   RooAbsPdf(name,title), 
+   x("x","x",this,_x),
+   c0("c0","c0",this,_c0),
+   c1("c1","c1",this,_c1),
+   frac("frac","frac",this,_frac)
+ { 
+ } 
+
+
+ Roo2ExpPdf::Roo2ExpPdf(const Roo2ExpPdf& other, const char* name) :  
+   RooAbsPdf(other,name), 
+   x("x",this,other.x),
+   c0("c0",this,other.c0),
+   c1("c1",this,other.c1),
+   frac("frac",this,other.frac)
+ { 
+ } 
+
+
+
+ Double_t Roo2ExpPdf::evaluate() const 
+ { 
+   // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
+   //return 1.0 ; 
+   return TwoExp(x,c0,c1,frac);
+ } 
+
+ClassImp(RooAlpha42ExpPdf) 
+
+ RooAlpha42ExpPdf::RooAlpha42ExpPdf(const char *name, const char *title, 
+                        RooAbsReal& _x,
+                        RooAbsReal& _c00,
+                        RooAbsReal& _c01,
+                        RooAbsReal& _frac0,
+                        RooAbsReal& _c10,
+                        RooAbsReal& _c11,
+                        RooAbsReal& _frac1) :
+   RooAbsPdf(name,title), 
+   x("x","x",this,_x),
+   c00("c00","c00",this,_c00),
+   c01("c01","c01",this,_c01),
+   frac0("frac0","frac0",this,_frac0),
+   c10("c10","c10",this,_c10),
+   c11("c11","c11",this,_c11),
+   frac1("frac1","frac1",this,_frac1)
+ { 
+ } 
+
+
+ RooAlpha42ExpPdf::RooAlpha42ExpPdf(const RooAlpha42ExpPdf& other, const char* name) :  
+   RooAbsPdf(other,name), 
+   x("x",this,other.x),
+   c00("c00",this,other.c00),
+   c01("c01",this,other.c01),
+   frac0("frac0",this,other.frac0),
+   c10("c10",this,other.c10),
+   c11("c11",this,other.c11),
+   frac1("frac1",this,other.frac1)
+ { 
+ } 
+
+
+
+ Double_t RooAlpha42ExpPdf::evaluate() const 
+ { 
+   // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
+   //return 1.0 ; 
+   return TwoExp(x,c00,c01,frac0)/TwoExp(x,c10,c11,frac1);
+ } 
+
+
+
+// RooAnaExpNPdf.cxx
+ClassImp(RooAnaExpNPdf) 
+
+ RooAnaExpNPdf::RooAnaExpNPdf(const char *name, const char *title, 
+                        RooAbsReal& _x,
+                        RooAbsReal& _c,
+                        RooAbsReal& _n) :
+   RooAbsPdf(name,title), 
+   x("x","x",this,_x),
+   c("c","c",this,_c),
+   n("n","n",this,_n)
+ { 
+ } 
+
+
+ RooAnaExpNPdf::RooAnaExpNPdf(const RooAnaExpNPdf& other, const char* name) :  
+   RooAbsPdf(other,name), 
+   x("x",this,other.x),
+   c("c",this,other.c),
+   n("n",this,other.n)
+ { 
+ } 
+
+
+
+ Double_t RooAnaExpNPdf::evaluate() const 
+ { 
+   // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
+   return ExpN(x,c,n) ; 
+ } 
+
+
+
+ Int_t RooAnaExpNPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const  
+ { 
+   // LIST HERE OVER WHICH VARIABLES ANALYTICAL INTEGRATION IS SUPPORTED, 
+   // ASSIGN A NUMERIC CODE FOR EACH SUPPORTED (SET OF) PARAMETERS 
+   // THE EXAMPLE BELOW ASSIGNS CODE 1 TO INTEGRATION OVER VARIABLE X
+   // YOU CAN ALSO IMPLEMENT MORE THAN ONE ANALYTICAL INTEGRAL BY REPEATING THE matchArgs 
+   // EXPRESSION MULTIPLE TIMES
+
+   if (matchArgs(allVars,analVars,x)){cout<<"return 1"<<endl; return 1; } 
+   cout<<"return 0"<<endl;
+   return 0 ; 
+ } 
+
+Double_t gamma_in_mathematica(Double_t a, Double_t z){
+	return (1-TMath::Gamma(a,z))*TMath::Gamma(a);
+}
+
+Double_t integral_ExpN(Double_t x, Double_t c, Double_t n){
+	//return -1*( x*TMath::Power(-1*c*TMath::Power(x,n) , -1/n ) * gamma_in_mathematica( 1/n, -1*c*TMath::Power(x, n) )   )/n   ;
+	return -1*( TMath::Power(-1*c , -1/n ) * gamma_in_mathematica( 1/n, -1*c*TMath::Power(x, n) )   )/n   ;
+}
+
+ Double_t RooAnaExpNPdf::analyticalIntegral(Int_t code, const char* rangeName) const  
+ { 
+   // RETURN ANALYTICAL INTEGRAL DEFINED BY RETURN CODE ASSIGNED BY getAnalyticalIntegral
+   // THE MEMBER FUNCTION x.min(rangeName) AND x.max(rangeName) WILL RETURN THE INTEGRATION
+   // BOUNDARIES FOR EACH OBSERVABLE x
+
+   // assert(code==1) ; 
+   // return (x.max(rangeName)-x.min(rangeName)) ; 
+
+	if (code==1) { 
+		Double_t x_min=x.min(rangeName);
+		Double_t x_max=x.max(rangeName);
+
+        Double_t minTerm=integral_ExpN(x_min,c,n);
+        Double_t maxTerm=integral_ExpN(x_max,c,n);
+		cout<<"maxTerm-minTerm="<<maxTerm-minTerm<<endl;
+		return (maxTerm-minTerm) ;
+	} 
+	return 0 ; 
+ } 
+
+
+
 
 /////////////////////////////////////////////Util.cxx
 
@@ -741,7 +1055,8 @@ void draw_error_band(RooAbsData &rdata, RooAbsPdf &rpdf, RooRealVar &rrv_number_
 	Double_t x_min=rrv_x->getMin();
 	Double_t x_max=rrv_x->getMax();
 	Double_t delta_x=(x_max-x_min)/number_point;
-	Double_t width_x=rrv_x->getBinWidth(1);
+	//Double_t width_x=rrv_x->getBinWidth(1);
+	Double_t width_x=mplot->getFitRangeBinW();
 	//rdata.plotOn(mplot);
 	//rpdf.plotOn(mplot,RooFit::VisualizeError(*rfres,1),RooFit::FillColor(kOrange));
 	//rpdf.plotOn(mplot);
@@ -816,7 +1131,8 @@ void draw_error_band( RooAbsPdf &rpdf, char* xaxis_name, RooRealVar &rrv_number_
 	Double_t x_min=rrv_x->getMin();
 	Double_t x_max=rrv_x->getMax();
 	Double_t delta_x=(x_max-x_min)/number_point;
-	Double_t width_x=rrv_x->getBinWidth(1);
+	//Double_t width_x=rrv_x->getBinWidth(1);
+	Double_t width_x=mplot->getFitRangeBinW();
 
 	Double_t number_events_mean = rrv_number_events.getVal();
 	Double_t number_events_sigma= rrv_number_events.getError();
@@ -889,7 +1205,8 @@ void draw_error_band_extendPdf(RooAbsData &rdata, RooExtendPdf &rpdf, RooFitResu
 	Double_t x_min=rrv_x->getMin();
 	Double_t x_max=rrv_x->getMax();
 	Double_t delta_x=(x_max-x_min)/number_point;
-	Double_t width_x=rrv_x->getBinWidth(1);
+	//Double_t width_x=rrv_x->getBinWidth(1);
+	Double_t width_x=mplot->getFitRangeBinW();
 
 	TGraph *bkgpred=new TGraph(number_point+1);
 	for(int i =0 ; i<= number_point ; i++){
@@ -959,7 +1276,8 @@ void draw_error_band2(RooAbsData &rdata, RooAbsPdf &rpdf, RooRealVar &rrv_number
 	Double_t x_min=rrv_x->getMin();
 	Double_t x_max=rrv_x->getMax();
 	Double_t delta_x=(x_max-x_min)/number_point;
-	Double_t width_x=rrv_x->getBinWidth(1);
+	//Double_t width_x=rrv_x->getBinWidth(1);
+	Double_t width_x=mplot->getFitRangeBinW();
 
 	Double_t number_events_mean = rrv_number_events.getVal();
 	Double_t number_events_sigma= rrv_number_events.getError();
@@ -1042,7 +1360,8 @@ void draw_error_band_Decor( char* pdf_name, char* xaxis_name, RooArgList &paras,
 	Double_t x_min=rrv_x->getMin();
 	Double_t x_max=rrv_x->getMax();
 	Double_t delta_x=(x_max-x_min)/number_point;
-	Double_t width_x=rrv_x->getBinWidth(1);
+	//Double_t width_x=rrv_x->getBinWidth(1);
+	Double_t width_x=mplot->getFitRangeBinW();
 
 	Double_t shape_scale = rrv_shape_scale.getVal();
 	Double_t shape_scale_error = rrv_shape_scale.getError();
@@ -1114,7 +1433,7 @@ void draw_error_band_Decor( char* pdf_name, char* xaxis_name, RooArgList &paras,
 } 
 
 
-void draw_error_band_shape_Decor( char* pdf_name, char* xaxis_name, RooArgList &paras, RooWorkspace &ws,Double_t sigma , RooPlot *mplot, Int_t kcolor=6,char* opt="F", char* uncertainty_title="", Int_t number_point=100, const Int_t number_errorband=2000)
+void draw_error_band_shape_Decor( char* pdf_name, char* xaxis_name, RooArgList &paras, RooWorkspace &ws,Double_t sigma , RooPlot *mplot, Int_t kcolor=6,char* opt="F", Int_t fillstyle=3013,char* uncertainty_title="", Int_t number_point=100, const Int_t number_errorband=2000)
 {
 	TRandom3 rand(1234);
 
@@ -1123,7 +1442,8 @@ void draw_error_band_shape_Decor( char* pdf_name, char* xaxis_name, RooArgList &
 	Double_t x_min=rrv_x->getMin();
 	Double_t x_max=rrv_x->getMax();
 	Double_t delta_x=(x_max-x_min)/number_point;
-	Double_t width_x=rrv_x->getBinWidth(1);
+	//Double_t width_x=rrv_x->getBinWidth(1);
+	Double_t width_x=mplot->getFitRangeBinW();
 
 	TGraph *bkgpred=new TGraph(number_point+1);
     //{double tmpb;cout<<"tmpb";cin>>tmpb;}
@@ -1170,9 +1490,10 @@ void draw_error_band_shape_Decor( char* pdf_name, char* xaxis_name, RooArgList &
 	ap->SetLineColor(kcolor);
 	am->SetLineWidth(2);
 	am->SetLineColor(kcolor);
-	//errorband->SetFillColor(kcolor);
-	errorband->SetFillColor(kBlack+7*(sigma-1));
-    errorband->SetFillStyle(3013+sigma-1);
+	//errorband->SetFillColor(kBlack+7*(sigma-1));
+	errorband->SetFillColor(kcolor);
+    //errorband->SetFillStyle(3013+sigma-1);
+    errorband->SetFillStyle(fillstyle);
     //errorband->SetName(Form("Uncertainty of %g#sigma",sigma));
     errorband->SetName(Form("%s %g#sigma",uncertainty_title,sigma));
 
