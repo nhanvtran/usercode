@@ -21,50 +21,54 @@ contains
 
 
 
-SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP)
+SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP,MomRealGlu)
 use ModParameters
 implicit none
 real(8) :: Mom(1:4,1:6)
+real(8),optional :: MomRealGlu(1:4)
 real(8) :: Spin, Lifetime
 real(8) :: XFV(1:4), Z1FV(1:4), Z2FV(1:4)
-real(8) :: MomDummy(1:4,1:6)
-real(8) :: Part1Mass,Part2Mass,XMass,V1Mass,V2Mass,L11Mass,L12Mass,L21Mass,L22Mass,tmp
+real(8) :: MomDummy(1:4,1:7)
+real(8) :: Part1Mass,Part2Mass,XMass,V1Mass,V2Mass,L11Mass,L12Mass,L21Mass,L22Mass,tmp,GluMass
 integer :: a,b,c
-integer :: MY_IDUP(1:9),LHE_IDUP(1:9),i,ISTUP(1:9),MOTHUP(1:2,1:9),ICOLUP(1:2,1:9)
+integer :: MY_IDUP(:),LHE_IDUP(1:10),i,ISTUP(1:10),MOTHUP(1:2,1:10),ICOLUP(:,:)
 integer :: NUP,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
 real(8) :: ntRnd
 character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
 
 
-DebugCounter(0)=DebugCounter(0)+1
-if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) DebugCounter(1)=DebugCounter(1)+1
-if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) DebugCounter(2)=DebugCounter(2)+1
-if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) DebugCounter(3)=DebugCounter(3)+1
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html
 
-if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.muP_ .and. abs(MY_IDUP(9)).eq.muP_ ) DebugCounter(4)=DebugCounter(4)+1
-if( abs(MY_IDUP(6)).eq.muP_ .and. abs(MY_IDUP(7)).eq.muP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) DebugCounter(4)=DebugCounter(4)+1
 
-if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) DebugCounter(5)=DebugCounter(5)+1
-if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) DebugCounter(5)=DebugCounter(5)+1
-
-if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) DebugCounter(6)=DebugCounter(6)+1
-if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) DebugCounter(6)=DebugCounter(6)+1
+! DebugCounter(0)=DebugCounter(0)+1
+! if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) DebugCounter(1)=DebugCounter(1)+1
+! if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) DebugCounter(2)=DebugCounter(2)+1
+! if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) DebugCounter(3)=DebugCounter(3)+1
+! 
+! if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.muP_ .and. abs(MY_IDUP(9)).eq.muP_ ) DebugCounter(4)=DebugCounter(4)+1
+! if( abs(MY_IDUP(6)).eq.muP_ .and. abs(MY_IDUP(7)).eq.muP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) DebugCounter(4)=DebugCounter(4)+1
+! 
+! if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) DebugCounter(5)=DebugCounter(5)+1
+! if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) DebugCounter(5)=DebugCounter(5)+1
+! 
+! if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) DebugCounter(6)=DebugCounter(6)+1
+! if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) DebugCounter(6)=DebugCounter(6)+1
 
 
 
 do i=1,9
-!        print *, "my_idup(i) ",MY_IDUP(i)
-LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
-!        print *, "LHE_IDUP(i) ",LHE_IDUP(i)
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
 enddo
 
 ! NUP changes for gamma gamma final state
 if (LHE_IDUP(4).eq.22) then
-NUP=5
+    NUP=5
 else
-NUP=9
+    NUP=9
 endif
+
 
 IDPRUP=100
 XWGTUP=1.
@@ -72,8 +76,8 @@ SCALUP=1000.
 AQEDUP=alpha_QED
 AQCDUP=0d0
 
-ISTUP(1) = - 1
-ISTUP(2) =  -1
+ISTUP(1) = -1
+ISTUP(2) = -1
 ISTUP(3) = 2
 ISTUP(4) = 2
 ISTUP(5) = 2
@@ -83,8 +87,8 @@ ISTUP(8) = 1
 ISTUP(9) = 1
 
 if (LHE_IDUP(4).eq.22) then
-ISTUP(4) = 1
-ISTUP(5) = 1
+    ISTUP(4) = 1
+    ISTUP(5) = 1
 endif
 
 
@@ -107,27 +111,63 @@ MOTHUP(2,8) = 5
 MOTHUP(1,9) = 5
 MOTHUP(2,9) = 5
 
+if( present(MomRealGlu) ) then ! add additional gluon
+    NUP=NUP+1
+    LHE_IDUP(10) = convertLHE( MY_IDUP(10) )
+    ISTUP(10) = 1
+    MOTHUP(1,10) = 1
+    MOTHUP(2,10) = 2
+    MomDummy(1,7) = 100.0d0*MomRealGlu(1)
+    MomDummy(2,7) = 100.0d0*MomRealGlu(2)
+    MomDummy(3,7) = 100.0d0*MomRealGlu(3)
+    MomDummy(4,7) = 100.0d0*MomRealGlu(4)
+endif
+
+
 ! Added by Nhan
-LHE_IDUP(3) = 39 ! X particle
-Lifetime = 0.0
-Spin = 1.0
+if( Process.eq.0 ) LHE_IDUP(3) = 25
+if( Process.eq.1 ) LHE_IDUP(3) = 32
+if( Process.eq.2 ) LHE_IDUP(3) = 39
+Lifetime = 0.0d0
+Spin = 1.0d0
 
 do a=1,6
-MomDummy(1,a) = 100.0d0*Mom(1,a)
-MomDummy(2,a) = 100.0d0*Mom(2,a)
-MomDummy(3,a) = 100.0d0*Mom(3,a)
-MomDummy(4,a) = 100.0d0*Mom(4,a)
+    MomDummy(1,a) = 100.0d0*Mom(1,a)
+    MomDummy(2,a) = 100.0d0*Mom(2,a)
+    MomDummy(3,a) = 100.0d0*Mom(3,a)
+    MomDummy(4,a) = 100.0d0*Mom(4,a)
 enddo
 
 do b=1,4
-Z1FV(b) = MomDummy(b,3)+MomDummy(b,4)
-Z2FV(b) = MomDummy(b,5)+MomDummy(b,6)
+    Z1FV(b) = MomDummy(b,3)+MomDummy(b,4)
+    Z2FV(b) = MomDummy(b,5)+MomDummy(b,6)
 enddo
 
 do c=1,4
-XFV(c) = Z1FV(c) + Z2FV(c)
+    XFV(c) = Z1FV(c) + Z2FV(c)
 enddo
 
+
+! check energy-momentum conservation
+tmp=Mom(1,1)+Mom(1,2)-Mom(1,3)-Mom(1,4)-Mom(1,5)-Mom(1,6)
+if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(1)
+if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
+
+tmp=Mom(2,1)+Mom(2,2)-Mom(2,3)-Mom(2,4)-Mom(2,5)-Mom(2,6)
+if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(2)
+if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
+
+tmp=Mom(3,1)+Mom(3,2)-Mom(3,3)-Mom(3,4)-Mom(3,5)-Mom(3,6)
+if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(3)
+if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
+
+tmp=Mom(4,1)+Mom(4,2)-Mom(4,3)-Mom(4,4)-Mom(4,5)-Mom(4,6)
+if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(4)
+if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
+
+
+
+! calculating and checking masses
 tmp = MomDummy(1,1)*MomDummy(1,1)-MomDummy(2,1)*MomDummy(2,1)-MomDummy(3,1)*MomDummy(3,1)-MomDummy(4,1)*MomDummy(4,1)
 if( tmp.lt. -1d-3 ) print *, "Error 1: large negative mass!",tmp
 Part1Mass = dSQRT(dabs(tmp))
@@ -194,9 +234,15 @@ if( tmp.lt.0d0 ) then
 MomDummy(1,6) = MomDummy(1,6) + 1d-7
 endif
 
+if( present(MomRealGlu) ) then ! add additional gluon, can be off-shell in POWHEG
+    tmp = MomDummy(1,7)*MomDummy(1,7)-MomDummy(2,7)*MomDummy(2,7)-MomDummy(3,7)*MomDummy(3,7)-MomDummy(4,7)*MomDummy(4,7)
+!     if( tmp.lt. -1d-3 ) print *, "Error 10: large negative mass!",tmp
+    GluMass = dSQRT(dabs(tmp))
+endif
+
 
 write(io_LHEOutFile,"(A)") "<event>"
-write(io_LHEOutFile,"(I1,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 
 
 ! parton_a
@@ -244,7 +290,16 @@ if (LHE_IDUP(i).gt.-9000) then
 write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
 endif
 
+if( present(MomRealGlu) ) then
+    i=10
+    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,7),MomDummy(1,7),GluMass,Lifetime,Spin
+endif
+
+
 write(io_LHEOutFile,"(A)") "</event>"
+
+
+
 
 ! print * ,"check ", LHE_IDUP(6),MomDummy(1:4,4)
 ! print * ,"check ", LHE_IDUP(7),MomDummy(1:4,3)

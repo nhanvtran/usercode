@@ -3,8 +3,8 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v2.2.6"
-! 
+character(len=6),parameter :: JHUGen_Version="v2.3.2"
+!  
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,Collider_Energy
@@ -49,7 +49,7 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
                                                             ! overal scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).
 
-real(8), public, parameter :: m_tau = 1.8d0  *GeV           ! tau lepton mass
+real(8), public, parameter :: m_tau = 1.777d0  *GeV           ! tau lepton mass
 
 real(8), public, parameter :: alpha_QED = 1d0/128.0d0       ! el.magn. coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
@@ -241,6 +241,45 @@ integer, public :: DebugCounter(0:10) = 0
 
 
 contains
+
+
+
+
+
+FUNCTION convertLHEreverse(Part)
+implicit none
+integer :: convertLHEreverse
+integer :: Part
+
+  if(     Part.eq.1 ) then
+      convertLHEreverse = Dn_
+  elseif( Part.eq.2 ) then
+      convertLHEreverse = Up_
+  elseif( Part.eq.3 ) then
+      convertLHEreverse = Str_
+  elseif( Part.eq.4 ) then
+      convertLHEreverse = Chm_
+  elseif( Part.eq.5 ) then
+      convertLHEreverse = Bot_
+  elseif( Part.eq.-1 ) then
+      convertLHEreverse = ADn_
+  elseif( Part.eq.-2 ) then
+      convertLHEreverse = AUp_
+  elseif( Part.eq.-3 ) then
+      convertLHEreverse = AStr_
+  elseif( Part.eq.-4 ) then
+      convertLHEreverse = AChm_
+  elseif( Part.eq.-5 ) then
+      convertLHEreverse = ABot_
+  elseif( Part.eq.21 ) then
+      convertLHEreverse = Glu_
+  else
+      print *, "MYLHE format not implemented for ",Part
+      stop
+  endif
+
+
+END FUNCTION
 
 
 

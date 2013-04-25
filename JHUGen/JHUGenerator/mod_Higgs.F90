@@ -732,12 +732,8 @@ enddo
             propz2=1d0
          endif
 
-         if( OffShellReson ) then
-              call OffHZZampl(pin,sp,A(1))
-         else
-              call HZZampl(pin,sp,A(1))
-         endif
 
+         call HZZampl(pin,sp,A(1))
          A(1) = A(1) * propZ1*propZ2
 
      end subroutine
@@ -835,103 +831,6 @@ enddo
 
 
       end subroutine HZZampl
-
-
-
-
-
-
-
-      subroutine OffHZZampl(p,sp,res)
-      implicit none
-      real(dp), intent(in) :: p(4,4)
-      complex(dp), intent(in) :: sp(3:4,4)
-      complex(dp), intent(out) :: res
-      complex(dp) :: e3_e4
-      complex(dp) :: q_q
-      complex(dp) :: q3_q4
-      complex(dp) :: e3_q4,e4_q3
-      complex(dp) :: q1(4),q3(4),q4(4),q(4)
-      complex(dp) :: e3(4),e4(4)
-      complex(dp) :: yyy1,yyy2,yyy3,yyy4
-      real(dp) :: q34
-      real(dp) :: MG, MZ3, MZ4, q3_q3, q4_q4
-
-      res = 0d0
-
-      q1 = dcmplx(p(1,:),0d0)
-      q3 = dcmplx(p(3,:),0d0)
-      q4 = dcmplx(p(4,:),0d0)
-
-
-      e3 = sp(3,:)
-      e4 = sp(4,:)
-
-      q = -q1
-
-      q_q =sc(q,q)
-      q3_q3 = sc(q3,q3)
-      q4_q4 = sc(q4,q4)
-
-
-      if (cdabs(q_q).lt.-0.1d0.or.(q3_q3).lt.-0.1d0.or.(q4_q4).lt.-0.1d0) return  ! if negative invariant masses return zero
-      MG =dsqrt(cdabs(q_q))
-      MZ3=dsqrt(dabs(q3_q3))
-      MZ4=dsqrt(dabs(q4_q4))
-
-      q3_q4 = sc(q3,q4)
-      e3_e4 = sc(e3,e4)
-      e3_q4 = sc(e3,q4)
-      e4_q3 = sc(e4,q3)
-
-
-!---- data that defines couplings
-  if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) ) then! decay into Z's or W's
-
-    if( generate_as ) then 
-      yyy1 = ahz1
-      yyy2 = ahz2
-      yyy3 = ahz3
-    else
-      yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
-           + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
-      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
-      yyy3 = -2d0*ghz4
-    endif
-
-
-      res = e3_e4*M_Reso**2*yyy1       &
-          + e3_q4*e4_q3*yyy2           &
-          + et1(e3,e4,q3,q4)*yyy3 
-
-
-  elseif( IsAPhoton(DecayMode1) ) then! decay into photons
-
-
-    if( generate_as ) then 
-      yyy1 = ahz1
-      yyy2 = -2*ahz1 !ahz2  ! gauge invariance fixes ahz2 in this case
-      yyy3 = ahz3
-    else
-      yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
-           + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
-      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
-      yyy3 = -2d0*ghz4
-    endif
-
-
-      res = e3_e4*M_Reso**2*yyy1       &
-          + e3_q4*e4_q3*yyy2           &
-          + et1(e3,e4,q3,q4)*yyy3 
-
-
-  endif
-
-
-      end subroutine OffHZZampl
-
 
 
 

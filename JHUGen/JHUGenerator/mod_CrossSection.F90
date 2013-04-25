@@ -594,7 +594,8 @@ IF( GENEVT ) THEN
    EvalUnWeighted = LO_Res_Unpol * PreFac
 
       if( EvalUnWeighted.gt. CS_max) then
-          print *, "CS_max is too small. Adjust CS_max!",EvalUnWeighted, CS_max
+          write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted, CS_max
+          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted, CS_max
           AlertCounter = AlertCounter + 1
           Res = 0d0
 
@@ -1023,7 +1024,8 @@ include 'csmaxvalue.f'
    EvalUnWeighted_BETA = LO_Res_Unpol * PreFac
 
       if( EvalUnWeighted_BETA .gt. globalMax) then
-          print *, "CS_max is too small. Adjust CS_max!",EvalUnWeighted_BETA, globalmax
+          write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_BETA, globalmax
+          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_BETA, globalmax
           AlertCounter = AlertCounter + 1
           Res = 0d0
 
@@ -1054,7 +1056,7 @@ END FUNCTION
 
 
 
-FUNCTION EvalUnWeighted_withoutProduction(yRnd,genEvt,Res,AcceptedEvent,MY_IDUP,ICOLUP)
+FUNCTION EvalUnWeighted_withoutProduction(yRnd,genEvt,Ehat,Res,AcceptedEvent,MY_IDUP,ICOLUP)
 use ModKinematics
 use ModParameters
 use ModHiggs
@@ -1099,7 +1101,6 @@ include 'csmaxvalue.f'
    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
 
 
-  Ehat = M_Reso
   eta1=1d0; eta2=1d0
   sHatJacobi = 1d0
 
@@ -1239,7 +1240,8 @@ IF( GENEVT ) THEN
       CS_max = csmax(0,0)
 
       if( EvalUnWeighted_withoutProduction .gt. CS_max) then
-          print *, "CS_max is too small. Adjust CS_max!",EvalUnWeighted_withoutProduction, CS_max
+          write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_withoutProduction, CS_max
+          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_withoutProduction, CS_max
           AlertCounter = AlertCounter + 1
           Res = 0d0
 
