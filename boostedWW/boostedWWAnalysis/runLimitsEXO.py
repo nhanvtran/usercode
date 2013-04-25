@@ -92,9 +92,12 @@ if __name__ == '__main__':
     mjlo  = [  40,  40,  40,  40,  40]  
     mjhi  = [ 130, 130, 130, 130, 130]  
     mlo   = [ 800, 800, 800, 800, 800]      
-    mhi   = [2500,2500,2500,2500,2500]          
-    shape    = ["Exp","Exp","Exp","Exp","Exp"]
-    shapeAlt = ["Pow","Pow","Pow","Pow","Pow"]
+    #mhi   = [2500,2500,2500,2500,2500]          
+    mhi   = [2800,2800,2800,2800,2800]          
+    shape       = ["ExpTail","ExpTail","ExpTail","ExpTail","ExpTail"]
+    shapeAlt    = ["Exp","Exp","Exp","Exp","Exp"]
+    #shape    = ["Exp","Exp","Exp","Exp","Exp"]
+    #shapeAlt = ["Pow","Pow","Pow","Pow","Pow"]
 
     BRnew = 00;
     #cprime = [10,07,05,04,03,02,01];
