@@ -103,7 +103,7 @@ void readOutAngles_LMH(std::string filename, bool applyRes=false){
       TLorentzVector pZ1; TLorentzVector pl1_m; TLorentzVector pl1_p;
       TLorentzVector pZ2; TLorentzVector pl2_m; TLorentzVector pl2_p;
       
-      //Distinguish the flavor type: 0 = mixed leptons, 1 4mu, 2 4e, 3 = tau
+      //Distinguish the flavor type: 0=4e, 1=4mu, 2=4tau, 3=2e2mu, 4=2e2tau, 5=2mu2tau
       if(abs(idup[0])==abs(idup[1]) && abs(idup[0])==abs(idup[2]) && abs(idup[0])==abs(idup[3]) ){
 	if(abs(idup[0])==13){
 	  flatype = muon; 
