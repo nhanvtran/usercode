@@ -153,9 +153,6 @@ class sampleWrapperClass:
         v_mt_             = array( 'f', [ 0. ] );
 
 
-        event_runNo_      = array( 'f', [ 0. ] );
-        event_lumi_       = array( 'f', [ 0. ] );
-
         jet_mass_pr_       = array( 'f', [ 0. ] );
         jet_pt_pr_         = array( 'f', [ 0. ] );
         ungroomed_jet_eta_ = array( 'f', [ 0. ] );
@@ -251,6 +248,8 @@ class sampleWrapperClass:
         deltaphi_METca8jet_ = array( 'f', [0.] );
         deltaphi_Vca8jet_ = array( 'f', [0.] );
                                                                                 
+        event_runNo_      = array( 'i', [ 0 ] );
+        event_lumi_       = array( 'i', [ 0 ] );
         event_ = array( 'i', [0] );
 
         otree.Branch("event", event_ , "event/I");
@@ -720,7 +719,10 @@ class sampleWrapperClass:
             if ttbarlike == 1 or signallike == 1 or signallike_exo_ ==1:                
              
              event_[0] = self.InputTree_.event_evtNo;
-                 
+             event_runNo_[0]      = getattr( self.InputTree_, "event_runNo" );
+             event_lumi_[0]       = getattr( self.InputTree_, "event_lumi" );
+
+             
              effwt = getattr( self.InputTree_, "effwt" );
              puwt = getattr( self.InputTree_, "puwt" );
              totSampleWeight = 1.;
@@ -898,8 +900,6 @@ class sampleWrapperClass:
              nbjets_csvm_veto_cleaned_[0]   = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm_veto" );
              nbjets_ssvhem_veto_cleaned_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem_veto" );
 
-             event_runNo_      = getattr( self.InputTree_, "event_runNo" );
-             event_lumi_       = getattr( self.InputTree_, "event_lumi" );
              
                         
 
