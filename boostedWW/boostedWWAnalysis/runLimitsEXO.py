@@ -94,8 +94,8 @@ if __name__ == '__main__':
     mlo   = [ 800, 800, 800, 800, 800]      
     #mhi   = [2500,2500,2500,2500,2500]          
     mhi   = [2800,2800,2800,2800,2800]          
-    shape       = ["ExpTail","ExpTail","ExpTail","ExpTail","ExpTail"]
-    shapeAlt    = ["Exp","Exp","Exp","Exp","Exp"]
+    shape    = ["ExpN","ExpN","ExpN","ExpN","ExpN"]
+    shapeAlt       = ["ExpTail","ExpTail","ExpTail","ExpTail","ExpTail"]
     #shape    = ["Exp","Exp","Exp","Exp","Exp"]
     #shapeAlt = ["Pow","Pow","Pow","Pow","Pow"]
 
