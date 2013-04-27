@@ -66,7 +66,7 @@ real(8),  parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-
   complex(8) :: b10  ! this coupling does not contribute to gamma+gamma final states
 
 
-  complex(8),  parameter  :: c1 = (1.0d0,0d0)! this parameters are not used
+  complex(8),  parameter  :: c1 = (1.0d0,0d0)! these parameters are not used
   complex(8),  parameter  :: c2 = (0.0d0,0d0)
   complex(8),  parameter  :: c3 = (0.0d0,0d0)
   complex(8),  parameter  :: c41= (0.0d0,0d0)

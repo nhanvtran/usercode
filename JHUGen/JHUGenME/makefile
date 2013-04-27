@@ -2,6 +2,7 @@ Comp = gfort
 
 ifeq ($(Comp),ifort)
 fcomp = ifort -fpp -O2 -vec-report0 -Dcompiler=1
+# fcomp = ifort -fpp -O0 -vec-report0 -Dcompiler=1
 endif
 ifeq ($(Comp),gfort)
 fcomp = f95 -O3 -ffree-line-length-none -Dcompiler=2
