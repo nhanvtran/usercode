@@ -57,7 +57,7 @@ parser.add_option('--inPath', action="store",type="string",dest="inPath",default
 
 ROOT.gSystem.Load(options.inPath+"/PDFs/HWWLVJRooPdfs_cxx.so")
 ROOT.gSystem.Load(options.inPath+"/PDFs/PdfDiagonalizer_cc.so")
-#ROOT.gSystem.Load("PDFs/Statistic_cxx.so")
+ROOT.gSystem.Load(options.inPath+"/PDFs/Util_cxx.so")
 
 from ROOT import draw_error_band, draw_error_band_extendPdf, draw_error_band_Decor, draw_error_band_shape_Decor, Calc_error_extendPdf, Calc_error, RooErfExpPdf, RooAlpha, RooAlpha4ErfPowPdf, RooAlpha4ErfPow2Pdf, RooAlpha4ErfPowExpPdf, PdfDiagonalizer, RooPowPdf, RooPow2Pdf, RooErfPowExpPdf, RooErfPowPdf, RooErfPow2Pdf, RooQCDPdf, RooUser1Pdf, RooBWRunPdf#, ClopperPearsonLimits
 
@@ -1593,6 +1593,7 @@ class doFit_wj_and_wlvj:
 
         
 
+        #correct_factor_pdf_deco.plotOn(mplot, RooFit.LineColor(kBlack),RooFit.Name("#alpha") );
         if label=="_WJets0":
             if self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets1_sim_%s_mlvj"%(self.channel)):
                 self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets1_sim_%s_mlvj"%(self.channel)).plotOn(mplot, RooFit.LineColor(kMagenta), RooFit.LineStyle(3),RooFit.Name("#alpha: Alternate Parton Shower") ); 
@@ -1625,8 +1626,18 @@ class doFit_wj_and_wlvj:
             paras.add(self.workspace4fit_.var("Deco%s_sim_%s_mlvj_eig2"%(label,self.channel) ));
             paras.add(self.workspace4fit_.var("Deco%s_sim_%s_mlvj_eig3"%(label,self.channel) ));
         if label=="_WJets0":
-            draw_error_band_shape_Decor("correct_factor_pdf_Deco%s_sim_%s_mlvj"%(label,self.channel),"rrv_mass_lvj", paras, self.workspace4fit_,1 ,mplot,6,"F","#alpha #pm",20,400);
-            draw_error_band_shape_Decor("correct_factor_pdf_Deco%s_sim_%s_mlvj"%(label,self.channel),"rrv_mass_lvj", paras, self.workspace4fit_,2 ,mplot,6,"F","#alpha #pm",20,400);
+            draw_error_band_shape_Decor("correct_factor_pdf_Deco%s_sim_%s_mlvj"%(label,self.channel),"rrv_mass_lvj", paras, self.workspace4fit_,1 ,mplot,kGray+3,"F",3001,"#alpha #pm",20,400);
+            #draw_error_band_shape_Decor("correct_factor_pdf_Deco%s_sim_%s_mlvj"%(label,self.channel),"rrv_mass_lvj", paras, self.workspace4fit_,2 ,mplot,kGreen+2,"F",3013,"#alpha #pm",20,400);
+            draw_error_band_shape_Decor("correct_factor_pdf_Deco%s_sim_%s_mlvj"%(label,self.channel),"rrv_mass_lvj", paras, self.workspace4fit_,2 ,mplot,kGreen+2,"F",3002,"#alpha #pm",20,400);
+            draw_error_band_shape_Decor("correct_factor_pdf_Deco%s_sim_%s_mlvj"%(label,self.channel),"rrv_mass_lvj", paras, self.workspace4fit_,1 ,mplot,kGray+3,"F",3001,"#alpha_invisible #pm",20,400);
+
+        correct_factor_pdf_deco.plotOn(mplot, RooFit.LineColor(kBlack),RooFit.Name("#alpha_invisible") );
+        if label=="_WJets0":
+            if self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets1_sim_%s_mlvj"%(self.channel)):
+                self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets1_sim_%s_mlvj"%(self.channel)).plotOn(mplot, RooFit.LineColor(kMagenta), RooFit.LineStyle(3),RooFit.Name("#alpha_invisible: Alternate Parton Shower") ); 
+            if self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets01_sim_%s_mlvj"%(self.channel)):
+                self.workspace4fit_.pdf("correct_factor_pdf_Deco_WJets01_sim_%s_mlvj"%(self.channel)).plotOn(mplot, RooFit.LineColor(kOrange), RooFit.LineStyle(7),RooFit.Name("#alpha_invisible: Alternate Function") ); 
+
         leg=self.legend4Plot(mplot,0,0, -0.15, 0);mplot.addObject(leg);
 
         #mplot.GetYaxis().SetRangeUser(0,mplot.GetMaximum()*1.1);
@@ -3760,6 +3771,7 @@ class doFit_wj_and_wlvj:
                 params_list.append(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel)));
                 if options.closuretest==0:
                     self.FloatingParams.add(self.workspace4limit_.var("Deco_TTbar_signal_region_%s_mlvj_eig0"%(self.channel))); 
+
             if self.MODEL_4_mlvj=="Pow2" :
                 self.workspace4limit_.var("Deco_WJets0_sb_lo_from_fitting_%s_mlvj_eig0"%(self.channel)).setError(shape_para_error_WJets0);
                 self.workspace4limit_.var("Deco_WJets0_sb_lo_from_fitting_%s_mlvj_eig1"%(self.channel)).setError(shape_para_error_WJets0);
@@ -4543,9 +4555,9 @@ def control_single_sb_correction(method, channel, higgs_sample="ggH600", in_mlvj
 
 def pre_limit_simple(channel):
     print "pre_limit_simple for %s sampel"%(channel)
-    pre_limit_sb_correction_without_systermatic(channel, "ggH600",550, 700,40,130,400,1000,"ErfPowExp_v1","ErfPow2_v1");
+    #pre_limit_sb_correction_without_systermatic(channel, "ggH600",550, 700,40,130,400,1000,"ErfPowExp_v1","ErfPow2_v1");
     #pre_limit_sb_correction_without_systermatic(channel, "ggH700",600, 850,40,130,400,1000,"ErfPowExp_v1","ErfPow2_v1");
-    #pre_limit_sb_correction_without_systermatic(channel, "ggH800",700, 950,40,130,600,1400,"Exp","Pow")
+    pre_limit_sb_correction_without_systermatic(channel, "ggH800",700, 950,40,130,600,1400,"Exp","Pow")
     #pre_limit_sb_correction_without_systermatic(channel, "ggH900",750,1100,40,130,600,1400,"Exp","Pow")
     #pre_limit_sb_correction_without_systermatic(channel,"ggH1000",800,1200,40,130,600,1400,"Exp","Pow")
 
