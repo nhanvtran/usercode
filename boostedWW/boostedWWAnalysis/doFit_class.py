@@ -178,8 +178,12 @@ class doFit_wj_and_wlvj:
 
         self.file_rlt_txt           = self.rlt_DIR+"other_hwwlvj_%s_%s_%02d_%02d.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
         self.file_rlt_root          = self.rlt_DIR+"hwwlvj_%s_%s_%02d_%02d_workspace.root"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
-        self.file_datacard_unbin    = self.rlt_DIR+"hwwlvj_%s_%s_%02d_%02d_unbin.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
-        self.file_datacard_counting = self.rlt_DIR+"hwwlvj_%s_%s_%02d_%02d_counting.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        self.file_datacard_unbin_ggHvbfH    = self.rlt_DIR+"hwwlvj_%s_%s_%02d_%02d_unbin.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        self.file_datacard_unbin_ggH    = self.rlt_DIR+"hwwlvj_%s_%s_ggH_%02d_%02d_unbin.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        self.file_datacard_unbin_vbfH   = self.rlt_DIR+"hwwlvj_%s_%s_vbfH_%02d_%02d_unbin.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        self.file_datacard_counting_ggHvbfH = self.rlt_DIR+"hwwlvj_%s_%s_%02d_%02d_counting.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        self.file_datacard_counting_ggH = self.rlt_DIR+"hwwlvj_%s_%s_ggH_%02d_%02d_counting.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
+        self.file_datacard_counting_vbfH = self.rlt_DIR+"hwwlvj_%s_%s_vbfH_%02d_%02d_counting.txt"%(self.higgs_sample,self.channel,options.cprime,options.BRnew)
         
         self.file_out=open(self.file_rlt_txt,"w");
         self.file_out.write("Welcome:\n");
@@ -3563,14 +3567,20 @@ class doFit_wj_and_wlvj:
         #    self.datadriven_alpha_WJets_counting = rrv_tmp.getVal()*signalInt_val/self.number_WJets_insideband 
 
     ######## ++++++++++++++
-    def print_limit_datacard(self, mode ,params_list=[] ): #mode:unbin or counting
+    def print_limit_datacard(self, mode, signalchannel, params_list=[] ): #mode:unbin or counting
         print "print_limit_datacard for %s"%(mode)
         if not (mode == "unbin" or mode == "counting"):
             print "print_limit_datacard use wrong mode: %s"%(mode);raw_input("ENTER");
-        datacard_out=open(getattr(self,"file_datacard_%s"%(mode)),"w");
+        #datacard_out=open(getattr(self,"file_datacard_%s"%(mode)),"w");
+        datacard_out=open(getattr(self,"file_datacard_%s_%s"%(mode, signalchannel)),"w");
 
         datacard_out.write( "imax 1" )
-        datacard_out.write( "\njmax 5" )
+        if signalchannel=="ggH" or signalchannel=="vbfH":
+            datacard_out.write( "\njmax 4" )
+        elif signalchannel=="ggHvbfH":
+            datacard_out.write( "\njmax 5" )
+        else:
+            raw_input("Wrong signal channel, please check!!");
         datacard_out.write( "\nkmax *" )
         datacard_out.write( "\n--------------- ")
         if mode == "unbin":
@@ -3582,28 +3592,71 @@ class doFit_wj_and_wlvj:
             datacard_out.write( "\nobservation %0.2f "%(self.workspace4limit_.data("data_obs_%s"%(self.channel)).sumEntries()) )
         if mode == "counting":
             datacard_out.write( "\nobservation %0.2f "%(self.workspace4limit_.var("observation_for_counting").getVal()) )
+
         datacard_out.write( "\n------------------------------" )
-        datacard_out.write( "\nbin                1         1             1        1        1       1" )
-        datacard_out.write( "\nprocess            %s    %s       WJets    TTbar    STop    VV "%(self.higgs_sample,self.vbfhiggs_sample) )
-        datacard_out.write( "\nprocess            -1        0             1        2        3       4" )
-        if mode == "unbin":
-            datacard_out.write( "\nrate               %0.2f    %0.2f       %0.2f   %0.2f    %0.2f    %0.2f "%(self.workspace4limit_.var("rate_%s_for_unbin"%(self.higgs_sample)).getVal(),self.workspace4limit_.var("rate_%s_for_unbin"%(self.vbfhiggs_sample)).getVal(), self.workspace4limit_.var("rate_WJets_for_unbin").getVal(), self.workspace4limit_.var("rate_TTbar_for_unbin").getVal(), self.workspace4limit_.var("rate_STop_for_unbin").getVal(), self.workspace4limit_.var("rate_VV_for_unbin").getVal()  ) )
-        if mode == "counting":
-            datacard_out.write( "\nrate               %0.2f    %0.2f    %0.2f   %0.2f    %0.2f    %0.2f"%(self.workspace4limit_.var("rate_%s_for_counting"%(self.higgs_sample)).getVal(),self.workspace4limit_.var("rate_%s_for_counting"%(self.vbfhiggs_sample)).getVal(), self.workspace4limit_.var("rate_WJets_for_counting").getVal(), self.workspace4limit_.var("rate_TTbar_for_counting").getVal(), self.workspace4limit_.var("rate_STop_for_counting").getVal(), self.workspace4limit_.var("rate_VV_for_counting").getVal()  ) )
-        datacard_out.write( "\n-------------------------------- " )
-        datacard_out.write( "\nlumi     lnN       %0.3f     %0.3f         -        %0.3f   %0.3f   %0.3f"%(1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty) )
-        datacard_out.write( "\nQCDscale_ggH lnN   %0.3f     -             -        -       -       -"%(1.+self.QCDscale_ggH))
-        datacard_out.write( "\npdf_gg       lnN   %0.3f     -             -        -       -       -"%(1.+self.pdf_gg))
-        datacard_out.write( "\nhwwlnJ_pdfAcc_gg lnN %0.3f   -             -        -       -       -"%(1.+self.hwwlnJ_pdfAcc_gg) )
-        datacard_out.write( "\nQCDscale_vbfH lnN  -         %0.3f         -        -       -       -"%(1.+self.QCDscale_vbfH) )
-        datacard_out.write( "\npdf_qqbar     lnN  -         %0.3f         -        -       -       -"%(1.+self.pdf_vbf))
-        datacard_out.write( "\nhwwlnJ_pdfAcc_vbf lnN -      %0.3f         -        -       -       -"%(1.+self.hwwlnJ_pdfAcc_vbf))
-        datacard_out.write( "\nintf_ggH  lnN      %0.3f     -             -        -       -       -"%(1.+self.interference_ggH_uncertainty) )
-        datacard_out.write( "\nintf_vbfH lnN      -         %0.3f         -        -       -       -"%(1.+self.interference_vbfH_uncertainty) )
-        #datacard_out.write( "\nXS_TTbar lnN       -         -             -        %0.3f   -       -"%(1+self.XS_TTbar_uncertainty) )
-        datacard_out.write( "\nXS_STop  lnN       -         -             -        -       %0.3f   -"%(1+self.XS_STop_uncertainty) )
-        datacard_out.write( "\nXS_VV    lnN       -         -             -        -       -       %0.3f"%(1+self.XS_VV_uncertainty) )
-        #print self.number_WJets_insideband; raw_input("ENTER");
+        if signalchannel=="ggH":
+            datacard_out.write( "\nbin                1                  1        1        1       1" )
+            datacard_out.write( "\nprocess            %s        WJets    TTbar    STop    VV "%(self.higgs_sample) )
+            datacard_out.write( "\nprocess            -1                 1        2        3       4" )
+            if mode == "unbin":
+                datacard_out.write( "\nrate               %0.2f           %0.2f   %0.2f    %0.2f    %0.2f "%(self.workspace4limit_.var("rate_%s_for_unbin"%(self.higgs_sample)).getVal(), self.workspace4limit_.var("rate_WJets_for_unbin").getVal(), self.workspace4limit_.var("rate_TTbar_for_unbin").getVal(), self.workspace4limit_.var("rate_STop_for_unbin").getVal(), self.workspace4limit_.var("rate_VV_for_unbin").getVal()  ) )
+            if mode == "counting":
+                datacard_out.write( "\nrate               %0.2f       %0.2f   %0.2f    %0.2f    %0.2f"%(self.workspace4limit_.var("rate_%s_for_counting"%(self.higgs_sample)).getVal(), self.workspace4limit_.var("rate_WJets_for_counting").getVal(), self.workspace4limit_.var("rate_TTbar_for_counting").getVal(), self.workspace4limit_.var("rate_STop_for_counting").getVal(), self.workspace4limit_.var("rate_VV_for_counting").getVal()  ) )
+            datacard_out.write( "\n-------------------------------- " )
+            datacard_out.write( "\nlumi     lnN       %0.3f          -        %0.3f   %0.3f   %0.3f"%(1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty) )
+            datacard_out.write( "\nQCDscale_ggH lnN   %0.3f           -        -       -       -"%(1.+self.QCDscale_ggH))
+            datacard_out.write( "\npdf_gg       lnN   %0.3f           -        -       -       -"%(1.+self.pdf_gg))
+            datacard_out.write( "\nhwwlnJ_pdfAcc_gg lnN %0.3f        -        -       -       -"%(1.+self.hwwlnJ_pdfAcc_gg) )
+            datacard_out.write( "\nintf_ggH  lnN      %0.3f          -        -       -       -"%(1.+self.interference_ggH_uncertainty) )
+            #datacard_out.write( "\nXS_TTbar lnN       -              -        %0.3f   -       -"%(1+self.XS_TTbar_uncertainty) )
+            datacard_out.write( "\nXS_STop  lnN       -               -        -       %0.3f   -"%(1+self.XS_STop_uncertainty) )
+            datacard_out.write( "\nXS_VV    lnN       -               -        -       -       %0.3f"%(1+self.XS_VV_uncertainty) )
+ 
+        elif signalchannel=="vbfH":
+            datacard_out.write( "\nbin                1               1        1        1       1" )
+            datacard_out.write( "\nprocess            %s        WJets    TTbar    STop    VV "%(self.vbfhiggs_sample) )
+            datacard_out.write( "\nprocess            -1              1        2        3       4" )
+            if mode == "unbin":
+                datacard_out.write( "\nrate            %0.2f         %0.2f   %0.2f    %0.2f    %0.2f "%(self.workspace4limit_.var("rate_%s_for_unbin"%(self.vbfhiggs_sample)).getVal(), self.workspace4limit_.var("rate_WJets_for_unbin").getVal(), self.workspace4limit_.var("rate_TTbar_for_unbin").getVal(), self.workspace4limit_.var("rate_STop_for_unbin").getVal(), self.workspace4limit_.var("rate_VV_for_unbin").getVal()  ) )
+            if mode == "counting":
+                datacard_out.write( "\nrate            %0.2f         %0.2f   %0.2f    %0.2f    %0.2f"%(self.workspace4limit_.var("rate_%s_for_counting"%(self.vbfhiggs_sample)).getVal(), self.workspace4limit_.var("rate_WJets_for_counting").getVal(), self.workspace4limit_.var("rate_TTbar_for_counting").getVal(), self.workspace4limit_.var("rate_STop_for_counting").getVal(), self.workspace4limit_.var("rate_VV_for_counting").getVal()  ) )
+            datacard_out.write( "\n-------------------------------- " )
+            datacard_out.write( "\nlumi     lnN       %0.3f         -        %0.3f   %0.3f   %0.3f"%(1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty) )
+            datacard_out.write( "\nQCDscale_vbfH lnN  %0.3f         -        -       -       -"%(1.+self.QCDscale_vbfH) )
+            datacard_out.write( "\npdf_qqbar     lnN  %0.3f         -        -       -       -"%(1.+self.pdf_vbf))
+            datacard_out.write( "\nhwwlnJ_pdfAcc_vbf lnN %0.3f         -        -       -       -"%(1.+self.hwwlnJ_pdfAcc_vbf))
+            datacard_out.write( "\nintf_vbfH lnN      %0.3f         -        -       -       -"%(1.+self.interference_vbfH_uncertainty) )
+            #datacard_out.write( "\nXS_TTbar lnN       -         -             -        %0.3f   -       -"%(1+self.XS_TTbar_uncertainty) )
+            datacard_out.write( "\nXS_STop  lnN       -             -        -       %0.3f   -"%(1+self.XS_STop_uncertainty) )
+            datacard_out.write( "\nXS_VV    lnN       -             -        -       -       %0.3f"%(1+self.XS_VV_uncertainty) )
+ 
+        elif signalchannel=="ggHvbfH":
+            datacard_out.write( "\nbin                1         1             1        1        1       1" )
+            datacard_out.write( "\nprocess            %s    %s       WJets    TTbar    STop    VV "%(self.higgs_sample,self.vbfhiggs_sample) )
+            datacard_out.write( "\nprocess            -1        0             1        2        3       4" )
+            if mode == "unbin":
+                datacard_out.write( "\nrate               %0.2f    %0.2f         %0.2f   %0.2f    %0.2f    %0.2f "%(self.workspace4limit_.var("rate_%s_for_unbin"%(self.higgs_sample)).getVal(),self.workspace4limit_.var("rate_%s_for_unbin"%(self.vbfhiggs_sample)).getVal(), self.workspace4limit_.var("rate_WJets_for_unbin").getVal(), self.workspace4limit_.var("rate_TTbar_for_unbin").getVal(), self.workspace4limit_.var("rate_STop_for_unbin").getVal(), self.workspace4limit_.var("rate_VV_for_unbin").getVal()  ) )
+            if mode == "counting":
+                datacard_out.write( "\nrate               %0.2f    %0.2f         %0.2f   %0.2f    %0.2f    %0.2f"%(self.workspace4limit_.var("rate_%s_for_counting"%(self.higgs_sample)).getVal(),self.workspace4limit_.var("rate_%s_for_counting"%(self.vbfhiggs_sample)).getVal(), self.workspace4limit_.var("rate_WJets_for_counting").getVal(), self.workspace4limit_.var("rate_TTbar_for_counting").getVal(), self.workspace4limit_.var("rate_STop_for_counting").getVal(), self.workspace4limit_.var("rate_VV_for_counting").getVal()  ) )
+            datacard_out.write( "\n-------------------------------- " )
+            datacard_out.write( "\nlumi     lnN       %0.3f     %0.3f         -        %0.3f   %0.3f   %0.3f"%(1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty,1.+self.lumi_uncertainty) )
+            datacard_out.write( "\nQCDscale_ggH lnN   %0.3f     -             -        -       -       -"%(1.+self.QCDscale_ggH))
+            datacard_out.write( "\npdf_gg       lnN   %0.3f     -             -        -       -       -"%(1.+self.pdf_gg))
+            datacard_out.write( "\nhwwlnJ_pdfAcc_gg lnN %0.3f   -             -        -       -       -"%(1.+self.hwwlnJ_pdfAcc_gg) )
+            datacard_out.write( "\nQCDscale_vbfH lnN  -         %0.3f         -        -       -       -"%(1.+self.QCDscale_vbfH) )
+            datacard_out.write( "\npdf_qqbar     lnN  -         %0.3f         -        -       -       -"%(1.+self.pdf_vbf))
+            datacard_out.write( "\nhwwlnJ_pdfAcc_vbf lnN -      %0.3f         -        -       -       -"%(1.+self.hwwlnJ_pdfAcc_vbf))
+            datacard_out.write( "\nintf_ggH  lnN      %0.3f     -             -        -       -       -"%(1.+self.interference_ggH_uncertainty) )
+            datacard_out.write( "\nintf_vbfH lnN      -         %0.3f         -        -       -       -"%(1.+self.interference_vbfH_uncertainty) )
+            #datacard_out.write( "\nXS_TTbar lnN       -         -             -        %0.3f   -       -"%(1+self.XS_TTbar_uncertainty) )
+            datacard_out.write( "\nXS_STop  lnN       -         -             -        -       %0.3f   -"%(1+self.XS_STop_uncertainty) )
+            datacard_out.write( "\nXS_VV    lnN       -         -             -        -       -       %0.3f"%(1+self.XS_VV_uncertainty) )
+            #print self.number_WJets_insideband; raw_input("ENTER");
+        else: 
+            raw_input("Wrong signal channel, please check!!");
+
+
+
         if self.number_WJets_insideband >0:
             datacard_out.write( "\nWJ_norm gmN %0.3f     -  %0.3f           -      -        -"%(self.number_WJets_insideband, getattr(self, "datadriven_alpha_WJets_%s"%(mode)) ) )
         else:
@@ -3810,8 +3863,12 @@ class doFit_wj_and_wlvj:
         self.rrv_counting_uncertainty_from_shape_uncertainty.setError( Calc_error("WJets_%s"%(self.channel), "rrv_mass_lvj" ,self.FloatingParams,self.workspace4limit_,"signal_region") );
         self.rrv_counting_uncertainty_from_shape_uncertainty.Print();
 
-        self.print_limit_datacard("unbin",params_list);
-        self.print_limit_datacard("counting");
+        self.print_limit_datacard("unbin", "ggH", params_list);
+        self.print_limit_datacard("unbin", "vbfH", params_list);
+        self.print_limit_datacard("unbin", "ggHvbfH", params_list);
+        self.print_limit_datacard("counting", "ggH");
+        self.print_limit_datacard("counting", "vbfH");
+        self.print_limit_datacard("counting", "ggHvbfH");
 
     ######### ++++++++++++++
     def read_workspace(self):
