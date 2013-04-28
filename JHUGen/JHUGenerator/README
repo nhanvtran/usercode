@@ -22,10 +22,16 @@ command line parameters:
                   x=5:  X-> W1 W2, W1->2q,
                   x=6:  X-> W1 W2, W1->taunu
                   x=7:  X-> gamma gamma 
+                  x=8:  Z --> l+ l- (l=e,mu,tau)
+                  x=9:  Z --> anything
+                  x=10: W --> l nu_l (l=e,mu,tau)
+                  x=11: W --> anyting                  
    DataFile=x    (name of the output file), default value: "output"
    Process=x     (gives the resonance spin 0,1 or 2)
    OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness for Higgs, Z/W boson 1/2, resp.), default 000
    if a parameter is not specified, the default value is chosen
+   ReadLHE="x"   (allows NLO production of spin-0 particles by reading in LHE file from NLO generator, e.g., POWHEG)
+   
 example call:
    ./JHUGen Collider=1 Process=0 VegasNc1=100000 PChannel=0 OffXVV=011 DecayMode1=0 DecayMode2=0 DataFile=test1
    * out-of-the-box: output datafile example is "data/outputTest.lhe" and terminal output is "data/outputTest_terminal.txt"

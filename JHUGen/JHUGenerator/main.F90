@@ -1056,7 +1056,8 @@ implicit none
     if( unweighted ) then 
         write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
         write(io_LHEOutFile ,'(A)') '<!--'
-        write(io_LHEOutFile ,'(A)') 'Output from the JHUGenerator described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph]'
+!        write(io_LHEOutFile ,'(A)') 'Output from the JHUGenerator described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph]'
+        write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph]'
         write(io_LHEOutFile ,'(A)') ''
 
         call WriteParameters(io_LHEOutFile)
