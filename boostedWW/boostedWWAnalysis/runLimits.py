@@ -44,6 +44,7 @@ parser.add_option('--massPoint',action="store",type="int",dest="massPoint",defau
 parser.add_option('--cPrime',action="store",type="int",dest="cPrime",default=-1)
 parser.add_option('--brNew',action="store",type="int",dest="brNew",default=-1)
 parser.add_option('--odir',action="store",type="string",dest="odir",default=".")
+parser.add_option('--sigChannel',action="store",type="string",dest="sigChannel",default="")
 
 
 (options, args) = parser.parse_args()
@@ -121,6 +122,10 @@ def submitBatchJob( command, fn ):
 # ----------------------------------------
 def submitBatchJobCombine( command, fn, mass, cprime, BRnew ):
     
+    
+    SIGCH = "";
+    if options.sigChannel.find("H") >= 0: SIGCH = "_"+options.sigChannel;
+    
     currentDir = os.getcwd();
     
     # create a dummy bash/csh
@@ -136,7 +141,7 @@ def submitBatchJobCombine( command, fn, mass, cprime, BRnew ):
     outScript.write("\n"+command);
     outScript.close();
     
-    file1 = "hwwlvj_ggH%03d_em_%02d_%02d_unbin.txt"%(mass,cprime,BRnew);
+    file1 = "hwwlvj_ggH%03d_em%s_%02d_%02d_unbin.txt"%(mass,SIGCH,cprime,BRnew);
     file2 = "hwwlvj_ggH%03d_mu_%02d_%02d_workspace.root"%(mass,cprime,BRnew);
     file3 = "hwwlvj_ggH%03d_el_%02d_%02d_workspace.root"%(mass,cprime,BRnew);    
     # link a condor script to your shell script
@@ -168,6 +173,8 @@ if __name__ == '__main__':
     
     CHAN = options.channel;
     DIR = "cards_"+CHAN;
+    SIGCH = "";
+    if options.sigChannel.find("H") >= 0: SIGCH = "_"+options.sigChannel;
 
     #mass  = [ 600, 700, 800, 900,1000]
     #ccmlo = [ 550, 600, 600, 750, 800]  
@@ -283,18 +290,17 @@ if __name__ == '__main__':
 
                     print "--------------------------------------------------";
                     print "--------------------------------------------------";                
-                    print "creating card: hwwlvj_ggH%03d_em_%02d_%02d_unbin.txt"%(mass[i],cprime[j],BRnew[k]);
-                    combineCmmd = "combineCards.py hwwlvj_ggH%03d_el_%02d_%02d_unbin.txt hwwlvj_ggH%03d_mu_%02d_%02d_unbin.txt > hwwlvj_ggH%03d_em_%02d_%02d_unbin.txt"%(mass[i],cprime[j],BRnew[k],mass[i],cprime[j],BRnew[k],mass[i],cprime[j],BRnew[k]);
+                    print "creating card: hwwlvj_ggH%03d_em%s_%02d_%02d_unbin.txt"%(mass[i],SIGCH,cprime[j],BRnew[k]);
+                    combineCmmd = "combineCards.py hwwlvj_ggH%03d_el%s_%02d_%02d_unbin.txt hwwlvj_ggH%03d_mu%s_%02d_%02d_unbin.txt > hwwlvj_ggH%03d_em%s_%02d_%02d_unbin.txt"%(mass[i],SIGCH,cprime[j],BRnew[k],mass[i],SIGCH,cprime[j],BRnew[k],mass[i],SIGCH,cprime[j],BRnew[k]);
                     os.system(combineCmmd);
 
                     
-                    print "running card: hwwlvj_ggH%03d_em_%02d_%02d_unbin.txt"%(mass[i],cprime[j],BRnew[k]);
-#                    runCmmd = "combine -M Asymptotic --rMin 0 --rMax 30 -n hwwlvj_ggH%03d_em_%02d_%02d_unbin -m %03d -d hwwlvj_ggH%03d_em_%02d_%02d_unbin.txt %s"%(mass[i],cprime[j],BRnew[k],mass[i],mass[i],cprime[j],BRnew[k],moreCombineOpts);
-                    runCmmd = "combine -M Asymptotic --minimizerAlgo Minuit2 --minosAlgo stepping -n hwwlvj_ggH%03d_em_%02d_%02d_unbin -m %03d -d hwwlvj_ggH%03d_em_%02d_%02d_unbin.txt %s -v 2"%(mass[i],cprime[j],BRnew[k],mass[i],mass[i],cprime[j],BRnew[k],moreCombineOpts);                    
+                    print "running card: hwwlvj_ggH%03d_em%s_%02d_%02d_unbin.txt"%(mass[i],SIGCH,cprime[j],BRnew[k]);
+                    runCmmd = "combine -M Asymptotic --minimizerAlgo Minuit2 --minosAlgo stepping -n hwwlvj_ggH%03d_em%s_%02d_%02d_unbin -m %03d -d hwwlvj_ggH%03d_em%s_%02d_%02d_unbin.txt %s -v 0"%(mass[i],SIGCH,cprime[j],BRnew[k],mass[i],mass[i],SIGCH,cprime[j],BRnew[k],moreCombineOpts);                    
                     
                     if options.batchMode:
-                        fn = "combineScript_%03d_%02d_%02d"%(mass[i],cprime[j],BRnew[k]);
-                        cardStem = "hwwlvj_ggH%03d_em_%02d_%02d"%(mass[i],cprime[j],BRnew[k]);
+                        fn = "combineScript_%03d%s_%02d_%02d"%(mass[i],SIGCH,cprime[j],BRnew[k]);
+                        cardStem = "hwwlvj_ggH%03d_em%s_%02d_%02d"%(mass[i],SIGCH,cprime[j],BRnew[k]);
                         submitBatchJobCombine( runCmmd, fn, mass[i], cprime[j], BRnew[k] );
                     else: 
                         os.system(runCmmd);
