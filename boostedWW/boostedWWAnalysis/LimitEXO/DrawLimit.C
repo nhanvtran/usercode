@@ -107,9 +107,9 @@ void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu
     Float_t  tmp_quantileExpected;
     Double_t tmp_limit;
 
-    limit->SetBranchAddress("limit",&tmp_limit);
-    limit->SetBranchAddress("mh",&tmp_mh);
-    limit->SetBranchAddress("quantileExpected",&tmp_quantileExpected);
+    tree_limit->SetBranchAddress("limit",&tmp_limit);
+    tree_limit->SetBranchAddress("mh",&tmp_mh);
+    tree_limit->SetBranchAddress("quantileExpected",&tmp_quantileExpected);
 
 	const double nmass = tree_limit.GetEntries()/6.;
 	double Mass[nmass] ;
@@ -273,7 +273,7 @@ void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu
         //draw grid on top of limits
     TH1D* postGrid=new TH1D("postGrid","postGrid",1,600,1000);
     postGrid->GetYaxis()->SetRangeUser(0.0000005, 10);
-    postGrid->Draw("AXIGSAME");
+    postGrid->Draw("AXISSAME");
 
 
 	TLegend * leg = new TLegend (0.6, 0.65, 0.9, 0.87, NULL, "brNDC") ;
