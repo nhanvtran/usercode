@@ -274,6 +274,7 @@ void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu
     TH1D* postGrid=new TH1D("postGrid","postGrid",1,600,1000);
     postGrid->GetYaxis()->SetRangeUser(0.0000005, 10);
     postGrid->Draw("AXISSAME");
+    postGrid->Draw("AXIGSAME");
 
 
 	TLegend * leg = new TLegend (0.6, 0.65, 0.9, 0.87, NULL, "brNDC") ;
