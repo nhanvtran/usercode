@@ -131,7 +131,7 @@ def makeSMLimits(SIGCH):
     curGraph_2s.SetFillColor(ROOT.kYellow);
 
     # -------
-    banner = TLatex(0.44,0.91,("CMS Preliminary, 19.3 fb^{-1} at #sqrt{s}=8TeV, e+#mu"));
+    banner = TLatex(0.30,0.91,("CMS Preliminary, 19.3 fb^{-1} at #sqrt{s}=8TeV, W#rightarrow e #nu + W#rightarrow #mu #nu"));
     banner.SetNDC(); banner.SetTextSize(0.028);
     oneLine = ROOT.TF1("oneLine","1",599,1001);
     oneLine.SetLineColor(ROOT.kRed);
@@ -141,16 +141,23 @@ def makeSMLimits(SIGCH):
     hrl_SM = can_SM.DrawFrame(599,0.0,1001,10.0);
     hrl_SM.GetYaxis().SetTitle("#mu = #sigma_{95%} / #sigma_{SM}");
     hrl_SM.GetYaxis().SetTitleOffset(1.4);
-    hrl_SM.GetXaxis().SetTitle("Higgs boson mass (GeV)");
+    hrl_SM.GetXaxis().SetTitle("Higgs boson mass (GeV/c^{2})");
     can_SM.SetGrid();
     
     curGraph_2s.Draw("F");
     curGraph_1s.Draw("F");
     curGraph_obs.Draw("PL");
     curGraph_exp.Draw("PL");
+
+    #grip
+    postGrid=TH1D("postGrid","",1,600,1000);
+    postGrid.GetYaxis().SetRangeUser(0.,10);
+    postGrid.Draw("AXISSAME");
+    postGrid.Draw("AXIGSAME");
     
-    leg2 = ROOT.TLegend(0.25,0.65,0.75,0.85);
-    leg2.SetFillStyle(0);
+    leg2 = ROOT.TLegend(0.25,0.65,0.60,0.85);
+    leg2.SetFillColor(0);
+    leg2.SetFillStyle(1001);
     leg2.SetBorderSize(0);
     leg2.AddEntry(curGraph_obs,"Observed","L")
     leg2.AddEntry(curGraph_exp,"Expected","L")
@@ -163,9 +170,9 @@ def makeSMLimits(SIGCH):
     oneLine.Draw("LESAMES");
     
     #ROOT.gPad.SetLogy();
-    can_SM.SaveAs("limitFigs/SMLim%s.eps"%(SIGCH));                      
-    can_SM.SaveAs("limitFigs/SMLim%s.png"%(SIGCH));                      
-    can_SM.SaveAs("limitFigs/SMLim%s.pdf"%(SIGCH));                      
+    can_SM.SaveAs("limitFigs%s/SMLim%s.eps"%(SIGCH,SIGCH));                      
+    can_SM.SaveAs("limitFigs%s/SMLim%s.png"%(SIGCH,SIGCH));                      
+    can_SM.SaveAs("limitFigs%s/SMLim%s.pdf"%(SIGCH,SIGCH));                      
 
 ############################################################
 ############################################################
@@ -234,6 +241,7 @@ def makeBSMLimits_vsMass( SIGCH, cprimes ):
             #print "curAsymLimits[0]: ",curAsymLimits[0]
             
             if gridMax < curAsymLimits[3]: gridMax = curAsymLimits[3];
+            if gridMax < curAsymLimits[0]: gridMax = curAsymLimits[0];
             cscur = ( curAsymLimits[3]*massCS[i]*cprimes[j]*0.1*(1-brnew*0.1)*massBRWW[i] );
             if gridMaxSig < cscur: gridMaxSig = cscur;
         
@@ -276,9 +284,11 @@ def makeBSMLimits_vsMass( SIGCH, cprimes ):
     can_BSM.SetGrid();
     
     leg2 = ROOT.TLegend(0.25,0.65,0.75,0.85);
-    leg2.SetFillStyle(0);
+    leg2.SetFillColor(0);
+    leg2.SetFillStyle(1001);
     leg2.SetBorderSize(0);
     leg2.SetNColumns(2);
+    leg2.SetTextSize(0.025);
 
     for k in range(len(cprimes)):
         #print cprime[k]
@@ -300,9 +310,9 @@ def makeBSMLimits_vsMass( SIGCH, cprimes ):
     banner2.Draw();
 
     #ROOT.gPad.SetLogy();
-    can_BSM.SaveAs("limitFigs/BSMLim%s_Mu.eps"%(SIGCH));                      
-    can_BSM.SaveAs("limitFigs/BSMLim%s_Mu.png"%(SIGCH));                      
-    can_BSM.SaveAs("limitFigs/BSMLim%s_Mu.pdf"%(SIGCH));          
+    can_BSM.SaveAs("limitFigs%s/BSMLim%s_Mu.eps"%(SIGCH,SIGCH));                      
+    can_BSM.SaveAs("limitFigs%s/BSMLim%s_Mu.png"%(SIGCH,SIGCH));                      
+    can_BSM.SaveAs("limitFigs%s/BSMLim%s_Mu.pdf"%(SIGCH,SIGCH));          
 
     ##----
 
@@ -313,10 +323,12 @@ def makeBSMLimits_vsMass( SIGCH, cprimes ):
     hrl_BSMsig.GetXaxis().SetTitle("Higgs boson mass (GeV)");
     can_BSMsig.SetGrid();
 
-    leg2 = ROOT.TLegend(0.2,0.65,0.85,0.85);
-    leg2.SetFillStyle(0);
+    leg2 = ROOT.TLegend(0.2,0.65,0.80,0.85);
+    leg2.SetFillColor(0);
+    leg2.SetFillStyle(1001);
     leg2.SetBorderSize(0);
     leg2.SetNColumns(3);
+    leg2.SetTextSize(0.025);
 
     for k in range(len(cprimes)):
         tGraphs_csXbr_exp[k].SetLineStyle(2);
@@ -342,9 +354,9 @@ def makeBSMLimits_vsMass( SIGCH, cprimes ):
     banner2.Draw();
 
     #ROOT.gPad.SetLogy();
-    can_BSMsig.SaveAs("limitFigs/BSMLim%s_Sigma.eps"%(SIGCH));                      
-    can_BSMsig.SaveAs("limitFigs/BSMLim%s_Sigma.png"%(SIGCH));                      
-    can_BSMsig.SaveAs("limitFigs/BSMLim%s_Sigma.pdf"%(SIGCH));  
+    can_BSMsig.SaveAs("limitFigs%s/BSMLim%s_Sigma.eps"%(SIGCH,SIGCH));                      
+    can_BSMsig.SaveAs("limitFigs%s/BSMLim%s_Sigma.png"%(SIGCH,SIGCH));                      
+    can_BSMsig.SaveAs("limitFigs%s/BSMLim%s_Sigma.pdf"%(SIGCH,SIGCH));  
 
 ############################################################
 ############################################################
@@ -454,9 +466,11 @@ def makeBSMLimits_vsBRnew( SIGCH, cprimes, mass ):
     can_BSM.SetGrid();
     
     leg2 = ROOT.TLegend(0.25,0.65,0.75,0.85);
-    leg2.SetFillStyle(0);
+    leg2.SetFillColor(0);
+    leg2.SetFillStyle(1001);
     leg2.SetBorderSize(0);
     leg2.SetNColumns(2);
+    leg2.SetTextSize(0.025);
     
     for k in range(len(cprimes)):
         tGraphs_exp[k].SetLineStyle(2);
@@ -477,9 +491,9 @@ def makeBSMLimits_vsBRnew( SIGCH, cprimes, mass ):
     banner2.Draw();
 
     #ROOT.gPad.SetLogy();
-    can_BSM.SaveAs("limitFigs/BSMLim%s_Mu_vsBRnew_%i.eps"%(SIGCH,mass));                      
-    can_BSM.SaveAs("limitFigs/BSMLim%s_Mu_vsBRnew_%i.png"%(SIGCH,mass));                      
-    can_BSM.SaveAs("limitFigs/BSMLim%s_Mu_vsBRnew_%i.pdf"%(SIGCH,mass));          
+    can_BSM.SaveAs("limitFigs%s/BSMLim%s_Mu_vsBRnew_%i.eps"%(SIGCH,SIGCH,mass));                      
+    can_BSM.SaveAs("limitFigs%s/BSMLim%s_Mu_vsBRnew_%i.png"%(SIGCH,SIGCH,mass));                      
+    can_BSM.SaveAs("limitFigs%s/BSMLim%s_Mu_vsBRnew_%i.pdf"%(SIGCH,SIGCH,mass));          
     
     ##----
     
@@ -490,10 +504,12 @@ def makeBSMLimits_vsBRnew( SIGCH, cprimes, mass ):
     hrl_BSMsig.GetXaxis().SetTitle("BR_{new}");
     can_BSMsig.SetGrid();
     
-    leg2 = ROOT.TLegend(0.2,0.65,0.85,0.85);
-    leg2.SetFillStyle(0);
+    leg2 = ROOT.TLegend(0.2,0.65,0.80,0.85);
+    leg2.SetFillColor(0);
+    leg2.SetFillStyle(1001);
     leg2.SetBorderSize(0);
     leg2.SetNColumns(3);
+    leg2.SetTextSize(0.025);
     
     for k in range(len(cprimes)):
         tGraphs_csXbr_exp[k].SetLineStyle(2);
@@ -519,9 +535,9 @@ def makeBSMLimits_vsBRnew( SIGCH, cprimes, mass ):
     banner2.Draw();
 
     #ROOT.gPad.SetLogy();
-    can_BSMsig.SaveAs("limitFigs/BSMLim%s_Sigma_vsBRnew_%i.eps"%(SIGCH,mass));                      
-    can_BSMsig.SaveAs("limitFigs/BSMLim%s_Sigma_vsBRnew_%i.png"%(SIGCH,mass));                      
-    can_BSMsig.SaveAs("limitFigs/BSMLim%s_Sigma_vsBRnew_%i.pdf"%(SIGCH,mass));  
+    can_BSMsig.SaveAs("limitFigs%s/BSMLim%s_Sigma_vsBRnew_%i.eps"%(SIGCH,SIGCH,mass));                      
+    can_BSMsig.SaveAs("limitFigs%s/BSMLim%s_Sigma_vsBRnew_%i.png"%(SIGCH,SIGCH,mass));                      
+    can_BSMsig.SaveAs("limitFigs%s/BSMLim%s_Sigma_vsBRnew_%i.pdf"%(SIGCH,SIGCH,mass));  
 
 
 ############################################################
@@ -593,34 +609,34 @@ def makeBSMLimits_2D( SIGCH, mass ):
     h2d_exp.Draw("colz");
     banner.Draw();
     banner2.Draw();
-    can1_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ExpMu_%i.eps"%(SIGCH,mass));                      
-    can1_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ExpMu_%i.png"%(SIGCH,mass));                      
-    can1_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ExpMu_%i.pdf"%(SIGCH,mass));          
+    can1_BSM2D.SaveAs("limitFigs%s/BSMLim%s_2D_ExpMu_%i.eps"%(SIGCH,SIGCH,mass));                      
+    can1_BSM2D.SaveAs("limitFigs%s/BSMLim%s_2D_ExpMu_%i.png"%(SIGCH,SIGCH,mass));                      
+    can1_BSM2D.SaveAs("limitFigs%s/BSMLim%s_2D_ExpMu_%i.pdf"%(SIGCH,SIGCH,mass));          
 
     can2_BSM2D = ROOT.TCanvas("can2_BSM2D","can2_BSM2D",1000,800);
     h2d_obs.Draw("colz");
     banner.Draw();
     banner2.Draw();
-    can2_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ObsMu_%i.eps"%(SIGCH,mass));                      
-    can2_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ObsMu_%i.png"%(SIGCH,mass));                      
-    can2_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ObsMu_%i.pdf"%(SIGCH,mass));          
+    can2_BSM2D.SaveAs("limitFigs%s/BSMLim%s_2D_ObsMu_%i.eps"%(SIGCH,SIGCH,mass));                      
+    can2_BSM2D.SaveAs("limitFigs%s/BSMLim%s_2D_ObsMu_%i.png"%(SIGCH,SIGCH,mass));                      
+    can2_BSM2D.SaveAs("limitFigs%s/BSMLim%s_2D_ObsMu_%i.pdf"%(SIGCH,SIGCH,mass));          
     
     can3_BSM2D = ROOT.TCanvas("can3_BSM2D","can3_BSM2D",1000,800);
     h2d_csXbr_exp.Draw("colz");
     banner.Draw();
     banner2.Draw();
-    can3_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ExpSigma_%i.eps"%(SIGCH,mass));                      
-    can3_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ExpSigma_%i.png"%(SIGCH,mass));                      
-    can3_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ExpSigma_%i.pdf"%(SIGCH,mass));          
+    can3_BSM2D.SaveAs("limitFigs%s/BSMLim%s_2D_ExpSigma_%i.eps"%(SIGCH,SIGCH,mass));                      
+    can3_BSM2D.SaveAs("limitFigs%s/BSMLim%s_2D_ExpSigma_%i.png"%(SIGCH,SIGCH,mass));                      
+    can3_BSM2D.SaveAs("limitFigs%s/BSMLim%s_2D_ExpSigma_%i.pdf"%(SIGCH,SIGCH,mass));          
 
     
     can4_BSM2D = ROOT.TCanvas("can4_BSM2D","can4_BSM2D",1000,800);
     h2d_csXbr_obs.Draw("colz");
     banner.Draw();
     banner2.Draw();
-    can4_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ObsSigma_%i.eps"%(SIGCH,mass));                      
-    can4_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ObsSigma_%i.png"%(SIGCH,mass));                      
-    can4_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ObsSigma_%i.pdf"%(SIGCH,mass));          
+    can4_BSM2D.SaveAs("limitFigs%s/BSMLim%s_2D_ObsSigma_%i.eps"%(SIGCH,SIGCH,mass));                      
+    can4_BSM2D.SaveAs("limitFigs%s/BSMLim%s_2D_ObsSigma_%i.png"%(SIGCH,SIGCH,mass));                      
+    can4_BSM2D.SaveAs("limitFigs%s/BSMLim%s_2D_ObsSigma_%i.pdf"%(SIGCH,SIGCH,mass));          
 
     ##----
 
@@ -646,16 +662,15 @@ def makeBSMLimits_2D( SIGCH, mass ):
 ##########################################################################################
 
 if __name__ == '__main__':
-    
-    
+
+
     ###############
-    
+
     CHAN = options.channel;
     DIR = "cards_"+CHAN;
     SIGCH = "";
     if options.sigChannel.find("H") >= 0: SIGCH = "_"+options.sigChannel;
-        
-    
+
     mass  = [ 600, 700, 800, 900,1000]
     ccmlo = [ 550, 600, 700, 750, 800]  
     ccmhi = [ 700, 850, 950,1100,1200]  
@@ -665,7 +680,7 @@ if __name__ == '__main__':
     mhi   = [1000,1000,1400,1400,1400]          
     shape    = ["ErfPowExp_v1","ErfPowExp_v1","Exp","Exp","Exp"]
     shapeAlt = [  "ErfPow2_v1",  "ErfPow2_v1","Pow","Pow","Pow"]
-        
+
     BRnew = [0,1,2,3,4,5];
     cprime = [1,2,3,4,5,6,7,8,9,10];    
     massCS  = [];
@@ -677,7 +692,7 @@ if __name__ == '__main__':
     massBRWW = [5.58E-01,5.77E-01,5.94E-01,6.09E-01,6.21E-01]
 
     moreCombineOpts = "";
-    
+
     ###############
 
     if options.computeLimits or options.plotLimits: os.chdir("cards_em");
@@ -692,7 +707,7 @@ if __name__ == '__main__':
     nBRnews = len(BRnew);
     brLo = 0;
     brHi = nBRnews;
-    
+
     if options.massPoint > 0:   
         curIndex = mass.index(options.massPoint);
         mLo = curIndex;
@@ -710,9 +725,9 @@ if __name__ == '__main__':
 
 
 # =====================================
-    
+
     nGraphs = nCprimes*2 + 2;
-    
+
     tGraphs = [];
     tGraphs_csXbr_exp = [];
     tGraphs_csXbr_obs = [];
@@ -721,9 +736,10 @@ if __name__ == '__main__':
     tGraphs_csXbr_obs = [];
 
     nPoints = len(mass);
-    
+
     if options.plotLimits:
-        
+        if not os.path.isdir("limitFigs%s"%(SIGCH)): os.system("mkdir -p limitFigs%s"%(SIGCH));
+
         makeSMLimits( SIGCH );
         cprimes = [3,6,8,10];    
         makeBSMLimits_vsMass( SIGCH, cprimes );
@@ -734,4 +750,4 @@ if __name__ == '__main__':
         makeBSMLimits_vsBRnew( SIGCH, cprimes, 1000 );
 
         makeBSMLimits_2D( SIGCH, 600 );
-        
+
