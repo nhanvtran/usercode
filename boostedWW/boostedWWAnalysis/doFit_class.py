@@ -2688,16 +2688,16 @@ class doFit_wj_and_wlvj:
                 # for multi-sample, like STop and VV. There are two sample, and two wSampleWeight_value.Use the least wSampleWeight as scale. 
                 tmp_event_weight4fit=tmp_event_weight4fit*treeIn.wSampleWeight/tmp_scale_to_lumi
 
-                if TString(label).Contains("ggH"):
+                if TString(label).Contains("ggH") or TString(label).Contains("vbfH"):
                     tmp_event_weight=tmp_event_weight/self.higgs_xs_scale; 
                     tmp_event_weight4fit=tmp_event_weight4fit/self.higgs_xs_scale; 
                     ## added by Nhan
                     tmp_event_weight=tmp_event_weight*tmp_bsmWeight;
                     tmp_event_weight4fit=tmp_event_weight4fit*tmp_bsmWeight;
 
-                if TString(label).Contains("vbfH"):
-                    tmp_event_weight=tmp_event_weight/self.higgs_xs_scale; 
-                    tmp_event_weight4fit=tmp_event_weight4fit/self.higgs_xs_scale; 
+                #if TString(label).Contains("vbfH"):
+                #    tmp_event_weight=tmp_event_weight/self.higgs_xs_scale; 
+                #    tmp_event_weight4fit=tmp_event_weight4fit/self.higgs_xs_scale; 
 
                 #wtagger_eff_reweight
                 if not label=="_data": 
@@ -4644,9 +4644,9 @@ def control_single_sb_correction(method, channel, higgs_sample="ggH600", in_mlvj
 
 def pre_limit_simple(channel):
     print "pre_limit_simple for %s sampel"%(channel)
-    #pre_limit_sb_correction_without_systermatic(channel, "ggH600",550, 700,40,130,400,1000,"ErfPowExp_v1","ErfPow2_v1");
+    pre_limit_sb_correction_without_systermatic(channel, "ggH600",550, 700,40,130,400,1000,"ErfPowExp_v1","ErfPow2_v1");
     #pre_limit_sb_correction_without_systermatic(channel, "ggH700",600, 850,40,130,400,1000,"ErfPowExp_v1","ErfPow2_v1");
-    pre_limit_sb_correction_without_systermatic(channel, "ggH800",700, 950,40,130,600,1400,"Exp","Pow")
+    #pre_limit_sb_correction_without_systermatic(channel, "ggH800",700, 950,40,130,600,1400,"Exp","Pow")
     #pre_limit_sb_correction_without_systermatic(channel, "ggH900",750,1100,40,130,600,1400,"Exp","Pow")
     #pre_limit_sb_correction_without_systermatic(channel,"ggH1000",800,1200,40,130,600,1400,"Exp","Pow")
 
