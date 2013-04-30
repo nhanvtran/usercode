@@ -450,7 +450,7 @@ def makeBSMLimits_vsBRnew( SIGCH, cprimes, mass ):
     hrl_BSM = can_BSM.DrawFrame(-0.01,0.0,0.51,gridMax*1.5);
     hrl_BSM.GetYaxis().SetTitle("#mu = #sigma_{95%} / #sigma_{SM}");
     hrl_BSM.GetYaxis().SetTitleOffset(1.4);
-    hrl_BSM.GetXaxis().SetTitle("Higgs boson mass (GeV)");
+    hrl_BSM.GetXaxis().SetTitle("BR_{new}");
     can_BSM.SetGrid();
     
     leg2 = ROOT.TLegend(0.25,0.65,0.75,0.85);
@@ -487,7 +487,7 @@ def makeBSMLimits_vsBRnew( SIGCH, cprimes, mass ):
     hrl_BSMsig = can_BSMsig.DrawFrame(-0.01,0.0,0.51,gridMaxSig*1.8);
     hrl_BSMsig.GetYaxis().SetTitle("#sigma_{95%} #times BR_{WW} (pb)");
     hrl_BSMsig.GetYaxis().SetTitleOffset(1.4);
-    hrl_BSMsig.GetXaxis().SetTitle("Higgs boson mass (GeV)");
+    hrl_BSMsig.GetXaxis().SetTitle("BR_{new}");
     can_BSMsig.SetGrid();
     
     leg2 = ROOT.TLegend(0.2,0.65,0.85,0.85);
