@@ -680,7 +680,7 @@ if __name__ == '__main__':
     
     ###############
 
-    if options.computeLimits or options.plotLimits: os.chdir("BSM_Apr28");
+    if options.computeLimits or options.plotLimits: os.chdir("cards_em");
 
     # put in functionality to test just one mass point or just one cprime
     nMasses = len(mass);
