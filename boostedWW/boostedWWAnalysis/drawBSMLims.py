@@ -10,6 +10,7 @@ from array import array
 
 import ROOT
 from ROOT import gROOT, gStyle, gSystem, TLatex
+from ROOT import *
 import subprocess
 from subprocess import Popen
 from optparse import OptionParser
@@ -17,6 +18,8 @@ from optparse import OptionParser
 #from condorUtils import submitBatchJob
 
 ROOT.gStyle.SetPadLeftMargin(0.16);
+ROOT.gStyle.SetPadRightMargin(0.16);
+ROOT.gStyle.SetOptStat(0);
 
 ############################################################
 ############################################
@@ -97,7 +100,7 @@ def makeSMLimits(SIGCH):
     
     for i in range(len(mass)):
         curFile = "higgsCombinehwwlvj_ggH%03d_em%s_%02d_%02d_unbin.Asymptotic.mH%03d.root"%(mass[i],SIGCH,cprime,brnew,mass[i]);
-        print "curFile: ",curFile
+        #print "curFile: ",curFile
         curAsymLimits = getAsymLimits(curFile);
         xbins.append( mass[i] );
         xbins_env.append( mass[i] );                                
@@ -128,13 +131,13 @@ def makeSMLimits(SIGCH):
     curGraph_2s.SetFillColor(ROOT.kYellow);
 
     # -------
-    banner = TLatex(0.4,0.91,("CMS Preliminary, 19.3 fb^{-1} at #sqrt{s}=8TeV, e+#mu"));
+    banner = TLatex(0.44,0.91,("CMS Preliminary, 19.3 fb^{-1} at #sqrt{s}=8TeV, e+#mu"));
     banner.SetNDC(); banner.SetTextSize(0.028);
     oneLine = ROOT.TF1("oneLine","1",599,1001);
     oneLine.SetLineColor(ROOT.kRed);
     oneLine.SetLineWidth(3);
 
-    can_SM = ROOT.TCanvas("can_SM","can_SM",800,800);
+    can_SM = ROOT.TCanvas("can_SM","can_SM",1000,800);
     hrl_SM = can_SM.DrawFrame(599,0.0,1001,10.0);
     hrl_SM.GetYaxis().SetTitle("#mu = #sigma_{95%} / #sigma_{SM}");
     hrl_SM.GetYaxis().SetTitleOffset(1.4);
@@ -168,8 +171,10 @@ def makeSMLimits(SIGCH):
 ############################################################
 ############################################################
 
-def makeBSMLimits_versusSigmaAndMu( SIGCH, cprimes ):
+def makeBSMLimits_vsMass( SIGCH, cprimes ):
 
+    print "module ===> makeBSMLimits_vsMass";
+    
     mass  = [ 600, 700, 800, 900,1000]    
     curcolors = [1,2,4,6]
     brnew = 00;
@@ -217,19 +222,19 @@ def makeBSMLimits_versusSigmaAndMu( SIGCH, cprimes ):
         
         for i in range(len(mass)):
             curFile = "higgsCombinehwwlvj_ggH%03d_em%s_%02d_%02d_unbin.Asymptotic.mH%03d.root"%(mass[i],SIGCH,cprimes[j],brnew,mass[i]);
-            print "curFile: ",curFile
+            #print "curFile: ",curFile
             curAsymLimits = getAsymLimits(curFile);
             xbins.append( mass[i] );
             ybins_exp.append( curAsymLimits[3] );                
             ybins_obs.append( curAsymLimits[0] );    
-            ybins_csXbr_exp.append( curAsymLimits[3]*massCS[i]*cprime[j]*0.1*(1-brnew*0.1)*massBRWW[i] );                
-            ybins_csXbr_obs.append( curAsymLimits[0]*massCS[i]*cprime[j]*0.1*(1-brnew*0.1)*massBRWW[i] );    
-            ybins_csXbr_th.append( 1.*massCS[i]*cprime[j]*0.1*(1-brnew*0.1)*massBRWW[i] );    
+            ybins_csXbr_exp.append( curAsymLimits[3]*massCS[i]*cprimes[j]*0.1*(1-brnew*0.1)*massBRWW[i] );                
+            ybins_csXbr_obs.append( curAsymLimits[0]*massCS[i]*cprimes[j]*0.1*(1-brnew*0.1)*massBRWW[i] );    
+            ybins_csXbr_th.append( 1.*massCS[i]*cprimes[j]*0.1*(1-brnew*0.1)*massBRWW[i] );    
         
-            print "curAsymLimits[0]: ",curAsymLimits[0]
+            #print "curAsymLimits[0]: ",curAsymLimits[0]
             
             if gridMax < curAsymLimits[3]: gridMax = curAsymLimits[3];
-            cscur = ( curAsymLimits[3]*massCS[i]*cprime[j]*0.1*(1-brnew*0.1)*massBRWW[i] );
+            cscur = ( curAsymLimits[3]*massCS[i]*cprimes[j]*0.1*(1-brnew*0.1)*massBRWW[i] );
             if gridMaxSig < cscur: gridMaxSig = cscur;
         
         curGraph_exp = ROOT.TGraph(nPoints,xbins,ybins_exp);
@@ -257,10 +262,13 @@ def makeBSMLimits_versusSigmaAndMu( SIGCH, cprimes ):
         tGraphs_csXbr_th.append( curGraph_csXbr_th );
 
     # -------
-    banner = TLatex(0.4,0.91,("CMS Preliminary, 19.3 fb^{-1} at #sqrt{s}=8TeV, e+#mu"));
+    banner = TLatex(0.44,0.91,("CMS Preliminary, 19.3 fb^{-1} at #sqrt{s}=8TeV, e+#mu"));
     banner.SetNDC(); banner.SetTextSize(0.028);
+
+    banner2 = TLatex(0.17,0.91,("BR_{new} = 0"));
+    banner2.SetNDC(); banner2.SetTextSize(0.028);
     
-    can_BSM = ROOT.TCanvas("can_BSM","can_BSM",800,800);
+    can_BSM = ROOT.TCanvas("can_BSM","can_BSM",1000,800);
     hrl_BSM = can_BSM.DrawFrame(599,0.0,1001,gridMax*1.5);
     hrl_BSM.GetYaxis().SetTitle("#mu = #sigma_{95%} / #sigma_{SM}");
     hrl_BSM.GetYaxis().SetTitleOffset(1.4);
@@ -273,7 +281,7 @@ def makeBSMLimits_versusSigmaAndMu( SIGCH, cprimes ):
     leg2.SetNColumns(2);
 
     for k in range(len(cprimes)):
-        print cprime[k]
+        #print cprime[k]
         tGraphs_exp[k].SetLineStyle(2);
         tGraphs_exp[k].SetLineColor(curcolors[k]);
         tGraphs_obs[k].SetLineColor(curcolors[k]);                
@@ -282,14 +290,15 @@ def makeBSMLimits_versusSigmaAndMu( SIGCH, cprimes ):
         tGraphs_exp[k].Draw("PL");
         tGraphs_obs[k].Draw("PL");   
 
-        tmplabel = "exp., C'^{2} = %1.1f    "%( float((cprimes[k])/10.) )
+        tmplabel = "exp., C'^{ 2} = %1.1f    "%( float((cprimes[k])/10.) )
         leg2.AddEntry(tGraphs_exp[k],tmplabel,"L")        
-        tmplabel = "obs., C'^{2} = %1.1f"%( float((cprimes[k])/10.) )
+        tmplabel = "obs., C'^{ 2} = %1.1f"%( float((cprimes[k])/10.) )
         leg2.AddEntry(tGraphs_obs[k],tmplabel,"L");        
     
     leg2.Draw();
     banner.Draw();
-    
+    banner2.Draw();
+
     #ROOT.gPad.SetLogy();
     can_BSM.SaveAs("limitFigs/BSMLim%s_Mu.eps"%(SIGCH));                      
     can_BSM.SaveAs("limitFigs/BSMLim%s_Mu.png"%(SIGCH));                      
@@ -297,9 +306,9 @@ def makeBSMLimits_versusSigmaAndMu( SIGCH, cprimes ):
 
     ##----
 
-    can_BSMsig = ROOT.TCanvas("can_BSMsig","can_BSMsig",800,800);
+    can_BSMsig = ROOT.TCanvas("can_BSMsig","can_BSMsig",1000,800);
     hrl_BSMsig = can_BSMsig.DrawFrame(599,0.0,1001,gridMaxSig*1.8);
-    hrl_BSMsig.GetYaxis().SetTitle("#sigma_{95%} (pb)");
+    hrl_BSMsig.GetYaxis().SetTitle("#sigma_{95%} #times BR_{WW} (pb)");
     hrl_BSMsig.GetYaxis().SetTitleOffset(1.4);
     hrl_BSMsig.GetXaxis().SetTitle("Higgs boson mass (GeV)");
     can_BSMsig.SetGrid();
@@ -310,7 +319,6 @@ def makeBSMLimits_versusSigmaAndMu( SIGCH, cprimes ):
     leg2.SetNColumns(3);
 
     for k in range(len(cprimes)):
-        print cprime[k]
         tGraphs_csXbr_exp[k].SetLineStyle(2);
         tGraphs_csXbr_exp[k].SetLineColor(curcolors[k]);
         tGraphs_csXbr_obs[k].SetLineColor(curcolors[k]);                
@@ -322,20 +330,300 @@ def makeBSMLimits_versusSigmaAndMu( SIGCH, cprimes ):
         tGraphs_csXbr_obs[k].Draw("PL");   
         tGraphs_csXbr_th[k].Draw("PL");   
         
-        tmplabel = "exp., C'^{2} = %1.1f    "%( float((cprimes[k])/10.) )
+        tmplabel = "exp., C'^{ 2} = %1.1f    "%( float((cprimes[k])/10.) )
         leg2.AddEntry(tGraphs_csXbr_exp[k],tmplabel,"L")        
-        tmplabel = "obs., C'^{2} = %1.1f    "%( float((cprimes[k])/10.) )
+        tmplabel = "obs., C'^{ 2} = %1.1f    "%( float((cprimes[k])/10.) )
         leg2.AddEntry(tGraphs_csXbr_obs[k],tmplabel,"L");        
-        tmplabel = "th., C'^{2} = %1.1f"%( float((cprimes[k])/10.) )
+        tmplabel = "th., C'^{ 2} = %1.1f"%( float((cprimes[k])/10.) )
         leg2.AddEntry(tGraphs_csXbr_th[k],tmplabel,"L");        
 
     leg2.Draw();
     banner.Draw();
+    banner2.Draw();
 
     #ROOT.gPad.SetLogy();
     can_BSMsig.SaveAs("limitFigs/BSMLim%s_Sigma.eps"%(SIGCH));                      
     can_BSMsig.SaveAs("limitFigs/BSMLim%s_Sigma.png"%(SIGCH));                      
     can_BSMsig.SaveAs("limitFigs/BSMLim%s_Sigma.pdf"%(SIGCH));  
+
+############################################################
+############################################################
+############################################################
+
+def makeBSMLimits_vsBRnew( SIGCH, cprimes, mass ):
+    
+    print "module ===> makeBSMLimits_vsBRnew";
+    
+    curcolors = [1,2,4,6]
+    brnews = [00,01,02,03,04,05];
+    massindex = {600:0,700:1,800:2,900:3,1000:4}
+    massCS  = [];
+    if SIGCH == "":
+        massCS.append( (0.5230 + 0.09688) );
+        massCS.append( (0.2288 + 0.06330) );
+        massCS.append( (0.1095 + 0.04365) );
+        massCS.append( (0.05684 + 0.03164) );
+        massCS.append( (0.03163 + 0.02399) );
+    elif SIGCH == "_ggH":
+        massCS.append( (0.5230) );
+        massCS.append( (0.2288) );
+        massCS.append( (0.1095) );
+        massCS.append( (0.05684) );
+        massCS.append( (0.03163) );
+    elif SIGCH == "_vbfH":
+        massCS.append( (0.09688) );
+        massCS.append( (0.06330) );
+        massCS.append( (0.04365) );
+        massCS.append( (0.03164) );
+        massCS.append( (0.02399) );
+    else:
+        print "problem!"
+    massBRWW = [5.58E-01,5.77E-01,5.94E-01,6.09E-01,6.21E-01]    
+    
+    gridMax = -999;
+    gridMaxSig = -999;
+    
+    tGraphs_exp = [];
+    tGraphs_obs = [];    
+    tGraphs_csXbr_exp = [];
+    tGraphs_csXbr_obs = [];    
+    tGraphs_csXbr_th = [];    
+    
+    for j in range(len(cprimes)):
+        
+        xbins = array('d', [])
+        ybins_exp = array('d', [])
+        ybins_obs = array('d', [])            
+        ybins_csXbr_exp = array('d', [])
+        ybins_csXbr_obs = array('d', [])            
+        ybins_csXbr_th = array('d', [])            
+        
+        for i in range(len(brnews)):
+            curFile = "higgsCombinehwwlvj_ggH%03d_em%s_%02d_%02d_unbin.Asymptotic.mH%03d.root"%(mass,SIGCH,cprimes[j],brnews[i],mass);
+            #print "curFile: ",curFile
+            curAsymLimits = getAsymLimits(curFile);
+            xbins.append( brnews[i] );
+            ybins_exp.append( curAsymLimits[3] );                
+            ybins_obs.append( curAsymLimits[0] );    
+            ybins_csXbr_exp.append( curAsymLimits[3]*massCS[massindex[mass]]*cprimes[j]*0.1*(1-brnews[i]*0.1)*massBRWW[massindex[mass]] );                
+            ybins_csXbr_obs.append( curAsymLimits[0]*massCS[massindex[mass]]*cprimes[j]*0.1*(1-brnews[i]*0.1)*massBRWW[massindex[mass]] );    
+            ybins_csXbr_th.append( 1.*massCS[massindex[mass]]*cprimes[j]*0.1*(1-brnews[i]*0.1)*massBRWW[massindex[mass]] );    
+            
+            #print "curAsymLimits[0]: ",curAsymLimits[0]
+            
+            if gridMax < curAsymLimits[3]: gridMax = curAsymLimits[3];
+            cscur = ( curAsymLimits[3]*massCS[massindex[mass]]*cprimes[j]*0.1*(1-brnews[i]*0.1)*massBRWW[massindex[mass]] );
+            if gridMaxSig < cscur: gridMaxSig = cscur;
+        
+        curGraph_exp = ROOT.TGraph(nPoints,xbins,ybins_exp);
+        curGraph_obs = ROOT.TGraph(nPoints,xbins,ybins_obs);        
+        curGraph_exp.SetLineStyle(2);
+        curGraph_exp.SetLineWidth(2);
+        curGraph_obs.SetLineWidth(2);                    
+        curGraph_exp.SetMarkerSize(2);
+        curGraph_obs.SetMarkerSize(2);
+        
+        curGraph_csXbr_exp = ROOT.TGraph(nPoints,xbins,ybins_csXbr_exp);
+        curGraph_csXbr_obs = ROOT.TGraph(nPoints,xbins,ybins_csXbr_obs);        
+        curGraph_csXbr_th = ROOT.TGraph(nPoints,xbins,ybins_csXbr_th);
+        curGraph_csXbr_exp.SetLineStyle(2);
+        curGraph_csXbr_exp.SetLineWidth(2);
+        curGraph_csXbr_obs.SetLineWidth(2);                    
+        curGraph_csXbr_exp.SetMarkerSize(2);
+        curGraph_csXbr_obs.SetMarkerSize(2);
+        curGraph_csXbr_th.SetLineWidth(2);        
+        
+        tGraphs_exp.append( curGraph_exp );
+        tGraphs_obs.append( curGraph_obs );
+        tGraphs_csXbr_exp.append( curGraph_csXbr_exp );
+        tGraphs_csXbr_obs.append( curGraph_csXbr_obs );
+        tGraphs_csXbr_th.append( curGraph_csXbr_th );
+    
+    # -------
+    banner = TLatex(0.44,0.91,("CMS Preliminary, 19.3 fb^{-1} at #sqrt{s}=8TeV, e+#mu"));
+    banner.SetNDC(); banner.SetTextSize(0.028);
+
+    banner2 = TLatex(0.17,0.91,("Higgs mass, %i GeV"%(mass)));
+    banner2.SetNDC(); banner2.SetTextSize(0.028);
+    
+    can_BSM = ROOT.TCanvas("can_BSM","can_BSM",1000,800);
+    hrl_BSM = can_BSM.DrawFrame(-0.01,0.0,0.51,gridMax*1.5);
+    hrl_BSM.GetYaxis().SetTitle("#mu = #sigma_{95%} / #sigma_{SM}");
+    hrl_BSM.GetYaxis().SetTitleOffset(1.4);
+    hrl_BSM.GetXaxis().SetTitle("Higgs boson mass (GeV)");
+    can_BSM.SetGrid();
+    
+    leg2 = ROOT.TLegend(0.25,0.65,0.75,0.85);
+    leg2.SetFillStyle(0);
+    leg2.SetBorderSize(0);
+    leg2.SetNColumns(2);
+    
+    for k in range(len(cprimes)):
+        tGraphs_exp[k].SetLineStyle(2);
+        tGraphs_exp[k].SetLineColor(curcolors[k]);
+        tGraphs_obs[k].SetLineColor(curcolors[k]);                
+        tGraphs_exp[k].SetLineWidth(2);
+        tGraphs_obs[k].SetLineWidth(2);                
+        tGraphs_exp[k].Draw("PL");
+        tGraphs_obs[k].Draw("PL");   
+        
+        tmplabel = "exp., C'^{ 2} = %1.1f    "%( float((cprimes[k])/10.) )
+        leg2.AddEntry(tGraphs_exp[k],tmplabel,"L")        
+        tmplabel = "obs., C'^{ 2} = %1.1f"%( float((cprimes[k])/10.) )
+        leg2.AddEntry(tGraphs_obs[k],tmplabel,"L");        
+    
+    leg2.Draw();
+    banner.Draw();
+    banner2.Draw();
+
+    #ROOT.gPad.SetLogy();
+    can_BSM.SaveAs("limitFigs/BSMLim%s_Mu_vsBRnew_%i.eps"%(SIGCH,mass));                      
+    can_BSM.SaveAs("limitFigs/BSMLim%s_Mu_vsBRnew_%i.png"%(SIGCH,mass));                      
+    can_BSM.SaveAs("limitFigs/BSMLim%s_Mu_vsBRnew_%i.pdf"%(SIGCH,mass));          
+    
+    ##----
+    
+    can_BSMsig = ROOT.TCanvas("can_BSMsig","can_BSMsig",1000,800);
+    hrl_BSMsig = can_BSMsig.DrawFrame(-0.01,0.0,0.51,gridMaxSig*1.8);
+    hrl_BSMsig.GetYaxis().SetTitle("#sigma_{95%} #times BR_{WW} (pb)");
+    hrl_BSMsig.GetYaxis().SetTitleOffset(1.4);
+    hrl_BSMsig.GetXaxis().SetTitle("Higgs boson mass (GeV)");
+    can_BSMsig.SetGrid();
+    
+    leg2 = ROOT.TLegend(0.2,0.65,0.85,0.85);
+    leg2.SetFillStyle(0);
+    leg2.SetBorderSize(0);
+    leg2.SetNColumns(3);
+    
+    for k in range(len(cprimes)):
+        tGraphs_csXbr_exp[k].SetLineStyle(2);
+        tGraphs_csXbr_exp[k].SetLineColor(curcolors[k]);
+        tGraphs_csXbr_obs[k].SetLineColor(curcolors[k]);                
+        tGraphs_csXbr_th[k].SetLineStyle(3);
+        tGraphs_csXbr_th[k].SetLineColor(curcolors[k]);                        
+        tGraphs_csXbr_exp[k].SetLineWidth(2);
+        tGraphs_csXbr_obs[k].SetLineWidth(2);                
+        tGraphs_csXbr_exp[k].Draw("PL");
+        tGraphs_csXbr_obs[k].Draw("PL");   
+        tGraphs_csXbr_th[k].Draw("PL");   
+        
+        tmplabel = "exp., C'^{ 2} = %1.1f    "%( float((cprimes[k])/10.) )
+        leg2.AddEntry(tGraphs_csXbr_exp[k],tmplabel,"L")        
+        tmplabel = "obs., C'^{ 2} = %1.1f    "%( float((cprimes[k])/10.) )
+        leg2.AddEntry(tGraphs_csXbr_obs[k],tmplabel,"L");        
+        tmplabel = "th., C'^{ 2} = %1.1f"%( float((cprimes[k])/10.) )
+        leg2.AddEntry(tGraphs_csXbr_th[k],tmplabel,"L");        
+    
+    leg2.Draw();
+    banner.Draw();
+    banner2.Draw();
+
+    #ROOT.gPad.SetLogy();
+    can_BSMsig.SaveAs("limitFigs/BSMLim%s_Sigma_vsBRnew_%i.eps"%(SIGCH,mass));                      
+    can_BSMsig.SaveAs("limitFigs/BSMLim%s_Sigma_vsBRnew_%i.png"%(SIGCH,mass));                      
+    can_BSMsig.SaveAs("limitFigs/BSMLim%s_Sigma_vsBRnew_%i.pdf"%(SIGCH,mass));  
+
+
+############################################################
+############################################################
+############################################################
+
+def makeBSMLimits_2D( SIGCH, mass ):
+    
+    print "module ===> makeBSMLimits_2D";
+    
+    cprimes = [1,2,3,4,5,6,7,8,9,10];
+    brnews = [00,01,02,03,04,05];
+    massindex = {600:0,700:1,800:2,900:3,1000:4}
+    massCS  = [];
+    if SIGCH == "":
+        massCS.append( (0.5230 + 0.09688) );
+        massCS.append( (0.2288 + 0.06330) );
+        massCS.append( (0.1095 + 0.04365) );
+        massCS.append( (0.05684 + 0.03164) );
+        massCS.append( (0.03163 + 0.02399) );
+    elif SIGCH == "_ggH":
+        massCS.append( (0.5230) );
+        massCS.append( (0.2288) );
+        massCS.append( (0.1095) );
+        massCS.append( (0.05684) );
+        massCS.append( (0.03163) );
+    elif SIGCH == "_vbfH":
+        massCS.append( (0.09688) );
+        massCS.append( (0.06330) );
+        massCS.append( (0.04365) );
+        massCS.append( (0.03164) );
+        massCS.append( (0.02399) );
+    else:
+        print "problem!"
+    massBRWW = [5.58E-01,5.77E-01,5.94E-01,6.09E-01,6.21E-01]    
+            
+    h2d_exp = TH2D("h2d_exp",";BR_{new};C'^{ 2};#mu = #sigma_{95%} / #sigma_{SM}",6,-0.05,0.55,10,0.05,1.05);
+    h2d_obs = TH2D("h2d_obs",";BR_{new};C'^{ 2};#mu = #sigma_{95%} / #sigma_{SM}",6,-0.05,0.55,10,0.05,1.05);
+    h2d_csXbr_exp = TH2D("h2d_csXbr_exp",";BR_{new};C'^{ 2};#sigma_{95%} #times BR_{WW} (pb)",6,-0.05,0.55,10,0.05,1.05);
+    h2d_csXbr_obs = TH2D("h2d_csXbr_obs",";BR_{new};C'^{ 2};#sigma_{95%} #times BR_{WW} (pb)",6,-0.05,0.55,10,0.05,1.05);    
+    
+    for j in range(len(cprimes)):
+        for i in range(len(brnews)):
+            curFile = "higgsCombinehwwlvj_ggH%03d_em%s_%02d_%02d_unbin.Asymptotic.mH%03d.root"%(mass,SIGCH,cprimes[j],brnews[i],mass);
+            curAsymLimits = getAsymLimits(curFile);
+            h2d_exp.SetBinContent( i+1, j+1, curAsymLimits[3] );
+            h2d_obs.SetBinContent( i+1, j+1, curAsymLimits[0] );
+            h2d_csXbr_exp.SetBinContent( i+1, j+1, curAsymLimits[3]*massCS[massindex[mass]]*cprimes[j]*0.1*(1-brnews[i]*0.1)*massBRWW[massindex[mass]] );
+            h2d_csXbr_obs.SetBinContent( i+1, j+1, curAsymLimits[0]*massCS[massindex[mass]]*cprimes[j]*0.1*(1-brnews[i]*0.1)*massBRWW[massindex[mass]] );
+
+    h2d_exp.GetZaxis().SetTitleOffset(1.4);
+    h2d_obs.GetZaxis().SetTitleOffset(1.4);
+    h2d_csXbr_exp.GetZaxis().SetTitleOffset(1.4);
+    h2d_csXbr_obs.GetZaxis().SetTitleOffset(1.4);
+
+    h2d_exp.GetZaxis().RotateTitle(1);
+    h2d_obs.GetZaxis().RotateTitle(1);
+    h2d_csXbr_exp.GetZaxis().RotateTitle(1);
+    h2d_csXbr_obs.GetZaxis().RotateTitle(1);
+
+    # -------
+    banner = TLatex(0.44,0.91,("CMS Preliminary, 19.3 fb^{-1} at #sqrt{s}=8TeV, e+#mu"));
+    banner.SetNDC(); banner.SetTextSize(0.028);
+
+    banner2 = TLatex(0.17,0.91,("Higgs mass, %i GeV"%(mass)));
+    banner2.SetNDC(); banner2.SetTextSize(0.028);
+
+    can1_BSM2D = ROOT.TCanvas("can1_BSM2D","can1_BSM2D",1000,800);
+    h2d_exp.Draw("colz");
+    banner.Draw();
+    banner2.Draw();
+    can1_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ExpMu_%i.eps"%(SIGCH,mass));                      
+    can1_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ExpMu_%i.png"%(SIGCH,mass));                      
+    can1_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ExpMu_%i.pdf"%(SIGCH,mass));          
+
+    can2_BSM2D = ROOT.TCanvas("can2_BSM2D","can2_BSM2D",1000,800);
+    h2d_obs.Draw("colz");
+    banner.Draw();
+    banner2.Draw();
+    can2_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ObsMu_%i.eps"%(SIGCH,mass));                      
+    can2_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ObsMu_%i.png"%(SIGCH,mass));                      
+    can2_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ObsMu_%i.pdf"%(SIGCH,mass));          
+    
+    can3_BSM2D = ROOT.TCanvas("can3_BSM2D","can3_BSM2D",1000,800);
+    h2d_csXbr_exp.Draw("colz");
+    banner.Draw();
+    banner2.Draw();
+    can3_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ExpSigma_%i.eps"%(SIGCH,mass));                      
+    can3_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ExpSigma_%i.png"%(SIGCH,mass));                      
+    can3_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ExpSigma_%i.pdf"%(SIGCH,mass));          
+
+    
+    can4_BSM2D = ROOT.TCanvas("can4_BSM2D","can4_BSM2D",1000,800);
+    h2d_csXbr_obs.Draw("colz");
+    banner.Draw();
+    banner2.Draw();
+    can4_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ObsSigma_%i.eps"%(SIGCH,mass));                      
+    can4_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ObsSigma_%i.png"%(SIGCH,mass));                      
+    can4_BSM2D.SaveAs("limitFigs/BSMLim%s_2D_ObsSigma_%i.pdf"%(SIGCH,mass));          
+
+    ##----
+
 
 
 ##########################################################################################
@@ -392,7 +680,7 @@ if __name__ == '__main__':
     
     ###############
 
-    if options.computeLimits or options.plotLimits: os.chdir("cards_em");
+    if options.computeLimits or options.plotLimits: os.chdir("BSM_Apr28");
 
     # put in functionality to test just one mass point or just one cprime
     nMasses = len(mass);
@@ -438,248 +726,12 @@ if __name__ == '__main__':
         
         makeSMLimits( SIGCH );
         cprimes = [3,6,8,10];    
-        makeBSMLimits_versusSigmaAndMu( SIGCH, cprimes );
-#        makeBSMLimits_2D( SIGCH );
-        
-        
-#        ##        for i in range(mLo,mHi):
-#        ##            for j in range(cpLo,cpHi):
-#        for j in range(cpHi-1,cpLo-1,-1):
-#            
-#            xbins = array('d', [])
-#            xbins_brnew = array('d', [])
-#            ybins_exp = array('d', [])
-#            ybins_obs = array('d', [])            
-#            ybins_exp_csXbr_exp = array('d', [])
-#            ybins_obs_csXbr_obs = array('d', [])            
-#            ybins_csXbr_vsBRnew_exp = array('d', [])
-#            ybins_csXbr_vsBRnew_obs = array('d', [])            
-#            xbins_env = array('d', [])
-#            ybins_1s = array('d', [])                        
-#            ybins_2s = array('d', [])                        
-#            
-#            for i in range(mLo,mHi):
-#                
-#                curFile = "higgsCombinehwwlvj_ggH%03d_em_%02d_00_unbin.Asymptotic.mH%03d.root"%(mass[i],cprime[j],mass[i]);
-#                curAsymLimits = getAsymLimits(curFile);
-#                
-#                xbins.append( mass[i] );
-#                ybins_exp.append( curAsymLimits[3] );                
-#                ybins_obs.append( curAsymLimits[0] );                                
-#                xbins_env.append( mass[i] );                                
-#                ybins_2s.append( curAsymLimits[1] );                                
-#                ybins_1s.append( curAsymLimits[2] );   
-#                
-#                # for cs x br:
-#                ybins_exp_csXbr_exp.append( curAsymLimits[3]*massCS[i]*massBRWW[i]*cprime[j]*0.1 );                
-#                ybins_obs_csXbr_obs.append( curAsymLimits[0]*massCS[i]*massBRWW[i]*cprime[j]*0.1 );          
-#            
-#            
-#            for i in range(nBRnews):
-#                
-#                print "BRnew[i]: ",BRnew[i],", cprime[j]: ",cprime[j],", mu' = ",massCS[0]*cprime[j]*0.1*(1-BRnew[i]*0.1)
-#                
-#                curFile = "higgsCombinehwwlvj_ggH600_em_%02d_%02d_unbin.Asymptotic.mH%03d.root"%(cprime[j],BRnew[i],mass[0]);
-#                curAsymLimits = getAsymLimits(curFile);
-#                
-#                xbins_brnew.append( BRnew[i]*0.1 );                
-#                # for cs x br:
-#                ybins_csXbr_vsBRnew_exp.append( curAsymLimits[3]*massCS[0]*cprime[j]*0.1*(1-BRnew[i]*0.1)*massBRWW[0] );                
-#                ybins_csXbr_vsBRnew_obs.append( curAsymLimits[0]*massCS[0]*cprime[j]*0.1*(1-BRnew[i]*0.1)*massBRWW[0] );              
-#
-#                
-#            #print "mass: ", mass[i], ", cprime: ", cprime[j], " -- obs: ", curAsymLimits[0], ", exp: ", curAsymLimits[3];
-#            
-#            #                if nCprimes > 1:
-#            #                    limitsHist_exp.SetBinContent(i+1,j+1,curAsymLimits[3]);
-#            #                    limitsHist_obs.SetBinContent(i+1,j+1,curAsymLimits[0]);                    
-#            
-#            for i in range(mHi-1,mLo-1,-1):
-#                curFile = "higgsCombinehwwlvj_ggH%03d_em_%02d_00_unbin.Asymptotic.mH%03d.root"%(mass[i],cprime[j],mass[i]);
-#                curAsymLimits = getAsymLimits(curFile);
-#                
-#                xbins_env.append( mass[i] );                                
-#                ybins_2s.append( curAsymLimits[5] );                                
-#                ybins_1s.append( curAsymLimits[4] );                                                
-#            
-#            curGraph_exp = ROOT.TGraph(nPoints,xbins,ybins_exp);
-#            curGraph_obs = ROOT.TGraph(nPoints,xbins,ybins_obs);
-#            curGraph_1s = ROOT.TGraph(nPoints*2,xbins_env,ybins_1s);
-#            curGraph_2s = ROOT.TGraph(nPoints*2,xbins_env,ybins_2s);
-#            
-#            curGraph_exp.SetLineStyle(2);
-#            curGraph_exp.SetLineWidth(2);
-#            curGraph_obs.SetLineWidth(2);                    
-#            curGraph_exp.SetMarkerSize(2);
-#            curGraph_obs.SetMarkerSize(2);                    
-#            curGraph_1s.SetFillColor(ROOT.kGreen);
-#            curGraph_2s.SetFillColor(ROOT.kYellow);
-#            
-#            tGraphs.append(curGraph_exp);
-#            tGraphs.append(curGraph_obs);
-#            tGraphs.append(curGraph_1s);
-#            tGraphs.append(curGraph_2s);
-#        
-#            curGraph_csXbr_exp = ROOT.TGraph(nPoints,xbins,ybins_exp_csXbr_exp);
-#            curGraph_csXbr_obs = ROOT.TGraph(nPoints,xbins,ybins_obs_csXbr_obs);
-#            tGraphs_csXbr_exp.append(curGraph_csXbr_exp);
-#            tGraphs_csXbr_obs.append(curGraph_csXbr_obs);
-#
-#            curGraph_csXbr_vsBRnew_exp = ROOT.TGraph(6,xbins_brnew,ybins_csXbr_vsBRnew_exp);
-#            curGraph_csXbr_vsBRnew_obs = ROOT.TGraph(6,xbins_brnew,ybins_csXbr_vsBRnew_obs);
-#            tGraphs_csXbr_vsBRnew_exp.append(curGraph_csXbr_vsBRnew_exp);
-#            tGraphs_csXbr_vsBRnew_obs.append(curGraph_csXbr_vsBRnew_obs);
-#    
-#        # -------
-#        banner = TLatex(0.17,0.91,("CMS Preliminary, 19.3 fb^{-1} at #sqrt{s}=8TeV, e+#mu"));
-#        banner.SetNDC(); banner.SetTextSize(0.028);
-#
-#        can_xs = ROOT.TCanvas("can_xs","can_xs",800,800);
-#        hrl_xs = can_xs.DrawFrame(599,0.015,1001,2.0);
-#        hrl_xs.GetYaxis().SetTitle("#sigma_{95%} #times  BR_{WW} (pb)");
-#        hrl_xs.GetXaxis().SetTitle("mass (GeV)");
-#        can_xs.SetGrid();
-#        
-#        curcolors = [1,2,4,6]
-#        kc = 0;
-#        for k in range(nCprimes):
-#            print cprime[k]
-#            if cprime[k] == 3 or cprime[k] == 6 or cprime[k] == 8 or cprime[k] == 10:
-#                tGraphs_csXbr_exp[k].SetLineStyle(2);
-#                tGraphs_csXbr_exp[k].SetLineColor(curcolors[kc]);
-#                tGraphs_csXbr_obs[k].SetLineColor(curcolors[kc]);                
-#                tGraphs_csXbr_exp[k].SetLineWidth(2);
-#                tGraphs_csXbr_obs[k].SetLineWidth(2);                
-#                tGraphs_csXbr_exp[k].Draw("PL");
-#                tGraphs_csXbr_obs[k].Draw("PL");   
-#                kc += 1;                    
-#        
-#        leg2 = ROOT.TLegend(0.25,0.65,0.75,0.85);
-#        leg2.SetFillStyle(0);
-#        leg2.SetBorderSize(0);
-#        leg2.SetNColumns(2);
-#        leg2.AddEntry(tGraphs_csXbr_exp[0],"BR_{new} = 0","")
-#        leg2.AddEntry(0,"","")
-#        for k in range(nCprimes):
-#            if cprime[k] == 3 or cprime[k] == 6 or cprime[k] == 8 or cprime[k] == 10:            
-#                tmplabel = "exp., C'^{2} = %1.1f    "%( float((cprime[k])/10.) )
-#                leg2.AddEntry(tGraphs_csXbr_exp[k],tmplabel,"L")
-#                tmplabel = "obs., C'^{2} = %1.1f"%( float((cprime[k])/10.) )
-#                leg2.AddEntry(tGraphs_csXbr_obs[k],tmplabel,"L");        
-#
-#        leg2.Draw();
-#        banner.Draw();
-#        
-#        ROOT.gPad.SetLogy();
-#        can_xs.SaveAs("limitFigs/test_cPrime_csXbr.eps");    
-#                    
-#        # -------
-#        banner = TLatex(0.17,0.91,("CMS Preliminary, 19.3 fb^{-1} at #sqrt{s}=8TeV, e+#mu"));
-#        banner.SetNDC(); banner.SetTextSize(0.028);
-#        
-#        can_xs_vsBRnew = ROOT.TCanvas("can_xs_vsBRnew","can_xs_vsBRnew",800,800);
-#        hrl_xs_vsBRnew = can_xs_vsBRnew.DrawFrame(-0.01,0.02,0.51,2.0);
-#        hrl_xs_vsBRnew.GetYaxis().SetTitle("#sigma_{95%} #times  BR_{WW} (pb)");
-#        hrl_xs_vsBRnew.GetXaxis().SetTitle("BR_{new}");
-#        can_xs_vsBRnew.SetGrid();
-#        
-#        curcolors = [1,2,4,6]
-#        kc = 0;
-#        for k in range(nCprimes):
-#            print cprime[k]
-#            if cprime[k] == 3 or cprime[k] == 6 or cprime[k] == 8 or cprime[k] == 10:
-#                tGraphs_csXbr_vsBRnew_exp[k].SetLineStyle(2);
-#                tGraphs_csXbr_vsBRnew_exp[k].SetLineColor(curcolors[kc]);
-#                tGraphs_csXbr_vsBRnew_obs[k].SetLineColor(curcolors[kc]);                
-#                tGraphs_csXbr_vsBRnew_exp[k].SetLineWidth(2);
-#                tGraphs_csXbr_vsBRnew_obs[k].SetLineWidth(2);                
-#                tGraphs_csXbr_vsBRnew_exp[k].Draw("PL");
-#                tGraphs_csXbr_vsBRnew_obs[k].Draw("PL");   
-#                kc += 1;                    
-#        
-#        leg2 = ROOT.TLegend(0.25,0.65,0.75,0.85);
-#        leg2.SetFillStyle(0);
-#        leg2.SetBorderSize(0);
-#        leg2.SetNColumns(2);
-#        leg2.AddEntry(tGraphs_csXbr_exp[0],"m_{H} = 600 GeV","")
-#        leg2.AddEntry(0,"","")
-#        for k in range(nCprimes):
-#            if cprime[k] == 3 or cprime[k] == 6 or cprime[k] == 8 or cprime[k] == 10:            
-#                tmplabel = "exp., C'^{2} = %1.1f    "%( float((cprime[k])/10.) )
-#                leg2.AddEntry(tGraphs_csXbr_vsBRnew_exp[k],tmplabel,"L")
-#                tmplabel = "obs., C'^{2} = %1.1f"%( float((cprime[k])/10.) )
-#                leg2.AddEntry(tGraphs_csXbr_vsBRnew_obs[k],tmplabel,"L");        
-#        
-#        leg2.Draw();
-#        banner.Draw();
-#        
-#        ROOT.gPad.SetLogy();
-#        can_xs_vsBRnew.SaveAs("limitFigs/test_cPrime_csXbr_vsBRnew800.eps");                      
-#        
-#        # ----------
-#        # ----------
-#        # ----------
-#        # ----------
-#        # ----------
-#        # ----------
-#        # ----------
-#        # ----------
-#                
-#        cprimeHist = [0.05,0.15,0.25,0.35,0.45,0.6,0.8,1.2];
-#        massHist = [550,650,750,850,950,1050];
-#        limitsHist_exp = ROOT.TH2F("limitsHist_exp","",nPoints,550,1050,nCprimes,0.05,1.05);
-#        limitsHist_obs = ROOT.TH2F("limitsHist_obs","",nPoints,550,1050,nCprimes,0.05,1.05);
-#        
-#        limitsHist_exp_600_2D = ROOT.TH2F("limitsHist_exp_600_2D","",nCprimes,0.05,1.05,nBRnews,-0.05,0.55);
-#        limitsHist_obs_600_2D = ROOT.TH2F("limitsHist_obs_600_2D","",nCprimes,0.05,1.05,nBRnews,-0.05,0.55); 
-#        
-#        for j in range(cpLo,cpHi):
-#            for i in range(mLo,mHi):
-#                curFile = "higgsCombinehwwlvj_ggH%03d_em_%02d_00_unbin.Asymptotic.mH%03d.root"%(mass[i],cprime[j],mass[i]);
-#                curAsymLimits = getAsymLimits(curFile);
-#                limitsHist_exp.SetBinContent(i+1,j+1,curAsymLimits[3]);
-#                limitsHist_obs.SetBinContent(i+1,j+1,curAsymLimits[0]);          
-#        
-#        for j in range(cpLo,cpHi):
-#            for i in range(brLo,brHi):
-#                curFile = "higgsCombinehwwlvj_ggH%03d_em_%02d_%02d_unbin.Asymptotic.mH%03d.root"%(600,cprime[j],BRnew[i],600);
-#                curAsymLimits = getAsymLimits(curFile);
-#                limitsHist_exp_600_2D.SetBinContent(j+1,i+1,curAsymLimits[3]);
-#                limitsHist_obs_600_2D.SetBinContent(j+1,i+1,curAsymLimits[0]);          
-#        
-#        
-#        limitsHist_exp.SetTitle("; mass (GeV); C'^{2}; Expected Upper Limit, #mu'");
-#        limitsHist_obs.SetTitle("; mass (GeV); C'^{2}; Observed Upper Limit, #mu'");
-#        limitsHist_exp.GetZaxis().RotateTitle(1);
-#        limitsHist_obs.GetZaxis().RotateTitle(1);
-#        
-#        limitsHist_exp_600_2D.SetTitle("; C'^{2}; BR_{New}; Expected Upper Limit, #mu'");
-#        limitsHist_obs_600_2D.SetTitle("; C'^{2}; BR_{New}; Observed Upper Limit, #mu'");
-#        limitsHist_exp_600_2D.GetZaxis().RotateTitle(1);
-#        limitsHist_obs_600_2D.GetZaxis().RotateTitle(1);
-#        
-#        can2d_exp = ROOT.TCanvas("can2d_exp","can2d_exp",1000,800);
-#        limitsHist_exp.SetStats(0);
-#        limitsHist_exp.Draw("colz");
-#        banner.Draw();
-#        can2d_exp.SaveAs("limitFigs/test2D_exp.eps");
-#        
-#        can2d_obs = ROOT.TCanvas("can2d_obs","can2d_obs",1000,800);
-#        limitsHist_obs.SetStats(0);
-#        limitsHist_obs.Draw("colz");
-#        banner.Draw();
-#        can2d_obs.SaveAs("limitFigs/test2D_obs.eps");
-#        
-#        can2dbr_exp = ROOT.TCanvas("can2dbr_exp","can2dbr_exp",1000,800);
-#        limitsHist_exp_600_2D.SetStats(0);
-#        limitsHist_exp_600_2D.Draw("colz");
-#        banner.Draw();
-#        can2dbr_exp.SaveAs("limitFigs/test2Dbr_exp.eps");
-#        
-#        can2dbr_obs = ROOT.TCanvas("can2dbr_obs","can2dbr_obs",1000,800);
-#        limitsHist_obs_600_2D.SetStats(0);
-#        limitsHist_obs_600_2D.Draw("colz");
-#        banner.Draw();
-#        can2dbr_obs.SaveAs("limitFigs/test2Dbr_obs.eps");
+        makeBSMLimits_vsMass( SIGCH, cprimes );
+        makeBSMLimits_vsBRnew( SIGCH, cprimes, 600 );
+        makeBSMLimits_vsBRnew( SIGCH, cprimes, 700 );
+        makeBSMLimits_vsBRnew( SIGCH, cprimes, 800 );
+        makeBSMLimits_vsBRnew( SIGCH, cprimes, 900 );
+        makeBSMLimits_vsBRnew( SIGCH, cprimes, 1000 );
 
-
+        makeBSMLimits_2D( SIGCH, 600 );
+        
