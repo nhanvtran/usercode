@@ -108,11 +108,11 @@ void setTDRStyle() {
 
   tdrStyle->SetTitleColor(1, "XYZ");
   tdrStyle->SetTitleFont(42, "XYZ");
-  tdrStyle->SetTitleSize(0.045, "XYZ");
+  tdrStyle->SetTitleSize(0.030, "XYZ");
   // tdrStyle->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
   // tdrStyle->SetTitleYSize(Float_t size = 0.02);
   tdrStyle->SetTitleXOffset(1.1);
-  tdrStyle->SetTitleYOffset(1.0);
+  tdrStyle->SetTitleYOffset(1.3);
   // tdrStyle->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
 
 // For the axis labels:
@@ -120,7 +120,7 @@ void setTDRStyle() {
   tdrStyle->SetLabelColor(1, "XYZ");
   tdrStyle->SetLabelFont(42, "XYZ");
   tdrStyle->SetLabelOffset(0.007, "XYZ");
-  tdrStyle->SetLabelSize(0.05, "XYZ");
+  tdrStyle->SetLabelSize(0.03, "XYZ");
 
 // For the axis:
 
@@ -162,7 +162,7 @@ Bool_t same(Float_t a1, Float_t a2){
 }
 
 
-void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu_lumi=19.3, bool showobs=1)
+void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.3, double mu_lumi=19.3, bool showobs=1)
 {
 	setTDRStyle();
 	TFile inFile(Form("higgisCombin_%s_%s.root",channel,model)) ;
@@ -233,17 +233,18 @@ void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu
 	likelihd_limit->Add(likelihd_limit_c, "L");                                                                                                              
     if(showobs){ likelihd_limit->Add(likelihd_limit_d, "LP"); }
 
-	TCanvas *c1 = new TCanvas("Limits_Canvas","Limits Canvas",800,600);
+	TCanvas *c1 = new TCanvas("Limits_Canvas","Limits Canvas",600,600);
 	gStyle->SetOptStat(0);
 	//c1->SetLogy () ;
-	c1->SetGridy(1);
-	c1->SetGrid(1);
+	//c1->SetGridy(1);
+	//c1->SetGrid(1);
 
 	Double_t y_max_h2=TMath::Max(P2S[nmass-1]+Median[nmass-1]+1, Observed[nmass-1]+1);
 	y_max_h2=10;
 	cout<<P2S[nmass-1]+Median[nmass-1]+1<<","<<Observed[nmass-1]+1<<endl;
 
-	TH2F *h2=new TH2F("h2",";m_{H} (GeV/c^{2});95% CL limit on #sigma/#sigma_{SM}",100,Mass[0]-30,Mass[nmass-1]+30,20,0, y_max_h2);
+	//TH2F *h2=new TH2F("h2",";m_{H} (GeV/c^{2});95% CL limit on #sigma/#sigma_{SM}",100,Mass[0]-30,Mass[nmass-1]+30,20,0, y_max_h2);
+	TH2F *h2=new TH2F("h2",";Higgs boson mass (GeV/c^{2});95% CL limit on #sigma/#sigma_{SM}",100,Mass[0]-1 ,Mass[nmass-1]+1 ,20,0, y_max_h2);
 	h2->Draw();
 
 	likelihd_limit->Draw("");	
@@ -260,9 +261,11 @@ void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu
 	//draw grid on top of limits
 	TH1D* postGrid=new TH1D("postGrid","postGrid",1,600,1000);
 	postGrid->GetYaxis()->SetRangeUser(0.,10);
-	postGrid->Draw("AXIGSAME");
+	postGrid->Draw("AXISSAME");
+	//postGrid->Draw("AXIGSAME");
+	line->Draw();
 
-	TLegend * theLeg = new TLegend(0.22, 0.57, 0.57, 0.87, "", "NDC");
+	TLegend * theLeg = new TLegend(0.25, 0.57, 0.62, 0.87, "", "NDC");
 	theLeg.SetName("theLegend");
 	theLeg.SetBorderSize(0);
 	theLeg.SetLineColor(0);
@@ -271,21 +274,24 @@ void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.2, double mu
 	theLeg.SetLineWidth(0);
 	theLeg.SetLineStyle(0);
 	theLeg.SetTextFont(42);
-	theLeg.SetTextSize(.035);
+	theLeg.SetTextSize(.030);
 
 	theLeg->AddEntry(likelihd_limit_d, "95% C.L.Observed Limit","l");
 	theLeg->AddEntry(likelihd_limit_c, "95% C.L.Expected Limit","l");
 	theLeg->AddEntry(likelihd_limit_1sigma, "#pm1 #sigma Expected Limit","f");
 	theLeg->AddEntry(likelihd_limit_2sigma, "#pm2 #sigma Expected Limit","f");
+	theLeg->AddEntry(line, "SM Expected","l");
 	theLeg->Draw();
 
 	//banner = TLatex(0.18,0.96,("CMS Preliminary, %.1f fb^{-1} at #sqrt{s}=8TeV %s+jets"%(self.GetLumi(),self.channel)));
-	double tmp_lumi=0.;
+	float tmp_lumi=0.;
+	double tmp_banner_offset=0.;
 	TString tmp_channel;
 	if(channel=="mu"){ tmp_lumi=mu_lumi; tmp_channel="W#rightarrow #mu #nu";}
-	if(channel=="em"){ tmp_lumi=(mu_lumi+el_lumi)/2.; tmp_channel="W#rightarrow e #nu and W#rightarrow #mu #nu";}
+	if(channel=="em"){ tmp_lumi=(mu_lumi+el_lumi)/2.; tmp_channel="e+#mu";tmp_banner_offset=0.08;}
 	if(channel=="el"){ tmp_lumi=el_lumi; tmp_channel="W#rightarrow e #nu";}
-	banner = TLatex(0.18,0.96,Form("CMS Preliminary, %i fb^{-1} at #sqrt{s} = 8 TeV, %s", Int_t(tmp_lumi), tmp_channel.Data() ) );
+	//banner = TLatex(0.18,0.96,Form("CMS Preliminary, %0.1f fb^{-1} at #sqrt{s} = 8 TeV, %s", (tmp_lumi), tmp_channel.Data() ) );
+	banner = TLatex(0.33+tmp_banner_offset,0.96,Form("CMS Preliminary, %0.1f fb^{-1} at #sqrt{s} = 8 TeV, %s", (tmp_lumi), tmp_channel.Data() ) );
 	banner.SetNDC(); banner.SetTextSize(0.028);
 	banner.Draw();
 
