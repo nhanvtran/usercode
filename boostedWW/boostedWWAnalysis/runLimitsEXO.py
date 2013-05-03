@@ -33,6 +33,10 @@ parser.add_option('--plotLimits', action='store_true', dest='plotLimits', defaul
 parser.add_option('--channel',action="store",type="string",dest="channel",default="el")
 parser.add_option('--massPoint',action="store",type="int",dest="massPoint",default=-1)
 parser.add_option('--cPrime',action="store",type="int",dest="cPrime",default=-1)
+parser.add_option('--odir',action="store",type="string",dest="odir",default=".")
+
+parser.add_option('--batchMode', action='store_true', dest='batchMode', default=False,
+                                    help='no X11 windows')
 
 
 (options, args) = parser.parse_args()
@@ -66,6 +70,96 @@ def getAsymLimits(file):
     
     return lims;
 
+def submitBatchJob( command, fn ):
+
+    currentDir = os.getcwd();
+
+    # create a dummy bash/sh
+    outScript=open(fn+".sh","w");
+
+    outScript.write('#!/bin/bash');
+    outScript.write("\n"+'date');
+    outScript.write("\n"+'source /uscmst1/prod/sw/cms/bashrc prod');
+    outScript.write("\n"+'echo "condor dir: " ${_CONDOR_SCRATCH_DIR}');
+    outScript.write("\n"+'cd '+currentDir);
+    outScript.write("\n"+'eval `scram runtime -sh`');
+    outScript.write("\n"+'cd -');
+    outScript.write("\n"+'export PATH=${PATH}:'+currentDir);
+    outScript.write("\n"+'echo ${PATH}');
+    outScript.write("\n"+'ls');
+    outScript.write("\n"+command);
+    outScript.write("\n"+'tar -cvzf outputFrom_'+fn+'.tar.gz *');
+    outScript.close();
+
+    # link a condor script to your shell script
+    condorScript=open("condor_"+fn,"w");
+    condorScript.write('universe = vanilla')
+    condorScript.write("\n"+"Executable = "+fn+".sh")
+    condorScript.write("\n"+'Requirements = Memory >= 199 &&OpSys == "LINUX"&& (Arch != "DUMMY" )&& Disk > 1000000')
+    condorScript.write("\n"+'Should_Transfer_Files = YES')
+    condorScript.write("\n"+'Transfer_Input_Files = exo_doFit_class.py')
+    condorScript.write("\n"+'WhenToTransferOutput  = ON_EXIT_OR_EVICT')
+    condorScript.write("\n"+'Output = out_$(Cluster).stdout')
+    condorScript.write("\n"+'Error  = out_$(Cluster).stderr')
+    condorScript.write("\n"+'Error  = out_$(Cluster).stderr')
+    condorScript.write("\n"+'Log    = out_$(Cluster).log')
+    condorScript.write("\n"+'Notification    = Error')
+    condorScript.write("\n"+'Queue 1')
+    condorScript.close();
+
+    os.system("condor_submit "+"condor_"+fn)
+
+    # ----------------------------------------
+
+def submitBatchJobCombine( command, fn, mass, cprime, BRnew ):
+
+
+    SIGCH = "";
+    if options.sigChannel.find("H") >= 0: SIGCH = "_"+options.sigChannel;
+
+    currentDir = os.getcwd();
+    # create a dummy bash/csh
+    outScript=open(fn+".sh","w");
+
+    outScript.write('#!/bin/bash');
+    outScript.write("\n"+'date');
+    outScript.write("\n"+'source /uscmst1/prod/sw/cms/bashrc prod');
+    outScript.write("\n"+'echo "condor dir: " ${_CONDOR_SCRATCH_DIR}');
+    outScript.write("\n"+'cd '+currentDir);
+    outScript.write("\n"+'eval `scram runtime -sh`');
+    outScript.write("\n"+'cd -');
+    outScript.write("\n"+'export PATH=${PATH}:'+currentDir);
+    outScript.write("\n"+'echo ${PATH}');
+    outScript.write("\n"+'ls');
+    outScript.write("\n"+command);
+    outScript.write("\n"+'tar -cvzf outputFrom_'+fn+'.tar.gz *');
+    outScript.close();
+
+    file1 = "hwwlvj_ggH%03d_em%s_%02d_%02d_unbin.txt"%(mass,SIGCH,cprime,BRnew);
+    file2 = "hwwlvj_ggH%03d_mu_%02d_%02d_workspace.root"%(mass,cprime,BRnew);
+    file3 = "hwwlvj_ggH%03d_el_%02d_%02d_workspace.root"%(mass,cprime,BRnew);
+    # link a condor script to your shell script
+    condorScript=open("subCondor_"+fn,"w");
+    condorScript.write('universe = vanilla')
+    condorScript.write("\n"+"Executable = "+fn+".sh")
+    condorScript.write("\n"+'Requirements = Memory >= 199 &&OpSys == "LINUX"&& (Arch != "DUMMY" )&& Disk > 1000000')
+    condorScript.write("\n"+'Should_Transfer_Files = YES')
+    condorScript.write("\n"+'Transfer_Input_Files = '+file1+', '+file2+', '+file3)
+    condorScript.write("\n"+'WhenToTransferOutput  = ON_EXIT_OR_EVICT')
+                                                                    
+    condorScript.write("\n"+'Output = out_$(Cluster).stdout')
+    condorScript.write("\n"+'Error  = out_$(Cluster).stderr')
+    condorScript.write("\n"+'Error  = out_$(Cluster).stderr')
+    condorScript.write("\n"+'Log    = out_$(Cluster).log')
+    condorScript.write("\n"+'Notification    = Error')
+    condorScript.write("\n"+'Queue 1')
+    condorScript.close();
+
+    # submit the condor job
+
+    os.system("condor_submit "+"subCondor_"+fn)
+                                                
+
 ############################################################
 
 if __name__ == '__main__':
@@ -86,16 +180,16 @@ if __name__ == '__main__':
     #shape    = ["ExpPowExp_v1","Exp","Exp","Exp","Exp"]
     #shapeAlt = ["ExpPow2_v1"  ,"Pow","Pow","Pow","Pow"]
 
-    mass  = [1000,1200,1500,1600,2000]
-    ccmlo = [ 900,1100,1400,1500,1900]  
-    ccmhi = [1100,1300,1600,1700,2100]  
-    mjlo  = [  40,  40,  40,  40,  40]  
-    mjhi  = [ 130, 130, 130, 130, 130]  
-    mlo   = [ 800, 800, 800, 800, 800]      
+    mass  = [1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500]
+    ccmlo = [ 900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400]  
+    ccmhi = [1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600]  
+    mjlo  = [  40,  40,  40,  40,  40,  40,  40,  40,  40,  40,  40,  40,  40,  40,  40,  40]  
+    mjhi  = [ 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130]  
+    mlo   = [ 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800, 800]      
     #mhi   = [2500,2500,2500,2500,2500]          
-    mhi   = [2800,2800,2800,2800,2800]          
-    shape    = ["ExpN","ExpN","ExpN","ExpN","ExpN"]
-    shapeAlt       = ["ExpTail","ExpTail","ExpTail","ExpTail","ExpTail"]
+    mhi   = [2800,2800,2800,2800,2800,2800,2800,2800,2800,2800,2800,2800,2800,2800,2800,2800]          
+    shape    = ["ExpN","ExpN","ExpN","ExpN","ExpN","ExpN","ExpN","ExpN","ExpN","ExpN","ExpN","ExpN","ExpN","ExpN","ExpN","ExpN"]
+    shapeAlt = ["ExpTail","ExpTail","ExpTail","ExpTail","ExpTail","ExpTail","ExpTail","ExpTail","ExpTail","ExpTail","ExpTail","ExpTail","ExpTail","ExpTail","ExpTail","ExpTail"]
     #shape    = ["Exp","Exp","Exp","Exp","Exp"]
     #shapeAlt = ["Pow","Pow","Pow","Pow","Pow"]
 
@@ -149,18 +243,19 @@ if __name__ == '__main__':
                 time.sleep(1);
                 
                 #command = "nohup python EXO_doFit_class.py %s ggH%03d %02d %02d %02d %02d %02d %02d %s %s -b -m --cprime %02d --BRnew 00  > log/log_%s_ggH%03d_%02d_%02d_%02d_%02d_%02d_%02d_%s_%s_cprime_%02d_BRnew_00 &"%(CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j], CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j]);
-                command = "nohup python exo_doFit_class.py %s BulkG_c0p2_M%03d %02d %02d %02d %02d %02d %02d %s %s -b -m --cprime %02d --BRnew 00  &"%(CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j]);
-                #command = "python doFit_class.py %s ggH%03d %02d %02d %02d %02d %02d %02d %s %s -b -m --cprime %02d --BRnew 00  >> log/log_%s_ggH%03d_%02d_%02d_%02d_%02d_%02d_%02d_%s_%s_cprime_%02d_BRnew_00 "%(CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j], CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j]);
+                #command = "nohup python exo_doFit_class.py %s BulkG_c0p2_M%03d %02d %02d %02d %02d %02d %02d %s %s -b -m --cprime %02d --BRnew 00  &"%(CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j]);
+#                command = "python exo_doFit_class.py %s BulkG_c0p2_M%03d %02d %02d %02d %02d %02d %02d %s %s -b -m --cprime %01d --BRnew 00 --inPath %s"%(CHAN, mass[i], ccmlo[i], ccmhi[i], mjlo[i], mjhi[i], mlo[i], mhi[i], shape[i], shapeAlt[i], cprime[j], os.getcwd());
+
                 print command #raw_input("ENTER");
-                os.system(command);
-                
-                #mvcmmd1 = "mv plots_"+CHAN+"* "+DIR+"/plots_"+CHAN+"_"+str(mass[i])+"_"+str(cprime[j])+"_00";
-                ##print mvcmmd1;
-                #os.system(mvcmmd1);
-            
-            #mvcmmd0 = "mv hwwlvj_*_"+CHAN+"* other_*_"+CHAN+"* "+DIR+"/.";
-            #print mvcmmd0;
-            #os.system(mvcmmd0);
+                unbinnedCard = options.odir+"/cards_%s/hwwlvj_ggH%03d_%s_%02d_%02d_unbin.txt"%(options.channel,mass[i],options.channel,cprime[j],BRnew);
+
+                fileExists = os.path.isfile(unbinnedCard)
+                print "fileExists: ",fileExists,", cards: ", unbinnedCard
+                if options.batchMode and not fileExists:
+                 fn = "fitScript_%s_%03d_%02d_%02d"%(options.channel,mass[i],cprime[j],BRnew);
+                 submitBatchJob( command, fn );
+                if not options.batchMode:
+                 os.system(command);
 
 
     # =====================================
