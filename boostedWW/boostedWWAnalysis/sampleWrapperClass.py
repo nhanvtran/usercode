@@ -40,7 +40,6 @@ ROOT.gSystem.Load('libFWCoreUtilities');
 def getListRMS(list):
     mean = sum(list)/float(len(list));
     return math.sqrt(sum((n-mean)*(n-mean) for n in list)/len(list));
-
 def getListMean(list):
     return sum(list)/float(len(list));
 
@@ -152,7 +151,6 @@ class sampleWrapperClass:
         v_pt_             = array( 'f', [ 0. ] );
         v_mt_             = array( 'f', [ 0. ] );
 
-
         jet_mass_pr_       = array( 'f', [ 0. ] );
         jet_pt_pr_         = array( 'f', [ 0. ] );
         ungroomed_jet_eta_ = array( 'f', [ 0. ] );
@@ -178,7 +176,30 @@ class sampleWrapperClass:
         mvaMET_    = array( 'f', [ 0. ] );                
         pfMET_     = array( 'f', [ 0. ] );
         pfMET_Phi_ = array( 'f', [ 0. ] );
-        
+
+        nu_pz_type0_ = array( 'f', [ 0. ] );
+        nu_pz_type1_ = array( 'f', [ 0. ] );
+        nu_pz_type2_ = array( 'f', [ 0. ] );
+        nu_pz_type3_ = array( 'f', [ 0. ] );
+
+        W_pz_type0_ = array( 'f', [ 0. ] );
+        W_pz_type1_ = array( 'f', [ 0. ] );
+        W_pz_type2_ = array( 'f', [ 0. ] );
+        W_pz_type3_ = array( 'f', [ 0. ] );
+
+        nu_pz_gen_   = array( 'f', [ 0. ] );
+        W_pz_gen_   = array( 'f', [ 0. ] );
+
+        mass_lvj_type0_   = array( 'f', [ 0. ] );
+        mass_lvj_type1_   = array( 'f', [ 0. ] );
+        mass_lvj_type2_   = array( 'f', [ 0. ] );
+        mass_lvj_type3_   = array( 'f', [ 0. ] );
+
+        v_mass_type0_    = array( 'f', [ 0. ] );
+        v_mass_type1_    = array( 'f', [ 0. ] );
+        v_mass_type2_    = array( 'f', [ 0. ] );
+        v_mass_type3_    = array( 'f', [ 0. ] );
+                
         nPV_ = array( 'f', [ 0. ] );                        
 
         totalEventWeight_ = array( 'f', [ 0. ] );                                
@@ -218,7 +239,6 @@ class sampleWrapperClass:
         jet_pt1frac_  = array ('f',[ 0. ]);
         jet_pt2frac_  = array ('f',[ 0. ]);
         jet_sjdr_     = array ('f',[ 0. ]);
-            # n bjets
 
         nbjets_ = array( 'f', [ 0. ] );
         nbjets_cvsl_ = array( 'f', [ 0. ] );
@@ -259,6 +279,29 @@ class sampleWrapperClass:
         otree.Branch("mass_lvj", mass_lvj_ , "mass_lvj/F");
         otree.Branch("v_pt", v_pt_ , "v_pt/F");
         otree.Branch("v_mt", v_mt_ , "v_mt/F");
+
+        otree.Branch("nu_pz_type0", nu_pz_type0_ , "nu_pz_type0/F");
+        otree.Branch("nu_pz_type1", nu_pz_type1_ , "nu_pz_type1/F");
+        otree.Branch("nu_pz_type2", nu_pz_type2_ , "nu_pz_type2/F");
+        otree.Branch("nu_pz_type3", nu_pz_type3_ , "nu_pz_type3/F");
+
+        otree.Branch("W_pz_type0", W_pz_type0_ , "W_pz_type0/F");
+        otree.Branch("W_pz_type1", W_pz_type1_ , "W_pz_type1/F");
+        otree.Branch("W_pz_type2", W_pz_type2_ , "W_pz_type2/F");
+        otree.Branch("W_pz_type3", W_pz_type3_ , "W_pz_type3/F");
+
+        otree.Branch("nu_pz_gen", nu_pz_gen_ , "nu_pz_gen/F");
+        otree.Branch("W_pz_gen", W_pz_gen_ , "W_pz_gen/F");
+
+        otree.Branch("mass_lvj_type0", mass_lvj_type0_ , "mass_lvj_type0/F");
+        otree.Branch("mass_lvj_type1", mass_lvj_type1_ , "mass_lvj_type1/F");
+        otree.Branch("mass_lvj_type2", mass_lvj_type2_ , "mass_lvj_type2/F");
+        otree.Branch("mass_lvj_type3", mass_lvj_type3_ , "mass_lvj_type3/F");
+
+        otree.Branch("v_mass_type0", v_mass_type0_ , "v_mass_type0/F");
+        otree.Branch("v_mass_type1", v_mass_type1_ , "v_mass_type1/F");
+        otree.Branch("v_mass_type2", v_mass_type2_ , "v_mass_type2/F");
+        otree.Branch("v_mass_type3", v_mass_type3_ , "v_mass_type3/F");
 
         otree.Branch("jet_pt_pr", jet_pt_pr_ , "jet_pt_pr/F");
         otree.Branch("ungroomed_jet_pt", ungroomed_jet_pt_, "ungroomed_jet_pt/F");
@@ -703,7 +746,7 @@ class sampleWrapperClass:
                 metCut = 40;
 
             signallike = 0;
-            if getattr( self.InputTree_, "W_pt" ) > 200 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut and getattr( self.InputTree_, "GroomedJet_CA8_deltaphi_METca8jet") > 2.0 and getattr( self.InputTree_, "GroomedJet_CA8_deltaR_lca8jet") > 1.57 :
+            if getattr( self.InputTree_, "W_pt" ) > 200 and getattr( self.InputTree_, "GroomedJet_CA8_pt" )[0] > 200 and getattr( self.InputTree_, "event_met_pfmet" ) > metCut and getattr( self.InputTree_, leptonCutString ) > leptonCut and getattr( self.InputTree_, "GroomedJet_CA8_deltaphi_METca8jet_type2") > 2.0 and getattr( self.InputTree_, "GroomedJet_CA8_deltaR_lca8jet") > 1.57 :
                 if ( self.Channel_ == "mu" and math.fabs(getattr( self.InputTree_, "W_muon_dz000")) < 0.02 and math.fabs(getattr( self.InputTree_, "W_muon_dzPV")) < 0.5 and math.fabs( getattr( self.InputTree_, "W_muon_eta" )) < 2.1 ) : signallike = 1 ; 
                 elif self.Channel_ == "el" : signallike = 1 ; 
                               
@@ -789,10 +832,35 @@ class sampleWrapperClass:
                 
              ###################################
              # make training tree
-             mass_lvj_[0] = getattr( self.InputTree_, "boostedW_lvj_m" );
+             mass_lvj_[0] = getattr( self.InputTree_, "boostedW_lvj_m_type2" );
 
              v_pt_[0] = getattr( self.InputTree_, "W_pt" );
              v_mt_[0] = getattr( self.InputTree_, "W_mt" );
+
+             nu_pz_type0_[0] = getattr( self.InputTree_, "W_nu1_pz_type0" );
+             nu_pz_type1_[0] = getattr( self.InputTree_, "W_nu1_pz_type1" );
+             nu_pz_type2_[0] = getattr( self.InputTree_, "W_nu1_pz_type2" );
+             nu_pz_type3_[0] = getattr( self.InputTree_, "W_nu1_pz_type3" );
+
+             W_pz_type0_[0] = getattr( self.InputTree_, "W_pz_type0" );
+             W_pz_type1_[0] = getattr( self.InputTree_, "W_pz_type1" );
+             W_pz_type2_[0] = getattr( self.InputTree_, "W_pz_type2" );
+             W_pz_type3_[0] = getattr( self.InputTree_, "W_pz_type3" );
+             
+             if self.IsData_ == False  : nu_pz_gen_[0]  =  getattr( self.InputTree_, "W_neutrino_pz_gen" );
+             if self.Channel_ == "mu" and self.IsData_ == False: W_pz_gen_[0]   =  getattr( self.InputTree_, "W_neutrino_pz_gen" ) + getattr( self.InputTree_, "W_muon_pz_gen" );
+             if self.Channel_ == "el" and self.IsData_ == False: W_pz_gen_[0]   =  getattr( self.InputTree_, "W_neutrino_pz_gen" ) + getattr( self.InputTree_, "W_electron_pz_gen" );
+
+              
+             mass_lvj_type0_[0]   = getattr( self.InputTree_, "boostedW_lvj_m_type0" );
+             mass_lvj_type1_[0]   = getattr( self.InputTree_, "boostedW_lvj_m_type1" );
+             mass_lvj_type2_[0]   = getattr( self.InputTree_, "boostedW_lvj_m_type2" );
+             mass_lvj_type3_[0]   = getattr( self.InputTree_, "boostedW_lvj_m_type3" );
+
+             v_mass_type0_[0]    = getattr( self.InputTree_, "W_mass_type0" );
+             v_mass_type1_[0]    = getattr( self.InputTree_, "W_mass_type1" );
+             v_mass_type2_[0]    = getattr( self.InputTree_, "W_mass_type2" );
+             v_mass_type3_[0]    = getattr( self.InputTree_, "W_mass_type3" );
              
              jet_mass_pr_[0] = getattr( self.InputTree_, prefix + "_mass_pr" )[0];
                
@@ -900,9 +968,6 @@ class sampleWrapperClass:
              nbjets_csvm_veto_cleaned_[0]   = getattr( self.InputTree_, "GroomedJet_numberbjets_csvm_veto" );
              nbjets_ssvhem_veto_cleaned_[0] = getattr( self.InputTree_, "GroomedJet_numberbjets_ssvhem_veto" );
 
-             
-                        
-
              index_ak5_cvst = array( 'f', [0.] );
 
              nbjets_csvt_veto_cleaned_[0] = 0. ;
@@ -957,8 +1022,8 @@ class sampleWrapperClass:
              jet_sjdr_[0] = getattr( self.InputTree_, prefix + "_prsubjet1subjet2_deltaR" );       
                 
              deltaR_lca8jet_[0] = getattr( self.InputTree_, prefix + "_deltaR_lca8jet" );       
-             deltaphi_METca8jet_[0] = getattr( self.InputTree_, prefix + "_deltaphi_METca8jet" );       
-             deltaphi_Vca8jet_[0] = getattr( self.InputTree_, prefix + "_deltaphi_Vca8jet" );       
+             deltaphi_METca8jet_[0] = getattr( self.InputTree_, prefix + "_deltaphi_METca8jet_type2" );       
+             deltaphi_Vca8jet_[0] = getattr( self.InputTree_, prefix + "_deltaphi_Vca8jet_type2" );       
                 
              listOfVarArray1[0][0] = jet_qjetvol_[0]
              listOfVarArray1[1][0] = jet_tau2tau1_[0]
@@ -1016,14 +1081,38 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus("event_met_pfmet",1);
         self.InputTree_.SetBranchStatus("event_met_pfmetPhi",1);
         self.InputTree_.SetBranchStatus("event_nPV",1);
-        self.InputTree_.SetBranchStatus("boostedW_lvj_m",1);
+        self.InputTree_.SetBranchStatus("boostedW_lvj_m_type0",1);
+        self.InputTree_.SetBranchStatus("boostedW_lvj_m_type1",1);
+        self.InputTree_.SetBranchStatus("boostedW_lvj_m_type2",1);
+        self.InputTree_.SetBranchStatus("boostedW_lvj_m_type3",1);
         self.InputTree_.SetBranchStatus("W_pt",1);
         self.InputTree_.SetBranchStatus("W_px",1);
         self.InputTree_.SetBranchStatus("W_py",1);
         self.InputTree_.SetBranchStatus("W_pz",1);
         self.InputTree_.SetBranchStatus("W_e",1);
         self.InputTree_.SetBranchStatus("W_mt",1);
-        
+
+        self.InputTree_.SetBranchStatus("W_nu1_pz_type0",1);
+        self.InputTree_.SetBranchStatus("W_nu1_pz_type1",1);
+        self.InputTree_.SetBranchStatus("W_nu1_pz_type2",1);
+        self.InputTree_.SetBranchStatus("W_nu1_pz_type3",1);
+
+        self.InputTree_.SetBranchStatus("W_pz_type0",1);
+        self.InputTree_.SetBranchStatus("W_pz_type1",1);
+        self.InputTree_.SetBranchStatus("W_pz_type2",1);
+        self.InputTree_.SetBranchStatus("W_pz_type3",1);
+
+        self.InputTree_.SetBranchStatus("W_neutrino_pz_gen",1);
+
+        if self.Channel_ == "mu" : self.InputTree_.SetBranchStatus("W_muon_pz_gen",1);
+        if self.Channel_ == "el" : self.InputTree_.SetBranchStatus("W_electron_pz_gen",1);
+ 
+
+        self.InputTree_.SetBranchStatus("W_mass_type0",1);
+        self.InputTree_.SetBranchStatus("W_mass_type1",1);
+        self.InputTree_.SetBranchStatus("W_mass_type2",1);
+        self.InputTree_.SetBranchStatus("W_mass_type3",1);
+
         self.InputTree_.SetBranchStatus(prefix + "_pt_pr",1);
         self.InputTree_.SetBranchStatus(prefix + "_eta_pr",1);
         self.InputTree_.SetBranchStatus(prefix + "_phi_pr",1);
@@ -1063,8 +1152,8 @@ class sampleWrapperClass:
         self.InputTree_.SetBranchStatus(prefix + "_planarflow07",1);
 
         self.InputTree_.SetBranchStatus(prefix + "_deltaR_lca8jet",1);
-        self.InputTree_.SetBranchStatus(prefix + "_deltaphi_METca8jet",1);
-        self.InputTree_.SetBranchStatus(prefix + "_deltaphi_Vca8jet",1);
+        self.InputTree_.SetBranchStatus(prefix + "_deltaphi_METca8jet_type2",1);
+        self.InputTree_.SetBranchStatus(prefix + "_deltaphi_Vca8jet_type2",1);
 
         if self.SignalMass_ > 0: self.InputTree_.SetBranchStatus("W_H_mass_gen",1)
         self.InputTree_.SetBranchStatus("avecomplexpolewtggH600",1)

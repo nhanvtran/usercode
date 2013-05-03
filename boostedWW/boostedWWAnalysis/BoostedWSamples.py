@@ -44,6 +44,8 @@ class Samples:
               self.filenames["TTbar_scaleUp"] = self.filepath + "RD_mu_TTbar_scaledown_CMSSW532.root"
               self.filenames["WJets_Pythia"] = self.filepath + "RD_mu_WpJPt100_CMSSW532.root"
               self.filenames["WJets_Pythia180"] = self.filepath + "RD_mu_WpJPt180_CMSSW532.root"              
+              self.filenames["WJets_Pythia180_higgs"] = self.filepath + "RD_mu_WpJ_PT180_CMSSW532_higgs.root"
+              self.filenames["WJets_Pythia180_newid"] = self.filepath + "RD_mu_WpJ_PT180_CMSSW532_newid.root"              
 #              self.filenames["WJets_Pythia"] = self.filepath + "RD_el_WpJPt100_CMSSW532.root"
               self.filenames["WJets_Herwig"] = self.filepath + "RD_mu_WpJPt100_herwig_CMSSW532.root";
               self.filenames["ZJets"] = self.filepath + "RD_mu_ZpJ_CMSSW532.root"
@@ -72,11 +74,25 @@ class Samples:
               self.filenames["rsg1500_kMpl01_hw"] = self.filepath + "RD_mu_RSGravitonToWW_kMpl01_M-1500_herwig_CMSSW532_private.root"          
               self.filenames["rsg2000_kMpl01_py"] = self.filepath + "RD_mu_RSGravitonToWW_kMpl01_M-2000_pythia_CMSSW532_private.root"                    
               self.filenames["BulkG_c0p2_M600"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M600.root"                    
+              self.filenames["BulkG_c0p2_M700"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M700.root"                    
+              self.filenames["BulkG_c0p2_M800"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M800.root"                    
+              self.filenames["BulkG_c0p2_M900"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M900.root"                    
               self.filenames["BulkG_c0p2_M1000"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M1000.root"                    
+              self.filenames["BulkG_c0p2_M1100"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M1100.root"                    
               self.filenames["BulkG_c0p2_M1200"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M1200.root"                    
+              self.filenames["BulkG_c0p2_M1300"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M1300.root"                    
+              self.filenames["BulkG_c0p2_M1400"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M1400.root"                    
               self.filenames["BulkG_c0p2_M1500"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M1500.root"                    
               self.filenames["BulkG_c0p2_M1600"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M1600.root"                    
-#              self.filenames["BulkG_c0p2_M2000"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M2000.root"                    
+              self.filenames["BulkG_c0p2_M1700"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M1700.root"                    
+              self.filenames["BulkG_c0p2_M1800"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M1800.root"                    
+              self.filenames["BulkG_c0p2_M1900"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M1900.root"                    
+              self.filenames["BulkG_c0p2_M2000"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M2000.root"                    
+              self.filenames["BulkG_c0p2_M2100"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M2100.root"                    
+              self.filenames["BulkG_c0p2_M2200"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M2200.root"                    
+              self.filenames["BulkG_c0p2_M2300"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M2300.root"                    
+              self.filenames["BulkG_c0p2_M2400"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M2400.root"                    
+              self.filenames["BulkG_c0p2_M2500"] = self.filepath + "RD_mu_BulkG_WW_lvjj_c0p2_M2500.root"                    
 
           elif self.channel == "el":
               self.filenames["data"] = self.filepath + "RD_WenuJets_DataAllSingleElectronTrigger_GoldenJSON_19p2invfb.root"
@@ -89,6 +105,8 @@ class Samples:
               self.filenames["TTbar_scaleUp"] = self.filepath + "RD_el_TTbar_scaledown_CMSSW532.root"              
               self.filenames["WJets_Pythia"] = self.filepath + "RD_el_WpJPt100_CMSSW532.root";
               self.filenames["WJets_Pythia180"] = self.filepath + "RD_el_WpJ_PT180_CMSSW532.root"                            
+              self.filenames["WJets_Pythia180_higgs"] = self.filepath + "RD_el_WpJ_PT180_CMSSW532_higgs.root"              
+              self.filenames["WJets_Pythia180_newid"] = self.filepath + "RD_el_WpJ_PT180_CMSSW532_newid.root"              
 #              self.filenames["WJets_Pythia"] = self.filepath + "RD_el_WpJPt100_CMSSW532.root";              
               self.filenames["WJets_Herwig"] = self.filepath + "RD_el_WpJPt100_herwig_CMSSW532.root";
               self.filenames["ZJets"] = self.filepath + "RD_el_ZpJ_CMSSW532.root"
@@ -116,12 +134,27 @@ class Samples:
               self.filenames["rsg1500_kMpl01_py"] = self.filepath + "RD_el_RSGravitonToWW_kMpl01_M-1500_pythia_CMSSW532_private.root"          
               self.filenames["rsg1500_kMpl01_hw"] = self.filepath + "RD_el_RSGravitonToWW_kMpl01_M-1500_herwig_CMSSW532_private.root"          
               self.filenames["rsg2000_kMpl01_py"] = self.filepath + "RD_el_RSGravitonToWW_kMpl01_M-2000_pythia_CMSSW532_private.root"                    
+
               self.filenames["BulkG_c0p2_M600"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M600.root"                    
+              self.filenames["BulkG_c0p2_M700"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M700.root"                    
+              self.filenames["BulkG_c0p2_M800"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M800.root"                    
+              self.filenames["BulkG_c0p2_M900"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M900.root"                    
               self.filenames["BulkG_c0p2_M1000"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M1000.root"                    
+              self.filenames["BulkG_c0p2_M1100"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M1100.root"                    
               self.filenames["BulkG_c0p2_M1200"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M1200.root"                    
+              self.filenames["BulkG_c0p2_M1300"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M1300.root"                    
+              self.filenames["BulkG_c0p2_M1400"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M1400.root"                    
               self.filenames["BulkG_c0p2_M1500"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M1500.root"                    
               self.filenames["BulkG_c0p2_M1600"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M1600.root"                    
-#              self.filenames["BulkG_c0p2_M2000"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M2000.root"                    
+              self.filenames["BulkG_c0p2_M1700"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M1700.root"                    
+              self.filenames["BulkG_c0p2_M1800"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M1800.root"                    
+              self.filenames["BulkG_c0p2_M1900"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M1900.root"                    
+              self.filenames["BulkG_c0p2_M2000"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M2000.root"                    
+              self.filenames["BulkG_c0p2_M2100"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M2100.root"                    
+              self.filenames["BulkG_c0p2_M2200"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M2200.root"                    
+              self.filenames["BulkG_c0p2_M2300"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M2300.root"                    
+              self.filenames["BulkG_c0p2_M2400"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M2400.root"                    
+              self.filenames["BulkG_c0p2_M2500"] = self.filepath + "RD_el_BulkG_WW_lvjj_c0p2_M2500.root"                    
 
 
       def GetLumiScaleFactor(self,txtfile,keyname):

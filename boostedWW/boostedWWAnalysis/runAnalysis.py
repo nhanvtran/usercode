@@ -57,8 +57,8 @@ if __name__ == '__main__':
     
     print "Welcome to the boosted analysis..."
 
-    sourcefiledirectory = "/gwteray/users/gerosa/RD_Trees_v1/";    
-    outputfiledirectory = "/gwteray/users/gerosa/otrees/";    
+    sourcefiledirectory = "/gwteray/users/gerosa/RD_Trees_Production/RD_Trees_ExoLeptonID/";    
+    outputfiledirectory = "/gwteray/users/gerosa/otrees/otrees_ExoLeptonID_v2/";    
 
     # ---------------------------------------------------
     # check if directories exists
@@ -85,7 +85,6 @@ if __name__ == '__main__':
 
     treename = ""
     if options.makeControlPlots or options.makeTTBarControlPlots: 
-#       sourcefiledirectory = "/uscmst1b_scratch/lpc1/3DayLifetime/weizou/BoostedWSample_v2/"
        treename = "WJet"
     if options.makeTMVAPlots:
        sourcefiledirectory = "/uscms_data/d3/weizou/VBFHiggsAnalysis/BoostedWAnalysis2012/boostedWWAnalysis/trainingtrees_%s/"%(CHANNEL)
@@ -100,79 +99,124 @@ if __name__ == '__main__':
     
     datasample = sampleWrapperClass("data",boostedWSamples.GetFileNames()["data"],CHANNEL,LUMI,LUMI,boostedWSamples.GetTreeName(),isData,outputfiledirectory)
     
-    #sigSCF = 200.;
-    #ggH600SampleXS = 8.55627E1*sigSCF;
-    #ggH600Sample_EffLumi = 197170/ggH600SampleXS;
     ggH600Sample = sampleWrapperClass("ggH600",boostedWSamples.GetFileNames()["ggH600"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH600")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+    
     ggH700Sample = sampleWrapperClass("ggH700",boostedWSamples.GetFileNames()["ggH700"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH700")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+    
     ggH800Sample = sampleWrapperClass("ggH800",boostedWSamples.GetFileNames()["ggH800"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH800")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+    
     ggH900Sample = sampleWrapperClass("ggH900",boostedWSamples.GetFileNames()["ggH900"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH900")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+    
     ggH1000Sample = sampleWrapperClass("ggH1000",boostedWSamples.GetFileNames()["ggH1000"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ggH1000")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
 
     vbfH600Sample = sampleWrapperClass("vbfH600",boostedWSamples.GetFileNames()["vbfH600"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"vbfH600")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
     vbfH700Sample = sampleWrapperClass("vbfH700",boostedWSamples.GetFileNames()["vbfH700"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"vbfH700")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
     vbfH800Sample = sampleWrapperClass("vbfH800",boostedWSamples.GetFileNames()["vbfH800"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"vbfH800")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
     vbfH900Sample = sampleWrapperClass("vbfH900",boostedWSamples.GetFileNames()["vbfH900"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"vbfH900")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
     vbfH1000Sample = sampleWrapperClass("vbfH1000",boostedWSamples.GetFileNames()["vbfH1000"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"vbfH1000")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
 
 
     rsg1000Sample_kMpl01_py = sampleWrapperClass("rsg1000_kMpl01_py",boostedWSamples.GetFileNames()["rsg1000_kMpl01_py"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"rsg1000_kMpl01_py")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
     rsg1000Sample_kMpl01_hw = sampleWrapperClass("rsg1000_kMpl01_hw",boostedWSamples.GetFileNames()["rsg1000_kMpl01_hw"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"rsg1000_kMpl01_hw")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
     rsg1500Sample_kMpl01_py = sampleWrapperClass("rsg1500_kMpl01_py",boostedWSamples.GetFileNames()["rsg1500_kMpl01_py"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"rsg1500_kMpl01_py")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
     rsg1500Sample_kMpl01_hw = sampleWrapperClass("rsg1500_kMpl01_hw",boostedWSamples.GetFileNames()["rsg1500_kMpl01_hw"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"rsg1500_kMpl01_hw")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
     rsg2000Sample_kMpl01_py = sampleWrapperClass("rsg2000_kMpl01_py",boostedWSamples.GetFileNames()["rsg2000_kMpl01_py"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"rsg2000_kMpl01_py")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
 
-    BulkG_c0p2_M600 =  sampleWrapperClass("BulkG_c0p2_M600",boostedWSamples.GetFileNames()["BulkG_c0p2_M600"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M600")),
-    LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
-    BulkG_c0p2_M1000 =  sampleWrapperClass("BulkG_c0p2_M1000",boostedWSamples.GetFileNames()["BulkG_c0p2_M1000"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1000")),
-    LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
-    BulkG_c0p2_M1200 =  sampleWrapperClass("BulkG_c0p2_M1200",boostedWSamples.GetFileNames()["BulkG_c0p2_M1200"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1200")),
-    LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
-    BulkG_c0p2_M1500 =  sampleWrapperClass("BulkG_c0p2_M1500",boostedWSamples.GetFileNames()["BulkG_c0p2_M1500"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1500")),
-    LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
-    BulkG_c0p2_M1600 =  sampleWrapperClass("BulkG_c0p2_M1600",boostedWSamples.GetFileNames()["BulkG_c0p2_M1600"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1600")),
-    LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
-#    BulkG_c0p2_M2000 =  sampleWrapperClass("BulkG_c0p2_M2000",boostedWSamples.GetFileNames()["BulkG_c0p2_M2000"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M2000")),
-#    LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
-     
+    BulkG_c0p2_M600 =  sampleWrapperClass("BulkG_c0p2_M600",boostedWSamples.GetFileNames()["BulkG_c0p2_M600"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M600")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M700 =  sampleWrapperClass("BulkG_c0p2_M700",boostedWSamples.GetFileNames()["BulkG_c0p2_M700"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M700")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M800 =  sampleWrapperClass("BulkG_c0p2_M800",boostedWSamples.GetFileNames()["BulkG_c0p2_M800"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M800")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M900 =  sampleWrapperClass("BulkG_c0p2_M900",boostedWSamples.GetFileNames()["BulkG_c0p2_M900"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M900")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M1000 =  sampleWrapperClass("BulkG_c0p2_M1000",boostedWSamples.GetFileNames()["BulkG_c0p2_M1000"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1000")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M1100 =  sampleWrapperClass("BulkG_c0p2_M1100",boostedWSamples.GetFileNames()["BulkG_c0p2_M1100"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1100")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M1200 =  sampleWrapperClass("BulkG_c0p2_M1200",boostedWSamples.GetFileNames()["BulkG_c0p2_M1200"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1200")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M1300 =  sampleWrapperClass("BulkG_c0p2_M1300",boostedWSamples.GetFileNames()["BulkG_c0p2_M1300"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1300")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M1400 =  sampleWrapperClass("BulkG_c0p2_M1400",boostedWSamples.GetFileNames()["BulkG_c0p2_M1400"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1400")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M1500 =  sampleWrapperClass("BulkG_c0p2_M1500",boostedWSamples.GetFileNames()["BulkG_c0p2_M1500"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1500")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M1600 =  sampleWrapperClass("BulkG_c0p2_M1600",boostedWSamples.GetFileNames()["BulkG_c0p2_M1600"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1600")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M1700 =  sampleWrapperClass("BulkG_c0p2_M1700",boostedWSamples.GetFileNames()["BulkG_c0p2_M1700"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1700")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M1800 =  sampleWrapperClass("BulkG_c0p2_M1800",boostedWSamples.GetFileNames()["BulkG_c0p2_M1800"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1800")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
     
-    #boostedWXS = 1.3*228.9E3;
-    #WJetsSample_EffLumi = 8955318/boostedWXS;
+    BulkG_c0p2_M1900 =  sampleWrapperClass("BulkG_c0p2_M1900",boostedWSamples.GetFileNames()["BulkG_c0p2_M1900"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M1900")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M2000 =  sampleWrapperClass("BulkG_c0p2_M2000",boostedWSamples.GetFileNames()["BulkG_c0p2_M2000"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M2000")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M2100 =  sampleWrapperClass("BulkG_c0p2_M2100",boostedWSamples.GetFileNames()["BulkG_c0p2_M2100"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M2100")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+  
+    BulkG_c0p2_M2200 =  sampleWrapperClass("BulkG_c0p2_M2200",boostedWSamples.GetFileNames()["BulkG_c0p2_M2200"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M2200")),    LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M2300 =  sampleWrapperClass("BulkG_c0p2_M2300",boostedWSamples.GetFileNames()["BulkG_c0p2_M2300"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M2300")),    LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M2400 =  sampleWrapperClass("BulkG_c0p2_M2400",boostedWSamples.GetFileNames()["BulkG_c0p2_M2400"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M2400")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+    BulkG_c0p2_M2500 =  sampleWrapperClass("BulkG_c0p2_M2500",boostedWSamples.GetFileNames()["BulkG_c0p2_M2500"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"BulkG_c0p2_M2500")), LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
+
     WJets_PythiaSample = sampleWrapperClass("WJets_Pythia",boostedWSamples.GetFileNames()["WJets_Pythia"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Pythia")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
     WJets_Pythia180Sample = sampleWrapperClass("WJets_Pythia180",boostedWSamples.GetFileNames()["WJets_Pythia180"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Pythia180")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+
     WJets_HerwigSample = sampleWrapperClass("WJets_Herwig",boostedWSamples.GetFileNames()["WJets_Herwig"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WJets_Herwig")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
+    
     ZJetsSample = sampleWrapperClass("ZJets",boostedWSamples.GetFileNames()["ZJets"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZJets")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory)
 
-    #TTbarSample_EffLumi = 6893735/225197.;
     TTbarSample = sampleWrapperClass("TTbar",boostedWSamples.GetFileNames()["TTbar"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
+    
     TTbarSample_matchDn = sampleWrapperClass("TTbar_matchDn",boostedWSamples.GetFileNames()["TTbar_matchDn"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_matchDn")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
+
     TTbarSample_matchUp = sampleWrapperClass("TTbar_matchUp",boostedWSamples.GetFileNames()["TTbar_matchUp"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_matchUp")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
+
     TTbarSample_Powheg = sampleWrapperClass("TTbar_Powheg",boostedWSamples.GetFileNames()["TTbar_Powheg"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_Powheg")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
+
     TTbarSample_scaleDn = sampleWrapperClass("TTbar_scaleDn",boostedWSamples.GetFileNames()["TTbar_scaleDn"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_scaleDn")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
+
     TTbarSample_scaleUp = sampleWrapperClass("TTbar_scaleUp",boostedWSamples.GetFileNames()["TTbar_scaleUp"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"TTbar_scaleUp")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
 
-    #WWSample_EffLumi = 9450414/33.61E3;
     WWSample = sampleWrapperClass("WW",boostedWSamples.GetFileNames()["WW"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WW")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
-   # WZSample_EffLumi = 10000267/12.63E3;
+
     WZSample = sampleWrapperClass("WZ",boostedWSamples.GetFileNames()["WZ"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"WZ")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
-    #ZZSample_EffLumi = 9702850/5.196E3;
+
     ZZSample = sampleWrapperClass("ZZ",boostedWSamples.GetFileNames()["ZZ"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"ZZ")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
    
     tchSample = sampleWrapperClass("tch",boostedWSamples.GetFileNames()["tch"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tch")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
+
     tWchSample = sampleWrapperClass("tWch",boostedWSamples.GetFileNames()["tWch"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tWch")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
+
     schSample = sampleWrapperClass("sch",boostedWSamples.GetFileNames()["sch"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"sch")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
+
     tch_barSample = sampleWrapperClass("tch_bar",boostedWSamples.GetFileNames()["tch_bar"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tch_bar")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
+
     tWch_barSample = sampleWrapperClass("tWch_bar",boostedWSamples.GetFileNames()["tWch_bar"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"tWch_bar")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
+
     sch_barSample = sampleWrapperClass("sch_bar",boostedWSamples.GetFileNames()["sch_bar"],CHANNEL,1.0/(boostedWSamples.GetLumiScaleFactor(lumifile,"sch_bar")),LUMI,boostedWSamples.GetTreeName(),notData,outputfiledirectory);
 
-    #mcbackgrounds = [WJetsSample,WWSample,WZSample,ZZSample,TTbarSample]
-    #myPlotter = plotterClass( ggH600Sample, mcbackgrounds, datasample );
 
     allSamples = [datasample,
                   ggH600Sample,ggH700Sample,ggH800Sample,ggH900Sample,ggH1000Sample,
                   vbfH600Sample,vbfH700Sample,vbfH800Sample,vbfH900Sample,vbfH1000Sample,
                   rsg1000Sample_kMpl01_py,rsg1000Sample_kMpl01_hw,rsg1500Sample_kMpl01_py,rsg1500Sample_kMpl01_hw,rsg2000Sample_kMpl01_py,
-                  BulkG_c0p2_M600,BulkG_c0p2_M1000,BulkG_c0p2_M1200,BulkG_c0p2_M1500,BulkG_c0p2_M1600,#BulkG_c0p2_M2000, 
+                  BulkG_c0p2_M600,BulkG_c0p2_M700,BulkG_c0p2_M800,BulkG_c0p2_M900,BulkG_c0p2_M1000,BulkG_c0p2_M1100,BulkG_c0p2_M1200,
+                  BulkG_c0p2_M1300,BulkG_c0p2_M1400,BulkG_c0p2_M1500,BulkG_c0p2_M1600,BulkG_c0p2_M1700,BulkG_c0p2_M1800,BulkG_c0p2_M1900,BulkG_c0p2_M2000,
+                  BulkG_c0p2_M2100,BulkG_c0p2_M2200,BulkG_c0p2_M2300,BulkG_c0p2_M2400,BulkG_c0p2_M2500,
                   WJets_PythiaSample,WJets_Pythia180Sample,WJets_HerwigSample,ZJetsSample,TTbarSample,
                   TTbarSample_matchDn,TTbarSample_matchUp,TTbarSample_scaleDn,TTbarSample_scaleUp,TTbarSample_Powheg,
                   WWSample,WZSample,ZZSample,
@@ -187,35 +231,8 @@ if __name__ == '__main__':
 
         if options.sampleToProcess == None:
             datasample.createTrainingTree();
-#            vbfH600Sample.createTrainingTree();
-#            vbfH700Sample.createTrainingTree();        
-#            vbfH800Sample.createTrainingTree();        
-#            vbfH900Sample.createTrainingTree();        
-#            vbfH1000Sample.createTrainingTree(); 
-#            ggH600Sample.createTrainingTree();
-#            ggH700Sample.createTrainingTree();        
-#            ggH800Sample.createTrainingTree();        
-#            ggH900Sample.createTrainingTree();        
-#            ggH1000Sample.createTrainingTree();        
-#            WJets_HerwigSample.createTrainingTree();
-#            WJets_PythiaSample.createTrainingTree();
             WJets_Pythia180Sample.createTrainingTree();
-#            ZJetsSample.createTrainingTree();
-#            TTbarSample.createTrainingTree();
-#            TTbarSample_matchDn.createTrainingTree();
-#            TTbarSample_matchUp.createTrainingTree();
-#            TTbarSample_Powheg.createTrainingTree();
-#            TTbarSample_scaleDn.createTrainingTree();            
-#            TTbarSample_scaleUp.createTrainingTree();            
-#            WWSample.createTrainingTree();
-#            WZSample.createTrainingTree();
-#            ZZSample.createTrainingTree();
-#            tchSample.createTrainingTree();
-#            tWchSample.createTrainingTree();
-#            schSample.createTrainingTree();
-#            tch_barSample.createTrainingTree();
-#            tWch_barSample.createTrainingTree();
-#            sch_barSample.createTrainingTree();
+
         else:
             for i in range(len(allSamples)):
                 if options.sampleToProcess == allSamples[i].getLabel():
