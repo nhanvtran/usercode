@@ -215,14 +215,14 @@ class doFit_wj_and_wlvj:
         #medium wtagger_eff reweight between data and mc
         if self.channel=="mu":
             self.rrv_wtagger_eff_reweight_forT=RooRealVar("rrv_wtagger_eff_reweight_forT","rrv_wtagger_eff_reweight_forT",0.94); self.rrv_wtagger_eff_reweight_forT.setError(0.04*self.rrv_wtagger_eff_reweight_forT.getVal());
-            self.rrv_wtagger_eff_reweight_forV=RooRealVar("rrv_wtagger_eff_reweight_forV","rrv_wtagger_eff_reweight_forV",0.91); self.rrv_wtagger_eff_reweight_forV.setError(0.11*self.rrv_wtagger_eff_reweight_forV.getVal());
+            self.rrv_wtagger_eff_reweight_forV=RooRealVar("rrv_wtagger_eff_reweight_forV","rrv_wtagger_eff_reweight_forV",0.90); self.rrv_wtagger_eff_reweight_forV.setError(0.11*self.rrv_wtagger_eff_reweight_forV.getVal());
         if self.channel=="el":
-            self.rrv_wtagger_eff_reweight_forT=RooRealVar("rrv_wtagger_eff_reweight_forT","rrv_wtagger_eff_reweight_forT",0.95); self.rrv_wtagger_eff_reweight_forT.setError(0.05*self.rrv_wtagger_eff_reweight_forT.getVal());
-            self.rrv_wtagger_eff_reweight_forV=RooRealVar("rrv_wtagger_eff_reweight_forV","rrv_wtagger_eff_reweight_forV",0.94); self.rrv_wtagger_eff_reweight_forV.setError(0.14*self.rrv_wtagger_eff_reweight_forV.getVal());
+            self.rrv_wtagger_eff_reweight_forT=RooRealVar("rrv_wtagger_eff_reweight_forT","rrv_wtagger_eff_reweight_forT",0.91); self.rrv_wtagger_eff_reweight_forT.setError(0.05*self.rrv_wtagger_eff_reweight_forT.getVal());
+            self.rrv_wtagger_eff_reweight_forV=RooRealVar("rrv_wtagger_eff_reweight_forV","rrv_wtagger_eff_reweight_forV",0.96); self.rrv_wtagger_eff_reweight_forV.setError(0.13*self.rrv_wtagger_eff_reweight_forV.getVal());
         print "wtagger efficiency correction for Top sample: %s +/- %s"%(self.rrv_wtagger_eff_reweight_forT.getVal(), self.rrv_wtagger_eff_reweight_forT.getError());
         print "wtagger efficiency correction for V   sample: %s +/- %s"%(self.rrv_wtagger_eff_reweight_forV.getVal(), self.rrv_wtagger_eff_reweight_forV.getError());
 
-        self.mean_shift=0.9; self.sigma_scale=1.194; #correct the W-jet mass peak difference between data and MC
+        self.mean_shift=1.2; self.sigma_scale=1.109; #correct the W-jet mass peak difference between data and MC
 
         #PU study: 0-11,11-15,15-100
         self.nPV_min=  0;
