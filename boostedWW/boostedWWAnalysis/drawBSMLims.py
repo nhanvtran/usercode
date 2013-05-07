@@ -142,7 +142,7 @@ def makeSMLimits(SIGCH):
     hrl_SM = can_SM.DrawFrame(599,0.0,1001,10.0);
     hrl_SM.GetYaxis().SetTitle("#mu = #sigma_{95%} / #sigma_{SM}");
     hrl_SM.GetYaxis().SetTitleOffset(1.4);
-    hrl_SM.GetXaxis().SetTitle("Higgs boson mass (GeV)");
+    hrl_SM.GetXaxis().SetTitle("Higgs boson mass (GeV/c^{2})");
     #can_SM.SetGrid();
     
     curGraph_2s.Draw("F");
@@ -273,7 +273,7 @@ def makeBSMLimits_vsMass( SIGCH, cprimes ):
     hrl_BSM = can_BSM.DrawFrame(599,0.0,1001,gridMax*1.5);
     hrl_BSM.GetYaxis().SetTitle("#mu = #sigma_{95%} / #sigma_{SM}");
     hrl_BSM.GetYaxis().SetTitleOffset(1.4);
-    hrl_BSM.GetXaxis().SetTitle("Higgs boson mass (GeV)");
+    hrl_BSM.GetXaxis().SetTitle("Higgs boson mass (GeV/c^{2})");
     #can_BSM.SetGrid();
     can_BSM.SetRightMargin(0.1);
     
@@ -312,7 +312,7 @@ def makeBSMLimits_vsMass( SIGCH, cprimes ):
     hrl_BSMsig = can_BSMsig.DrawFrame(599,0.0,1001,gridMaxSig*1.8);
     hrl_BSMsig.GetYaxis().SetTitle("#sigma_{95%} #times BR_{WW} (pb)");
     hrl_BSMsig.GetYaxis().SetTitleOffset(1.4);
-    hrl_BSMsig.GetXaxis().SetTitle("Higgs boson mass (GeV)");
+    hrl_BSMsig.GetXaxis().SetTitle("Higgs boson mass (GeV/c^{2})");
     #can_BSMsig.SetGrid();
     can_BSMsig.SetRightMargin(0.1);
 
@@ -446,7 +446,7 @@ def makeBSMLimits_vsBRnew( SIGCH, cprimes, mass ):
     banner = TLatex(0.47,0.91,("CMS Preliminary, 19.3 fb^{-1} at #sqrt{s}=8TeV, e+#mu"));
     banner.SetNDC(); banner.SetTextSize(0.028);
 
-    banner2 = TLatex(0.17,0.91,("Higgs mass, %i GeV"%(mass)));
+    banner2 = TLatex(0.17,0.91,("Higgs mass, %i GeV/c^{2}"%(mass)));
     banner2.SetNDC(); banner2.SetTextSize(0.028);
     
     can_BSM = ROOT.TCanvas("can_BSM","can_BSM",1000,800);
