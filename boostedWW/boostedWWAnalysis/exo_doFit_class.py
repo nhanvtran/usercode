@@ -1,3 +1,4 @@
+
 #! /usr/bin/env python
 import os
 import glob
@@ -50,6 +51,7 @@ parser.add_option('--closuretest', action='store',type="int", dest='closuretest'
 parser.add_option('--cprime', action="store",type="int",dest="cprime",default=10)
 parser.add_option('--BRnew', action="store",type="int",dest="BRnew",default=0)
 parser.add_option('--inPath', action="store",type="string",dest="inPath",default="./")
+parser.add_option('--wtaggerCateogry', action="store",type="string",dest="wtaggerCategory",default="highPurity")
 
 
 (options, args) = parser.parse_args()
@@ -197,19 +199,12 @@ class doFit_wj_and_wlvj:
             'Other_Backgrounds'  : kBlue
         }
 
-        #self.wtagger_label="tight";#50%
-        self.wtagger_label="medium";#75%
-        #self.wtagger_label="loose";#90%
-        #self.wtagger_label="nocut";#nocut
-        if self.wtagger_label=="tight":
-            if self.channel=="el":self.wtagger_cut=0.43  ;
-            if self.channel=="mu":self.wtagger_cut=0.43  ;
-        if self.wtagger_label=="medium":
-            if self.channel=="el":self.wtagger_cut=0.5   ;
-            if self.channel=="mu":self.wtagger_cut=0.5   ;
-        if self.wtagger_label=="loose":
-            if self.channel=="el":self.wtagger_cut=0.66  ;
-            if self.channel=="mu":self.wtagger_cut=0.65  ;
+        self.wtagger_label=options.wtaggerCategory;
+        
+        if self.wtagger_label=="highPurity":
+            if self.channel=="el":self.wtagger_cut=0.5   ; self.wtagger_cut_min=0.  ;
+            if self.channel=="mu":self.wtagger_cut=0.5   ; self.wtagger_cut_min=0.  ;
+        if self.wtagger_label=="lowPurity": self.wtagger_cut=0.75  ; self.wtagger_cut_min=0.5 ;  
         if self.wtagger_label=="nocut": self.wtagger_cut=10000;
 
         #medium wtagger_eff reweight between data and mc
@@ -2432,7 +2427,7 @@ class doFit_wj_and_wlvj:
         hnum_4region=TH1D("hnum_4region"+label+"_"+self.channel,"hnum_4region"+label+"_"+self.channel,4,-1.5,2.5);# m_j   -1: sb_lo; 0:signal_region; 1: sb_hi; 2:total
         hnum_2region=TH1D("hnum_2region"+label+"_"+self.channel,"hnum_2region"+label+"_"+self.channel,2,-0.5,1.5);# m_lvj  0: signal_region; 1: total
         for i in range(treeIn.GetEntries()):
-            if i % 10000 == 0: print "i: ",i
+            if i % 100000 == 0: print "i: ",i
             treeIn.GetEntry(i);
             if i==0:
                 tmp_scale_to_lumi=treeIn.wSampleWeight;
@@ -2441,7 +2436,7 @@ class doFit_wj_and_wlvj:
 
             wtagger=-1;
             wtagger=treeIn.jet_tau2tau1;
-            if wtagger <self.wtagger_cut:
+            if wtagger <self.wtagger_cut and wtagger > self.wtagger_cut_min :
                 discriminantCut=True;
             else:
                 discriminantCut=False;
@@ -2450,7 +2445,7 @@ class doFit_wj_and_wlvj:
             tmp_jet_mass=getattr(treeIn, jet_mass);
 
             #if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjetsSSVHE < 1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.v_pt > self.vpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.l_pt > self.lpt_cut:
-            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjets_csvm_veto < 1 and treeIn.mass_lvj >= rrv_mass_lvj.getMin() and treeIn.mass_lvj<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.v_pt > self.vpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.l_pt > self.lpt_cut and treeIn.issignal==1:
+            if treeIn.ungroomed_jet_pt > 200. and discriminantCut and tmp_jet_mass >= rrv_mass_j.getMin() and tmp_jet_mass<=rrv_mass_j.getMax() and treeIn.nbjets_csvm_veto < 1 and treeIn.mass_lvj_type2 >= rrv_mass_lvj.getMin() and treeIn.mass_lvj_type2<=rrv_mass_lvj.getMax() and  treeIn.nPV >=self.nPV_min and treeIn.nPV<=self.nPV_max and treeIn.v_pt > self.vpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.l_pt > self.lpt_cut and treeIn.issignal==1:
                 #print tmp_jet_mass_dn, tmp_jet_mass, tmp_jet_mass_up;
                 tmp_event_weight= treeIn.totalEventWeight;
                 tmp_event_weight4fit= treeIn.eff_and_pu_Weight;
@@ -2468,7 +2463,7 @@ class doFit_wj_and_wlvj:
                         tmp_event_weight=tmp_event_weight*self.rrv_wtagger_eff_reweight_forV.getVal();
                     tmp_event_weight=tmp_event_weight*self.btag_scale;
                 
-                rrv_mass_lvj.setVal(treeIn.mass_lvj);
+                rrv_mass_lvj.setVal(treeIn.mass_lvj_type2);
                 if tmp_jet_mass >= self.mj_sideband_lo_min and tmp_jet_mass < self.mj_sideband_lo_max:
                     rdataset_sb_lo_mlvj.add( RooArgSet( rrv_mass_lvj ), tmp_event_weight );
                     rdataset4fit_sb_lo_mlvj.add( RooArgSet( rrv_mass_lvj ), tmp_event_weight4fit );
@@ -2482,7 +2477,7 @@ class doFit_wj_and_wlvj:
                     combData.add(RooArgSet(rrv_mass_lvj,data_category),tmp_event_weight);
                     combData4fit.add(RooArgSet(rrv_mass_lvj,data_category),tmp_event_weight4fit);
                     hnum_2region.Fill(1,tmp_event_weight);
-                    if treeIn.mass_lvj >=self.mlvj_signal_min  and treeIn.mass_lvj <self.mlvj_signal_max: hnum_2region.Fill(0,tmp_event_weight);
+                    if treeIn.mass_lvj_type2 >=self.mlvj_signal_min  and treeIn.mass_lvj_type2 <self.mlvj_signal_max: hnum_2region.Fill(0,tmp_event_weight);
                 if tmp_jet_mass >= self.mj_sideband_hi_min and tmp_jet_mass < self.mj_sideband_hi_max:
                     rdataset_sb_hi_mlvj.add( RooArgSet( rrv_mass_lvj ), tmp_event_weight );
                     rdataset4fit_sb_hi_mlvj.add( RooArgSet( rrv_mass_lvj ), tmp_event_weight4fit );
@@ -2655,7 +2650,7 @@ class doFit_wj_and_wlvj:
                 category_p_f.setLabel("pass"); combData_p_f.add(RooArgSet(rrv_mass_j,category_p_f),tmp_event_weight);
                 #category_p_f.setLabel("pass"); combData_p_f.add(RooArgSet(rrv_mass_j,category_p_f),tmp_event_weight4fit);
 
-            if  treeIn.mass_lvj < rrv_mass_lvj.getMax() and treeIn.mass_lvj > rrv_mass_lvj.getMin() and (treeIn.ttb_nak5_same_csvm > 0 or treeIn.ttb_nak5_oppoveto_csvm > 0)  and treeIn.isttbar > 0 and treeIn.v_pt > self.vpt_cut and treeIn.l_pt >= self.lpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.ttb_ca8_ungroomed_pt > 200 and tmp_jet_mass>rrv_mass_j.getMin() and tmp_jet_mass<rrv_mass_j.getMax():
+            if  treeIn.mass_lvj_type2 < rrv_mass_lvj.getMax() and treeIn.mass_lvj_type2 > rrv_mass_lvj.getMin() and (treeIn.ttb_nak5_same_csvm > 0 or treeIn.ttb_nak5_oppoveto_csvm > 0)  and treeIn.isttbar > 0 and treeIn.v_pt > self.vpt_cut and treeIn.l_pt >= self.lpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.ttb_ca8_ungroomed_pt > 200 and tmp_jet_mass>rrv_mass_j.getMin() and tmp_jet_mass<rrv_mass_j.getMax():
             #if treeIn.mass_lvj < 1400 and treeIn.mass_lvj > 400 and (treeIn.ttb_nak5_same_csvm > 0 or treeIn.ttb_nak5_oppoveto_csvm > 0)  and treeIn.isttbar > 0 and treeIn.v_pt > self.vpt_cut and treeIn.l_pt >= self.lpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.ttb_ca8_ungroomed_pt > 200 and tmp_jet_mass>rrv_mass_j.getMin() and tmp_jet_mass<rrv_mass_j.getMax():
             #if treeIn.mass_lvj > 0 and (treeIn.ttb_nak5_same_csvm > 0 or treeIn.ttb_nak5_oppoveto_csvm > 0)  and treeIn.isttbar > 0 and treeIn.v_pt >  self.vpt_cut and treeIn.l_pt >= self.lpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.ttb_ca8_ungroomed_pt > 200 and tmp_jet_mass>rrv_mass_j.getMin() and tmp_jet_mass<rrv_mass_j.getMax():
 
@@ -2674,7 +2669,7 @@ class doFit_wj_and_wlvj:
                 category_cut.setLabel("beforecut"); combData4cut.add(RooArgSet(rrv_mass_j,category_cut),tmp_event_weight4fit);
                 #category_cut.setLabel("beforecut"); combData4cut.add(RooArgSet(rrv_mass_j,category_cut),tmp_event_weight);
 
-            if (not discriminantCut) and treeIn.mass_lvj < rrv_mass_lvj.getMax() and treeIn.mass_lvj > rrv_mass_lvj.getMin() and (treeIn.ttb_nak5_same_csvm > 0 or treeIn.ttb_nak5_oppoveto_csvm > 0)  and treeIn.isttbar > 0 and treeIn.v_pt > self.vpt_cut and treeIn.l_pt >= self.lpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.ttb_ca8_ungroomed_pt > 200 and tmp_jet_mass>rrv_mass_j.getMin() and tmp_jet_mass<rrv_mass_j.getMax():
+            if (not discriminantCut) and treeIn.mass_lvj_type2 < rrv_mass_lvj.getMax() and treeIn.mass_lvj_type2 > rrv_mass_lvj.getMin() and (treeIn.ttb_nak5_same_csvm > 0 or treeIn.ttb_nak5_oppoveto_csvm > 0)  and treeIn.isttbar > 0 and treeIn.v_pt > self.vpt_cut and treeIn.l_pt >= self.lpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.ttb_ca8_ungroomed_pt > 200 and tmp_jet_mass>rrv_mass_j.getMin() and tmp_jet_mass<rrv_mass_j.getMax():
             #if (not discriminantCut) and treeIn.mass_lvj < 1400 and treeIn.mass_lvj > 400 and (treeIn.ttb_nak5_same_csvm > 0 or treeIn.ttb_nak5_oppoveto_csvm > 0)  and treeIn.isttbar > 0 and treeIn.v_pt > self.vpt_cut and treeIn.l_pt >= self.lpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.ttb_ca8_ungroomed_pt > 200 and tmp_jet_mass>rrv_mass_j.getMin() and tmp_jet_mass<rrv_mass_j.getMax():
             #if (not discriminantCut) and treeIn.mass_lvj > 0 and (treeIn.ttb_nak5_same_csvm > 0 or treeIn.ttb_nak5_oppoveto_csvm > 0)  and treeIn.isttbar > 0 and treeIn.v_pt >  self.vpt_cut and treeIn.l_pt >= self.lpt_cut and treeIn.pfMET > self.pfMET_cut and treeIn.ttb_ca8_ungroomed_pt > 200 and tmp_jet_mass>rrv_mass_j.getMin() and tmp_jet_mass<rrv_mass_j.getMax():
 
