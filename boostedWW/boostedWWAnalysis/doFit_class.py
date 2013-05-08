@@ -1911,20 +1911,34 @@ class doFit_wj_and_wlvj:
         wtagger_eff_MC  = number_dataset_signal_region_TotalMC_mj/number_dataset_signal_region_before_mva_TotalMC_mj;
         wtagger_eff_data= number_dataset_signal_region_data_mj/number_dataset_signal_region_before_mva_data_mj;
 
+        wtagger_eff_MC_err=wtagger_eff_MC*TMath.Sqrt(
+                number_dataset_signal_region_error2_TotalMC_mj/number_dataset_signal_region_TotalMC_mj/number_dataset_signal_region_TotalMC_mj +  
+                number_dataset_signal_region_before_mva_error2_TotalMC_mj/number_dataset_signal_region_before_mva_TotalMC_mj/number_dataset_signal_region_before_mva_TotalMC_mj 
+                );
+        wtagger_eff_data_err=wtagger_eff_data*TMath.Sqrt(
+                number_dataset_signal_region_error2_data_mj/number_dataset_signal_region_data_mj/number_dataset_signal_region_data_mj +  
+                number_dataset_signal_region_before_mva_error2_data_mj/number_dataset_signal_region_before_mva_data_mj/number_dataset_signal_region_before_mva_data_mj  
+                );
+  
+
+
+
         wtagger_eff_reweight=wtagger_eff_data/wtagger_eff_MC;
         wtagger_eff_reweight_err=wtagger_eff_reweight*TMath.Sqrt(
                 number_dataset_signal_region_error2_data_mj/number_dataset_signal_region_data_mj/number_dataset_signal_region_data_mj +  
                 number_dataset_signal_region_error2_TotalMC_mj/number_dataset_signal_region_TotalMC_mj/number_dataset_signal_region_TotalMC_mj +  
-                number_dataset_signal_region_before_mva_error2_data_mj/number_dataset_signal_region_before_mva_data_mj/number_dataset_signal_region_data_mj +  
+                number_dataset_signal_region_before_mva_error2_data_mj/number_dataset_signal_region_before_mva_data_mj/number_dataset_signal_region_before_mva_data_mj +  
                 number_dataset_signal_region_before_mva_error2_TotalMC_mj/number_dataset_signal_region_before_mva_TotalMC_mj/number_dataset_signal_region_before_mva_TotalMC_mj 
                 );
+        print number_dataset_signal_region_error2_data_mj;
+        print number_dataset_signal_region_data_mj
         
         print "wtagger efficiency of %s channel"%(self.channel )
         print "wtagger_eff_MC   = %s "%(wtagger_eff_MC )
         print "wtagger_eff_data = %s "%(wtagger_eff_data )
         print "wtagger_eff_reweight = %s +/- %s"%(wtagger_eff_reweight, wtagger_eff_reweight_err)
-        self.file_out_ttbar_control.write("wtagger_eff_MC   = %s \n"%(wtagger_eff_MC ));
-        self.file_out_ttbar_control.write("wtagger_eff_data = %s \n"%(wtagger_eff_data ));
+        self.file_out_ttbar_control.write("wtagger_eff_MC   = %s +/- %s, %0.3f\n"%(wtagger_eff_MC, wtagger_eff_MC_err, wtagger_eff_MC_err/wtagger_eff_MC ));
+        self.file_out_ttbar_control.write("wtagger_eff_data = %s +/- %s, %0.3f\n"%(wtagger_eff_data, wtagger_eff_data_err, wtagger_eff_data_err/wtagger_eff_data ));
         self.file_out_ttbar_control.write("wtagger_eff_reweight = %s +/- %s, %0.3f\n"%(wtagger_eff_reweight, wtagger_eff_reweight_err, wtagger_eff_reweight_err/wtagger_eff_reweight));
 
         ## wtagger reweight: reweight the event number difference in signal region after mva cut between MC and data
