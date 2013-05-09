@@ -270,7 +270,8 @@ void DrawLimit(char*channel, char* model="unbin", double el_lumi=19.3, double mu
 	theLeg.SetBorderSize(0);
 	theLeg.SetLineColor(0);
 	theLeg.SetFillColor(0);
-	theLeg.SetFillStyle(1001);
+	//theLeg.SetFillStyle(1001);
+	theLeg.SetFillStyle(0);
 	theLeg.SetLineWidth(0);
 	theLeg.SetLineStyle(0);
 	theLeg.SetTextFont(42);
