@@ -3343,7 +3343,8 @@ class doFit_wj_and_wlvj:
                 rrv_number_dataset.setError(0.)#(rdataset.sumEntries())**0.5);
                 draw_error_band(rdataset, model_pdf,rrv_number_dataset,rfresult_pdf,mplot_deco,self.color_palet["Uncertainty"],"F");
 
-            leg=self.legend4Plot(mplot_deco,0);
+            leg=self.legend4Plot(mplot_deco,-1,0,-0.05, 0);
+            #leg=self.legend4Plot(mplot_deco,0);
             mplot_deco.addObject(leg);
             self.draw_canvas( mplot_deco, "plots_%s_%s/other/"%(self.channel,self.PS_model), "m_lvj"+label+in_range+in_range+mlvj_model+"_deco")
 
