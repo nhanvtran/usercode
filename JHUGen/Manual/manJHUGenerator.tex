@@ -366,6 +366,26 @@ kinematically the same but are presented only to illustrate how one takes care o
 
 \end{verbatim}
 
+\subsection{Cross-section calculation and fraction notation}
+
+For a vector boson coupling, we can represent the four independent parameters by two  fractions 
+($f_{g2}$ and $f_{g4}$) and two phases ($\phi_{g2}$ and $\phi_{g4}$), defined for the $HZZ$
+and $HWW$ couplings as follows (ignoring $g_3$)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{eqnarray}
+&& f_{gi} =  \frac{|g^{}_{i}|^2\sigma_i}{|g^{}_{1}|^2\sigma_1+|g^{}_{2}|^2\sigma_2+|g^{}_{4}|^2\sigma_4}\,;
+~~~~~~~~~
+ \phi_{gi} = \arg\left(\frac{g_i}{g_1}\right)\,.
+\nonumber
+\label{eq:fractions}
+\end{eqnarray}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In order to obtain the cross-sections $\sigma_i$ corresponding to the $g^{}_{i}=1$ coupling, 
+generate large enough (e.g. {\tt VegasNc1=1000000}) number of unweighted events
+({\tt Unweighted=0}) with the corresponding couplings setup ($g^{}_{i}=1$, $g^{}_{j\ne i}=0$).
+
 %%%%%%%%%%%
 \section{ JHU Generator Matrix Elements (JHUGenME)}
 
@@ -381,12 +401,15 @@ $ make
 \rm
 \noindent
 The usage of the package is straight-forward and an example is given in \verb|testprogram.c|.  
-There are 4 main modules:
+There are 6 main modules allowing both specific production process and production-independent calculation:
 \begin{itemize}
 \item "modhiggs\_\_evalamp\_gg\_h\_vv": spin-0 matrix elements for $gg$ initiated processes
 \item "modzprime\_\_evalamp\_qqb\_zprime\_vv": spin-1 matrix elements for $q\bar{q}$ initiated processes
-\item "modgraviton\_\_evalamp\_gg\_g\_vv: spin-2 matrix elements for $gg$ initiated processes
-\item "modgraviton\_\_evalamp\_qqb\_g\_vv: spin-2 matrix elements for $q\bar{q}$ initiated processes
+\item "modgraviton\_\_evalamp\_gg\_g\_vv:" spin-2 matrix elements for $gg$ initiated processes
+\item "modgraviton\_\_evalamp\_qqb\_g\_vv": spin-2 matrix elements for $q\bar{q}$ initiated processes
+\item "modzprime\_\_evalamp\_zprime\_vv": spin-1 matrix elements production-independent
+\item "modgraviton\_\_evalamp\_g\_vv": spin-2 matrix elements production-independent
+
 \end{itemize}
 
 The inputs are the 4-vectors of the incoming patrons and outgoing particles in the CM frame of the object $X$.  
@@ -414,15 +437,15 @@ In going from \verb|v2.2.6| to \verb|v3.1.1|, the updates are as follows:
 
 To \verb|JHUGenerator|:
 \begin{itemize}
-\item Capability reading LHE files with Higgs boson production, allows NLO production of spin-0
-\item Extended the list of final state combinations
-\item Log messages, lhe file headers, and minor cleanup
+\item Capability reading LHE files with Higgs boson production, allows NLO production of spin-0;
+\item Extended the list of final state combinations;
+\item Log messages, lhe file headers, and minor cleanup.
 \end{itemize}
 
 To \verb|JHUGenME|:
 \begin{itemize}
-\item Production-independent JHUGenME for spin-0, 1, 2
-\item Complex couplings in JHUGenME input
+\item Production-independent JHUGenME for spin-0, 1, 2;
+\item Complex couplings in JHUGenME input.
 \end{itemize}
 
 \noindent
